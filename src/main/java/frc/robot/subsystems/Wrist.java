@@ -6,9 +6,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Arm extends SubsystemBase {
-  /** Creates a new Arm. */
-  public Arm() {}
+public class Wrist extends SubsystemBase {
+  /** Creates a new Wrist. */
+  public Wrist() {
+    // One motor for the wrist 
+    // factory default configs 
+  }
+  // control mode function 
+  // set percent output function
+  // shuffleboard funciton
 
   @Override
   public void periodic() {
