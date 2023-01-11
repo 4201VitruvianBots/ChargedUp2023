@@ -31,6 +31,7 @@ public class Elevator extends SubsystemBase {
    * Position and velocity will check for both motor's health
   */
 
+  // Rotations to inches conversion function
 
   @Override
   public void periodic() {

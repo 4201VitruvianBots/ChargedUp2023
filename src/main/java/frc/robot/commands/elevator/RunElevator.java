@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class IncrementElevatorHeight extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. */
-  public IncrementElevatorHeight() {
+public class RunElevator extends CommandBase {
+  /** Creates a new RunElevator. */
+  public RunElevator() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
