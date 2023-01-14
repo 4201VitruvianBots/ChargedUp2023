@@ -5,17 +5,29 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  /** Creates a new Intkae. */
+  private static final String Controlmode = null;
+/** Creates a new Intake. */
+  private boolean isIntaking = false; 
+  private TalonFX intakeMotor = new TalonFX(Constants.Intake.intakeMotor);
   public Intake() {
+    intakeMotor.configFactoryDefault();
     //factory default cofigs 
     // one or two motors
     
   }
-   // control mode function 
+  public void setIntakeSate(boolean state){
+    isIntaking = state;
+  }
+  public void setIntakePercentOutput(double value){
+    intakeMotor.set(Controlmode.PercentOutput, value);
+  }
+
+  // control mode function 
   // set percent output function
-  // shuffleboard funciton
+  // shuffleboard or smartdashboard funciton
 
 
   @Override
