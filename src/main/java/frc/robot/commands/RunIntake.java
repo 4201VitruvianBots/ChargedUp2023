@@ -6,9 +6,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class Runclaw extends CommandBase {
-  /** Creates a new Runclaw. */
-  public Runclaw() {
+public class RunIntake extends CommandBase {
+  /** Creates a new RunIntake. */
+  public RunIntake() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
