@@ -106,7 +106,7 @@ public class SwerveModule extends SubsystemBase {
     return m_driveMotor.getSelectedSensorVelocity() * kDriveMotorDistancePerPulse * 10;
   }
   public double getDriveMeters() {
-    return m_driveMotor.getSelectedSensorPosition() * Module.kDriveDistancePerPulse;
+    return m_driveMotor.getSelectedSensorPosition() * Constants.Module.kDriveDistancePerPulse;
   }
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
     desiredState = CtreUtils.optimize(desiredState, getHeadingRotation2d());

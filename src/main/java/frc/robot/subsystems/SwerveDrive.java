@@ -21,9 +21,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
@@ -69,9 +71,11 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
 
+  
+
   private final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
-          SwerveDrive.kSwerveKinematics,
+          Constants.SwerveDrive.kSwerveKinematics,
           getHeadingRotation2d(),
           getModulePositions(),
           new Pose2d());
@@ -125,7 +129,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_odometry.resetPosition(pose, pose.getRotation());
+    m_odometry.resetPosition(getHeadingRotation2d(), getModulePositions(), pose);
     m_pigeon.setYaw(pose.getRotation().getDegrees());
   }
 
@@ -138,7 +142,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public Pose2d getPoseMeters() {
-    return m_odometry.getEstimatedPosition();
+    return m_odometry.getPoseMeters();
   }
 
   public SwerveModule getSwerveModule(ModulePosition modulePosition) {
@@ -157,8 +161,9 @@ public class SwerveDrive extends SubsystemBase {
         m_swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
         m_swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
         m_swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
-        m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition()
-    };3
+        m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition(),
+    };
+  }
   public PIDController getXPidController() {
     return m_xController;
   }
@@ -178,14 +183,14 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  public SwerveDrivePoseEstimator getOdometry() {
+  public SwerveDriveOdometry getOdometry() {
     return m_odometry;
   }
 
   public void updateOdometry() {
     m_odometry.update(
         getHeadingRotation2d(),
-        ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
+        getModulePositions());
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
