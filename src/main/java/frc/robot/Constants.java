@@ -37,10 +37,6 @@ public final class Constants {
 
   }
 
-  public final class CAN {
-
-  }
-
   public final class Elevator {
     public static final int elevatorMotorLeft = 21;
     public static final int elevatorMotorRight = 22;
@@ -51,24 +47,11 @@ public final class Constants {
   }
 
   public final class LED {
-
+    public static final int CANdleID = 0;
   }
 
   public final class Vision {
 
-  }
-
-  public final class DriveConstants{
-    public final class AutoConstants{}
-
-    public final class ModuleConstants{}
-  }
-
-  public static final class USB {
-    public static final int leftJoystick = 0;
-    public static final int rightJoystick = 1;
-    public static final int xBoxController = 2;
-    public static final int testController = 4;
   }
 
 public static final class CAN { // TODO Not real number change tbt//

@@ -58,7 +58,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public static void setElevatorClimbState(boolean climbState) {
-    this.elevatorClimbState = climbState;
+    elevatorClimbState = climbState;
   }
 
   public static void setElevatorPercentOutput(double output) {

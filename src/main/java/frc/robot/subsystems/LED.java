@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.RobotState;
 
 //creates LED subsystem
 public class LED extends SubsystemBase {
-    private final CANdle m_candle = new CANdle(Constants.LED.CANdle); //LED In constants implecation later (the errors fine)
+    private final CANdle m_candle = new CANdle(Constants.LED.CANdleID); //LED In constants implecation later (the errors fine)
     int red = 0;
     int green = 0; //setting all LED colors to none: there is no color when robot actiates
     int blue = 0;
