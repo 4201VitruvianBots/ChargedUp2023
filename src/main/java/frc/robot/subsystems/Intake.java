@@ -6,9 +6,17 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Arm extends SubsystemBase {
-  /** Creates a new Arm. */
-  public Arm() {}
+public class Intake extends SubsystemBase {
+  /** Creates a new Intkae. */
+  public Intake() {
+    //factory default cofigs 
+    // one or two motors
+    
+  }
+   // control mode function 
+  // set percent output function
+  // shuffleboard funciton
+
 
   @Override
   public void periodic() {
