@@ -22,15 +22,53 @@ import frc.robot.utils.ModuleMap;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  public static final class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+  }
+  
+  public static class USB {
+    public static final int leftJoystick = 0;
+    public static final int rightJoystick = 1;
+    public static final int xBoxController = 2;
+  }
+
+  public final class Pnuematics {
+
+  }
+
+  public final class CAN {
+
+  }
+
+  public final class Elevator {
+    public static final int elevatorMotorLeft = 21;
+    public static final int elevatorMotorRight = 22;
+  }
+
+  public final class Claw {
+
+  }
+
+  public final class LED {
+
+  }
+
+  public final class Vision {
+
+  }
+
+  public final class DriveConstants{
+    public final class AutoConstants{}
+
+    public final class ModuleConstants{}
+  }
+
   public static final class USB {
     public static final int leftJoystick = 0;
     public static final int rightJoystick = 1;
     public static final int xBoxController = 2;
     public static final int testController = 4;
-  }
-  
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
   }
 
 public static final class CAN { // TODO Not real number change tbt//
@@ -116,23 +154,6 @@ public static final class SwerveDrive {
 
     public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
     public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
-  }
-
-  public static final class Module {
-    public static final double kDriveGearRatio = 6.12;
-    public static final double kTurnGearRatio = 12.8;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3.94);
-    public static final int kFalconEncoderCPR = 2048;
-    public static final int kCANCoderCPR = 4096;
-
-    public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
-    public static final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
-
-    public static final double kDriveDistancePerPulse =
-    (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveGearRatio);
-public static final double kTurnDistancePerPulse =
-    360.0 / (kFalconEncoderCPR * kTurnGearRatio);
-public static final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
   }
   }
    

@@ -4,34 +4,106 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
-  /** Creates a new Elevator. */
-  // Initialize 2 elevator motors as an array
-  // 0 = left motor, 1 = right motor
-  // We will likely use TalonFX motors
-  // Delcare constants for F and P for PIDF control
-  // Boolean for elevator climb state, maybe double for holdPosition? (not sure what that is)
-  // Int for desired height, 0 = no desired height/ground, 1 = middle nodes, 2 = top nodes
 
-  public Elevator() {
-    // Config both motors using a for loop on the array
-    // Invert both motors
-    // Follower statement for right motor to follow left motor speed
-    // Config F and P for only the left motor for now cause thats how its done in Carbon for some reason, change it later if necessary
-    // Set status frame period for both motors, frame values 1 and 2
+  public static final TalonFX[] elevatorMotors = {
+    new TalonFX(Constants.Elevator.elevatorMotorLeft), new TalonFX(Constants.Elevator.elevatorMotorRight)
+  };
+  
+  public enum elevatorHeights {
+    LOW,
+    MID,
+    HIGH,
+    JOYSTICK
   }
 
-  // Function for setting both motors into neutral mode
-  // Function for setting the percent output of the motors
-  // Getter methods for motor current, voltage, and output, input motor index
+  private final double kF = 0;
+  private final double kP = 0.2;
 
-  /** Getter methods for position, height, and velocity
-   * Position and velocity will check for both motor's health
-  */
+  private static boolean elevatorClimbState;
 
-  // Rotations to inches conversion function
+  private static double elevatorHeight = 0; // the amount of rotations the motor has gone up from the initial low position
+
+  public Elevator() {
+    for(TalonFX motor : elevatorMotors){
+      motor.configFactoryDefault();
+      motor.setNeutralMode(NeutralMode.Brake);
+    }
+
+    elevatorMotors[0].setInverted(true);
+    elevatorMotors[1].setInverted(true);
+
+    elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
+
+    elevatorMotors[0].config_kF(0, kF);
+    elevatorMotors[0].config_kP(0, kP);
+
+  }
+
+  public void setElevatorNeutralMode(NeutralMode mode) {
+    elevatorMotors[0].setNeutralMode(mode);
+    elevatorMotors[1].setNeutralMode(mode);
+  }
+
+  public static boolean getElevatorClimbState() {
+    return elevatorClimbState;
+  }
+
+  public static void setElevatorClimbState(boolean climbState) {
+    this.elevatorClimbState = climbState;
+  }
+
+  public static void setElevatorPercentOutput(double output) {
+    elevatorMotors[0].set(ControlMode.PercentOutput, output);
+  }
+
+  public double getElevatorPercentOutput() {
+    return elevatorMotors[0].getMotorOutputPercent();
+  }
+
+  public double getElevatorMotorVoltage() {
+    return elevatorMotors[0].getMotorOutputVoltage();
+  }
+  
+  public static double getElevatorHeight() {
+    return elevatorHeight;
+  }
+
+  public void setElevatorHeight(double height) {
+    elevatorHeight = height;
+  }
+  
+  // TODO: Get elevator height from encoders or limit switches
+
+  public static double moveToElevatorHeight(elevatorHeights heightEnum, double joystickY) {
+    double desiredHeight = elevatorHeight; // Set to elevator height intially in case none of the switch states change it
+    switch(heightEnum) {
+      case JOYSTICK:
+        desiredHeight = elevatorHeight+joystickY;
+      case LOW:
+        desiredHeight = 0.0; // Placeholder values
+      case MID:
+        desiredHeight = 5.0; // Placeholder values
+      case HIGH:
+        desiredHeight = 10.0; // Placeholder values
+    }
+    double distanceBetween = desiredHeight-elevatorHeight;
+    if(distanceBetween == 0) {
+      setElevatorClimbState(false);
+    }
+    else {
+      setElevatorClimbState(true);
+    }
+    return distanceBetween;
+  }
 
   @Override
   public void periodic() {

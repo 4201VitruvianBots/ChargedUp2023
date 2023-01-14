@@ -8,6 +8,12 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Elevator.elevatorHeights;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.SwerveDrive;
@@ -16,6 +22,7 @@ import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -30,11 +37,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final Elevator m_elevator = new Elevator();
     private final SwerveDrive m_swerveDrive = new SwerveDrive();
-
+    
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
     static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
     static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
@@ -106,10 +115,18 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
-
+    
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    // TODO: Map shorcut buttons to IncrementElevatorHeight
+    // m_driverController.a().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.LOW), 0.0);
+    // m_driverController.b().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.MID), 0.0);
+    // m_driverController.x().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.HIGH), 0.0);
+    
+    // TODO: Control elevator height by moving the joystick up and down
+    // m_elevator.IncrementElevatorHeight(elevatorHeights.JOYSTICK, leftJoystick.getY());
   }
 
   /**

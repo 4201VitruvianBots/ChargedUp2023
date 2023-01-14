@@ -5,17 +5,29 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
-  public IncrementElevatorHeight() {
+  private elevatorHeights heightEnum;
+  private double joystickY;
+
+  public IncrementElevatorHeight(elevatorHeights heightEnum, double joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.heightEnum = heightEnum;
+    this.joystickY = joystickY;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    double distanceBetween = Elevator.moveToElevatorHeight(this.heightEnum, this.joystickY);
+    // TODO: Add function to determine motor output based off of how far away our targeted height is
+    Elevator.setElevatorPercentOutput(joystickY);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
