@@ -5,26 +5,32 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
 
-  public final TalonFX[] elevatorMotors = {
+  public static final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.Elevator.elevatorMotorLeft), new TalonFX(Constants.Elevator.elevatorMotorRight)
   };
+  
+  public enum elevatorHeights {
+    LOW,
+    MID,
+    HIGH,
+    JOYSTICK
+  }
 
   private final double kF = 0;
   private final double kP = 0.2;
 
-  private boolean elevatorClimbState;
+  private static boolean elevatorClimbState;
+
+  private static double elevatorHeight = 0; // the amount of rotations the motor has gone up from the initial low position
 
   public Elevator() {
     for(TalonFX motor : elevatorMotors){
@@ -40,11 +46,6 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
 
-    elevatorMotors[0].setStatusFramePeriod(1, 100);
-    elevatorMotors[0].setStatusFramePeriod(2, 100);
-
-    elevatorMotors[1].setStatusFramePeriod(1, 255);
-    elevatorMotors[1].setStatusFramePeriod(2, 255);
   }
 
   public void setElevatorNeutralMode(NeutralMode mode) {
@@ -52,15 +53,15 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[1].setNeutralMode(mode);
   }
 
-  public boolean getElevatorClimbState() {
+  public static boolean getElevatorClimbState() {
     return elevatorClimbState;
   }
 
-  public void setElevatorClimbState(boolean climbState) {
+  public static void setElevatorClimbState(boolean climbState) {
     this.elevatorClimbState = climbState;
   }
 
-  public void setElevatorPercentOutput(double output) {
+  public static void setElevatorPercentOutput(double output) {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
@@ -72,6 +73,38 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
   
+  public static double getElevatorHeight() {
+    return elevatorHeight;
+  }
+
+  public void setElevatorHeight(double height) {
+    elevatorHeight = height;
+  }
+  
+  // TODO: Get elevator height from encoders or limit switches
+
+  public static double moveToElevatorHeight(elevatorHeights heightEnum, double joystickY) {
+    double desiredHeight = elevatorHeight; // Set to elevator height intially in case none of the switch states change it
+    switch(heightEnum) {
+      case JOYSTICK:
+        desiredHeight = elevatorHeight+joystickY;
+      case LOW:
+        desiredHeight = 0.0; // Placeholder values
+      case MID:
+        desiredHeight = 5.0; // Placeholder values
+      case HIGH:
+        desiredHeight = 10.0; // Placeholder values
+    }
+    double distanceBetween = desiredHeight-elevatorHeight;
+    if(distanceBetween == 0) {
+      setElevatorClimbState(false);
+    }
+    else {
+      setElevatorClimbState(true);
+    }
+    return distanceBetween;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
