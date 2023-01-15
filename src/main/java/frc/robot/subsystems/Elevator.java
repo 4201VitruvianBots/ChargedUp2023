@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,12 +16,15 @@ import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase {
 
+  // Initializing both motors
   public static final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.Elevator.elevatorMotorLeft), new TalonFX(Constants.Elevator.elevatorMotorRight)
   };
   
+  // Limit switch at bottom of elevator
   private static DigitalInput elevatorLowerSwitch = new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
 
+  // Used by RobotContainer to specify which button has been pressed
   public enum elevatorHeights {
     LOW,
     MID,
@@ -30,18 +32,19 @@ public class Elevator extends SubsystemBase {
     JOYSTICK
   }
 
-  private static double desiredHeightValue;
-  private static double elevatorJoystickY;
-  private static elevatorHeights desiredHeightState = elevatorHeights.LOW;
+  private static double desiredHeightValue; // The height in encoder units our robot is trying to reach
+  private static elevatorHeights desiredHeightState = elevatorHeights.LOW; // Think of this as our "next state" in our state machine.
 
-  private final double kF = 0;
+  private static double elevatorJoystickY;
+
+  private final double kF = 0; // Only F and P control is needed for Elevator
   private final double kP = 0.2;
 
   private static boolean elevatorClimbState;
 
   private static double elevatorHeight = 0; // the amount of rotations the motor has gone up from the initial low position
 
-  /* Constructs a new Elevator. */
+  /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
     for(TalonFX motor : elevatorMotors){
       motor.configFactoryDefault();
@@ -60,37 +63,32 @@ public class Elevator extends SubsystemBase {
 
   }
 
-  public void setElevatorNeutralMode(NeutralMode mode) {
-    elevatorMotors[0].setNeutralMode(mode);
-    elevatorMotors[1].setNeutralMode(mode);
-  }
-
   public static boolean getElevatorClimbState() {
     return elevatorClimbState;
   }
-
   public static void setElevatorClimbState(boolean climbState) {
     elevatorClimbState = climbState;
   }
 
-  public static void setElevatorPercentOutput(double output) {
-    elevatorMotors[0].set(ControlMode.PercentOutput, output);
-  }
 
   public double getElevatorPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
-
-  public double getElevatorMotorVoltage() {
-    return elevatorMotors[0].getMotorOutputVoltage();
+  public static void setElevatorPercentOutput(double output) {
+    elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
-  
+
+
   public static double getElevatorHeight() {
     return elevatorHeight;
   }
-
   public static void setElevatorHeight(double height) {
     elevatorHeight = height;
+  }
+
+
+  public double getElevatorMotorVoltage() {
+    return elevatorMotors[0].getMotorOutputVoltage();
   }
   
   public static boolean getElevatorLowerSwitch() {
@@ -108,14 +106,23 @@ public class Elevator extends SubsystemBase {
   public static void setElevatorJoystickY(double joystickY) {
     elevatorJoystickY = joystickY;
   }
-  
+
+  public void setElevatorNeutralMode(NeutralMode mode) {
+    elevatorMotors[0].setNeutralMode(mode);
+    elevatorMotors[1].setNeutralMode(mode);
+  }
+
   // Update elevator height using encoders and bottom limit switch
   public static void updateElevatorHeight() {
+    /* Uses limit switch to act as a baseline
+    * to reset the sensor position and height to improve accuracy
+    */
     if(getElevatorLowerSwitch()) {
       setElevatorHeight(0.0);
       setElevatorSensorPosition(0.0);
     }
     else {
+      /* Uses built in feedback sensor if not at limit switch */
       setElevatorHeight(
         elevatorMotors[0].getSelectedSensorPosition()
       );
@@ -144,6 +151,8 @@ public class Elevator extends SubsystemBase {
       setElevatorClimbState(true);
     }
 
+    // TODO: Replace bang-bang controls with motion magic
+    // The part where we actually determine where the elevator should move
     if (distanceBetween < 0) {
       Elevator.setElevatorPercentOutput(0.8);
     }

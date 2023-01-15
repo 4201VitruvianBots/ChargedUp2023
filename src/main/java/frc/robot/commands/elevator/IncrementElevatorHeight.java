@@ -5,7 +5,6 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
@@ -33,8 +32,7 @@ public class IncrementElevatorHeight extends CommandBase {
   public void execute() {
     Elevator.setElevatorDesiredHeightState(heightEnum);
     Elevator.setElevatorJoystickY(joystickY);
-    // TODO: Maybe replace bang-bang controls with motion magic
-    // Move above to moveToElevatorHeight()
+    
     Elevator.updateElevatorHeight();
   }
 
