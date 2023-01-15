@@ -12,6 +12,7 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
+
   private elevatorHeights heightEnum;
   private double joystickY;
 
@@ -19,19 +20,23 @@ public class IncrementElevatorHeight extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.heightEnum = heightEnum;
     this.joystickY = joystickY;
+
+    addRequirements();
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    double distanceBetween = Elevator.moveToElevatorHeight(this.heightEnum, this.joystickY);
-    // TODO: Add function to determine motor output based off of how far away our targeted height is
-    Elevator.setElevatorPercentOutput(joystickY);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    Elevator.setElevatorDesiredHeightState(heightEnum);
+    Elevator.setElevatorJoystickY(joystickY);
+    // TODO: Maybe replace bang-bang controls with motion magic
+    // Move above to moveToElevatorHeight()
+    Elevator.updateElevatorHeight();
+  }
 
   // Called once the command ends or is interrupted.
   @Override

@@ -38,8 +38,10 @@ public final class Constants {
   }
 
   public final class Elevator {
-    public static final int elevatorMotorLeft = 21;
-    public static final int elevatorMotorRight = 22;
+    public static final int elevatorMotorLeft = 31;
+    public static final int elevatorMotorRight = 32;
+
+    public static final int elevatorLowerSwitch = 33;
   }
 
   public final class Claw {

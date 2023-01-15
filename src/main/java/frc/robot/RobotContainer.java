@@ -38,7 +38,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Elevator m_elevator = new Elevator();
-    private final SwerveDrive m_swerveDrive = new SwerveDrive();
+  private final SwerveDrive m_swerveDrive = new SwerveDrive();
     
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -78,7 +78,14 @@ public class RobotContainer {
               () -> leftJoystick.getRawAxis(1),
               () -> leftJoystick.getRawAxis(0),
               () -> rightJoystick.getRawAxis(0)));
-  
+      
+      // Control elevator height by moving the joystick up and down
+      m_elevator.setDefaultCommand(
+          new IncrementElevatorHeight(
+            elevatorHeights.JOYSTICK,
+            leftJoystick.getRawAxis(1)
+          ));
+      
     }
   
     /**
@@ -120,13 +127,10 @@ public class RobotContainer {
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
-    // TODO: Map shorcut buttons to IncrementElevatorHeight
-    // m_driverController.a().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.LOW), 0.0);
-    // m_driverController.b().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.MID), 0.0);
-    // m_driverController.x().whileTrue(m_elevator.IncrementElevatorHeight(elevatorHeights.HIGH), 0.0);
-    
-    // TODO: Control elevator height by moving the joystick up and down
-    // m_elevator.IncrementElevatorHeight(elevatorHeights.JOYSTICK, leftJoystick.getY());
+    // Map shorcut buttons to IncrementElevatorHeight
+    m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, 0.0));
+    m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
+    m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
   }
 
   /**
