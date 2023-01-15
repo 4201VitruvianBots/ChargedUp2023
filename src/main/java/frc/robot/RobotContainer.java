@@ -5,11 +5,27 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.USB;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Elevator.elevatorHeights;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.SetSwerveDrive;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.SwerveDrive;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -21,16 +37,77 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
+  private final Elevator m_elevator = new Elevator();
+  private final SwerveDrive m_swerveDrive = new SwerveDrive();
+    
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+      
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
+    static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
+    static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
+    static XboxController xBoxController = new XboxController(Constants.USB.xBoxController);
+
+  
+    public Trigger[] leftTriggers = new Trigger[2];
+    public Trigger[] rightTriggers = new Trigger[2];
+    public Trigger[] xBoxTriggers = new Trigger[10];
+    public Trigger[] xBoxPOVTriggers = new Trigger[4];
+    public Trigger xBoxLeftTrigger, xBoxRightTrigger;
+  
+    public RobotContainer() {
+      initializeSubsystems();
+      // initializeAutoChooser();
+  
+      // Configure the button bindings
+      configureButtonBindings();
+    }
+  
+    public void initializeSubsystems() {
+      // m_swerveDrive.setDefaultCommand(
+      //     new SetSwerveDrive(
+      //         m_swerveDrive,
+      //         () -> -testController.getLeftY(),
+      //         () -> -testController.getLeftX(),
+      //         () -> -testController.getRightX()));
+  
+      m_swerveDrive.setDefaultCommand(
+          new SetSwerveDrive(
+              m_swerveDrive,
+              () -> leftJoystick.getRawAxis(1),
+              () -> leftJoystick.getRawAxis(0),
+              () -> rightJoystick.getRawAxis(0)));
+      
+      // Control elevator height by moving the joystick up and down
+      m_elevator.setDefaultCommand(
+          new IncrementElevatorHeight(
+            elevatorHeights.JOYSTICK,
+            leftJoystick.getRawAxis(1)
+          ));
+      
+    }
+  
+    /**
+     * Use this method to define your button->command mappings. Buttons can be created by
+     * instantiating a {@link GenericHID} or one of its subclasses ({@link
+     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+     * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+     */
+    private void configureButtonBindings() { //TODO: Replace Joystick Button?
+      for (int i = 0; i < leftTriggers.length; i++)
+        leftTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
+      for (int i = 0; i < rightTriggers.length; i++)
+        rightTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
+      for (int i = 0; i < xBoxTriggers.length; i++)
+        xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
+      for (int i = 0; i < xBoxPOVTriggers.length; i++)
+        xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+  
+    }
+
+  
+    
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -45,10 +122,15 @@ public class RobotContainer {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));
-
+    
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+    // Map shorcut buttons to IncrementElevatorHeight
+    m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, 0.0));
+    m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
+    m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
   }
 
   /**

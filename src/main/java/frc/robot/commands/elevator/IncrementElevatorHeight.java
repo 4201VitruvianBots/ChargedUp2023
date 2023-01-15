@@ -5,12 +5,23 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
-  public IncrementElevatorHeight() {
+
+  private elevatorHeights heightEnum;
+  private double joystickY;
+
+  public IncrementElevatorHeight(elevatorHeights heightEnum, double joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.heightEnum = heightEnum;
+    this.joystickY = joystickY;
+
+    addRequirements();
   }
 
   // Called when the command is initially scheduled.
@@ -19,7 +30,13 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    Elevator.setElevatorDesiredHeightState(heightEnum);
+    Elevator.setElevatorJoystickY(joystickY);
+    // TODO: Maybe replace bang-bang controls with motion magic
+    // Move above to moveToElevatorHeight()
+    Elevator.updateElevatorHeight();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
