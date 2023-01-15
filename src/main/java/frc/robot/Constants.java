@@ -117,7 +117,7 @@ public static final class SwerveDrive {
   }
 }
   public static final class SwerveModule {
-    public static final double kDriveMotorGearRatio = 6.75;
+    public static final double kDriveMotorGearRatio = 6.12;
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3.94);
     public static final int kFalconEncoderCPR = 2048;
