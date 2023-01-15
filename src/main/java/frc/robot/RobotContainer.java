@@ -6,11 +6,8 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -38,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
     private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
@@ -57,9 +53,6 @@ public class RobotContainer {
   public Trigger[] xBoxTriggers = new Trigger[10];
   public Trigger[] xBoxPOVTriggers = new Trigger[4];
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
-      // Configure the button bindings
-      configureButtonBindings();
-    }
   
     public void initializeSubsystems() {
       // m_swerveDrive.setDefaultCommand(
@@ -82,7 +75,9 @@ public class RobotContainer {
             elevatorHeights.JOYSTICK,
             leftJoystick.getRawAxis(1)
           ));
-      
+          m_fieldSim.initSim();
+    }
+
 
   public RobotContainer() {
     initializeSubsystems();
@@ -90,24 +85,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureBindings();
-  }
-
-  public void initializeSubsystems() {
-    // m_swerveDrive.setDefaultCommand(
-    //     new SetSwerveDrive(
-    //         m_swerveDrive,
-    //         () -> -testController.getLeftY(),
-    //         () -> -testController.getLeftX(),
-    //         () -> -testController.getRightX()));
-
-    m_swerveDrive.setDefaultCommand(
-        new SetSwerveDrive(
-            m_swerveDrive,
-            () -> leftJoystick.getRawAxis(1),
-            () -> leftJoystick.getRawAxis(0),
-            () -> rightJoystick.getRawAxis(0)));
-
-    m_fieldSim.initSim();
   }
 
   /**
