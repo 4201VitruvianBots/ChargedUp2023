@@ -12,6 +12,9 @@ import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.SetSwerveDrive;
@@ -132,12 +135,20 @@ public class RobotContainer {
     m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
     m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
   }
+public void disableInit(){
+  m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+ 
+}
+public void teleopeInit(){
+  m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return Autos.exampleAuto(m_exampleSubsystem);
