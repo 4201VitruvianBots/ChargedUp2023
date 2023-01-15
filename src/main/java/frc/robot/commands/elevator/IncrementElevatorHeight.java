@@ -31,14 +31,10 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double distanceBetween = Elevator.moveToElevatorHeight(this.heightEnum, this.joystickY);
-    // TODO: Add function to determine motor output based off of how far away our targeted height is
-    if (distanceBetween < 0) {
-      Elevator.setElevatorPercentOutput(0.8);
-    }
-    else if (distanceBetween > 0) {
-      Elevator.setElevatorPercentOutput(-0.8);
-    }
+    Elevator.setElevatorDesiredHeightState(heightEnum);
+    Elevator.setElevatorJoystickY(joystickY);
+    // TODO: Maybe replace bang-bang controls with motion magic
+    // Move above to moveToElevatorHeight()
     Elevator.updateElevatorHeight();
   }
 

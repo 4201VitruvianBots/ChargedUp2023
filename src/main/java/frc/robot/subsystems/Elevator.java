@@ -30,6 +30,10 @@ public class Elevator extends SubsystemBase {
     JOYSTICK
   }
 
+  private static double desiredHeightValue;
+  private static double elevatorJoystickY;
+  private static elevatorHeights desiredHeightState = elevatorHeights.LOW;
+
   private final double kF = 0;
   private final double kP = 0.2;
 
@@ -97,30 +101,14 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  // TODO: Get elevator height from encoders or limit switches
-
-  public static double moveToElevatorHeight(elevatorHeights heightEnum, double joystickY) {
-    double desiredHeight = elevatorHeight; // Set to elevator height intially in case none of the switch states change it
-    switch(heightEnum) {
-      case JOYSTICK:
-        desiredHeight = elevatorHeight+joystickY;
-      case LOW:
-        desiredHeight = 0.0; // Placeholder values
-      case MID:
-        desiredHeight = 5.0; // Placeholder values
-      case HIGH:
-        desiredHeight = 10.0; // Placeholder values
-    }
-    double distanceBetween = desiredHeight-elevatorHeight;
-    if(distanceBetween == 0) {
-      setElevatorClimbState(false);
-    }
-    else {
-      setElevatorClimbState(true);
-    }
-    return distanceBetween;
+  public static void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
+    desiredHeightState = heightEnum;
   }
-
+  
+  public static void setElevatorJoystickY(double joystickY) {
+    elevatorJoystickY = joystickY;
+  }
+  
   // Update elevator height using encoders and bottom limit switch
   public static void updateElevatorHeight() {
     if(getElevatorLowerSwitch()) {
@@ -133,8 +121,37 @@ public class Elevator extends SubsystemBase {
       );
     }
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    switch(desiredHeightState) {
+      case JOYSTICK:
+        desiredHeightValue = elevatorHeight+elevatorJoystickY; // Add limits/clamp function
+      case LOW:
+        desiredHeightValue = 0.0; // Placeholder values
+      case MID:
+        desiredHeightValue = 5.0; // Placeholder values
+      case HIGH:
+        desiredHeightValue = 10.0; // Placeholder values
+    }
+    double distanceBetween = desiredHeightValue-elevatorHeight;
+    if(distanceBetween < 5.0 && distanceBetween > -5.0) { // Placeholder values
+      setElevatorClimbState(false);
+      distanceBetween = 0;
+    }
+    else {
+      setElevatorClimbState(true);
+    }
+
+    if (distanceBetween < 0) {
+      Elevator.setElevatorPercentOutput(0.8);
+    }
+    else if (distanceBetween > 0) {
+      Elevator.setElevatorPercentOutput(-0.8);
+    }
+    else if (distanceBetween == 0) {
+      Elevator.setElevatorPercentOutput(0.0);
+    }
   }
 }
