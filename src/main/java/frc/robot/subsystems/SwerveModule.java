@@ -14,12 +14,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.unmanaged.Unmanaged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,12 +49,12 @@ public class SwerveModule extends SubsystemBase {
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(0.1, 0.0008), kTurnGearbox, kTurningMotorGearRatio);
+          LinearSystemId.identifyVelocitySystem(0.1, 0.0001), kTurnGearbox, kTurningMotorGearRatio);
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(4, 1.24), kDriveGearbox, kDriveMotorGearRatio);
+          LinearSystemId.identifyVelocitySystem(1.5, 0.6), kDriveGearbox, kDriveMotorGearRatio);
 
   private double m_drivePercentOutput;
   private double m_turnPercentOutput;
@@ -82,7 +84,8 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
-    resetAngleToAbsolute();
+    if(RobotBase.isReal())
+      resetAngleToAbsolute();
   }
 
   public ModulePosition getModulePosition() {
@@ -172,8 +175,8 @@ public class SwerveModule extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_turnMotorSim.setInputVoltage(m_turnPercentOutput * RobotController.getBatteryVoltage());
-    m_driveMotorSim.setInputVoltage(m_drivePercentOutput * RobotController.getBatteryVoltage());
+    m_turnMotorSim.setInputVoltage(MathUtil.clamp(m_turnPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_driveMotorSim.setInputVoltage(MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
     m_turnMotorSim.update(0.02);
     m_driveMotorSim.update(0.02);
@@ -182,6 +185,9 @@ public class SwerveModule extends SubsystemBase {
 
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
+
+//    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
+//    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
 
     m_turnMotor
         .getSimCollection()
