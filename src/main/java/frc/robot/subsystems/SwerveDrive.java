@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -70,6 +71,7 @@ public class SwerveDrive extends SubsystemBase {
                           ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
+  private Trajectory m_trajectory;
 
   
 
@@ -82,8 +84,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private PIDController m_xController = new PIDController(kP_X, 0, kD_X);
   private PIDController m_yController = new PIDController(kP_Y, 0, kD_Y);
-  private ProfiledPIDController m_turnController =
-      new ProfiledPIDController(kP_Theta, 0, kD_Theta, kThetaControllerConstraints);
+  private PIDController m_turnController = new PIDController(kP_Theta, 0, kD_Theta);
 
   private double m_simYaw;
 
@@ -127,6 +128,11 @@ public class SwerveDrive extends SubsystemBase {
   public void setSwerveModuleStatesAuto(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
+  
+  public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
+    var states = kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    setSwerveModuleStates(states, false);
+  }
 
   public void setOdometry(Pose2d pose) {
     m_odometry.resetPosition(getHeadingRotation2d(), getModulePositions(), pose);
@@ -156,6 +162,7 @@ public class SwerveDrive extends SubsystemBase {
     }
     return map;
   }
+
   public SwerveModulePosition[] getModulePositions() {
     return new SwerveModulePosition[] {
         m_swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
@@ -164,6 +171,15 @@ public class SwerveDrive extends SubsystemBase {
         m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition(),
     };
   }
+
+  public Map<ModulePosition, Pose2d> getModulePoses() {
+    Map<ModulePosition, Pose2d> map = new HashMap<>();
+    for (ModulePosition i : m_swerveModules.keySet()) {
+      map.put(i, m_swerveModules.get(i).getModulePose());
+    }
+    return map;
+  }
+
   public PIDController getXPidController() {
     return m_xController;
   }
@@ -172,7 +188,7 @@ public class SwerveDrive extends SubsystemBase {
     return m_yController;
   }
 
-  public ProfiledPIDController getThetaPidController() {
+  public PIDController getThetaPidController() {
     return m_turnController;
   }
 
@@ -181,6 +197,15 @@ public class SwerveDrive extends SubsystemBase {
       module.setDriveNeutralMode(mode);
       module.setTurnNeutralMode(mode);
     }
+  }
+
+  public void setCurrentTrajectory(Trajectory trajectory) {
+    m_trajectory = trajectory;
+  }
+
+  public Trajectory getCurrentTrajectory(){
+    return m_trajectory;
+
   }
 
   public SwerveDriveOdometry getOdometry() {
@@ -193,15 +218,14 @@ public class SwerveDrive extends SubsystemBase {
         getModulePositions());
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      Translation2d modulePositionFromChassis =
-          kModuleTranslations
-              .get(module.getModulePosition())
+      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
               .rotateBy(getHeadingRotation2d())
-              .plus(getPoseMeters().getTranslation());
+              .plus(kModuleTranslations.get(module.getModulePosition()));
+
       module.setModulePose(
           new Pose2d(
               modulePositionFromChassis,
-              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
     }
   }
 
