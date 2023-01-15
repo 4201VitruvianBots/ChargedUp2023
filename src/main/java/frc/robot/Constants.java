@@ -43,8 +43,8 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 33;
   }
 
-  public final class Claw {
-
+  public final class Intake {
+    public static final int intakeMotor = 38; 
   }
 
   public final class LED {
