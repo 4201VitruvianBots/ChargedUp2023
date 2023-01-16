@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -44,6 +46,8 @@ public class Elevator extends SubsystemBase {
 
   private static double elevatorHeight = 0; // the amount of rotations the motor has gone up from the initial low position
 
+  public ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
+
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
     for(TalonFX motor : elevatorMotors){
@@ -61,6 +65,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
 
+    Shuffleboard.selectTab("Elevator");
   }
 
   public static boolean getElevatorClimbState() {
@@ -127,6 +132,30 @@ public class Elevator extends SubsystemBase {
         elevatorMotors[0].getSelectedSensorPosition()
       );
     }
+  }
+
+  public void updateShuffleboard() {
+    // TODO: Add encoder counts per second or since last scheduler run
+    
+    elevatorTab.add("Elevator Climbing", getElevatorClimbState());
+
+    elevatorTab.add("Elevator Height", getElevatorHeight());
+    elevatorTab.add("Elevator Target Height", desiredHeightValue);
+    elevatorTab.add("Elevator Target Position", desiredHeightState);
+
+    elevatorTab.add("Elevator Raw Percent Output", getElevatorPercentOutput());
+
+    /* Converts the raw percent output to something more readable, by 
+    *  rounding it to the nearest whole number and turning it into an actual percentage.
+    *  Example: -0.71247 -> -71%
+    */
+    elevatorTab.add("Elevator Percent Output",
+      String.valueOf(
+      Math.round(
+      getElevatorPercentOutput()*100
+      ))
+      +"%"
+    );
   }
 
   @Override
