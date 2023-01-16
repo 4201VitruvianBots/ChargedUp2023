@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.auto.RedMiddleOneConeBalance;
 import frc.robot.simulation.FieldSim;
@@ -38,6 +40,7 @@ public class RobotContainer {
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
     private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
+    private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -53,7 +56,7 @@ public class RobotContainer {
   public Trigger[] xBoxTriggers = new Trigger[10];
   public Trigger[] xBoxPOVTriggers = new Trigger[4];
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
-  
+
     public void initializeSubsystems() {
       // m_swerveDrive.setDefaultCommand(
       //     new SetSwerveDrive(
@@ -81,6 +84,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     initializeSubsystems();
+    initializeAutoChooser();
     // initializeAutoChooser();
 
     // Configure the button bindings
@@ -120,10 +124,14 @@ public void teleopeInit(){
    *
    * @return the command to run in autonomous
    */
-
+ public void initializeAutoChooser(){
+ m_autoChooser.addOption("RedMiddleOneConeBalance", new RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+ 
+  SmartDashboard.putData("Auto Selector", m_autoChooser);
+ }
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return new RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim);
+    return m_autoChooser.getSelected();
     
   }
   
