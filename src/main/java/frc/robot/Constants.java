@@ -50,8 +50,35 @@ public final class Constants {
     public static final int CANdleID = 0;
   }
 
-  public final class Vision {
+  public static final class Vision {
+    public enum CAMERA_TYPE {
+      OAK,
+      LIMELIGHT,
+      PHOTONVISION
+    }
+    
+    public enum CAMERA_POSITION {
+      INTAKE,
+      OUTTAKE,
+      FORWARD_LOCALIZER,
+      REAR_LOCALIZER
+    }
 
+    public enum SERVER_IPS {
+      INTAKE("10.42.1.11"),
+      OUTTAKE("10.42.1.12"),
+      FORWARD_LOCALIZER("10.42.1.13"),
+      REAR_LOCALIZER("10.42.1.14");
+      
+      private final String ip;
+      SERVER_IPS(final String ip) {
+        this.ip = ip;
+      } 
+      @Override
+      public String toString(){
+        return ip;
+      }
+    }
   }
 
 public static final class CAN { // TODO Not real number change tbt//
