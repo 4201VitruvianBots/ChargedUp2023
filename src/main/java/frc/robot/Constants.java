@@ -40,7 +40,7 @@ public final class Constants {
     public static final int elevatorMotorLeft = 31;
     public static final int elevatorMotorRight = 32;
 
-    public static final int elevatorLowerSwitch = 0;
+    public static final int elevatorLowerSwitch = 8;
   }
 
   public final class Intake {

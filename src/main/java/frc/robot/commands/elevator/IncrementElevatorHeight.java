@@ -20,6 +20,7 @@ public class IncrementElevatorHeight extends CommandBase {
     m_elevator = elevator;
     this.heightEnum = heightEnum;
     this.joystickY = joystickY;
+    this.m_elevator = elevator;
 
     addRequirements(m_elevator);
   }
