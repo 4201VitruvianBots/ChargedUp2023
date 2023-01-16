@@ -71,7 +71,7 @@ public class RobotContainer {
       
       // Control elevator height by moving the joystick up and down
       m_elevator.setDefaultCommand(
-          new IncrementElevatorHeight(
+          new IncrementElevatorHeight(m_elevator, 
             elevatorHeights.JOYSTICK,
             leftJoystick.getRawAxis(1)
           ));
@@ -103,9 +103,10 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, 0.0));
-    m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
-    m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
+    // Map shorcut buttons to IncrementElevatorHeight
+    m_driverController.a().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.LOW, 0.0));
+    m_driverController.b().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.MID, 0.0));
+    m_driverController.y().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.HIGH, 0.0));
   }
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);
