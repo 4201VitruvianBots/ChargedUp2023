@@ -7,7 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
-
+import frc.robot.commands.elevator.IncrementElevatorHeight;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -132,6 +132,10 @@ public void teleopeInit(){
     
   }
   
+  public void simulationPeriodic() {
+    m_elevator.simulationPeriodic();
+  }
+
   public void periodic() {
     m_fieldSim.periodic();
   }

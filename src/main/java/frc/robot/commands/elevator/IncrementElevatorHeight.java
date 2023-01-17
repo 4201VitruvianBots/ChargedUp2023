@@ -21,7 +21,6 @@ public class IncrementElevatorHeight extends CommandBase {
     this.heightEnum = heightEnum;
     this.joystickY = joystickY;
     this.m_elevator = elevator;
-
     addRequirements(m_elevator);
   }
 
@@ -32,7 +31,9 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    Elevator.updateShuffleboard();
     Elevator.setElevatorDesiredHeightState(heightEnum);
+    System.out.println(heightEnum.name());
     Elevator.setElevatorJoystickY(joystickY);
     
     Elevator.updateElevatorHeight();
