@@ -26,7 +26,6 @@ public final class Constants {
   public static final class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-  
   public static class USB {
     public static final int leftJoystick = 0;
     public static final int rightJoystick = 1;
@@ -38,12 +37,14 @@ public final class Constants {
   }
 
   public final class Elevator {
-    public static final int elevatorMotorLeft = 21;
-    public static final int elevatorMotorRight = 22;
+    public static final int elevatorMotorLeft = 31;
+    public static final int elevatorMotorRight = 32;
+
+    public static final int elevatorLowerSwitch = 0;
   }
 
-  public final class Claw {
-
+  public final class Intake {
+    public static final int intakeMotor = 38; 
   }
 
   public final class LED {
@@ -144,7 +145,7 @@ public static final class SwerveDrive {
 }
   public static final class SwerveModule {
     public static final double kDriveMotorGearRatio = 6.12;
-    public static final double kTurningMotorGearRatio = 12.8;
+    public static final double kTurningMotorGearRatio = 150.0 / 7.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3.94);
     public static final int kFalconEncoderCPR = 2048;
     public static final int kCANCoderCPR = 4096;
