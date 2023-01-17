@@ -7,9 +7,6 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,6 +15,8 @@ import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.auto.RedMiddleOneConeBalance;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Elevator.elevatorHeights;
+import frc.robot.subsystems.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -128,6 +127,10 @@ public void teleopeInit(){
     
   }
   
+  public void simulationPeriodic() {
+    m_elevator.simulationPeriodic();
+  }
+
   public void periodic() {
     m_fieldSim.periodic();
   }
