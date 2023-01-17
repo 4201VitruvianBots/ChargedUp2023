@@ -11,16 +11,17 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
-
+  private Elevator m_elevator;
   private elevatorHeights heightEnum;
   private double joystickY;
 
-  public IncrementElevatorHeight(elevatorHeights heightEnum, double joystickY) {
+  public IncrementElevatorHeight(Elevator elevator, elevatorHeights heightEnum, double joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_elevator = elevator;
     this.heightEnum = heightEnum;
     this.joystickY = joystickY;
 
-    addRequirements();
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
