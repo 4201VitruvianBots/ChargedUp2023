@@ -162,3 +162,7 @@ bin/
 *-window.json
 
 .idea/
+
+simgui-ds.json
+
+simgui.json
