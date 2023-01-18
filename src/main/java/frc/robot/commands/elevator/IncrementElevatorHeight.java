@@ -31,7 +31,6 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Elevator.updateShuffleboard();
     Elevator.setElevatorDesiredHeightState(heightEnum);
     Elevator.setElevatorJoystickY(joystickY);
     if(Elevator.getElevatorSimulated()) {

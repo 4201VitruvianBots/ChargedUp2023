@@ -97,7 +97,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
-    initShuffleboard();
   }
 
   public static boolean getElevatorClimbState() {
@@ -176,7 +175,7 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public static void updateShuffleboard() {
+  public static void initShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
     elevatorClimbingTab.setBoolean(getElevatorClimbState());
 
@@ -213,6 +212,7 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    initShuffleboard();
     // This method will be called once per scheduler run
     // updateShuffleboard();
     switch(desiredHeightState) {
