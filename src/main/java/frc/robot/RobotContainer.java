@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
 
@@ -62,7 +63,7 @@ public class RobotContainer {
       m_swerveDrive.setDefaultCommand(
           new SetSwerveDrive(
               m_swerveDrive,
-              () -> leftJoystick.getRawAxis(1),
+              () -> -leftJoystick.getRawAxis(1),
               () -> -leftJoystick.getRawAxis(0),
               () -> rightJoystick.getRawAxis(0)));
       
@@ -100,10 +101,11 @@ public class RobotContainer {
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+      
+    m_driverController.a().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.LOW, 0.0));
+    m_driverController.b().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.MID, 0.0));
+    m_driverController.y().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.HIGH, 0.0));
 
-    // m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, 0.0));
-    // m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
-    // m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
   }
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);
@@ -119,9 +121,9 @@ public void teleopeInit(){
    * @return the command to run in autonomous
    */
  public void initializeAutoChooser(){
-  m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-  // m_autoChooser.setDefaultOption("RedMiddleOneConeBalance", new RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
-
+   m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
+//   m_autoChooser.addOption("RedMiddleOneConeBalance", new RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+ 
   SmartDashboard.putData("Auto Selector", m_autoChooser);
  }
   public Command getAutonomousCommand() {

@@ -64,8 +64,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
-
-    Shuffleboard.selectTab("Elevator");
     initShuffleboard();
   }
 

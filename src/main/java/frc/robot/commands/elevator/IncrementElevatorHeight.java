@@ -17,7 +17,7 @@ public class IncrementElevatorHeight extends CommandBase {
 
   public IncrementElevatorHeight(Elevator elevator, elevatorHeights heightEnum, double joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.m_elevator = elevator;
+    m_elevator = elevator;
     this.heightEnum = heightEnum;
     this.joystickY = joystickY;
 

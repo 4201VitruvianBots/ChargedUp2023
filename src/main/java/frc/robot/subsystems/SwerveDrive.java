@@ -69,8 +69,6 @@ public class SwerveDrive extends SubsystemBase {
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
   private Trajectory m_trajectory;
 
-  
-
   private final SwerveDriveOdometry m_odometry =
       new SwerveDriveOdometry(
           Constants.SwerveDrive.kSwerveKinematics,
@@ -213,15 +211,26 @@ public class SwerveDrive extends SubsystemBase {
         getHeadingRotation2d(),
         getModulePositions());
 
+//    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+//      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
+//              .rotateBy(getHeadingRotation2d())
+//              .plus(kModuleTranslations.get(module.getModulePosition()));
+//
+//      module.setModulePose(
+//          new Pose2d(
+//              modulePositionFromChassis,
+//              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
+//    }
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-              .rotateBy(getHeadingRotation2d())
-              .plus(kModuleTranslations.get(module.getModulePosition()));
-
+      Translation2d modulePositionFromChassis =
+              kModuleTranslations
+                      .get(module.getModulePosition())
+                      .rotateBy(getHeadingRotation2d())
+                      .plus(getPoseMeters().getTranslation());
       module.setModulePose(
-          new Pose2d(
-              modulePositionFromChassis,
-              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
+              new Pose2d(
+                      modulePositionFromChassis,
+                      module.getHeadingRotation2d().plus(getHeadingRotation2d())));
     }
   }
 
