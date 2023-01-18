@@ -57,7 +57,9 @@ public class Elevator extends SubsystemBase {
 
   // Simulation setup
 
-  private final ElevatorSim elevatorSim = new ElevatorSim(
+  private static boolean isSimulated = false;
+
+  private final static ElevatorSim elevatorSim = new ElevatorSim(
     Constants.Elevator.elevatorGearbox,
     Constants.Elevator.elevatorGearing,
     Constants.Elevator.elevatorMassKg,
@@ -130,6 +132,10 @@ public class Elevator extends SubsystemBase {
     return elevatorLowerSwitch.get();
   }
 
+  public static boolean getElevatorSimulated() {
+    return isSimulated;
+  }
+
   public static void setElevatorSensorPosition(double position) {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
@@ -145,6 +151,11 @@ public class Elevator extends SubsystemBase {
   public void setElevatorNeutralMode(NeutralMode mode) {
     elevatorMotors[0].setNeutralMode(mode);
     elevatorMotors[1].setNeutralMode(mode);
+  }
+
+  public static void updateSimulatedElevatorHeight() {
+    //setElevatorHeight(getElevatorPercentOutput()/100);
+    setElevatorHeight(elevatorSim.getPositionMeters());
   }
 
   // Update elevator height using encoders and bottom limit switch
@@ -188,15 +199,13 @@ public class Elevator extends SubsystemBase {
     );
   }
 
-
-
   @Override
   public void simulationPeriodic() {
+    Elevator.isSimulated = true;
+
     elevatorSim.setInput(getElevatorMotorVoltage() * RobotController.getBatteryVoltage());
 
     elevatorSim.update(0.020);
-
-    setElevatorHeight(elevatorSim.getPositionMeters());
 
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
@@ -212,12 +221,12 @@ public class Elevator extends SubsystemBase {
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
       case MID:
-        desiredHeightValue = 5.0; // Placeholder values
+        desiredHeightValue = 1.0; // Placeholder values
       case HIGH:
-        desiredHeightValue = 10.0; // Placeholder values
+        desiredHeightValue = 2.0; // Placeholder values
     }
     double distanceBetween = desiredHeightValue-elevatorHeight;
-    if(distanceBetween < 5.0 && distanceBetween > -5.0) { // Placeholder values
+    if(distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
       setElevatorClimbState(false);
       distanceBetween = 0;
     }

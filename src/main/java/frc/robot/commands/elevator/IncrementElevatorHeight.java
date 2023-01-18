@@ -33,10 +33,13 @@ public class IncrementElevatorHeight extends CommandBase {
   public void execute() {
     Elevator.updateShuffleboard();
     Elevator.setElevatorDesiredHeightState(heightEnum);
-    System.out.println(heightEnum.name());
     Elevator.setElevatorJoystickY(joystickY);
-    
-    Elevator.updateElevatorHeight();
+    if(Elevator.getElevatorSimulated()) {
+      Elevator.updateSimulatedElevatorHeight();
+    }
+    else {
+      Elevator.updateElevatorHeight();
+    }
   }
 
   // Called once the command ends or is interrupted.
