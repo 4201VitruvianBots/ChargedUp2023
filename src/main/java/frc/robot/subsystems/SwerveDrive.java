@@ -65,10 +65,6 @@ public class SwerveDrive extends SubsystemBase {
                       new TalonFX(CAN.backRightDriveMotor),
                       new CANCoder(CAN.backRightCanCoder),
                       backRightCANCoderOffset)));
-                      
-                      public static final SwerveDriveKinematics kSwerveKinematics =
-                      new SwerveDriveKinematics(
-                          ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
   private Trajectory m_trajectory;

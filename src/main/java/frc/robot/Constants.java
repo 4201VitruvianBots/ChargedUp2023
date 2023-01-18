@@ -111,10 +111,10 @@ public static final class SwerveDrive {
           ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
           ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-  public static final double frontLeftCANCoderOffset = 94.219;
-  public static final double frontRightCANCoderOffset = 132.363;
-  public static final double backLeftCANCoderOffset = 284.590;
-  public static final double backRightCANCoderOffset = 179.648;
+  public static final double frontLeftCANCoderOffset = 153.1054;
+  public static final double frontRightCANCoderOffset = 217.2665;
+  public static final double backLeftCANCoderOffset = 260.2441;
+  public static final double backRightCANCoderOffset = 143.9648;
 
   public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(

@@ -7,9 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -19,12 +16,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.auto.RedMiddleOneConeBalance;
+import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -59,13 +60,6 @@ public class RobotContainer {
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
 
     public void initializeSubsystems() {
-      // m_swerveDrive.setDefaultCommand(
-      //     new SetSwerveDrive(
-      //         m_swerveDrive,
-      //         () -> -testController.getLeftY(),
-      //         () -> -testController.getLeftX(),
-      //         () -> -testController.getRightX()));
-  
       m_swerveDrive.setDefaultCommand(
           new SetSwerveDrive(
               m_swerveDrive,
@@ -80,14 +74,13 @@ public class RobotContainer {
             elevatorHeights.JOYSTICK,
             leftJoystick.getRawAxis(1)
           ));
-          m_fieldSim.initSim();
+      m_fieldSim.initSim();
     }
 
 
   public RobotContainer() {
     initializeSubsystems();
     initializeAutoChooser();
-    // initializeAutoChooser();
 
     // Configure the button bindings
     configureBindings();
@@ -108,10 +101,11 @@ public class RobotContainer {
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
-
+      
     m_driverController.a().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.LOW, 0.0));
     m_driverController.b().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.MID, 0.0));
     m_driverController.y().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.HIGH, 0.0));
+
   }
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);

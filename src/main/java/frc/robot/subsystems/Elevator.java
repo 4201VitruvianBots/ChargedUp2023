@@ -64,7 +64,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
-
     initShuffleboard();
   }
 
@@ -161,7 +160,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-//    updateShuffleboard();
+    // updateShuffleboard();
     switch(desiredHeightState) {
       case JOYSTICK:
         desiredHeightValue = elevatorHeight+elevatorJoystickY; // Add limits/clamp function
