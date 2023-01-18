@@ -36,11 +36,18 @@ public final class Constants {
 
   }
 
-  public final class Elevator {
+  public static final class Elevator {
     public static final int elevatorMotorLeft = 31;
     public static final int elevatorMotorRight = 32;
 
-    public static final int elevatorLowerSwitch = 0;
+    public static final int elevatorLowerSwitch = 8;
+
+    public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
+    public static final double elevatorGearing = 10.0;
+    public static final double elevatorMassKg = 4.0;
+    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
+    public static final double elevatorMinHeightMeters = 0;
+    public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
   }
 
   public final class Intake {

@@ -10,9 +10,18 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -23,9 +32,6 @@ public class Elevator extends SubsystemBase {
     new TalonFX(Constants.Elevator.elevatorMotorLeft), new TalonFX(Constants.Elevator.elevatorMotorRight)
   };
   
-  // Limit switch at bottom of elevator
-  private static DigitalInput elevatorLowerSwitch = new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
-
   // Used by RobotContainer to specify which button has been pressed
   public enum elevatorHeights {
     LOW,
@@ -33,6 +39,9 @@ public class Elevator extends SubsystemBase {
     HIGH,
     JOYSTICK
   }
+  
+  // Limit switch at bottom of elevator
+  private static DigitalInput elevatorLowerSwitch = new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
 
   private static double desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState = elevatorHeights.LOW; // Think of this as our "next state" in our state machine.
@@ -46,7 +55,31 @@ public class Elevator extends SubsystemBase {
 
   private static double elevatorHeight = 0; // the amount of rotations the motor has gone up from the initial low position
 
-  public ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
+  // Simulation setup
+
+  private static boolean isSimulated = false;
+
+  private final static ElevatorSim elevatorSim = new ElevatorSim(
+    Constants.Elevator.elevatorGearbox,
+    Constants.Elevator.elevatorGearing,
+    Constants.Elevator.elevatorMassKg,
+    Constants.Elevator.elevatorDrumRadiusMeters,
+    Constants.Elevator.elevatorMinHeightMeters,
+    Constants.Elevator.elevatorMaxHeightMeters,
+    true,
+    VecBuilder.fill(0.01)
+  );
+
+  // Shuffleboard setup
+
+  public static ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
+  
+  public static GenericEntry elevatorClimbingTab = elevatorTab.add("Elevator Climbing", false).getEntry();
+  public static GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
+  public static GenericEntry elevatorTargetHeightTab = elevatorTab.add("Elevator Target Height", desiredHeightValue).getEntry();
+  public static GenericEntry elevatorTargetPosTab = elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
+  public static GenericEntry elevatorRawPerOutTab = elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
+  public static GenericEntry elevatorPerOutTab = elevatorTab.add("Elevator Percent Output", "0%").getEntry();
 
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
@@ -56,7 +89,7 @@ public class Elevator extends SubsystemBase {
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
       motor.setSelectedSensorPosition(elevatorHeight);
     }
-
+    
     elevatorMotors[0].setInverted(true);
     elevatorMotors[1].setInverted(true);
 
@@ -75,7 +108,7 @@ public class Elevator extends SubsystemBase {
   }
 
 
-  public double getElevatorPercentOutput() {
+  public static double getElevatorPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
   public static void setElevatorPercentOutput(double output) {
@@ -99,6 +132,10 @@ public class Elevator extends SubsystemBase {
     return elevatorLowerSwitch.get();
   }
 
+  public static boolean getElevatorSimulated() {
+    return isSimulated;
+  }
+
   public static void setElevatorSensorPosition(double position) {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
@@ -116,8 +153,14 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[1].setNeutralMode(mode);
   }
 
+  public static void updateSimulatedElevatorHeight() {
+    //setElevatorHeight(getElevatorPercentOutput()/100);
+    setElevatorHeight(elevatorSim.getPositionMeters());
+  }
+
   // Update elevator height using encoders and bottom limit switch
   public static void updateElevatorHeight() {
+
     /* Uses limit switch to act as a baseline
     * to reset the sensor position and height to improve accuracy
     */
@@ -133,28 +176,39 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public void initShuffleboard() {
+  public static void updateShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
-    
-    elevatorTab.add("Elevator Climbing", getElevatorClimbState());
+    elevatorClimbingTab.setBoolean(getElevatorClimbState());
 
-    elevatorTab.add("Elevator Height", getElevatorHeight());
-    elevatorTab.add("Elevator Target Height", desiredHeightValue);
-    elevatorTab.add("Elevator Target Position", desiredHeightState.name());
+    elevatorHeightTab.setDouble(getElevatorHeight());
+    elevatorTargetHeightTab.setDouble(desiredHeightValue);
+    elevatorTargetPosTab.setString(desiredHeightState.name());
 
-    elevatorTab.add("Elevator Raw Percent Output", getElevatorPercentOutput());
+    elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
 
     /* Converts the raw percent output to something more readable, by 
     *  rounding it to the nearest whole number and turning it into an actual percentage.
     *  Example: -0.71247 -> -71%
     */
-    elevatorTab.add("Elevator Percent Output",
+    elevatorPerOutTab.setString(
       String.valueOf(
       Math.round(
       getElevatorPercentOutput()*100
       ))
       +"%"
     );
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    Elevator.isSimulated = true;
+
+    elevatorSim.setInput(getElevatorMotorVoltage() * RobotController.getBatteryVoltage());
+
+    elevatorSim.update(0.020);
+
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
   }
 
   @Override
@@ -167,12 +221,12 @@ public class Elevator extends SubsystemBase {
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
       case MID:
-        desiredHeightValue = 5.0; // Placeholder values
+        desiredHeightValue = 1.0; // Placeholder values
       case HIGH:
-        desiredHeightValue = 10.0; // Placeholder values
+        desiredHeightValue = 2.0; // Placeholder values
     }
     double distanceBetween = desiredHeightValue-elevatorHeight;
-    if(distanceBetween < 5.0 && distanceBetween > -5.0) { // Placeholder values
+    if(distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
       setElevatorClimbState(false);
       distanceBetween = 0;
     }
