@@ -69,8 +69,8 @@ public class SwerveDrive extends SubsystemBase {
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
   private Trajectory m_trajectory;
 
-  private final SwerveDriveOdometry m_odometry =
-      new SwerveDriveOdometry(
+  private final SwerveDrivePoseEstimator m_odometry =
+      new SwerveDrivePoseEstimator(
           Constants.SwerveDrive.kSwerveKinematics,
           getHeadingRotation2d(),
           getModulePositions(),
@@ -142,7 +142,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public Pose2d getPoseMeters() {
-    return m_odometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
   public SwerveModule getSwerveModule(ModulePosition modulePosition) {
@@ -202,7 +202,7 @@ public class SwerveDrive extends SubsystemBase {
 
   }
 
-  public SwerveDriveOdometry getOdometry() {
+  public SwerveDrivePoseEstimator getOdometry() {
     return m_odometry;
   }
 
