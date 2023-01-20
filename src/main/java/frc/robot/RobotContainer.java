@@ -8,13 +8,15 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.USB;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetSwerveDrive;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.SetSwerveDrive;
 import frc.robot.commands.auto.RedMiddleOneConeBalance;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.simulation.FieldSim;
@@ -106,6 +108,7 @@ public class RobotContainer {
     m_driverController.b().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.MID, 0.0));
     m_driverController.y().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.HIGH, 0.0));
 
+    SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
   }
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);
