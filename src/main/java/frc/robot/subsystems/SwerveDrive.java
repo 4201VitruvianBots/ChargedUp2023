@@ -206,6 +206,11 @@ public class SwerveDrive extends SubsystemBase {
     return m_odometry;
   }
 
+  public void resetGyro() {
+    m_pigeon.setYaw(0);
+    m_pigeon.setAccumZAngle(0);
+  }
+
   public void updateOdometry() {
     m_odometry.update(
         getHeadingRotation2d(),
