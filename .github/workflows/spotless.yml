@@ -1,0 +1,20 @@
+# This is a basic workflow to build robot code.
+
+name: SpotlessApply
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "apply"
+  apply:
+  
+    # Runs a single command using the runners shell
+    - name: Applies spotless formatting changes to the robot code
+      run: ./gradlew spotlessApply
