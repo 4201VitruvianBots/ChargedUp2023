@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
@@ -63,8 +64,9 @@ public class SwerveDrive extends SubsystemBase {
                       new CANCoder(CAN.backRightCanCoder),
                       backRightCANCoderOffset)));
 
-  private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
+  private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private Trajectory m_trajectory;
+  private boolean Initialize = false; 
 
   private final SwerveDrivePoseEstimator m_odometry =
       new SwerveDrivePoseEstimator(
@@ -171,6 +173,16 @@ public class SwerveDrive extends SubsystemBase {
     return map;
   }
 
+  public boolean getModuleInitStatus() {
+    for (ModulePosition i : m_swerveModules.keySet()) {
+
+      if(m_swerveModules.get(i).getInitSuccess() == false){
+        return false; 
+      }
+    }
+    return true; 
+  }
+
   public PIDController getXPidController() {
     return m_xController;
   }
@@ -233,10 +245,19 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  private void updateSmartDashboard() {}
+  private void updateSmartDashboard() {
+    SmartDashboard.putNumber(
+        "gyro " + m_pigeon + " heading", getHeadingDegrees());
+    SmartDashboard.putBoolean("ModuleInitStatus", Initialize); 
+  }
 
   @Override
   public void periodic() {
+    if(Initialize == false){
+    if(getModuleInitStatus()){
+      Initialize = true; 
+    }
+    }
     updateOdometry();
     updateSmartDashboard();
   }

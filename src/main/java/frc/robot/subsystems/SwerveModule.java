@@ -8,6 +8,7 @@ import static frc.robot.Constants.SwerveDrive.kMaxSpeedMetersPerSecond;
 import static frc.robot.Constants.SwerveModule.*;
 import static frc.robot.Constants.SwerveModule.kDriveMotorGearRatio;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,6 +41,7 @@ public class SwerveModule extends SubsystemBase {
   double m_angleOffset;
   double m_lastAngle;
   Pose2d m_pose;
+  boolean m_initSuccess = false; 
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -81,11 +84,34 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
 
-    m_angleEncoder.configFactoryDefault();
-    m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    initCanCoder();
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
     if (RobotBase.isReal()) resetAngleToAbsolute();
+  }
+
+  private void initCanCoder(){
+    Timer.delay(1);
+    int counter = 0; 
+    
+    while(counter < 100){ 
+      m_angleEncoder.getAbsolutePosition();
+      if(m_angleEncoder.getLastError() == ErrorCode.OK){
+        break; 
+      }
+      else if(counter > 100){
+        return;
+      }
+      counter++; 
+      
+    }
+    m_angleEncoder.configFactoryDefault();
+    m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    m_initSuccess = true; 
+  }
+
+  public boolean getInitSuccess(){
+    return m_initSuccess; 
   }
 
   public ModulePosition getModulePosition() {
