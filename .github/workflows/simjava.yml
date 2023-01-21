@@ -14,7 +14,7 @@ on:
 jobs:
   # This workflow contains a single job called "sim"
   sim:
-  
+    
     # Runs a single command using the runners shell
     - name: Runs the robot code in a simulator
       run: ./gradlew simulateJava
