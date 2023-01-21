@@ -1,5 +1,4 @@
 package frc.robot.commands.auto;
-package frc.robot.commands.auto;
 
 import java.lang.reflect.Field;
 
@@ -20,7 +19,7 @@ public class BlueTopTwoConeBalance extends SequentialCommandGroup {
   public BlueTopTwoConeBalance (SwerveDrive swerveDrive, FieldSim fieldSim){
            
     PathPlannerTrajectory trajectory =
-           pathplanner.loadPath("BlueTopTwoConeBalance" ,Units.feetToMeters(2), Units.feetToMeters(2), false);
+    PathPlanner.loadPath("BlueTopTwoConeBalance" ,Units.feetToMeters(2), Units.feetToMeters(2), false);
      PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(
              trajectory,

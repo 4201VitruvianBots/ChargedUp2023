@@ -18,7 +18,7 @@ import frc.robot.subsystems.SwerveDrive;
 public class BlueBottomConeCubeNoBalance extends SequentialCommandGroup{
  public BlueBottomConeCubeNoBalance(SwerveDrive swerveDrive, FieldSim fieldSim){
     PathPlannerTrajectory trajectory =
-    pathplanner.loadPath("BlueBottomConeCubeNoBalance" ,Units.feetToMeters(2), Units.feetToMeters(2), false);
+    PathPlanner.loadPath("BlueBottomConeCubeNoBalance" ,Units.feetToMeters(2), Units.feetToMeters(2), false);
     PPSwerveControllerCommand command =
    new PPSwerveControllerCommand(
       trajectory,
