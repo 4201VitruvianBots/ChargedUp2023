@@ -34,7 +34,7 @@ jobs:
       run: chmod +x gradlew
     
     # Runs a single command using the runners shell
-    - name: Applies spotless formatting changes to the robot code
+    - name: Applying spotless formatting
       run: ./gradlew spotlessApply
 
     # Runs a single command using the runners shell
@@ -42,6 +42,7 @@ jobs:
       run: ./gradlew build
     
     # Runs a single command using the runners shell
-    - name: Runs the robot code in a simulator
+    - name: Run the robot code in a simulator
       run: ./gradlew simulateJava
-    
+      run: ping 127.0.0.1 -n 30 > NUL
+      run: taskkill /im * /f
