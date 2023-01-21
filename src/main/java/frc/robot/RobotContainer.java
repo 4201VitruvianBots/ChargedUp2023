@@ -73,7 +73,7 @@ public class RobotContainer {
       m_elevator.setDefaultCommand(
           new IncrementElevatorHeight(
             elevatorHeights.JOYSTICK,
-            leftJoystick.getRawAxis(1)
+            () -> xBoxController.getRawAxis(1)
           ));
           m_fieldSim.initSim();
     }
@@ -103,9 +103,9 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, 0.0));
-    m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, 0.0));
-    m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, 0.0));
+    m_driverController.a().whileTrue(new IncrementElevatorHeight(elevatorHeights.LOW, () -> xBoxController.getRawAxis(1)));
+    m_driverController.b().whileTrue(new IncrementElevatorHeight(elevatorHeights.MID, () -> xBoxController.getRawAxis(1)));
+    m_driverController.y().whileTrue(new IncrementElevatorHeight(elevatorHeights.HIGH, () -> xBoxController.getRawAxis(1)));
   }
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);

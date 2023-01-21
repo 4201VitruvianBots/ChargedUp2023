@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -68,6 +70,10 @@ public class Elevator extends SubsystemBase {
     Shuffleboard.selectTab("Elevator");
   }
 
+  /*
+   * True? Elevator climbing
+   * False? Elevator not climbing
+   */
   public static boolean getElevatorClimbState() {
     return elevatorClimbState;
   }
@@ -76,6 +82,9 @@ public class Elevator extends SubsystemBase {
   }
 
 
+  /*
+   * Elevator's motor output as a percentage
+   */
   public double getElevatorPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
@@ -83,7 +92,9 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-
+  /*
+   * Elevator's height position
+   */
   public static double getElevatorHeight() {
     return elevatorHeight;
   }
@@ -108,10 +119,14 @@ public class Elevator extends SubsystemBase {
     desiredHeightState = heightEnum;
   }
   
-  public static void setElevatorJoystickY(double joystickY) {
-    elevatorJoystickY = joystickY;
+  public static void setElevatorJoystickY(DoubleSupplier m_joystickY) {
+    elevatorJoystickY = m_joystickY.getAsDouble();
   }
 
+  /*
+   * Coast: Motor moving without power
+   * Brake: Motor is kept in place
+   */
   public void setElevatorNeutralMode(NeutralMode mode) {
     elevatorMotors[0].setNeutralMode(mode);
     elevatorMotors[1].setNeutralMode(mode);
