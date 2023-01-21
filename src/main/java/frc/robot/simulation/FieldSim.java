@@ -5,20 +5,12 @@
 package frc.robot.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
-import frc.robot.Constants.SwerveDrive.ModulePosition;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.ModuleMap;
-
-import java.util.Map;
-
 
 public class FieldSim {
   private final SwerveDrive m_swerveDrive;
@@ -29,8 +21,7 @@ public class FieldSim {
     m_swerveDrive = swerveDrive;
   }
 
-  public void initSim() {
-  }
+  public void initSim() {}
 
   public Field2d getField2d() {
     return m_field2d;
@@ -51,7 +42,6 @@ public class FieldSim {
         .getObject("Swerve Modules")
         .setPoses(ModuleMap.orderedValues(m_swerveDrive.getModulePoses(), new Pose2d[0]));
   }
-
 
   public void periodic() {
     updateRobotPoses();

@@ -85,8 +85,7 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
-    if(RobotBase.isReal())
-      resetAngleToAbsolute();
+    if (RobotBase.isReal()) resetAngleToAbsolute();
   }
 
   public ModulePosition getModulePosition() {
@@ -109,9 +108,12 @@ public class SwerveModule extends SubsystemBase {
   public double getVelocityMetersPerSecond() {
     return m_driveMotor.getSelectedSensorVelocity() * kDriveMotorDistancePerPulse * 10;
   }
+
   public double getDriveMeters() {
-    return m_driveMotor.getSelectedSensorPosition() * Constants.SwerveModule.kDriveMotorDistancePerPulse;
+    return m_driveMotor.getSelectedSensorPosition()
+        * Constants.SwerveModule.kDriveMotorDistancePerPulse;
   }
+
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
     desiredState = CtreUtils.optimize(desiredState, getHeadingRotation2d());
 
@@ -143,9 +145,11 @@ public class SwerveModule extends SubsystemBase {
   public SwerveModuleState getState() {
     return new SwerveModuleState(getVelocityMetersPerSecond(), getHeadingRotation2d());
   }
+
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getDriveMeters(), getHeadingRotation2d());
   }
+
   public void setModulePose(Pose2d pose) {
     m_pose = pose;
   }
@@ -176,8 +180,10 @@ public class SwerveModule extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_turnMotorSim.setInputVoltage(MathUtil.clamp(m_turnPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
-    m_driveMotorSim.setInputVoltage(MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_turnMotorSim.setInputVoltage(
+        MathUtil.clamp(m_turnPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_driveMotorSim.setInputVoltage(
+        MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
     m_turnMotorSim.update(0.02);
     m_driveMotorSim.update(0.02);
@@ -187,8 +193,8 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
 
-//    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
-//    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
+    //    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
+    //    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
 
     m_turnMotor
         .getSimCollection()

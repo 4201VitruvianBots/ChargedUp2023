@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   public Wrist() {
-    // One motor for the wrist 
-    // factory default configs 
+    // One motor for the wrist
+    // factory default configs
   }
-  // control mode function 
+  // control mode function
   // set percent output function
   // shuffleboard funciton
 

@@ -10,10 +10,9 @@ import frc.robot.subsystems.Wrist;
 public class RunWrist extends CommandBase {
   private final Wrist m_wrist;
 
-
   /** Creates a new RunWrist. */
   public RunWrist(Wrist wrist) {
-    m_wrist = wrist; 
+    m_wrist = wrist;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

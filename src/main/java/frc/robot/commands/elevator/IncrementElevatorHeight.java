@@ -5,19 +5,20 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+import java.util.function.DoubleSupplier;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private DoubleSupplier m_joystickY;
+
   private Elevator m_elevator;
   private elevatorHeights heightEnum;
-  public IncrementElevatorHeight(elevatorHeights heightEnum, DoubleSupplier joystickY) {
+
+  public IncrementElevatorHeight(
+      Elevator elevator, elevatorHeights heightEnum, DoubleSupplier joystickY) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -35,10 +36,9 @@ public class IncrementElevatorHeight extends CommandBase {
   public void execute() {
     Elevator.setElevatorDesiredHeightState(heightEnum);
     Elevator.setElevatorJoystickY(m_joystickY);
-    if(Elevator.getElevatorSimulated()) {
+    if (Elevator.getElevatorSimulated()) {
       Elevator.updateSimulatedElevatorHeight();
-    }
-    else {
+    } else {
       Elevator.updateElevatorHeight();
     }
   }
