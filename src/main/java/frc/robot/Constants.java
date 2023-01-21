@@ -51,9 +51,12 @@ public final class Constants {
   }
 
   public final class Intake {
-    public static final int intakeMotor = 38; 
+    public static final int intakeMotor = 31; 
   }
 
+  public final class Wrist {
+    public static final int wristMotor = 30;
+  }
   public final class LED {
     public static final int CANdleID = 0;
   }
