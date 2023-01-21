@@ -43,6 +43,4 @@ jobs:
     
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
-      run: ./gradlew simulateJava
-      run: ping 127.0.0.1 -n 30 > NUL
-      run: taskkill /im * /f
+      run: ./gradlew simulateJava & ping 127.0.0.1 -n 30 > NUL & taskkill /im * /f
