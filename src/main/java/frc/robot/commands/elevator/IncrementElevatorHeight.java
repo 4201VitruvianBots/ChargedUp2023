@@ -14,17 +14,16 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
-
   private DoubleSupplier m_joystickY;
-
+  private Elevator m_elevator;
   private elevatorHeights heightEnum;
-
   public IncrementElevatorHeight(elevatorHeights heightEnum, DoubleSupplier joystickY) {
+
     // Use addRequirements() here to declare subsystem dependencies.
+    m_elevator = elevator;
     this.heightEnum = heightEnum;
     m_joystickY = joystickY;
-
-    addRequirements();
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -36,8 +35,12 @@ public class IncrementElevatorHeight extends CommandBase {
   public void execute() {
     Elevator.setElevatorDesiredHeightState(heightEnum);
     Elevator.setElevatorJoystickY(m_joystickY);
-    
-    Elevator.updateElevatorHeight();
+    if(Elevator.getElevatorSimulated()) {
+      Elevator.updateSimulatedElevatorHeight();
+    }
+    else {
+      Elevator.updateElevatorHeight();
+    }
   }
 
   // Called once the command ends or is interrupted.

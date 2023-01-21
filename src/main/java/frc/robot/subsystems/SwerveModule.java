@@ -79,6 +79,7 @@ public class SwerveModule extends SubsystemBase {
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
+    m_turnMotor.setInverted(true);
 
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());

@@ -36,11 +36,18 @@ public final class Constants {
 
   }
 
-  public final class Elevator {
+  public static final class Elevator {
     public static final int elevatorMotorLeft = 31;
     public static final int elevatorMotorRight = 32;
 
-    public static final int elevatorLowerSwitch = 0;
+    public static final int elevatorLowerSwitch = 8;
+
+    public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
+    public static final double elevatorGearing = 10.0;
+    public static final double elevatorMassKg = 4.0;
+    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
+    public static final double elevatorMinHeightMeters = 0;
+    public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
   }
 
   public final class Intake {
@@ -51,8 +58,35 @@ public final class Constants {
     public static final int CANdleID = 0;
   }
 
-  public final class Vision {
+  public static final class Vision {
+    public enum CAMERA_TYPE {
+      OAK,
+      LIMELIGHT,
+      PHOTONVISION
+    }
+    
+    public enum CAMERA_POSITION {
+      INTAKE,
+      OUTTAKE,
+      FORWARD_LOCALIZER,
+      REAR_LOCALIZER
+    }
 
+    public enum SERVER_IPS {
+      INTAKE("10.42.1.11"),
+      OUTTAKE("10.42.1.12"),
+      FORWARD_LOCALIZER("10.42.1.13"),
+      REAR_LOCALIZER("10.42.1.14");
+      
+      private final String ip;
+      SERVER_IPS(final String ip) {
+        this.ip = ip;
+      } 
+      @Override
+      public String toString(){
+        return ip;
+      }
+    }
   }
 
 public static final class CAN { // TODO Not real number change tbt//
@@ -84,10 +118,10 @@ public static final class SwerveDrive {
           ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
           ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-  public static final double frontLeftCANCoderOffset = 94.219;
-  public static final double frontRightCANCoderOffset = 132.363;
-  public static final double backLeftCANCoderOffset = 284.590;
-  public static final double backRightCANCoderOffset = 179.648;
+  public static final double frontLeftCANCoderOffset = 153.1054;
+  public static final double frontRightCANCoderOffset = 217.2665;
+  public static final double backLeftCANCoderOffset = 260.2441;
+  public static final double backRightCANCoderOffset = 143.9648;
 
   public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(

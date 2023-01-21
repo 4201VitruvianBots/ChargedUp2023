@@ -162,3 +162,9 @@ bin/
 *-window.json
 
 .idea/
+
+simgui-ds.json
+
+simgui.json
+
+.vscode/settings.json
