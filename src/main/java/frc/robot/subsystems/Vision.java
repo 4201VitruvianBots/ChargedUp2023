@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -23,7 +24,9 @@ public class Vision extends SubsystemBase {
   private final NetworkTable forwardLocalizer;
   private final NetworkTable rearLocalizer;
 
-  private DoubleLogEntry limelightTargetValidLog;
+  private DataLog m_logger;
+  private DoubleLogEntry limelightTargetValid;
+  private DoubleLogEntry forwardLocalizerTargetValid;
 
   Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -43,13 +46,13 @@ public class Vision extends SubsystemBase {
   double avgYPose = 0;
   double headingPose = 0;
 
-  public Vision(SwerveDrive swerveDrive) {
+  public Vision(SwerveDrive swerveDrive, DataLog logger) {
     m_swerveDrive = swerveDrive;
 
     intake = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
-    forwardLocalizer = NetworkTableInstance.getDefault().getTable("limelight");
-    rearLocalizer = NetworkTableInstance.getDefault().getTable("limelight");
+    forwardLocalizer = NetworkTableInstance.getDefault().getTable("fLocalizer");
+    rearLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
 
     PortForwarder.add(5800, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5800);
     PortForwarder.add(5801, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5801);
@@ -57,6 +60,11 @@ public class Vision extends SubsystemBase {
     PortForwarder.add(5803, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5803);
     PortForwarder.add(5804, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5804);
     PortForwarder.add(5805, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5805);
+
+
+    m_logger = logger;
+    limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
+    forwardLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
   }
 
   /**
@@ -180,8 +188,8 @@ public class Vision extends SubsystemBase {
   }
 
   private void logData() {
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
+    limelightTargetValid.append(getValidTargetType(CAMERA_POSITION.INTAKE));
+    forwardLocalizerTargetValid.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
   }
 
   @Override
