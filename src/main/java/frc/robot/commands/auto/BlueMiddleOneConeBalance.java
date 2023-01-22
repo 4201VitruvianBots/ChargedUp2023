@@ -16,7 +16,7 @@ public class BlueMiddleOneConeBalance extends SequentialCommandGroup {
   public BlueMiddleOneConeBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
 
     PathPlannerTrajectory trajectory =
-    TrajectoryUtils.readTrajectory(
+        TrajectoryUtils.readTrajectory(
             "RedMiddleOneConeBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(

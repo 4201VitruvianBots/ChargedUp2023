@@ -6,12 +6,11 @@ package frc.robot.utils;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class TrajectoryUtils {
-  public static PathPlannerTrajectory readTrajectory(String fileName, double MaxVelocity, double MaxAcceleration, boolean reverse) {
+  public static PathPlannerTrajectory readTrajectory(
+      String fileName, double MaxVelocity, double MaxAcceleration, boolean reverse) {
 
     if (fileName.startsWith("Red")) {
       try {
@@ -20,9 +19,11 @@ public class TrajectoryUtils {
         // TODO: handle exception
         DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, null);
         fileName = fileName.replace("Red", "Blue");
-        PathPlannerTrajectory trajectory = readTrajectory(fileName, MaxVelocity, MaxAcceleration, reverse);
-        trajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(
-          trajectory, DriverStation.Alliance.Red);
+        PathPlannerTrajectory trajectory =
+            readTrajectory(fileName, MaxVelocity, MaxAcceleration, reverse);
+        trajectory =
+            PathPlannerTrajectory.transformTrajectoryForAlliance(
+                trajectory, DriverStation.Alliance.Red);
         return trajectory;
       }
     } else {
