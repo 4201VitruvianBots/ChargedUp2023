@@ -25,6 +25,8 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,6 +66,8 @@ public class SwerveModule extends SubsystemBase {
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
 
+  private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
+
   public SwerveModule(
       ModulePosition modulePosition,
       TalonFX turnMotor,
@@ -88,6 +92,7 @@ public class SwerveModule extends SubsystemBase {
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
     if (RobotBase.isReal()) resetAngleToAbsolute();
+    initShuffleboard();
   }
 
   private void initCanCoder() {
@@ -190,16 +195,14 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.setNeutralMode(mode);
   }
 
-  private void updateSmartDashboard() {
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " heading", getState().angle.getDegrees());
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
+  private void initShuffleboard() {
+    m_ShuffleboardTab.add("module " + m_moduleNumber + " heading", getState().angle.getDegrees());
+    m_ShuffleboardTab.add("module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
   }
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    // updateSmartDashboard();
   }
 
   @Override

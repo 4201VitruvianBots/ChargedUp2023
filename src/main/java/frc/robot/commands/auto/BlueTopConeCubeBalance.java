@@ -1,6 +1,7 @@
 package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.util.Units;
@@ -10,12 +11,11 @@ import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
-import frc.robot.utils.TrajectoryUtils;
 
 public class BlueTopConeCubeBalance extends SequentialCommandGroup {
   public BlueTopConeCubeBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
-        TrajectoryUtils.readTrajectory(
+        PathPlanner.loadPath(
             "BlueTopConeCubeBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(

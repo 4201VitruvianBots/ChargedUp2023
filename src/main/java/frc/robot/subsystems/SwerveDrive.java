@@ -66,7 +66,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private Trajectory m_trajectory;
-  private boolean Initialize = false;
+  private boolean Initialize = false; 
 
   private final SwerveDrivePoseEstimator m_odometry =
       new SwerveDrivePoseEstimator(
@@ -176,11 +176,11 @@ public class SwerveDrive extends SubsystemBase {
   public boolean getModuleInitStatus() {
     for (ModulePosition i : m_swerveModules.keySet()) {
 
-      if (m_swerveModules.get(i).getInitSuccess() == false) {
-        return false;
+      if(m_swerveModules.get(i).getInitSuccess() == false){
+        return false; 
       }
     }
-    return true;
+    return true; 
   }
 
   public PIDController getXPidController() {
@@ -246,16 +246,17 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   private void updateSmartDashboard() {
-    SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
+    SmartDashboard.putNumber(
+        "gyro " + m_pigeon + " heading", getHeadingDegrees());
+    SmartDashboard.putBoolean("ModuleInitStatus", Initialize); 
   }
 
   @Override
   public void periodic() {
-    if (Initialize == false) {
-      if (getModuleInitStatus()) {
-        Initialize = true;
-      }
+    if(Initialize == false){
+    if(getModuleInitStatus()){
+      Initialize = true; 
+    }
     }
     updateOdometry();
     updateSmartDashboard();
