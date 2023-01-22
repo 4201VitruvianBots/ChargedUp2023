@@ -44,7 +44,6 @@ public class Vision extends SubsystemBase {
   double headingPose = 0;
 
   public Vision(SwerveDrive swerveDrive) {
-
     m_swerveDrive = swerveDrive;
 
     intake = NetworkTableInstance.getDefault().getTable("limelight");
@@ -76,7 +75,6 @@ public class Vision extends SubsystemBase {
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case FORWARD_LOCALIZER:
-        return getAprilTagIds(position)[0];
       case REAR_LOCALIZER:
         return getAprilTagIds(position)[0];
       default:
@@ -174,14 +172,11 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
-    switch (position) {
-      case FORWARD_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      case REAR_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      default:
-        return defaultPose;
-    }
+    return new Pose2d(pose[0], pose[1], m_swerveDrive.getHeadingRotation2d());
+  }
+
+  private void updateVisionPose(CAMERA_POSITION position) {
+    m_swerveDrive.getOdometry().addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
   }
 
   private void logData() {
@@ -192,6 +187,7 @@ public class Vision extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateVisionPose(CAMERA_POSITION.FORWARD_LOCALIZER);
     logData();
   }
 

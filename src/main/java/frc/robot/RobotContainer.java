@@ -23,6 +23,7 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,7 +35,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
