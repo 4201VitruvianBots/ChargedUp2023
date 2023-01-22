@@ -12,11 +12,11 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class BlueTopConeCubeBalance extends SequentialCommandGroup {
-  public BlueTopConeCubeBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
+public class RedMiddleTwoConeNoBalance extends SequentialCommandGroup {
+  public RedMiddleTwoConeNoBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueTopConeCubeBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
+            "RedMiddleTwoConeNoBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(
             trajectory,
