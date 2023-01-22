@@ -43,7 +43,7 @@ public class SwerveModule extends SubsystemBase {
   double m_angleOffset;
   double m_lastAngle;
   Pose2d m_pose;
-  boolean m_initSuccess = false; 
+  boolean m_initSuccess = false;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -95,28 +95,26 @@ public class SwerveModule extends SubsystemBase {
     initShuffleboard();
   }
 
-  private void initCanCoder(){
+  private void initCanCoder() {
     Timer.delay(1);
-    int counter = 0; 
-    
-    while(counter < 100){ 
+    int counter = 0;
+
+    while (counter < 100) {
       m_angleEncoder.getAbsolutePosition();
-      if(m_angleEncoder.getLastError() == ErrorCode.OK){
-        break; 
-      }
-      else if(counter > 100){
+      if (m_angleEncoder.getLastError() == ErrorCode.OK) {
+        break;
+      } else if (counter > 100) {
         return;
       }
-      counter++; 
-      
+      counter++;
     }
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
-    m_initSuccess = true; 
+    m_initSuccess = true;
   }
 
-  public boolean getInitSuccess(){
-    return m_initSuccess; 
+  public boolean getInitSuccess() {
+    return m_initSuccess;
   }
 
   public ModulePosition getModulePosition() {
