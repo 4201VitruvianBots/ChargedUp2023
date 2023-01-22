@@ -9,10 +9,11 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.ModuleMap;
 
-public class FieldSim {
+public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
 
   private final Field2d m_field2d = new Field2d();
@@ -43,6 +44,7 @@ public class FieldSim {
         .setPoses(ModuleMap.orderedValues(m_swerveDrive.getModulePoses(), new Pose2d[0]));
   }
 
+  @Override
   public void periodic() {
     updateRobotPoses();
 

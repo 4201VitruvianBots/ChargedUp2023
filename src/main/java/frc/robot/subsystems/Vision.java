@@ -159,7 +159,7 @@ public class Vision extends SubsystemBase {
   /**
    * Get the timestamp of the detection results.
    *
-   * @return Robot Pose in meters
+   * @return Robot Pose in m/eters
    */
   public double getDetectionTimestamp(CAMERA_POSITION position) {
     switch (position) {

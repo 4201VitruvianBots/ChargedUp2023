@@ -259,7 +259,7 @@ public class SwerveDrive extends SubsystemBase {
     }
     }
     updateOdometry();
-    updateSmartDashboard();
+    // updateSmartDashboard();
   }
 
   @Override
