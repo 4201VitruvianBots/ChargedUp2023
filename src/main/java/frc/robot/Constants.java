@@ -118,7 +118,7 @@ public final class Constants {
             ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset =265.430;
+    public static final double frontLeftCANCoderOffset = 265.430;
     public static final double frontRightCANCoderOffset = 41.748;
     public static final double backLeftCANCoderOffset = 82.354;
     public static final double backRightCANCoderOffset = 329.150;
