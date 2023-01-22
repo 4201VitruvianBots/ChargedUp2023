@@ -4,10 +4,7 @@
 
 package frc.robot.commands.auto;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
 
@@ -25,7 +22,7 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
- m_fieldSim.setTrajectory(m_trajectory);
+    m_fieldSim.setTrajectory(m_trajectory);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

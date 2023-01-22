@@ -8,6 +8,7 @@ import static frc.robot.Constants.SwerveDrive.kMaxSpeedMetersPerSecond;
 import static frc.robot.Constants.SwerveModule.*;
 import static frc.robot.Constants.SwerveModule.kDriveMotorGearRatio;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -23,6 +24,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,6 +43,7 @@ public class SwerveModule extends SubsystemBase {
   double m_angleOffset;
   double m_lastAngle;
   Pose2d m_pose;
+  boolean m_initSuccess = false;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -61,6 +66,8 @@ public class SwerveModule extends SubsystemBase {
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
 
+  private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
+
   public SwerveModule(
       ModulePosition modulePosition,
       TalonFX turnMotor,
@@ -81,12 +88,33 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
 
-    m_angleEncoder.configFactoryDefault();
-    m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    initCanCoder();
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
-    if(RobotBase.isReal())
-      resetAngleToAbsolute();
+    if (RobotBase.isReal()) resetAngleToAbsolute();
+    initShuffleboard();
+  }
+
+  private void initCanCoder() {
+    Timer.delay(1);
+    int counter = 0;
+
+    while (counter < 100) {
+      m_angleEncoder.getAbsolutePosition();
+      if (m_angleEncoder.getLastError() == ErrorCode.OK) {
+        break;
+      } else if (counter > 100) {
+        return;
+      }
+      counter++;
+    }
+    m_angleEncoder.configFactoryDefault();
+    m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    m_initSuccess = true;
+  }
+
+  public boolean getInitSuccess() {
+    return m_initSuccess;
   }
 
   public ModulePosition getModulePosition() {
@@ -109,9 +137,12 @@ public class SwerveModule extends SubsystemBase {
   public double getVelocityMetersPerSecond() {
     return m_driveMotor.getSelectedSensorVelocity() * kDriveMotorDistancePerPulse * 10;
   }
+
   public double getDriveMeters() {
-    return m_driveMotor.getSelectedSensorPosition() * Constants.SwerveModule.kDriveMotorDistancePerPulse;
+    return m_driveMotor.getSelectedSensorPosition()
+        * Constants.SwerveModule.kDriveMotorDistancePerPulse;
   }
+
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
     desiredState = CtreUtils.optimize(desiredState, getHeadingRotation2d());
 
@@ -143,9 +174,11 @@ public class SwerveModule extends SubsystemBase {
   public SwerveModuleState getState() {
     return new SwerveModuleState(getVelocityMetersPerSecond(), getHeadingRotation2d());
   }
+
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getDriveMeters(), getHeadingRotation2d());
   }
+
   public void setModulePose(Pose2d pose) {
     m_pose = pose;
   }
@@ -162,22 +195,22 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.setNeutralMode(mode);
   }
 
-  private void updateSmartDashboard() {
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " heading", getState().angle.getDegrees());
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
+  private void initShuffleboard() {
+    m_ShuffleboardTab.add("module " + m_moduleNumber + " heading", getState().angle.getDegrees());
+    m_ShuffleboardTab.add("module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
   }
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    // updateSmartDashboard();
   }
 
   @Override
   public void simulationPeriodic() {
-    m_turnMotorSim.setInputVoltage(MathUtil.clamp(m_turnPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
-    m_driveMotorSim.setInputVoltage(MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_turnMotorSim.setInputVoltage(
+        MathUtil.clamp(m_turnPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_driveMotorSim.setInputVoltage(
+        MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
     m_turnMotorSim.update(0.02);
     m_driveMotorSim.update(0.02);
@@ -187,8 +220,8 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
 
-//    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
-//    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
+    //    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
+    //    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
 
     m_turnMotor
         .getSimCollection()

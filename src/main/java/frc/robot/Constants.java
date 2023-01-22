@@ -177,4 +177,3 @@ public static final class SwerveDrive {
     public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
   }
-   

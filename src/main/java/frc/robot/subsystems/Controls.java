@@ -80,7 +80,8 @@ public class Controls extends SubsystemBase {
   /** Sends values to SmartDashboard */
   private void updateSmartDashboard() {
     SmartDashboard.putBoolean("Alliance", getAllianceColorBoolean());
-    // SmartDashboardTab.putString("Controls", "alliance_string", getAllianceColor().toString()); TODO: fix 
+    // SmartDashboardTab.putString("Controls", "alliance_string", getAllianceColor().toString());
+    // TODO: fix
   }
 
   @Override
