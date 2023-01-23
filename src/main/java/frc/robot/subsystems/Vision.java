@@ -43,7 +43,7 @@ public class Vision extends SubsystemBase {
   double avgYPose = 0;
   double headingPose = 0;
 
-  public Vision(SwerveDrive swerveDrive, Vision vision) {
+  public Vision(SwerveDrive swerveDrive) {
 
     m_swerveDrive = swerveDrive;
 
@@ -184,13 +184,9 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  // public Pose2d getLimelightPose() {
-  //   return new Pose2d()
-  // }
-
   private void logData() {
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
+    // limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
+    // limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
   }
 
   @Override
