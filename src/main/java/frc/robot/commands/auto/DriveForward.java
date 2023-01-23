@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
+import frc.robot.commands.swerve.TestPPSwerveControllerCommand;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
@@ -29,7 +30,9 @@ public class DriveForward extends SequentialCommandGroup {
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
             swerveDrive::setSwerveModuleStatesAuto,
+            false,
             swerveDrive);
+//    TestPPSwerveControllerCommand command = new TestPPSwerveControllerCommand(swerveDrive, trajectory);
 
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),

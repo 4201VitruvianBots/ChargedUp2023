@@ -138,10 +138,6 @@ public final class Constants {
     public static final double kP_Theta = 4;
     public static final double kD_Theta = 0.01;
 
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxRotationRadiansPerSecond, kMaxRotationRadiansPerSecondSquared);
-
     public enum ModulePosition {
       FRONT_LEFT,
       FRONT_RIGHT,

@@ -147,7 +147,6 @@ public class SwerveDrive extends SubsystemBase {
 
   public double getHeadingDegrees() {
     return m_pigeon.getYaw();
-    // return 0;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -164,36 +163,33 @@ public class SwerveDrive extends SubsystemBase {
 
   public Map<ModulePosition, SwerveModuleState> getModuleStates() {
     Map<ModulePosition, SwerveModuleState> map = new HashMap<>();
-    for (ModulePosition i : m_swerveModules.keySet()) {
+    for (ModulePosition i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getState());
-    }
     return map;
   }
 
   public Map<ModulePosition, SwerveModulePosition> getModulePositions() {
     Map<ModulePosition, SwerveModulePosition> map = new HashMap<>();
-    for (ModulePosition i : m_swerveModules.keySet()) {
+    for (ModulePosition i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getPosition());
-    }
     return map;
   }
 
   public SwerveModulePosition[] getModulePositionsArray() {
-    return getModulePositions().values().toArray(new SwerveModulePosition[4]);
+    return ModuleMap.orderedValues(getModulePositions(), new SwerveModulePosition[0]);
   }
 
   public Map<ModulePosition, Pose2d> getModulePoses() {
     Map<ModulePosition, Pose2d> map = new HashMap<>();
-    for (ModulePosition i : m_swerveModules.keySet()) {
+    for (ModulePosition i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getModulePose());
-    }
     return map;
   }
 
   public boolean getModuleInitStatus() {
     for (ModulePosition i : m_swerveModules.keySet()) {
 
-      if (m_swerveModules.get(i).getInitSuccess() == false) {
+      if (!m_swerveModules.get(i).getInitSuccess()) {
         return false;
       }
     }
@@ -239,26 +235,27 @@ public class SwerveDrive extends SubsystemBase {
   public void updateOdometry() {
     m_odometry.update(getHeadingRotation2d(), getModulePositionsArray());
 
-    //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-    //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-    //              .rotateBy(getHeadingRotation2d())
-    //              .plus(kModuleTranslations.get(module.getModulePosition()));
-    //
-    //      module.setModulePose(
-    //          new Pose2d(
-    //              modulePositionFromChassis,
-    //              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
-    //    }
+//    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+//      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
+//              .rotateBy(getHeadingRotation2d())
+//              .plus(kModuleTranslations.get(module.getModulePosition()));
+//
+//      module.setModulePose(
+//          new Pose2d(
+//              modulePositionFromChassis,
+//              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
+//    }
+
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
-          kModuleTranslations
-              .get(module.getModulePosition())
-              .rotateBy(getHeadingRotation2d())
-              .plus(getPoseMeters().getTranslation());
+              kModuleTranslations
+                      .get(module.getModulePosition())
+                      .rotateBy(getHeadingRotation2d())
+                      .plus(getPoseMeters().getTranslation());
       module.setModulePose(
-          new Pose2d(
-              modulePositionFromChassis,
-              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+              new Pose2d(
+                      modulePositionFromChassis,
+                      module.getHeadingRotation2d().plus(getHeadingRotation2d())));
     }
   }
 

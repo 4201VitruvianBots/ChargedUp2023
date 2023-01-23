@@ -26,6 +26,7 @@ public class RedMiddleTwoConeNoBalance extends SequentialCommandGroup {
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
             swerveDrive::setSwerveModuleStatesAuto,
+                false,
             swerveDrive);
 
     addCommands(
