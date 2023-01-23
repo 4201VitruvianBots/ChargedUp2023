@@ -77,32 +77,23 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder = angleEncoder;
     m_angleOffset = angleOffset;
 
-    m_driveMotor.configFactoryDefault();
-    m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
+    initCanCoder();
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
+    m_turnMotor.setSelectedSensorPosition(0);
 
-    initCanCoder();
+    m_driveMotor.configFactoryDefault();
+    m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
+    m_driveMotor.setInverted(false);
+
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
-
-    if (RobotBase.isReal()) resetAngleToAbsolute();
+    m_lastAngle = getHeadingDegrees();
   }
 
   private void initCanCoder() {
     Timer.delay(1);
-    int counter = 0;
-
-    while (counter < 100) {
-      m_angleEncoder.getAbsolutePosition();
-      if (m_angleEncoder.getLastError() == ErrorCode.OK) {
-        break;
-      } else if (counter > 100) {
-        return;
-      }
-      counter++;
-    }
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     m_initSuccess = true;
@@ -192,7 +183,7 @@ public class SwerveModule extends SubsystemBase {
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " heading", getState().angle.getDegrees());
+        "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
   }

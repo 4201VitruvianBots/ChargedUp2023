@@ -108,8 +108,8 @@ public final class Constants {
   }
 
   public static final class SwerveDrive {
-    public static final double kTrackWidth = Units.inchesToMeters(30);
-    public static final double kWheelBase = Units.inchesToMeters(30);
+    public static final double kTrackWidth = Units.inchesToMeters(24);
+    public static final double kWheelBase = Units.inchesToMeters(24);
 
     public static final Map<ModulePosition, Translation2d> kModuleTranslations =
         Map.of(
@@ -118,10 +118,10 @@ public final class Constants {
             ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 265.430;
-    public static final double frontRightCANCoderOffset = 41.748;
-    public static final double backLeftCANCoderOffset = 82.354;
-    public static final double backRightCANCoderOffset = 329.150;
+    public static final double frontLeftCANCoderOffset = 265.342;//265.430;
+    public static final double frontRightCANCoderOffset = 39.990;//41.748;
+    public static final double backLeftCANCoderOffset = 261.475;//261.914;
+    public static final double backRightCANCoderOffset = 328.359;//329.150;
 
     public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(
@@ -131,12 +131,12 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_X = 0.2;
+    public static final double kP_X = 0.6;
     public static final double kD_X = 0;
-    public static final double kP_Y = 0.2;
+    public static final double kP_Y = 0.6;
     public static final double kD_Y = 0;
-    public static final double kP_Theta = 8;
-    public static final double kD_Theta = 0;
+    public static final double kP_Theta = 4;
+    public static final double kD_Theta = 0.01;
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
@@ -153,7 +153,7 @@ public final class Constants {
   public static final class SwerveModule {
     public static final double kDriveMotorGearRatio = 6.12;
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3.94);
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final int kFalconEncoderCPR = 2048;
     public static final int kCANCoderCPR = 4096;
 
@@ -166,9 +166,9 @@ public final class Constants {
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
     public static final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
-    public static final double ksDriveVoltSecondsPerMeter = 0.667 / 12;
-    public static final double kvDriveVoltSecondsSquaredPerMeter = 2.44 / 12;
-    public static final double kaDriveVoltSecondsSquaredPerMeter = 0.27 / 12;
+    public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
+    public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
+    public static final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
 
     public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
     public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3

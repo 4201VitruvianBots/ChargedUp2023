@@ -22,6 +22,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -68,12 +70,7 @@ public class SwerveDrive extends SubsystemBase {
   private Trajectory m_trajectory;
   private boolean Initialize = false;
 
-  private final SwerveDrivePoseEstimator m_odometry =
-      new SwerveDrivePoseEstimator(
-          Constants.SwerveDrive.kSwerveKinematics,
-          getHeadingRotation2d(),
-          getModulePositions(),
-          new Pose2d());
+  private final SwerveDrivePoseEstimator m_odometry;
 
   private PIDController m_xController = new PIDController(kP_X, 0, kD_X);
   private PIDController m_yController = new PIDController(kP_Y, 0, kD_Y);
@@ -82,7 +79,24 @@ public class SwerveDrive extends SubsystemBase {
   private double m_simYaw;
 
   public SwerveDrive() {
+    m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
+    m_turnController.enableContinuousInput(-Math.PI, Math.PI);
+
+    m_odometry =
+      new SwerveDrivePoseEstimator(
+          Constants.SwerveDrive.kSwerveKinematics,
+          getHeadingRotation2d(),
+          getModulePositionsArray(),
+          new Pose2d());
+    
+    Timer.delay(1);
+    if (RobotBase.isReal()) resetModulesToAbsolute();
+  }
+
+  private void resetModulesToAbsolute(){
+    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
+      module.resetAngleToAbsolute();
   }
 
   public void drive(
@@ -128,12 +142,12 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_odometry.resetPosition(getHeadingRotation2d(), getModulePositions(), pose);
-    m_pigeon.setYaw(pose.getRotation().getDegrees());
+    m_odometry.resetPosition(getHeadingRotation2d(), getModulePositionsArray(), pose);
   }
 
   public double getHeadingDegrees() {
-    return Math.IEEEremainder(m_pigeon.getYaw(), 360);
+    return m_pigeon.getYaw();
+    // return 0;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -156,13 +170,16 @@ public class SwerveDrive extends SubsystemBase {
     return map;
   }
 
-  public SwerveModulePosition[] getModulePositions() {
-    return new SwerveModulePosition[] {
-      m_swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
-      m_swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
-      m_swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
-      m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition(),
-    };
+  public Map<ModulePosition, SwerveModulePosition> getModulePositions() {
+    Map<ModulePosition, SwerveModulePosition> map = new HashMap<>();
+    for (ModulePosition i : m_swerveModules.keySet()) {
+      map.put(i, m_swerveModules.get(i).getPosition());
+    }
+    return map;
+  }
+
+  public SwerveModulePosition[] getModulePositionsArray() {
+    return getModulePositions().values().toArray(new SwerveModulePosition[4]);
   }
 
   public Map<ModulePosition, Pose2d> getModulePoses() {
@@ -220,7 +237,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void updateOdometry() {
-    m_odometry.update(getHeadingRotation2d(), getModulePositions());
+    m_odometry.update(getHeadingRotation2d(), getModulePositionsArray());
 
     //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
     //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()

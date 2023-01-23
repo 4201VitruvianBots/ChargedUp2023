@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.DriveTest;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -127,6 +129,8 @@ public class RobotContainer {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("RedMiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
