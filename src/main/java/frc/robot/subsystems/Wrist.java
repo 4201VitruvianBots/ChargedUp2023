@@ -13,12 +13,12 @@ import frc.robot.Constants;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
-  private TalonFX wristMotor = new TalonFX(Constants.Wrist.wristMotor);
+    private TalonFX wristMotor = new TalonFX(Constants.Wrist.wristMotor);
     private final PIDController wristPID = new PIDController(0.1, 0.01, 0.05);
     private boolean isWristtaking;
   public Wrist() {
-    // One motor for the wrist 
-    
+    // One motor for the wrist
+
     // factory default configs
     wristMotor.configFactoryDefault();
     wristPID.setTolerance(0.01);
@@ -49,7 +49,6 @@ public boolean getWristState;
 public void setWristState(boolean state){
   boolean isWristtaking = state;
 }
-
   // set percent output function
 public void setWristPercentOutput(double output) {
   wristMotor.set(ControlMode.PercentOutput, output);
@@ -66,5 +65,3 @@ public void updateSmartDashboard() {
     setWristPercentOutput(wristPID.calculate(getMeasurement()));
   }
 }
-
-

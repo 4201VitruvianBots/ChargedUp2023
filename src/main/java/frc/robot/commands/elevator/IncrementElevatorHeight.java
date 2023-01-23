@@ -8,19 +8,22 @@ package frc.robot.commands.elevator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+import java.util.function.DoubleSupplier;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
+  private DoubleSupplier m_joystickY;
+
   private Elevator m_elevator;
   private elevatorHeights heightEnum;
-  private double joystickY;
 
-  public IncrementElevatorHeight(Elevator elevator, elevatorHeights heightEnum, double joystickY) {
+  public IncrementElevatorHeight(
+      Elevator elevator, elevatorHeights heightEnum, DoubleSupplier joystickY) {
+
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     this.heightEnum = heightEnum;
-    this.joystickY = joystickY;
-    this.m_elevator = elevator;
+    m_joystickY = joystickY;
     addRequirements(m_elevator);
   }
 
@@ -32,11 +35,10 @@ public class IncrementElevatorHeight extends CommandBase {
   @Override
   public void execute() {
     Elevator.setElevatorDesiredHeightState(heightEnum);
-    Elevator.setElevatorJoystickY(joystickY);
-    if(Elevator.getElevatorSimulated()) {
+    Elevator.setElevatorJoystickY(m_joystickY);
+    if (Elevator.getElevatorSimulated()) {
       Elevator.updateSimulatedElevatorHeight();
-    }
-    else {
+    } else {
       Elevator.updateElevatorHeight();
     }
   }

@@ -43,8 +43,8 @@ public class Vision extends SubsystemBase {
   double avgYPose = 0;
   double headingPose = 0;
 
-  public Vision(SwerveDrive swerveDrive) {
-    
+  public Vision(SwerveDrive swerveDrive, Vision vision) {
+
     m_swerveDrive = swerveDrive;
 
     intake = NetworkTableInstance.getDefault().getTable("limelight");
@@ -62,7 +62,7 @@ public class Vision extends SubsystemBase {
 
   /**
    * Given a camera, return a boolean value based on if it sees a target or not.
-   * 
+   *
    * @return true: Camera has a target. false: Camera does not have a target
    */
   public boolean getValidTarget(CAMERA_POSITION position) {
@@ -143,7 +143,7 @@ public class Vision extends SubsystemBase {
   }
 
   /*
-   * botpose: Robot transform in field-space. Translation (X,Y,Z) Rotation(X,Y,Z)  
+   * botpose: Robot transform in field-space. Translation (X,Y,Z) Rotation(X,Y,Z)
    */
   public double[] getBotPose(CAMERA_POSITION position) {
     switch (position) {
@@ -159,7 +159,7 @@ public class Vision extends SubsystemBase {
   /**
    * Get the timestamp of the detection results.
    *
-   * @return Robot Pose in meters
+   * @return Robot Pose in m/eters
    */
   public double getDetectionTimestamp(CAMERA_POSITION position) {
     switch (position) {
@@ -172,17 +172,21 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public Pose2d getRobotPose2d (CAMERA_POSITION position) {
+  public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
-    switch(position) {
+    switch (position) {
       case FORWARD_LOCALIZER:
         return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
       case REAR_LOCALIZER:
         return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
       default:
-        return defaultPose;  
+        return defaultPose;
     }
   }
+
+  // public Pose2d getLimelightPose() {
+  //   return new Pose2d()
+  // }
 
   private void logData() {
     limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));

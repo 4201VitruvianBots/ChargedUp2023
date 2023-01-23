@@ -54,8 +54,7 @@ public class SetSwerveOdometry extends CommandBase {
   @Override
   public void initialize() {
     m_swerveDrive.setOdometry(m_pose2d);
-     if (RobotBase.isSimulation())
-       m_fieldSim.resetRobotPose(m_pose2d);
+    if (RobotBase.isSimulation()) m_fieldSim.resetRobotPose(m_pose2d);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

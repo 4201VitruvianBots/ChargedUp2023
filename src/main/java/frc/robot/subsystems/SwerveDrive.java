@@ -11,20 +11,18 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
@@ -66,8 +64,9 @@ public class SwerveDrive extends SubsystemBase {
                       new CANCoder(CAN.backRightCanCoder),
                       backRightCANCoderOffset)));
 
-  private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon);
+  private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private Trajectory m_trajectory;
+  private boolean Initialize = false;
 
   private final SwerveDrivePoseEstimator m_odometry =
       new SwerveDrivePoseEstimator(
@@ -122,7 +121,7 @@ public class SwerveDrive extends SubsystemBase {
   public void setSwerveModuleStatesAuto(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
   }
-  
+
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
     var states = kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
@@ -159,10 +158,10 @@ public class SwerveDrive extends SubsystemBase {
 
   public SwerveModulePosition[] getModulePositions() {
     return new SwerveModulePosition[] {
-        m_swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
-        m_swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
-        m_swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
-        m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition(),
+      m_swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
+      m_swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
+      m_swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
+      m_swerveModules.get(ModulePosition.BACK_RIGHT).getPosition(),
     };
   }
 
@@ -172,6 +171,16 @@ public class SwerveDrive extends SubsystemBase {
       map.put(i, m_swerveModules.get(i).getModulePose());
     }
     return map;
+  }
+
+  public boolean getModuleInitStatus() {
+    for (ModulePosition i : m_swerveModules.keySet()) {
+
+      if (m_swerveModules.get(i).getInitSuccess() == false) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public PIDController getXPidController() {
@@ -197,9 +206,8 @@ public class SwerveDrive extends SubsystemBase {
     m_trajectory = trajectory;
   }
 
-  public Trajectory getCurrentTrajectory(){
+  public Trajectory getCurrentTrajectory() {
     return m_trajectory;
-
   }
 
   public SwerveDrivePoseEstimator getOdometry() {
@@ -212,37 +220,43 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void updateOdometry() {
-    m_odometry.update(
-        getHeadingRotation2d(),
-        getModulePositions());
+    m_odometry.update(getHeadingRotation2d(), getModulePositions());
 
-//    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-//      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-//              .rotateBy(getHeadingRotation2d())
-//              .plus(kModuleTranslations.get(module.getModulePosition()));
-//
-//      module.setModulePose(
-//          new Pose2d(
-//              modulePositionFromChassis,
-//              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
-//    }
+    //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+    //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
+    //              .rotateBy(getHeadingRotation2d())
+    //              .plus(kModuleTranslations.get(module.getModulePosition()));
+    //
+    //      module.setModulePose(
+    //          new Pose2d(
+    //              modulePositionFromChassis,
+    //              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
+    //    }
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
-              kModuleTranslations
-                      .get(module.getModulePosition())
-                      .rotateBy(getHeadingRotation2d())
-                      .plus(getPoseMeters().getTranslation());
+          kModuleTranslations
+              .get(module.getModulePosition())
+              .rotateBy(getHeadingRotation2d())
+              .plus(getPoseMeters().getTranslation());
       module.setModulePose(
-              new Pose2d(
-                      modulePositionFromChassis,
-                      module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+          new Pose2d(
+              modulePositionFromChassis,
+              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
     }
   }
 
-  private void updateSmartDashboard() {}
+  private void updateSmartDashboard() {
+    SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
+    SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
+  }
 
   @Override
   public void periodic() {
+    if (Initialize == false) {
+      if (getModuleInitStatus()) {
+        Initialize = true;
+      }
+    }
     updateOdometry();
     updateSmartDashboard();
   }
