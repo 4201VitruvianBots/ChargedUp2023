@@ -11,6 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.subsystems.Controls;
 import frc.robot.utils.ModuleMap;
 
 /**
@@ -56,6 +58,13 @@ public final class Constants {
 
   public final class LED {
     public static final int CANdleID = 0;
+
+    public LED(Controls m_controls) {
+    }
+
+    public Object setDefaultCommand(GetSubsystemStates getSubsystemStates) {
+      return null;
+    }
   }
 
   public static final class Vision {

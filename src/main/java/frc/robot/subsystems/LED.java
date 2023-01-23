@@ -22,7 +22,7 @@ public class LED extends SubsystemBase {
     private robotState currentRobotState = robotState.Disabled; 
     private Animation m_Animation = null; 
 
-    private final Controls m_controls; //fiugure out during robtoics class 
+    private final Controls m_controls; //fiugure out during robtoics class
 
     private final int LEDcount = 22; //TODO: Change LEDCount
 
@@ -105,33 +105,32 @@ public LED (Controls controls) {
     if(state != currentRobotState){
       switch(state) {
         case Disabled:
-            setPattern(225, 0, 0, 0, 0, AnimationTypes.Solid);
-            break;
+          setPattern(225, 0, 0, 0, 0, AnimationTypes.Solid);
+          break;
         case Intaking:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(0,0, 0, 0, 0, AnimationTypes.Solid);
           break;
         case Cone:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(190,3, 252, 0, 0, AnimationTypes.Solid);
           break;
         case Cube:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(248, 252, 3, 0, 0, AnimationTypes.Solid);
           break;
         case Elevating:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Scoring:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
+        // case Scoring:    we want the LED's to indicate when we are extended and placing/scoring and object
+        //   setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+        //   break;
         case Enabled:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-            break;
-		        default:
-			      break;
-            }
+          break;
+		      default:
+			    break;
       }
+    }
       currentRobotState = state;
-       
-    } 
+  } 
 
     @Override
   public void periodic() {
@@ -173,7 +172,7 @@ public LED (Controls controls) {
     Scoring,
     Cone,
     Cube,
-    Enabled, Enabled,
+    Enabled,
   }
  
 }

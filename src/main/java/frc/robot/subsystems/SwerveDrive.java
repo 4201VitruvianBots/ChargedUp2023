@@ -27,6 +27,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.SetSwerveDrive;
 import frc.robot.Constants.CAN;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
@@ -258,4 +259,7 @@ public class SwerveDrive extends SubsystemBase {
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
   }
+
+public void setDefaultCommand(SetSwerveDrive setSwerveDrive) {
+}
 }

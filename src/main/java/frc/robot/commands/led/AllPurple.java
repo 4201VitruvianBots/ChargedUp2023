@@ -11,23 +11,20 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.robotState;
 
 /** Sets the LED based on the subsystems' statuses */
-public class GetSubsystemStates extends CommandBase {
+public class AllPurple extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   
 //TODO: figure out scoring system
   private final LED m_led;
-  private final Elevator m_elevator;
   private final Intake m_intake;
-  private boolean disabled;
-  private boolean enabled;
-  private boolean intaking;
-  private boolean elevating;
+  private boolean cube;
+  private robotState state;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates (LED led, Intake intake, Elevator elevator) {
+  public AllPurple (LED led, Intake intake, robotState state) {
     m_led = led;
     m_intake = intake;
-    m_elevator = elevator;
+    this.state = state;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_led);
   }
@@ -42,22 +39,13 @@ public class GetSubsystemStates extends CommandBase {
   @Override
   public void execute() {
     // the prioritized state to be expressed to the LEDs
-    disabled = DriverStation.isDisabled();
-    enabled = !disabled;
-    intaking = m_intake.getIntakeState();
-    elevating = m_elevator.getElevatorClimbState();
+    cube = m_intake.getIntakeState();
 
-
+    
     // set in order of priority to be expressed from the least priority to the
     // highest priority
-    if (disabled) {
-      m_led.expressState(LED.robotState.Disabled);
-    } else if (intaking) {
-      m_led.expressState(LED.robotState.Intaking);
-    } else if (elevating) {
-      m_led.expressState(LED.robotState.Elevating);
-    } else if (enabled) {
-      m_led.expressState(LED.robotState.Enabled);
+    if (cube) {
+      m_led.expressState(LED.robotState.Cube);
     } 
   }
 

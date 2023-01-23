@@ -19,9 +19,9 @@ public class Intake extends SubsystemBase {
     intakeMotor.configFactoryDefault();
     //factory default cofigs 
     // one or two motors
-    
+    /** @return Gets a boolean for the intake's actuation */
   }
-  public void setIntakeSate(boolean state){
+  public void setIntakeState(boolean state){
     isIntaking = state;
   }
   public void setIntakePercentOutput(double value){

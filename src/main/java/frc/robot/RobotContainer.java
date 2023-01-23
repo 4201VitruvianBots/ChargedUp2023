@@ -4,12 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.USB;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.swerve.ResetOdometry;
-import frc.robot.commands.swerve.SetSwerveDrive;
+import javax.swing.plaf.ButtonUI;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -17,21 +12,27 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.auto.RedMiddleOneConeBalance;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.simulation.FieldSim;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Elevator.elevatorHeights;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.led.AllPurple;
+import frc.robot.commands.led.AllYellow;
+import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Elevator.elevatorHeights;
+import frc.robot.subsystems.LED.robotState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,10 +42,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+
+  private final Controls m_controls = new Controls();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-    private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
-    private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
+  private final Intake m_intake = new Intake();
+  private final LED m_led = new LED(m_controls);
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -63,11 +68,14 @@ public class RobotContainer {
 
     public void initializeSubsystems() {
       m_swerveDrive.setDefaultCommand(
-          new SetSwerveDrive(
+          new SetSwerveDrive( 
               m_swerveDrive,
               () -> -leftJoystick.getRawAxis(1),
               () -> -leftJoystick.getRawAxis(0),
               () -> rightJoystick.getRawAxis(0)));
+          m_led.setDefaultCommand(
+            new GetSubsystemStates(m_led, m_intake, m_elevator));
+              
       
       // Control elevator height by moving the joystick up and down
       m_elevator.setDefaultCommand(
@@ -103,13 +111,25 @@ public class RobotContainer {
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+
+    xBoxLeftTrigger =
+      new Trigger(() -> xBoxController.getLeftTriggerAxis() > 0.2);
+    xBoxLeftTrigger =
+      new Trigger(() -> xBoxController.getLeftTriggerAxis() > 0.2);
+
+
+    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
+    xBoxLeftTrigger.whileTrue(new AllPurple(m_led, m_intake, robotState.Cube));
+    xBoxRightTrigger.whileTrue(new RunIntake(m_intake));
+    xBoxRightTrigger.whileTrue(new AllYellow(m_led, m_intake, robotState.Cone));
       
     m_driverController.a().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.LOW, 0.0));
     m_driverController.b().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.MID, 0.0));
     m_driverController.y().whileTrue(new IncrementElevatorHeight(m_elevator, elevatorHeights.HIGH, 0.0));
 
-    SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
   }
+
+
 public void disableInit(){
   m_swerveDrive.setNeutralMode(NeutralMode.Coast);
  
@@ -135,10 +155,6 @@ public void teleopeInit(){
     
   }
   
-  public void simulationPeriodic() {
-    m_elevator.simulationPeriodic();
-  }
-
   public void periodic() {
     m_fieldSim.periodic();
   }
