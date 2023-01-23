@@ -20,6 +20,7 @@ import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.SwerveDrive;
@@ -39,6 +40,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+
+  private final MemoryLog m_memorylog = new MemoryLog();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -138,6 +141,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
+    m_memorylog.simulationPeriodic();
   }
 
   public void periodic() {
