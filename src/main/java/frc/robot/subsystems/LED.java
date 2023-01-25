@@ -10,6 +10,7 @@ import frc.robot.Constants;
 
 // creates LED subsystem
 public class LED extends SubsystemBase {
+  private PieceType pieceIntent = PieceType.NONE;
   private final CANdle m_candle =
       new CANdle(Constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
   int red = 0;
@@ -58,28 +59,40 @@ public class LED extends SubsystemBase {
   public void expressState(robotState state) {
     if (state != currentRobotState) {
       switch (state) {
-        case Elavating:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case Scoring:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
         case Intaking:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Cone:
+        case Elevating: 
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Cube:
+        case Wrist: //Solid blue 
+          setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
+          break;
+        case Cone: //Solid Yellow
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-        case Disabled:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          break;
+        case Cube: //Solid purple 
+          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
+          break;
+          case Enabled: //Soild green
+          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
+          break;
+        case Disabled: //Solid red
+          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
         default:
           break;
       }
     }
     currentRobotState = state;
+  }
+
+  public PieceType getPieceIntent(){
+    return pieceIntent;
+  }
+
+  public void setPieceIntent(PieceType type){
+      pieceIntent = type; 
   }
 
   /** Different LED animation types */
@@ -98,11 +111,18 @@ public class LED extends SubsystemBase {
 
   /** Different robot states */
   public enum robotState {
-    Scoring,
-    Elavating,
     Intaking,
-    Disabled,
+    Elevating,
+    Wrist,
     Cone,
     Cube,
+    Disabled,
+    Enabled, 
+  }
+
+  public enum PieceType{
+    CONE,
+    CUBE,
+    NONE,
   }
 }
