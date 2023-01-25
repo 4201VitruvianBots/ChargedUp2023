@@ -245,7 +245,7 @@ public class Elevator extends SubsystemBase {
       setElevatorClimbState(true);
     }
 
-    // TODO: Replace bang-bang controls with motion magic
+      // TODO: Replace bang-bang controls with motion magic
     // The part where we actually determine where the elevator should move
     if (distanceBetween < 0) {
       Elevator.setElevatorPercentOutput(0.8);
