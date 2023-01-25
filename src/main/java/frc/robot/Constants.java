@@ -118,10 +118,10 @@ public final class Constants {
             ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 265.342;//265.430;
-    public static final double frontRightCANCoderOffset = 39.990;//41.748;
-    public static final double backLeftCANCoderOffset = 81.475;//261.914;
-    public static final double backRightCANCoderOffset = 328.359;//329.150;
+    public static final double frontLeftCANCoderOffset = 85.957 ;//265.430;
+    public static final double frontRightCANCoderOffset = 220.342 ;//41.748;
+    public static final double backLeftCANCoderOffset = 261.475;//261.914;
+    public static final double backRightCANCoderOffset = 148.008 ;//329.150;
 
     public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(

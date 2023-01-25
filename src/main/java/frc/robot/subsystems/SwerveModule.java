@@ -186,6 +186,8 @@ public class SwerveModule extends SubsystemBase {
         "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
+        SmartDashboard.putNumber(
+          "module" + m_moduleNumber + "position", getPosition().distanceMeters);
   }
 
   @Override

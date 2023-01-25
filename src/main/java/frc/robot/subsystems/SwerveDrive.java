@@ -82,7 +82,7 @@ public class SwerveDrive extends SubsystemBase {
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_turnController.enableContinuousInput(-Math.PI, Math.PI);
-
+    SmartDashboard.putData(m_turnController);
     m_odometry =
       new SwerveDrivePoseEstimator(
           Constants.SwerveDrive.kSwerveKinematics,
@@ -262,6 +262,7 @@ public class SwerveDrive extends SubsystemBase {
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
+    SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
   }
 
   @Override

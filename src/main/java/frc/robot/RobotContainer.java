@@ -59,8 +59,8 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
