@@ -145,7 +145,7 @@ public class SwerveDrive extends SubsystemBase {
     m_odometry.resetPosition(getHeadingRotation2d(), getModulePositionsArray(), pose);
   }
 
-  public double getHeadingDegrees() {
+  public double  getHeadingDegrees() {
     return m_pigeon.getYaw();
   }
 
