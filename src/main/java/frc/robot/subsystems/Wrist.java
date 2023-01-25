@@ -69,4 +69,7 @@ public class Wrist extends SubsystemBase {
     // This method will be called once per scheduler run
     setWristPercentOutput(wristPID.calculate(getMeasurement()));
   }
+public Object getWristState() {
+    return isWristtaking;
+}
 }
