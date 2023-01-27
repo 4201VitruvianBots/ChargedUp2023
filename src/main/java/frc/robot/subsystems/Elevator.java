@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import java.util.function.DoubleSupplier;
@@ -35,7 +36,8 @@ public class Elevator extends SubsystemBase {
     LOW,
     MID,
     HIGH,
-    JOYSTICK
+    JOYSTICK,
+    NONE
   }
 
   // Limit switch at bottom of elevator
@@ -45,14 +47,12 @@ public class Elevator extends SubsystemBase {
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState =
-      elevatorHeights.LOW; // Think of this as our "next state" in our state machine.
+      elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
 
   private static double elevatorJoystickY;
 
   private final double kF = 0; // Only F and P control is needed for Elevator
   private final double kP = 0.2;
-
-  private static boolean elevatorClimbState;
 
   private static double elevatorHeight =
       0; // the amount of rotations the motor has gone up from the initial low position
@@ -76,8 +76,6 @@ public class Elevator extends SubsystemBase {
 
   public static ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
 
-  public static GenericEntry elevatorClimbingTab =
-      elevatorTab.add("Elevator Climbing", false).getEntry();
   public static GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
   public static GenericEntry elevatorTargetHeightTab =
       elevatorTab.add("Elevator Target Height", desiredHeightValue).getEntry();
@@ -95,33 +93,21 @@ public class Elevator extends SubsystemBase {
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
       motor.setSelectedSensorPosition(elevatorHeight);
-    }
 
-    elevatorMotors[0].setInverted(true);
-    elevatorMotors[1].setInverted(true);
+    }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
-  }
-
-  /*
-   * True? Elevator climbing
-   * False? Elevator not climbing
-   */
-  public static boolean getElevatorClimbState() {
-    return elevatorClimbState;
-  }
-
-  public static void setElevatorClimbState(boolean climbState) {
-    elevatorClimbState = climbState;
+    
+    initShuffleboard();
+    SmartDashboard.putData(this);
   }
   /*
    * Elevator's motor output as a percentage
    */
   public static double getElevatorPercentOutput() {
-
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
@@ -156,6 +142,10 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
+  public static elevatorHeights getElevatorDesiredHeightState() {
+    return desiredHeightState;
+  }
+
   public static void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
     desiredHeightState = heightEnum;
   }
@@ -174,8 +164,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public static void updateSimulatedElevatorHeight() {
-    // setElevatorHeight(getElevatorPercentOutput()/100);
-    setElevatorHeight(elevatorSim.getPositionMeters());
+    setElevatorHeight(getElevatorHeight()+(getElevatorPercentOutput()/10));
+    //setElevatorHeight(elevatorSim.getPositionMeters());
   }
 
   // Update elevator height using encoders and bottom limit switch
@@ -195,7 +185,6 @@ public class Elevator extends SubsystemBase {
 
   public static void initShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
-    elevatorClimbingTab.setBoolean(getElevatorClimbState());
 
     elevatorHeightTab.setDouble(getElevatorHeight());
     elevatorTargetHeightTab.setDouble(desiredHeightValue);
@@ -208,6 +197,7 @@ public class Elevator extends SubsystemBase {
      *  Example: -0.71247 -> -71%
      */
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
+    
   }
 
   @Override
@@ -226,33 +216,36 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     initShuffleboard();
     // This method will be called once per scheduler run
-    // updateShuffleboard();
-    switch (desiredHeightState) {
-      case JOYSTICK:
-        desiredHeightValue = elevatorHeight + elevatorJoystickY; // Add limits/clamp function
-      case LOW:
-        desiredHeightValue = 0.0; // Placeholder values
-      case MID:
-        desiredHeightValue = 1.0; // Placeholder values
-      case HIGH:
-        desiredHeightValue = 2.0; // Placeholder values
+    if(desiredHeightState == elevatorHeights.JOYSTICK) {
+      Elevator.setElevatorPercentOutput(elevatorJoystickY*0.8);
     }
-    double distanceBetween = desiredHeightValue - elevatorHeight;
-    if (distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
-      setElevatorClimbState(false);
-      distanceBetween = 0;
-    } else {
-      setElevatorClimbState(true);
-    }
-
-    // TODO: Replace bang-bang controls with motion magic
-    // The part where we actually determine where the elevator should move
-    if (distanceBetween < 0) {
-      Elevator.setElevatorPercentOutput(0.8);
-    } else if (distanceBetween > 0) {
-      Elevator.setElevatorPercentOutput(-0.8);
-    } else if (distanceBetween == 0) {
-      Elevator.setElevatorPercentOutput(0.0);
+    else {
+      switch (desiredHeightState) {
+        case LOW:
+          desiredHeightValue = 0.0; // Placeholder values
+        case MID:
+          desiredHeightValue = 5.0; // Placeholder values
+        case HIGH:
+          desiredHeightValue = 10.0; // Placeholder values
+        case NONE:
+          desiredHeightValue = elevatorHeight;
+      }
+      double distanceBetween = desiredHeightValue - elevatorHeight;
+      // Checking if our desired height has been reached within a certain range
+      if (distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
+        setElevatorDesiredHeightState(elevatorHeights.NONE);
+      }
+      else {
+        // TODO: Replace bang-bang controls with motion magic
+        // The part where we actually determine where the elevator should move
+        if (distanceBetween < 0) {
+            Elevator.setElevatorPercentOutput(-0.8);
+        } else if (distanceBetween > 0) {
+          Elevator.setElevatorPercentOutput(0.8);
+        } else if (distanceBetween == 0) {
+          Elevator.setElevatorPercentOutput(0.0);
+        }
+      }
     }
   }
 }
