@@ -62,19 +62,19 @@ public class LED extends SubsystemBase {
         case INTAKING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case ELEVATING: 
+        case ELEVATING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case WRIST: //Solid blue 
+        case WRIST: // Solid blue
           setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
           break;
-        case CONE: //Solid Yellow
+        case CONE: // Solid Yellow
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case CUBE: //Soild green
+        case CUBE: // Soild green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case DISABLED: //Solid red
+        case DISABLED: // Solid red
           setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
         default:
@@ -84,12 +84,12 @@ public class LED extends SubsystemBase {
     currentRobotState = state;
   }
 
-  public PieceType getPieceIntent(){
+  public PieceType getPieceIntent() {
     return pieceIntent;
   }
 
-  public void setPieceIntent(PieceType type){
-      pieceIntent = type; 
+  public void setPieceIntent(PieceType type) {
+    pieceIntent = type;
   }
 
   /** Different LED animation types */
@@ -117,7 +117,7 @@ public class LED extends SubsystemBase {
     ENABLED,
   }
 
-  public enum PieceType{
+  public enum PieceType {
     CONE,
     CUBE,
     NONE,

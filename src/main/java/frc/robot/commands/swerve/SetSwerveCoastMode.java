@@ -3,13 +3,16 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.swerve;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
+
 public class SetSwerveCoastMode extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
-  public SetSwerveCoastMode(SwerveDrive swerveDrive){
+
+  public SetSwerveCoastMode(SwerveDrive swerveDrive) {
     m_swerveDrive = swerveDrive;
     addRequirements(swerveDrive);
   }

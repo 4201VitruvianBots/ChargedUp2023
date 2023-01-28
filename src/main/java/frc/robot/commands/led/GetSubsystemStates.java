@@ -4,8 +4,8 @@
 
 package frc.robot.commands.led;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.*;
 
 /** Sets the LED based on the subsystems' statuses */
@@ -21,11 +21,10 @@ public class GetSubsystemStates extends CommandBase {
   private boolean enabled;
   private boolean elavating;
   private boolean intaking;
-  private boolean wrist; 
+  private boolean wrist;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(
-      LED led, Intake intake, Wrist wrist) {
+  public GetSubsystemStates(LED led, Intake intake, Wrist wrist) {
     m_led = led;
     m_intake = intake;
     m_wrist = wrist;
@@ -42,29 +41,28 @@ public class GetSubsystemStates extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  // the prioritized state to be expressed to the LEDs
-  disabled = DriverStation.isDisabled();
-  enabled = !disabled;
-  intaking = m_intake.getIntakeState();
-  wrist = m_wrist.getWristState(); 
+    // the prioritized state to be expressed to the LEDs
+    disabled = DriverStation.isDisabled();
+    enabled = !disabled;
+    intaking = m_intake.getIntakeState();
+    wrist = m_wrist.getWristState();
 
-  // set in order of priority to be expressed from the least priority to the
-  // highest priority
-  if (disabled) {
-    m_led.expressState(LED.robotState.DISABLED);
-  } else if (elavating) {
-    m_led.expressState(LED.robotState.ELEVATING);
-  } else if (Cone) {
-    m_led.expressState(LED.robotState.CONE);
-  } else if (Cube) {
-    m_led.expressState(LED.robotState.CUBE);
-  } else if (wrist) {
-    m_led.expressState(LED.robotState.WRIST);
-  } else if (enabled) {
-    m_led.expressState(LED.robotState.ENABLED);
+    // set in order of priority to be expressed from the least priority to the
+    // highest priority
+    if (disabled) {
+      m_led.expressState(LED.robotState.DISABLED);
+    } else if (elavating) {
+      m_led.expressState(LED.robotState.ELEVATING);
+    } else if (Cone) {
+      m_led.expressState(LED.robotState.CONE);
+    } else if (Cube) {
+      m_led.expressState(LED.robotState.CUBE);
+    } else if (wrist) {
+      m_led.expressState(LED.robotState.WRIST);
+    } else if (enabled) {
+      m_led.expressState(LED.robotState.ENABLED);
+    }
   }
-}
-
 
   // Called once the command ends or is interrupted.
   @Override

@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -27,6 +26,7 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 
 /**
@@ -37,6 +37,7 @@ import frc.robot.subsystems.SwerveDrive;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
@@ -69,15 +70,14 @@ public class RobotContainer {
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(
-            m_elevator, () -> leftJoystick.getRawAxis(1)));
+        new IncrementElevatorHeight(m_elevator, () -> leftJoystick.getRawAxis(1)));
     m_fieldSim.initSim();
   }
 
   public RobotContainer() {
     initializeSubsystems();
     initializeAutoChooser();
-     
+
     // Configure the button bindings
     configureBindings();
   }
@@ -98,21 +98,10 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    m_driverController
-        .a()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.LOW));
-    m_driverController
-        .b()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.MID));
-    m_driverController
-        .y()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.HIGH));
+    xBoxTriggers[0].onTrue(new RunIntake(m_intake));
+    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
+    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
@@ -140,9 +129,8 @@ public class RobotContainer {
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
-  public void disabledInit(){
 
-  }
+  public void disabledInit() {}
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
