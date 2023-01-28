@@ -43,7 +43,7 @@ public class Vision extends SubsystemBase {
   double avgYPose = 0;
   double headingPose = 0;
 
-  public Vision(SwerveDrive swerveDrive, Vision vision) {
+  public Vision(SwerveDrive swerveDrive) {
 
     m_swerveDrive = swerveDrive;
 
@@ -148,7 +148,13 @@ public class Vision extends SubsystemBase {
   public double[] getBotPose(CAMERA_POSITION position) {
     switch (position) {
       case FORWARD_LOCALIZER:
-        return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        var rawBotPose = forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        if(rawBotPose.length > 0) {
+            rawBotPose[0] = 15.980/2 + rawBotPose[0];
+            rawBotPose[1] = 8.210/2 + rawBotPose[1];
+            return rawBotPose;
+        }
+        return defaultDoubleArray;
       case REAR_LOCALIZER:
         return rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
       default:
@@ -174,23 +180,22 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
-    switch (position) {
-      case FORWARD_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      case REAR_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      default:
-        return defaultPose;
+    if(pose.length > 0) {
+      switch (position) {
+        case FORWARD_LOCALIZER:
+          return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(0));
+        case REAR_LOCALIZER:
+          return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(0));
+        default:
+          return defaultPose;
+      }
     }
+    return new Pose2d();
   }
 
-  // public Pose2d getLimelightPose() {
-  //   return new Pose2d()
-  // }
-
   private void logData() {
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
+    // limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
+    // limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
   }
 
   @Override
