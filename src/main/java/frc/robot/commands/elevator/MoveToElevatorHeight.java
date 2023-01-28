@@ -2,28 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+// Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
-
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 
-public class IncrementElevatorHeight extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. 
-   * This is our default command
-  */
-  private DoubleSupplier m_joystickY;
+public class MoveToElevatorHeight extends CommandBase {
+  /** Creates a new IncrementElevatorHeight. */
 
   private Elevator m_elevator;
+  private elevatorHeights heightEnum;
 
-  public IncrementElevatorHeight(
-    Elevator elevator, DoubleSupplier joystickY) {
+  public MoveToElevatorHeight(
+      Elevator elevator, elevatorHeights heightEnum) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    m_joystickY = joystickY;
+    this.heightEnum = heightEnum;
     addRequirements(m_elevator);
   }
 
@@ -34,16 +31,9 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if statement to prioritize shortcut buttons
-    if (m_joystickY.getAsDouble() != 0.0) {
-      Elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
+    if (Elevator.getElevatorDesiredHeightState() != heightEnum) {
+      Elevator.setElevatorDesiredHeightState(heightEnum);
     }
-    else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-      Elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
-      Elevator.setElevatorPercentOutput(0.0);
-    }
-
-    Elevator.setElevatorJoystickY(m_joystickY);
   }
 
   // Called once the command ends or is interrupted.

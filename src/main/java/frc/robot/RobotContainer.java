@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
@@ -66,7 +69,7 @@ public class RobotContainer {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
         new IncrementElevatorHeight(
-            m_elevator, elevatorHeights.JOYSTICK, () -> xBoxController.getRawAxis(1)));
+            m_elevator, () -> leftJoystick.getRawAxis(1)));
     m_fieldSim.initSim();
   }
 
@@ -97,28 +100,30 @@ public class RobotContainer {
     m_driverController
         .a()
         .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.LOW, () -> xBoxController.getRawAxis(0)));
+            new MoveToElevatorHeight(
+                m_elevator, elevatorHeights.LOW));
     m_driverController
         .b()
         .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.MID, () -> xBoxController.getRawAxis(0)));
+            new MoveToElevatorHeight(
+                m_elevator, elevatorHeights.MID));
     m_driverController
         .y()
         .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.HIGH, () -> xBoxController.getRawAxis(0)));
+            new MoveToElevatorHeight(
+                m_elevator, elevatorHeights.HIGH));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
   }
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_elevator.setElevatorNeutralMode(NeutralMode.Coast);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.setElevatorNeutralMode(NeutralMode.Brake);
   }
 
   /**
