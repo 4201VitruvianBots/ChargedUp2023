@@ -44,23 +44,21 @@ public class Wrist extends SubsystemBase {
     return wristMotor.getSelectedSensorPosition();
   }
 
-  public boolean getWristState(boolean state) {
+  public boolean getWristState() {
     return isWristtaking;
   }
-
-  // control mode function
-  public boolean getWristState;
 
   public void setWristState(boolean state) {
     boolean isWristtaking = state;
   }
+
   // set percent output function
   public void setWristPercentOutput(double output) {
     wristMotor.set(ControlMode.PercentOutput, output);
   }
   // smartdashboard funciton
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Wrist", getWristState(false));
+    SmartDashboard.putBoolean("Wrist", getWristState());
     SmartDashboard.putNumber("getWrist", 1);
   }
 
@@ -69,7 +67,4 @@ public class Wrist extends SubsystemBase {
     // This method will be called once per scheduler run
     setWristPercentOutput(wristPID.calculate(getMeasurement()));
   }
-public boolean getWristState() {
-    return isWristtaking;
-}
 }

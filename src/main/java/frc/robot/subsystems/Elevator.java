@@ -44,8 +44,7 @@ public class Elevator extends SubsystemBase {
   private static DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
 
-  private double
-      desiredHeightValue; // The height in encoder units our robot is trying to reach
+  private double desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState =
       elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
 
@@ -56,8 +55,8 @@ public class Elevator extends SubsystemBase {
 
   private static double elevatorHeight =
       0; // the amount of rotations the motor has gone up from the initial low position
-  
-  private final static double maxElevatorHeight = 10.0;
+
+  private static final double maxElevatorHeight = 10.0;
 
   // Simulation setup
 
@@ -95,14 +94,13 @@ public class Elevator extends SubsystemBase {
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
       motor.setSelectedSensorPosition(elevatorHeight);
-
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
-    
+
     updateShuffleboard();
     SmartDashboard.putData(this);
   }
@@ -166,14 +164,13 @@ public class Elevator extends SubsystemBase {
   }
 
   public static void updateSimulatedElevatorHeight() {
-    setElevatorHeight(getElevatorHeight()+(getElevatorPercentOutput()/10));
+    setElevatorHeight(getElevatorHeight() + (getElevatorPercentOutput() / 10));
     if (getElevatorHeight() > maxElevatorHeight) {
       setElevatorHeight(maxElevatorHeight);
-    }
-    else if (getElevatorHeight() < 0.0) {
+    } else if (getElevatorHeight() < 0.0) {
       setElevatorHeight(0.0);
     }
-    //setElevatorHeight(elevatorSim.getPositionMeters());
+    // setElevatorHeight(elevatorSim.getPositionMeters());
   }
 
   // Update elevator height using encoders and bottom limit switch
@@ -205,7 +202,6 @@ public class Elevator extends SubsystemBase {
      *  Example: -0.71247 -> -71%
      */
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
-    
   }
 
   @Override
@@ -223,7 +219,8 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not work without this
+    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
+    // work without this
 
     if (Elevator.getElevatorSimulated()) {
       Elevator.updateSimulatedElevatorHeight();
@@ -233,14 +230,14 @@ public class Elevator extends SubsystemBase {
 
     switch (desiredHeightState) {
       case JOYSTICK:
-        Elevator.setElevatorPercentOutput(elevatorJoystickY*-0.8);
+        Elevator.setElevatorPercentOutput(elevatorJoystickY * -0.8);
         System.out.println("Joystick");
         return;
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
         break;
       case MID:
-        desiredHeightValue = maxElevatorHeight/2; // Placeholder values
+        desiredHeightValue = maxElevatorHeight / 2; // Placeholder values
         break;
       case HIGH:
         desiredHeightValue = maxElevatorHeight; // Placeholder values
@@ -254,12 +251,11 @@ public class Elevator extends SubsystemBase {
     if (distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
       setElevatorDesiredHeightState(elevatorHeights.NONE);
       setElevatorPercentOutput(0.0);
-    }
-    else {
+    } else {
       // TODO: Replace bang-bang controls with motion magic
       // The part where we actually determine where the elevator should move
       if (distanceBetween < 0) {
-          setElevatorPercentOutput(-0.8);
+        setElevatorPercentOutput(-0.8);
       } else if (distanceBetween > 0) {
         setElevatorPercentOutput(0.8);
       } else if (distanceBetween == 0) {
