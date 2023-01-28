@@ -66,4 +66,6 @@ return isIntaking;
     // This method will be called once per scheduler run
     setIntakePercentOutput(intakePID.calculate(getMeasurement()));
   }
+public void setIntakeState(boolean b) {
+}
 }
