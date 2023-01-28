@@ -84,7 +84,10 @@ public class Vision extends SubsystemBase {
         return outtake.getEntry("tv").getDouble(0);
       case FORWARD_LOCALIZER:
       case REAR_LOCALIZER:
-        return getAprilTagIds(position)[0];
+        var tagIds = getAprilTagIds(position);
+        if(tagIds.length == 0)
+          return 0;
+        return tagIds[0];
       default:
         return 0;
     }
@@ -204,9 +207,8 @@ public class Vision extends SubsystemBase {
           yPoses = forwardLocalizer.getEntry("Y Poses").getDoubleArray(new double[]{});
           zPoses = forwardLocalizer.getEntry("Z Poses").getDoubleArray(new double[]{});
           poseArray = new Pose2d[xPoses.length];
-          for(int i = 0; i < xPoses.length; i++) {
+          for (int i = 0; i < xPoses.length; i++)
             poseArray[i] = new Pose2d(xPoses[i], yPoses[i], Rotation2d.fromDegrees(0));
-          }
           break;
         case REAR_LOCALIZER:
           break;
