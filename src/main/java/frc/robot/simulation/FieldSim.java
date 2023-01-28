@@ -41,7 +41,8 @@ public class FieldSim {
 
   private void updateRobotPoses() {
     m_field2d.setRobotPose(m_swerveDrive.getPoseMeters());
-    m_field2d.getObject("oakRobotPose").setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("oakAvgRobotPose").setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("oakPoses").setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
 
     if(RobotBase.isSimulation()) {
       m_field2d

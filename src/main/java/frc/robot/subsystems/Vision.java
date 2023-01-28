@@ -162,6 +162,16 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  public double[] getBotPoses(CAMERA_POSITION position) {
+    switch (position) {
+      case FORWARD_LOCALIZER:
+        return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+      case REAR_LOCALIZER:
+        return rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+      default:
+        return defaultDoubleArray;
+    }
+  }
   /**
    * Get the timestamp of the detection results.
    *
@@ -181,6 +191,28 @@ public class Vision extends SubsystemBase {
   public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
     return new Pose2d(pose[0], pose[1], m_swerveDrive.getHeadingRotation2d());
+  }
+  public Pose2d[] getRobotPoses2d(CAMERA_POSITION position) {
+    Pose2d[] poseArray = {
+        new Pose2d(-1, -1, Rotation2d.fromDegrees(0))
+    };
+
+    if(getValidTarget(position))
+      switch (position) {
+        case FORWARD_LOCALIZER:
+          xPoses = forwardLocalizer.getEntry("X Poses").getDoubleArray(new double[]{});
+          yPoses = forwardLocalizer.getEntry("Y Poses").getDoubleArray(new double[]{});
+          zPoses = forwardLocalizer.getEntry("Z Poses").getDoubleArray(new double[]{});
+          poseArray = new Pose2d[xPoses.length];
+          for(int i = 0; i < xPoses.length; i++) {
+            poseArray[i] = new Pose2d(xPoses[i], yPoses[i], Rotation2d.fromDegrees(0));
+          }
+          break;
+        case REAR_LOCALIZER:
+          break;
+      }
+
+    return poseArray;
   }
 
   private void updateVisionPose(CAMERA_POSITION position) {
