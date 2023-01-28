@@ -21,6 +21,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
@@ -114,6 +115,7 @@ public class RobotContainer {
                 m_elevator, elevatorHeights.HIGH));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
+    SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
   }
 
   public void disableInit() {
