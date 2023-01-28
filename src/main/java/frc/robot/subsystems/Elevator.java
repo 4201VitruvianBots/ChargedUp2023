@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -87,6 +90,12 @@ public class Elevator extends SubsystemBase {
   public GenericEntry elevatorPerOutTab =
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
 
+  // Mechanism2d visualization setup
+
+  public Mechanism2d mech2d = new Mechanism2d(maxElevatorHeight/2, maxElevatorHeight);
+  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxElevatorHeight/4, 0);
+  public MechanismLigament2d elevatorLigament2d = root2d.append(new MechanismLigament2d("Elevator", elevatorHeight, 90));
+
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
     for (TalonFX motor : elevatorMotors) {
@@ -102,7 +111,9 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].config_kP(0, kP);
 
     updateShuffleboard();
+
     SmartDashboard.putData(this);
+    SmartDashboard.putData("Elevator", mech2d);
   }
   /*
    * Elevator's motor output as a percentage
@@ -164,7 +175,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public static void updateSimulatedElevatorHeight() {
-    setElevatorHeight(getElevatorHeight() + (getElevatorPercentOutput() / 10));
+    setElevatorHeight(getElevatorHeight()+(getElevatorPercentOutput()/5));
     if (getElevatorHeight() > maxElevatorHeight) {
       setElevatorHeight(maxElevatorHeight);
     } else if (getElevatorHeight() < 0.0) {
@@ -202,6 +213,7 @@ public class Elevator extends SubsystemBase {
      *  Example: -0.71247 -> -71%
      */
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
+    elevatorLigament2d.setLength(getElevatorHeight());
   }
 
   @Override
@@ -230,8 +242,7 @@ public class Elevator extends SubsystemBase {
 
     switch (desiredHeightState) {
       case JOYSTICK:
-        Elevator.setElevatorPercentOutput(elevatorJoystickY * -0.8);
-        System.out.println("Joystick");
+        Elevator.setElevatorPercentOutput(elevatorJoystickY*-0.8);
         return;
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
