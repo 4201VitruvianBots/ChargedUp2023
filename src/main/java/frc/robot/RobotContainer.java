@@ -73,7 +73,7 @@ public class RobotContainer {
   public RobotContainer() {
     initializeSubsystems();
     initializeAutoChooser();
-
+     
     // Configure the button bindings
     configureBindings();
   }
@@ -132,6 +132,9 @@ public class RobotContainer {
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
+  }
+  public void disabledInit(){
+
   }
 
   public Command getAutonomousCommand() {
