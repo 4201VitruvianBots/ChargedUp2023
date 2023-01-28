@@ -11,7 +11,9 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. */
+  /** Creates a new IncrementElevatorHeight. 
+   * This is our default command
+  */
   private DoubleSupplier m_joystickY;
 
   private Elevator m_elevator;
@@ -32,17 +34,16 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_joystickY.getAsDouble() != 0) {
+    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if statement to prioritize shortcut buttons
+    if (m_joystickY.getAsDouble() != 0.0) {
       Elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
+    }
+    else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+      Elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
+      Elevator.setElevatorPercentOutput(0.0);
     }
 
     Elevator.setElevatorJoystickY(m_joystickY);
-
-    if (Elevator.getElevatorSimulated()) {
-      Elevator.updateSimulatedElevatorHeight();
-    } else {
-      Elevator.updateElevatorHeight();
-    }
   }
 
   // Called once the command ends or is interrupted.

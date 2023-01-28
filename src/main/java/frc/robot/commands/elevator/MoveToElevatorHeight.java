@@ -32,7 +32,7 @@ public class MoveToElevatorHeight extends CommandBase {
   @Override
   public void execute() {
     if (Elevator.getElevatorDesiredHeightState() != heightEnum) {
-    Elevator.setElevatorDesiredHeightState(heightEnum);
+      Elevator.setElevatorDesiredHeightState(heightEnum);
     }
   }
 

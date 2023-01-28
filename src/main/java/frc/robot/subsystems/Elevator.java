@@ -44,7 +44,7 @@ public class Elevator extends SubsystemBase {
   private static DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
 
-  private static double
+  private double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState =
       elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
@@ -56,6 +56,8 @@ public class Elevator extends SubsystemBase {
 
   private static double elevatorHeight =
       0; // the amount of rotations the motor has gone up from the initial low position
+  
+  private final static double maxElevatorHeight = 10.0;
 
   // Simulation setup
 
@@ -76,14 +78,14 @@ public class Elevator extends SubsystemBase {
 
   public static ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
 
-  public static GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
-  public static GenericEntry elevatorTargetHeightTab =
+  public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
+  public GenericEntry elevatorTargetHeightTab =
       elevatorTab.add("Elevator Target Height", desiredHeightValue).getEntry();
-  public static GenericEntry elevatorTargetPosTab =
+  public GenericEntry elevatorTargetPosTab =
       elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
-  public static GenericEntry elevatorRawPerOutTab =
+  public GenericEntry elevatorRawPerOutTab =
       elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
-  public static GenericEntry elevatorPerOutTab =
+  public GenericEntry elevatorPerOutTab =
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
 
   /* Constructs a new Elevator. Mostly motor setup */
@@ -101,7 +103,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].config_kF(0, kF);
     elevatorMotors[0].config_kP(0, kP);
     
-    initShuffleboard();
+    updateShuffleboard();
     SmartDashboard.putData(this);
   }
   /*
@@ -165,6 +167,12 @@ public class Elevator extends SubsystemBase {
 
   public static void updateSimulatedElevatorHeight() {
     setElevatorHeight(getElevatorHeight()+(getElevatorPercentOutput()/10));
+    if (getElevatorHeight() > maxElevatorHeight) {
+      setElevatorHeight(maxElevatorHeight);
+    }
+    else if (getElevatorHeight() < 0.0) {
+      setElevatorHeight(0.0);
+    }
     //setElevatorHeight(elevatorSim.getPositionMeters());
   }
 
@@ -183,11 +191,11 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  public static void initShuffleboard() {
+  public void updateShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
 
     elevatorHeightTab.setDouble(getElevatorHeight());
-    elevatorTargetHeightTab.setDouble(desiredHeightValue);
+    elevatorTargetHeightTab.setDouble(this.desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
     elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
@@ -214,37 +222,48 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    initShuffleboard();
     // This method will be called once per scheduler run
-    if(desiredHeightState == elevatorHeights.JOYSTICK) {
-      Elevator.setElevatorPercentOutput(elevatorJoystickY*0.8);
+    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not work without this
+
+    if (Elevator.getElevatorSimulated()) {
+      Elevator.updateSimulatedElevatorHeight();
+    } else {
+      Elevator.updateElevatorHeight();
+    }
+
+    switch (desiredHeightState) {
+      case JOYSTICK:
+        Elevator.setElevatorPercentOutput(elevatorJoystickY*-0.8);
+        System.out.println("Joystick");
+        return;
+      case LOW:
+        desiredHeightValue = 0.0; // Placeholder values
+        break;
+      case MID:
+        desiredHeightValue = maxElevatorHeight/2; // Placeholder values
+        break;
+      case HIGH:
+        desiredHeightValue = maxElevatorHeight; // Placeholder values
+        break;
+      case NONE:
+        desiredHeightValue = elevatorHeight;
+        break;
+    }
+    double distanceBetween = desiredHeightValue - elevatorHeight;
+    // Checking if our desired height has been reached within a certain range
+    if (distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
+      setElevatorDesiredHeightState(elevatorHeights.NONE);
+      setElevatorPercentOutput(0.0);
     }
     else {
-      switch (desiredHeightState) {
-        case LOW:
-          desiredHeightValue = 0.0; // Placeholder values
-        case MID:
-          desiredHeightValue = 5.0; // Placeholder values
-        case HIGH:
-          desiredHeightValue = 10.0; // Placeholder values
-        case NONE:
-          desiredHeightValue = elevatorHeight;
-      }
-      double distanceBetween = desiredHeightValue - elevatorHeight;
-      // Checking if our desired height has been reached within a certain range
-      if (distanceBetween < 0.1 && distanceBetween > -0.1) { // Placeholder values
-        setElevatorDesiredHeightState(elevatorHeights.NONE);
-      }
-      else {
-        // TODO: Replace bang-bang controls with motion magic
-        // The part where we actually determine where the elevator should move
-        if (distanceBetween < 0) {
-            Elevator.setElevatorPercentOutput(-0.8);
-        } else if (distanceBetween > 0) {
-          Elevator.setElevatorPercentOutput(0.8);
-        } else if (distanceBetween == 0) {
-          Elevator.setElevatorPercentOutput(0.0);
-        }
+      // TODO: Replace bang-bang controls with motion magic
+      // The part where we actually determine where the elevator should move
+      if (distanceBetween < 0) {
+          setElevatorPercentOutput(-0.8);
+      } else if (distanceBetween > 0) {
+        setElevatorPercentOutput(0.8);
+      } else if (distanceBetween == 0) {
+        setElevatorPercentOutput(0.0);
       }
     }
   }

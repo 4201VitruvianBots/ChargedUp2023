@@ -69,7 +69,7 @@ public class RobotContainer {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
         new IncrementElevatorHeight(
-            m_elevator, () -> xBoxController.getRawAxis(1)));
+            m_elevator, () -> leftJoystick.getRawAxis(1)));
     m_fieldSim.initSim();
   }
 
@@ -118,10 +118,12 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_elevator.setElevatorNeutralMode(NeutralMode.Coast);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.setElevatorNeutralMode(NeutralMode.Brake);
   }
 
   /**
