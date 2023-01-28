@@ -13,7 +13,9 @@ public class RunWrist extends CommandBase {
   /** Creates a new RunWrist. */
   public RunWrist(Wrist wrist) {
     m_wrist = wrist;
+
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(null);
   }
 
   // Called when the command is initially scheduled.
@@ -26,7 +28,9 @@ public class RunWrist extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_wrist.setWristState(false);
+  }
 
   // Returns true when the command should end.
   @Override

@@ -157,7 +157,13 @@ public class Vision extends SubsystemBase {
   public double[] getBotPose(CAMERA_POSITION position) {
     switch (position) {
       case FORWARD_LOCALIZER:
-        return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        var rawBotPose = forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        if(rawBotPose.length > 0) {
+            rawBotPose[0] = 15.980/2 + rawBotPose[0];
+            rawBotPose[1] = 8.210/2 + rawBotPose[1];
+            return rawBotPose;
+        }
+        return defaultDoubleArray;
       case REAR_LOCALIZER:
         return rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
       default:
@@ -178,7 +184,7 @@ public class Vision extends SubsystemBase {
   /**
    * Get the timestamp of the detection results.
    *
-   * @return Robot Pose in meters
+   * @return Robot Pose in m/eters
    */
   public double getDetectionTimestamp(CAMERA_POSITION position) {
     switch (position) {

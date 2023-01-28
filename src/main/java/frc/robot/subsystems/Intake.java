@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -17,23 +18,27 @@ public class Intake extends SubsystemBase {
   private TalonFX intakeMotor = new TalonFX(Constants.Intake.intakeMotor);
 
   public Intake() {
+    // one motor for the intake
+
     intakeMotor.configFactoryDefault();
     // factory default cofigs
-    // one or two motors
-
   }
 
-  public void setIntakeSate(boolean state) {
+  public boolean getIntakeState() {
+    return isIntaking;
+  }
+  // control mode function
+  public void setIntakeState(boolean state) {
     isIntaking = state;
   }
-
+  // set percent output function
   public void setIntakePercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
-
-  // control mode function
-  // set percent output function
   // shuffleboard or smartdashboard funciton
+  public void updateSmartDashboard() {
+    SmartDashboard.putBoolean("Intake", getIntakeState());
+  }
 
   @Override
   public void periodic() {

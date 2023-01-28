@@ -25,8 +25,9 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDrive.ModulePosition;
@@ -41,7 +42,7 @@ public class SwerveModule extends SubsystemBase {
   double m_angleOffset;
   double m_lastAngle;
   Pose2d m_pose;
-  boolean m_initSuccess = false; 
+  boolean m_initSuccess = false;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -63,6 +64,8 @@ public class SwerveModule extends SubsystemBase {
   private double m_turnPercentOutput;
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
+
+  private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
 
   public SwerveModule(
       ModulePosition modulePosition,
@@ -88,30 +91,29 @@ public class SwerveModule extends SubsystemBase {
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
 
     if (RobotBase.isReal()) resetAngleToAbsolute();
+    initShuffleboard();
   }
 
-  private void initCanCoder(){
+  private void initCanCoder() {
     Timer.delay(1);
-    int counter = 0; 
-    
-    while(counter < 100){ 
+    int counter = 0;
+
+    while (counter < 100) {
       m_angleEncoder.getAbsolutePosition();
-      if(m_angleEncoder.getLastError() == ErrorCode.OK){
-        break; 
-      }
-      else if(counter > 100){
+      if (m_angleEncoder.getLastError() == ErrorCode.OK) {
+        break;
+      } else if (counter > 100) {
         return;
       }
-      counter++; 
-      
+      counter++;
     }
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
-    m_initSuccess = true; 
+    m_initSuccess = true;
   }
 
-  public boolean getInitSuccess(){
-    return m_initSuccess; 
+  public boolean getInitSuccess() {
+    return m_initSuccess;
   }
 
   public ModulePosition getModulePosition() {
@@ -192,16 +194,15 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.setNeutralMode(mode);
   }
 
-  private void updateSmartDashboard() {
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " heading", getState().angle.getDegrees());
-    SmartDashboard.putNumber(
+  private void initShuffleboard() {
+    m_ShuffleboardTab.add("module " + m_moduleNumber + " heading", getState().angle.getDegrees());
+    m_ShuffleboardTab.add(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
   }
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    // updateSmartDashboard();
   }
 
   @Override
