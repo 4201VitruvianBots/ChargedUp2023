@@ -43,7 +43,7 @@ public class FieldSim extends SubsystemBase {
   private void updateRobotPoses() {
     m_field2d.setRobotPose(m_swerveDrive.getPoseMeters());
 
-    m_field2d.getObject("Limelight Pose").setPoses(m_vision.getRobotPose2d(CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("Limelight Pose").setPose(m_vision.getRobotPose2d(CAMERA_POSITION.FORWARD_LOCALIZER));
 
     m_field2d
         .getObject("Swerve Modules")
