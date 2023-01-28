@@ -36,7 +36,7 @@ public class GetSubsystemStates extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_led.expressState(LED.robotState.Enabled);
+    m_led.expressState(LED.robotState.ENABLED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -51,17 +51,17 @@ public class GetSubsystemStates extends CommandBase {
   // set in order of priority to be expressed from the least priority to the
   // highest priority
   if (disabled) {
-    m_led.expressState(LED.robotState.Disabled);
+    m_led.expressState(LED.robotState.DISABLED);
   } else if (elavating) {
-    m_led.expressState(LED.robotState.Elevating);
+    m_led.expressState(LED.robotState.ELEVATING);
   } else if (Cone) {
-    m_led.expressState(LED.robotState.Cone);
+    m_led.expressState(LED.robotState.CONE);
   } else if (Cube) {
-    m_led.expressState(LED.robotState.Cube);
+    m_led.expressState(LED.robotState.CUBE);
   } else if (wrist) {
-    m_led.expressState(LED.robotState.Wrist);
+    m_led.expressState(LED.robotState.WRIST);
   } else if (enabled) {
-    m_led.expressState(LED.robotState.Enabled);
+    m_led.expressState(LED.robotState.ENABLED);
   }
 }
 
