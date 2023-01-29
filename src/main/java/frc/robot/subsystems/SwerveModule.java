@@ -8,7 +8,6 @@ import static frc.robot.Constants.SwerveDrive.kMaxSpeedMetersPerSecond;
 import static frc.robot.Constants.SwerveModule.*;
 import static frc.robot.Constants.SwerveModule.kDriveMotorGearRatio;
 
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -186,8 +184,7 @@ public class SwerveModule extends SubsystemBase {
         "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
-        SmartDashboard.putNumber(
-          "module" + m_moduleNumber + "position", getPosition().distanceMeters);
+    SmartDashboard.putNumber("module" + m_moduleNumber + "position", getPosition().distanceMeters);
   }
 
   @Override

@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
@@ -118,10 +117,10 @@ public final class Constants {
             ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 85.957 ;//265.430;
-    public static final double frontRightCANCoderOffset = 220.342 ;//41.748;
-    public static final double backLeftCANCoderOffset = 261.475;//261.914;
-    public static final double backRightCANCoderOffset = 148.008 ;//329.150;
+    public static final double frontLeftCANCoderOffset = 84.98628; // 85.957;
+    public static final double frontRightCANCoderOffset = 219.506836; // 41.748;
+    public static final double backLeftCANCoderOffset = 261.95906; // 261.475;
+    public static final double backRightCANCoderOffset = 148.183594; // 148.008; // 329.150;
 
     public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(

@@ -14,10 +14,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.DriveSideway;
+import frc.robot.commands.auto.DriveSideway2;
 import frc.robot.commands.auto.DriveTest;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -91,8 +93,8 @@ public class RobotContainer {
       rightTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
     for (int i = 0; i < xBoxTriggers.length; i++)
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
-    for (int i = 0; i < xBoxPOVTriggers.length; i++)
-      xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+    // for (int i = 0; i < xBoxPOVTriggers.length; i++)
+    //   xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
     m_driverController
         .a()
@@ -128,8 +130,13 @@ public class RobotContainer {
    */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-    //   m_autoChooser.addOption("RedMiddleOneConeBalance", new
+    //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
 

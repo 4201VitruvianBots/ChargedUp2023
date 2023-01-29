@@ -12,13 +12,11 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class DriveForward extends SequentialCommandGroup {
-  public DriveForward(SwerveDrive swerveDrive, FieldSim fieldSim) {
-
+public class DriveSideway2 extends SequentialCommandGroup {
+  public DriveSideway2(SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "DriveForward", Units.feetToMeters(1), Units.feetToMeters(1), false);
-
+            "DriveSideway2", Units.feetToMeters(2), Units.feetToMeters(2), false);
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(
             trajectory,
@@ -30,8 +28,6 @@ public class DriveForward extends SequentialCommandGroup {
             swerveDrive::setSwerveModuleStatesAuto,
             false,
             swerveDrive);
-    //    TestPPSwerveControllerCommand command = new TestPPSwerveControllerCommand(swerveDrive,
-    // trajectory);
 
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),
