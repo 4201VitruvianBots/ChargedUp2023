@@ -49,7 +49,7 @@ public final class Constants {
   }
 
   public final class Intake {
-    public static final int intakeMotor = 31;
+    public static final int intakeMotor = 33;
   }
 
   public final class Wrist {

@@ -28,7 +28,7 @@ public class RunIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(0.5);
+    m_intake.setIntakePercentOutput(0.58);
   }
 
   // Called once the command ends or is interrupted.
