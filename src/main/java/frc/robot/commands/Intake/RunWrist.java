@@ -15,7 +15,7 @@ public class RunWrist extends CommandBase {
     m_wrist = wrist;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(null);
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.

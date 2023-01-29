@@ -37,7 +37,7 @@ public class RobotContainer {
   private final DataLog m_logger = DataLogManager.getLog();
 
   // The robot's subsystems and commands are defined here...
-  private final Elevator m_elevator = new Elevator();
+//  private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
@@ -67,9 +67,9 @@ public class RobotContainer {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(
-            m_elevator, elevatorHeights.JOYSTICK, () -> xBoxController.getRawAxis(1)));
+//    m_elevator.setDefaultCommand(
+//        new IncrementElevatorHeight(
+//            m_elevator, elevatorHeights.JOYSTICK, () -> xBoxController.getRawAxis(1)));
     m_fieldSim.initSim();
   }
 
@@ -97,21 +97,21 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    m_driverController
-        .a()
-        .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.LOW, () -> xBoxController.getRawAxis(0)));
-    m_driverController
-        .b()
-        .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.MID, () -> xBoxController.getRawAxis(0)));
-    m_driverController
-        .y()
-        .whileTrue(
-            new IncrementElevatorHeight(
-                m_elevator, elevatorHeights.HIGH, () -> xBoxController.getRawAxis(0)));
+//    m_driverController
+//        .a()
+//        .whileTrue(
+//            new IncrementElevatorHeight(
+//                m_elevator, elevatorHeights.LOW, () -> xBoxController.getRawAxis(0)));
+//    m_driverController
+//        .b()
+//        .whileTrue(
+//            new IncrementElevatorHeight(
+//                m_elevator, elevatorHeights.MID, () -> xBoxController.getRawAxis(0)));
+//    m_driverController
+//        .y()
+//        .whileTrue(
+//            new IncrementElevatorHeight(
+//                m_elevator, elevatorHeights.HIGH, () -> xBoxController.getRawAxis(0)));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
   }
@@ -143,7 +143,7 @@ public class RobotContainer {
   }
 
   public void simulationPeriodic() {
-    m_elevator.simulationPeriodic();
+    //m_elevator.simulationPeriodic();
   }
 
   public void periodic() {

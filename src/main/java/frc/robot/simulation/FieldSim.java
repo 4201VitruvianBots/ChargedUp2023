@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.Vision.CAMERA_POSITION;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
@@ -43,9 +44,12 @@ public class FieldSim extends SubsystemBase {
   private void updateRobotPoses() {
     m_field2d.setRobotPose(m_swerveDrive.getPoseMeters());
     m_field2d.getObject("oakAvgRobotPose").setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
-    m_field2d.getObject("oakPoses").setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("oakRobotPoses").setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("oakTagPoses").setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.FORWARD_LOCALIZER));
 
-    m_field2d.getObject("Limelight Pose").setPose(m_vision.getRobotPose2d(CAMERA_POSITION.FORWARD_LOCALIZER));
+    m_field2d.getObject("Limelight Pose").setPose(m_vision.getRobotPose2d(CAMERA_POSITION.REAR_LOCALIZER));
+
+
     if(RobotBase.isSimulation()) {
       m_field2d
               .getObject("Swerve Modules")
