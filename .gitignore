@@ -168,3 +168,6 @@ simgui-ds.json
 simgui.json
 
 .vscode/settings.json
+
+# Memory log
+memorylog.txt
