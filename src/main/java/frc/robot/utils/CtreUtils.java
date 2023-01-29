@@ -15,8 +15,8 @@ public final class CtreUtils {
 
     motorConfig.slot0.kF = 0.0;
     motorConfig.slot0.kP = 0.6; // 0.8;
-    motorConfig.slot0.kI = 0; // 0.0001;
-    // motorConfig.slot0.integralZone = 100.0;
+    motorConfig.slot0.kI = 0.0001;
+    motorConfig.slot0.integralZone = 121.904762;
     motorConfig.slot0.kD = 12; // 0.0;
     motorConfig.slot0.allowableClosedloopError = 0.0;
 

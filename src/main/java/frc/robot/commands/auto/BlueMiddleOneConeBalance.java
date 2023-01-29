@@ -27,7 +27,7 @@ public class BlueMiddleOneConeBalance extends SequentialCommandGroup {
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
             swerveDrive::setSwerveModuleStatesAuto,
-                false,
+            false,
             swerveDrive);
 
     addCommands(

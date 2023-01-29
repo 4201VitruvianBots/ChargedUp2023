@@ -84,17 +84,17 @@ public class SwerveDrive extends SubsystemBase {
     m_turnController.enableContinuousInput(-Math.PI, Math.PI);
     SmartDashboard.putData(m_turnController);
     m_odometry =
-      new SwerveDrivePoseEstimator(
-          Constants.SwerveDrive.kSwerveKinematics,
-          getHeadingRotation2d(),
-          getModulePositionsArray(),
-          new Pose2d());
-    
+        new SwerveDrivePoseEstimator(
+            Constants.SwerveDrive.kSwerveKinematics,
+            getHeadingRotation2d(),
+            getModulePositionsArray(),
+            new Pose2d());
+
     Timer.delay(1);
     if (RobotBase.isReal()) resetModulesToAbsolute();
   }
 
-  private void resetModulesToAbsolute(){
+  private void resetModulesToAbsolute() {
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.resetAngleToAbsolute();
   }
@@ -145,8 +145,9 @@ public class SwerveDrive extends SubsystemBase {
     m_odometry.resetPosition(getHeadingRotation2d(), getModulePositionsArray(), pose);
   }
 
-  public double  getHeadingDegrees() {
+  public double getHeadingDegrees() {
     return m_pigeon.getYaw();
+    // return 0;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -163,8 +164,7 @@ public class SwerveDrive extends SubsystemBase {
 
   public Map<ModulePosition, SwerveModuleState> getModuleStates() {
     Map<ModulePosition, SwerveModuleState> map = new HashMap<>();
-    for (ModulePosition i : m_swerveModules.keySet())
-      map.put(i, m_swerveModules.get(i).getState());
+    for (ModulePosition i : m_swerveModules.keySet()) map.put(i, m_swerveModules.get(i).getState());
     return map;
   }
 
@@ -235,27 +235,27 @@ public class SwerveDrive extends SubsystemBase {
   public void updateOdometry() {
     m_odometry.update(getHeadingRotation2d(), getModulePositionsArray());
 
-//    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-//      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-//              .rotateBy(getHeadingRotation2d())
-//              .plus(kModuleTranslations.get(module.getModulePosition()));
-//
-//      module.setModulePose(
-//          new Pose2d(
-//              modulePositionFromChassis,
-//              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
-//    }
+    //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+    //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
+    //              .rotateBy(getHeadingRotation2d())
+    //              .plus(kModuleTranslations.get(module.getModulePosition()));
+    //
+    //      module.setModulePose(
+    //          new Pose2d(
+    //              modulePositionFromChassis,
+    //              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
+    //    }
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
-              kModuleTranslations
-                      .get(module.getModulePosition())
-                      .rotateBy(getHeadingRotation2d())
-                      .plus(getPoseMeters().getTranslation());
+          kModuleTranslations
+              .get(module.getModulePosition())
+              .rotateBy(getHeadingRotation2d())
+              .plus(getPoseMeters().getTranslation());
       module.setModulePose(
-              new Pose2d(
-                      modulePositionFromChassis,
-                      module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+          new Pose2d(
+              modulePositionFromChassis,
+              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
     }
   }
 
@@ -263,6 +263,9 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
     SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
+    SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
+    SmartDashboard.putNumber("Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
   }
 
   @Override
