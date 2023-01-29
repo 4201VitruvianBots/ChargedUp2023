@@ -60,17 +60,18 @@ public class Intake extends SubsystemBase {
   }
   // set percent output function
   public void setIntakePercentOutput(double value) {
-    intakeMotor.set(ControlMode.PercentOutput, intakePID.calculate(getMeasurement()));
+    intakeMotor.set(ControlMode.PercentOutput,value);
   }
   // shuffleboard or smartdashboard funciton
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
     SmartDashboard.putNumber("getIntake", 1);
-    PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
+    // PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // setIntakePercentOutput(intakePID.calculate(getMeasurement()));
   }
 }
