@@ -75,7 +75,7 @@ public class LED extends SubsystemBase {
           setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
           break;
         case CONE: //Solid Yellow
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(250, 246, 17, 0, 0, AnimationTypes.Solid);
           break;
         case CUBE: //Solid purple 
           setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);

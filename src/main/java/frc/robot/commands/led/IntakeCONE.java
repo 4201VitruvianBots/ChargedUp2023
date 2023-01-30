@@ -10,26 +10,20 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.robotState;
 
 /** Sets the LED based on the subsystems' statuses */
-public class GetSubsystemStates extends CommandBase {
+public class IntakeCONE extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LED m_led;
 
-  private final Wrist m_wrist;
   private final Intake m_intake;
   private boolean Cone;
-  private boolean Cube;
+
   private boolean disabled;
   private boolean enabled;
-  private boolean elavating;
-  private boolean intaking;
-  private boolean wrist; 
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(
-      LED led, Intake intake, Wrist wrist) {
+  public IntakeCONE(LED led, Intake intake, robotState robotState) {
     m_led = led;
     m_intake = intake;
-    m_wrist = wrist;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(led);
   }
@@ -46,21 +40,14 @@ public class GetSubsystemStates extends CommandBase {
   // the prioritized state to be expressed to the LEDs
   disabled = DriverStation.isDisabled();
   enabled = !disabled;
-  intaking = m_intake.getIntakeState();
-  wrist = m_wrist.getWristState(); 
+  Cone = m_intake.getIntakeState();
 
   // set in order of priority to be expressed from the least priority to the
   // highest priority
   if (disabled) {
     m_led.expressState(LED.robotState.DISABLED);
-  } else if (elavating) {
-    m_led.expressState(LED.robotState.ELEVATING);
   } else if (Cone) {
     m_led.expressState(LED.robotState.CONE);
-  } else if (Cube) {
-    m_led.expressState(LED.robotState.CUBE);
-  } else if (wrist) {
-    m_led.expressState(LED.robotState.WRIST);
   } else if (enabled) {
     m_led.expressState(LED.robotState.ENABLED);
   }
