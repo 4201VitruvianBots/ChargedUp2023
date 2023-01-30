@@ -1,0 +1,52 @@
+# This is a workflow to check for memory leaks in our code. It will run the robot sim for a full hour
+
+name: MemoryLeakTest
+
+# Controls when the action will run. Triggers the workflow at 8:00 am PST (16:00 UTC) every other day
+# Will use approx. 900/2000 allotted minutes per month
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '0 16 */2 * *'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "test"
+  test:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # This grabs the WPILib docker container
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v3
+
+    # Declares the repository safe and not under dubious ownership.
+    - name: Add repository to git safe directories
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+    # Grant execute permission for gradlew
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    # Runs a single command using the runners shell
+    - name: Applying spotless formatting
+      run: ./gradlew spotlessApply
+
+    # Runs a single command using the runners shell
+    - name: Compile and run tests on robot code
+      run: ./gradlew build
+    
+    # Runs a single command using the runners shell
+    - name: Run the robot code in a simulator
+      run: timeout 3600 ./gradlew simulateJava || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
+
+    # Runs a single command using the runners shell
+    - name: Upload artifact of memory log
+      uses: actions/upload-artifact@v3
+      with:
+        name: memory-log-file
+        path: .github/artifacts/memorylog.txt
