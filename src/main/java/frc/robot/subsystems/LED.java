@@ -5,6 +5,12 @@ import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -71,7 +77,10 @@ public class LED extends SubsystemBase {
         case CONE: //Solid Yellow
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case CUBE: //Soild green
+        case CUBE: //Solid purple 
+          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
+          break;
+          case ENABLED: //Soild green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
         case DISABLED: //Solid red
@@ -84,6 +93,26 @@ public class LED extends SubsystemBase {
     currentRobotState = state;
   }
 
+  @Override
+  public void periodic() {
+    // null indicates that the animation is "Solid"
+    if (m_Animation == null) {
+      m_candle.setLEDs(255, 30, 0, 0, 0, 125);
+      m_candle.setLEDs(red, green, blue, 0, 20, 35); // setting all LEDs to color
+    } else {
+      m_candle.animate(m_Animation); // setting the candle animation to m_animation if not null
+    }
+  }
+  ShuffleboardTab ledTab = Shuffleboard.getTab("LED");
+    
+  public GenericEntry currentState = 
+    ledTab.add("LED Mode", currentRobotState.toString()).getEntry();
+  
+
+  public void updateShuffleboard() {
+    currentState.setString(pieceIntent.name());
+  }
+
   public PieceType getPieceIntent(){
     return pieceIntent;
   }
@@ -94,7 +123,7 @@ public class LED extends SubsystemBase {
 
   /** Different LED animation types */
   public enum AnimationTypes {
-    ColorFlow,
+  ColorFlow,
     Fire,
     Larson,
     Rainbow,
@@ -114,7 +143,7 @@ public class LED extends SubsystemBase {
     CONE,
     CUBE,
     DISABLED,
-    ENABLED,
+    ENABLED, 
   }
 
   public enum PieceType{

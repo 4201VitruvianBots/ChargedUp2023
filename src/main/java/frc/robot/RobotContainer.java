@@ -20,14 +20,21 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
+import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
+import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -41,6 +48,11 @@ public class RobotContainer {
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+  private final Controls m_controls = new Controls();
+  private final Intake m_intake = new Intake();
+  private final Wrist m_wrist = new Wrist();
+  private final LED m_led = new LED(m_controls);
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -66,6 +78,7 @@ public class RobotContainer {
             () -> -leftJoystick.getRawAxis(1),
             () -> -leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_wrist));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
@@ -97,6 +110,9 @@ public class RobotContainer {
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+
+    xBoxTriggers[5].onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xBoxTriggers[6].onTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
 
     m_driverController
         .a()
