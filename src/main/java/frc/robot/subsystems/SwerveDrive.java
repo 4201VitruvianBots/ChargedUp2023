@@ -265,7 +265,8 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber("Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putNumber(
+        "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
   }
 
   @Override

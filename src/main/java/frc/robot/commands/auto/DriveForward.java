@@ -2,7 +2,6 @@ package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -19,8 +18,8 @@ public class DriveForward extends SequentialCommandGroup {
         TrajectoryUtils.readTrajectory(
             "DriveForward", Units.feetToMeters(1), Units.feetToMeters(1), false);
 
-    PPSwerveControllerCommand command =
-        new PPSwerveControllerCommand(
+    VitruvianPPSwerveControllerCommand command =
+        new VitruvianPPSwerveControllerCommand(
             trajectory,
             swerveDrive::getPoseMeters,
             Constants.SwerveDrive.kSwerveKinematics,
@@ -28,7 +27,6 @@ public class DriveForward extends SequentialCommandGroup {
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
             swerveDrive::setSwerveModuleStatesAuto,
-            false,
             swerveDrive);
     //    TestPPSwerveControllerCommand command = new TestPPSwerveControllerCommand(swerveDrive,
     // trajectory);

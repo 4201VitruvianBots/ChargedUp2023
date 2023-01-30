@@ -4,8 +4,6 @@
 
 package frc.robot.commands.auto;
 
-import java.util.List;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,25 +13,22 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.SwerveDrive;
+import java.util.List;
 
 public class DynamicPathGeneration extends CommandBase {
   /** Creates a new DynamicPathGeneration. */
   public DynamicPathGeneration() {
 
     TrajectoryConfig config =
-      new TrajectoryConfig(
-        Units.feetToMeters(3),
-        Units.feetToMeters(3))
-
-    .setKinematics(Constants.SwerveDrive.kSwerveKinematics);
+        new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(3))
+            .setKinematics(Constants.SwerveDrive.kSwerveKinematics);
 
     Trajectory trajectory =
-      TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, new Rotation2d(0)),
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(0, 0, new Rotation2d(0)),
+            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+            new Pose2d(3, 0, new Rotation2d(0)),
+            config);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -43,9 +38,7 @@ public class DynamicPathGeneration extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
