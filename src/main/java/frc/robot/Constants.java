@@ -40,12 +40,26 @@ public final class Constants {
 
     public static final int elevatorLowerSwitch = 8;
 
+    // Elevator sim constants
     public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
     public static final double elevatorGearing = 10.0;
     public static final double elevatorMassKg = 4.0;
     public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
     public static final double elevatorMinHeightMeters = 0;
     public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
+
+    // PID
+    public static final double kSensorUnitsPerRotation = 2048.0;
+    public static final double kGearRatio = 1.0/5.0;
+    public static final double kMaxRPM = 6380.0;
+    public static final double kMaxVelocity = (kMaxRPM  / 600) * (kSensorUnitsPerRotation / kGearRatio);
+
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopIdx = 0;
+    public static final int kTimeoutMs = 0;
+
+    public static final double metersToEncoderCounts =
+    (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
   public final class Intake {
