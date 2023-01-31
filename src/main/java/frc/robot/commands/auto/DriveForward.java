@@ -16,7 +16,7 @@ public class DriveForward extends SequentialCommandGroup {
 
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "DriveForward", Units.feetToMeters(1), Units.feetToMeters(1), false);
+            "TestPath2", Units.feetToMeters(1), Units.feetToMeters(1), false);
 
     VitruvianPPSwerveControllerCommand command =
         new VitruvianPPSwerveControllerCommand(
@@ -33,7 +33,7 @@ public class DriveForward extends SequentialCommandGroup {
 
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),
-        new SetSwerveOdometry(swerveDrive, trajectory.getInitialPose(), fieldSim),
+        new SetSwerveOdometry(swerveDrive, trajectory.getInitialHolonomicPose(), fieldSim),
         command,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
