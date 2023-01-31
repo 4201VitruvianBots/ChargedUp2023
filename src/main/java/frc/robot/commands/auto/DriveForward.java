@@ -16,7 +16,7 @@ public class DriveForward extends SequentialCommandGroup {
 
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "TestPath2", Units.feetToMeters(1), Units.feetToMeters(1), false);
+            "DriveForward", Units.feetToMeters(1), Units.feetToMeters(1), false);
 
     VitruvianPPSwerveControllerCommand command =
         new VitruvianPPSwerveControllerCommand(

@@ -16,7 +16,7 @@ public class BlueTopConeCubeBalance extends SequentialCommandGroup {
   public BlueTopConeCubeBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueTopConeCubeBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
+            "BlueTopConeCubeBalance", Units.feetToMeters(8), Units.feetToMeters(8), false);
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(
             trajectory,
