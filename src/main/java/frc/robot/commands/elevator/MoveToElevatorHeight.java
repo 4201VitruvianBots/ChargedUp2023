@@ -30,9 +30,9 @@ public class MoveToElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //if (m_elevator.getElevatorDesiredHeightState() != heightEnum) {
-      m_elevator.setElevatorDesiredHeightState(heightEnum);
-    //}
+    // if (m_elevator.getElevatorDesiredHeightState() != heightEnum) {
+    m_elevator.setElevatorDesiredHeightState(heightEnum);
+    // }
   }
 
   // Called once the command ends or is interrupted.
