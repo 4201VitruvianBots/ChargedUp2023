@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase {
   }
   // set percent output function
   public void setIntakePercentOutput(double value) {
-    intakeMotor.set(ControlMode.PercentOutput,value);
+    intakeMotor.set(ControlMode.PercentOutput, value);
   }
   // shuffleboard or smartdashboard funciton
   public void updateSmartDashboard() {

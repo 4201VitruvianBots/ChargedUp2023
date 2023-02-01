@@ -182,13 +182,22 @@ public class SwerveModule extends SubsystemBase {
   public void setTurnNeutralMode(NeutralMode mode) {
     m_turnMotor.setNeutralMode(mode);
   }
-  
+
   private void updateSmartDashboard() {
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("module" + m_moduleNumber + "position", getPosition().distanceMeters);
+
+    SmartDashboard.getNumber(
+        "frontLeftCANCoderOffset", Constants.SwerveDrive.frontLeftCANCoderOffset);
+    SmartDashboard.getNumber(
+        "frontRightCANCoderOffset", Constants.SwerveDrive.frontRightCANCoderOffset);
+    SmartDashboard.getNumber(
+        "backLeftCANCoderOffset", Constants.SwerveDrive.backLeftCANCoderOffset);
+    SmartDashboard.getNumber(
+        "backRightCANCoderOffset", Constants.SwerveDrive.backRightCANCoderOffset);
   }
 
   @Override
