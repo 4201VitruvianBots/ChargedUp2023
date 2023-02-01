@@ -173,3 +173,5 @@ simgui.json
 
 # Memory log
 memorylog.txt
+
+.github/artifacts/

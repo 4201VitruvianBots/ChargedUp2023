@@ -9,11 +9,9 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -112,9 +110,6 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.Elevator.kSlotIdx, kI, Constants.Elevator.kTimeoutMs);
       motor.config_kD(Constants.Elevator.kSlotIdx, kD, Constants.Elevator.kTimeoutMs);
 
-      /* Set the peak and nominal outputs */
-      // motor.configNominalOutputForward(0, Constants.Elevator.kTimeoutMs);
-      // motor.configNominalOutputReverse(0, Constants.Elevator.kTimeoutMs);
       motor.configPeakOutputForward(1, Constants.Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-1, Constants.Elevator.kTimeoutMs);
 
@@ -186,29 +181,14 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[1].setNeutralMode(mode);
   }
 
-  // public static void updateSimulatedElevatorHeight() {
-  //   // setElevatorHeight(getElevatorHeight()+(getElevatorPercentOutput()/5));
-  //   // if (getElevatorHeight() > maxElevatorHeight) {
-  //   //   setElevatorHeight(maxElevatorHeight);
-  //   // } else if (getElevatorHeight() < 0.0) {
-  //   //   setElevatorHeight(0.0);
-  //   // }
-  //   setElevatorHeight(elevatorSim.getPositionMeters());
-  // }
-
   // Update elevator height using encoders and bottom limit switch
   public static void updateElevatorHeight() {
-
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
     if (getElevatorLowerSwitch()) {
       setElevatorSensorPosition(0.0);
     }
-    // } else {
-    //   /* Uses built in feedback sensor if not at limit switch */
-    //   setElevatorHeight(elevatorMotors[0].getSelectedSensorPosition());
-    // }
   }
 
   public void updateShuffleboard() {
@@ -234,8 +214,6 @@ public class Elevator extends SubsystemBase {
     // Next, we update it. The standard loop time is 20ms.
     elevatorSim.update(0.020);
 
-    System.out.println(elevatorSim.getPositionMeters() / Constants.Elevator.metersToEncoderCounts);
-
     elevatorMotors[0].getSimCollection().setIntegratedSensorRawPosition((int) (elevatorSim.getPositionMeters() / Constants.Elevator.metersToEncoderCounts));
     
     elevatorMotors[0].getSimCollection().setIntegratedSensorVelocity((int) (elevatorSim.getVelocityMetersPerSecond() / Constants.Elevator.metersToEncoderCounts * 10));
@@ -251,12 +229,7 @@ public class Elevator extends SubsystemBase {
     // This method will be called once per scheduler run
     updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
     // work without this
-
-    // if (getElevatorSimulated()) {
-    //   updateSimulatedElevatorHeight();
-    // } else {
     updateElevatorHeight();
-
     switch (desiredHeightState) {
       case JOYSTICK:
         Elevator.setElevatorPercentOutput(elevatorJoystickY*-0.8);
@@ -271,25 +244,8 @@ public class Elevator extends SubsystemBase {
         desiredHeightValue = maxElevatorHeight; // Placeholder values
         break;
       case NONE:
-        //desiredHeightValue = elevatorHeight;
         break;
     }
-    double distanceBetween = desiredHeightValue - elevatorHeight;
-    // Checking if our desired height has been reached within a certain range
-    //if (distanceBetween < 0.01 && distanceBetween > -0.01) { // Placeholder values
-      //setElevatorDesiredHeightState(elevatorHeights.NONE);
-      //setElevatorPercentOutput(0.0);
-    //}
-    // } else {
-      // The part where we actually determine where the elevator should move
-      // if (distanceBetween < 0) {
-      //   setElevatorPercentOutput(-0.8);
-      // } else if (distanceBetween > 0) {
-      //   setElevatorPercentOutput(0.8);
-      // } else if (distanceBetween == 0) {
-      //   setElevatorPercentOutput(0.0);
-      // }
-    // }
     setElevatorMotionMagicMeters(desiredHeightValue);
   }
 }
