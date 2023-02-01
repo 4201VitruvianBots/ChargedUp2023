@@ -23,8 +23,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveDrive.ModulePosition;
@@ -61,6 +62,8 @@ public class SwerveModule extends SubsystemBase {
   private double m_turnPercentOutput;
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
+
+  private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
 
   public SwerveModule(
       ModulePosition modulePosition,
@@ -178,7 +181,7 @@ public class SwerveModule extends SubsystemBase {
   public void setTurnNeutralMode(NeutralMode mode) {
     m_turnMotor.setNeutralMode(mode);
   }
-
+  
   private void updateSmartDashboard() {
     SmartDashboard.putNumber(
         "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
@@ -189,7 +192,7 @@ public class SwerveModule extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    // updateSmartDashboard();
   }
 
   @Override

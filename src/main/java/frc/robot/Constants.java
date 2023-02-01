@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
@@ -39,16 +40,34 @@ public final class Constants {
 
     public static final int elevatorLowerSwitch = 8;
 
+    // Elevator sim constants
     public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
     public static final double elevatorGearing = 10.0;
     public static final double elevatorMassKg = 4.0;
     public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
     public static final double elevatorMinHeightMeters = 0;
     public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
+
+    // PID
+    public static final double kSensorUnitsPerRotation = 2048.0;
+    public static final double kGearRatio = 1.0/5.0;
+    public static final double kMaxRPM = 6380.0;
+    public static final double kMaxVelocity = (kMaxRPM  / 600) * (kSensorUnitsPerRotation / kGearRatio);
+
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopIdx = 0;
+    public static final int kTimeoutMs = 0;
+
+    public static final double metersToEncoderCounts =
+    (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
   public final class Intake {
-    public static final int intakeMotor = 38;
+    public static final int intakeMotor = 33;
+  }
+
+  public final class Wrist {
+    public static final int wristMotor = 30;
   }
 
   public final class LED {

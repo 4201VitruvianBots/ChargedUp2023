@@ -10,12 +10,13 @@ import frc.robot.Constants;
 
 // creates LED subsystem
 public class LED extends SubsystemBase {
+  private PieceType pieceIntent = PieceType.NONE;
   private final CANdle m_candle =
       new CANdle(Constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot actiates
   int blue = 0;
-  private robotState currentRobotState = robotState.Disabled;
+  private robotState currentRobotState = robotState.DISABLED;
   private Animation m_Animation = null;
 
   private final Controls m_controls; // fiugure out during robtoics class
@@ -58,28 +59,37 @@ public class LED extends SubsystemBase {
   public void expressState(robotState state) {
     if (state != currentRobotState) {
       switch (state) {
-        case Elavating:
+        case INTAKING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Scoring:
+        case ELEVATING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Intaking:
+        case WRIST: // Solid blue
+          setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
+          break;
+        case CONE: // Solid Yellow
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Cone:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+        case CUBE: // Soild green
+          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case Cube:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-        case Disabled:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+        case DISABLED: // Solid red
+          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
         default:
           break;
       }
     }
     currentRobotState = state;
+  }
+
+  public PieceType getPieceIntent() {
+    return pieceIntent;
+  }
+
+  public void setPieceIntent(PieceType type) {
+    pieceIntent = type;
   }
 
   /** Different LED animation types */
@@ -98,11 +108,18 @@ public class LED extends SubsystemBase {
 
   /** Different robot states */
   public enum robotState {
-    Scoring,
-    Elavating,
-    Intaking,
-    Disabled,
-    Cone,
-    Cube,
+    INTAKING,
+    ELEVATING,
+    WRIST,
+    CONE,
+    CUBE,
+    DISABLED,
+    ENABLED,
+  }
+
+  public enum PieceType {
+    CONE,
+    CUBE,
+    NONE,
   }
 }
