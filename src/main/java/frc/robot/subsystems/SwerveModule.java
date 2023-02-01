@@ -8,7 +8,6 @@ import static frc.robot.Constants.SwerveDrive.kMaxSpeedMetersPerSecond;
 import static frc.robot.Constants.SwerveModule.*;
 import static frc.robot.Constants.SwerveModule.kDriveMotorGearRatio;
 
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -80,33 +78,23 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder = angleEncoder;
     m_angleOffset = angleOffset;
 
-    m_driveMotor.configFactoryDefault();
-    m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
+    initCanCoder();
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
+    m_turnMotor.setSelectedSensorPosition(0);
 
-    initCanCoder();
+    m_driveMotor.configFactoryDefault();
+    m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
+    m_driveMotor.setInverted(false);
+
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
-
-    if (RobotBase.isReal()) resetAngleToAbsolute();
-    initShuffleboard();
+    m_lastAngle = getHeadingDegrees();
   }
 
   private void initCanCoder() {
     Timer.delay(1);
-    int counter = 0;
-
-    while (counter < 100) {
-      m_angleEncoder.getAbsolutePosition();
-      if (m_angleEncoder.getLastError() == ErrorCode.OK) {
-        break;
-      } else if (counter > 100) {
-        return;
-      }
-      counter++;
-    }
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     m_initSuccess = true;
@@ -193,11 +181,13 @@ public class SwerveModule extends SubsystemBase {
   public void setTurnNeutralMode(NeutralMode mode) {
     m_turnMotor.setNeutralMode(mode);
   }
-
-  private void initShuffleboard() {
-    m_ShuffleboardTab.add("module " + m_moduleNumber + " heading", getState().angle.getDegrees());
-    m_ShuffleboardTab.add(
+  
+  private void updateSmartDashboard() {
+    SmartDashboard.putNumber(
+        "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
+    SmartDashboard.putNumber(
         "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("module" + m_moduleNumber + "position", getPosition().distanceMeters);
   }
 
   @Override

@@ -117,7 +117,11 @@ public class Elevator extends SubsystemBase {
       // motor.configNominalOutputReverse(0, Constants.Elevator.kTimeoutMs);
       motor.configPeakOutputForward(1, Constants.Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-1, Constants.Elevator.kTimeoutMs);
-
+      
+    elevatorMotors[0].config_kF(0, kF);
+    elevatorMotors[0].config_kP(0, kP);
+    initShuffleboard();
+  }
       motor.setSensorPhase(true); // Forward direction = positive, forward velocity = positive, positive x positive = positive
 
       motor.configMotionCruiseVelocity(15000, Constants.Elevator.kTimeoutMs);

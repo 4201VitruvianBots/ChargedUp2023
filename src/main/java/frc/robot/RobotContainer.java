@@ -70,8 +70,8 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
@@ -116,12 +116,10 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Coast);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Brake);
   }
 
   /**
@@ -131,13 +129,18 @@ public class RobotContainer {
    */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-    //   m_autoChooser.addOption("RedMiddleOneConeBalance", new
+    //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
-
-  public void disabledInit() {}
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
@@ -145,7 +148,7 @@ public class RobotContainer {
   }
 
   public void simulationPeriodic() {
-    m_memorylog.simulationPeriodic();
+    m_elevator.simulationPeriodic();
   }
 
   public void periodic() {

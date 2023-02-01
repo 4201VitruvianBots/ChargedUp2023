@@ -12,11 +12,13 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class BlueTopConeCubeBalance extends SequentialCommandGroup {
-  public BlueTopConeCubeBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
+public class DriveSideway extends SequentialCommandGroup {
+  public DriveSideway(SwerveDrive swerveDrive, FieldSim fieldSim) {
+
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueTopConeCubeBalance", Units.feetToMeters(8), Units.feetToMeters(8), false);
+            "DriveSideway", Units.feetToMeters(1), Units.feetToMeters(1), false);
+
     PPSwerveControllerCommand command =
         new PPSwerveControllerCommand(
             trajectory,
@@ -28,6 +30,8 @@ public class BlueTopConeCubeBalance extends SequentialCommandGroup {
             swerveDrive::setSwerveModuleStatesAuto,
             false,
             swerveDrive);
+    //    TestPPSwerveControllerCommand command = new TestPPSwerveControllerCommand(swerveDrive,
+    // trajectory);
 
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),
