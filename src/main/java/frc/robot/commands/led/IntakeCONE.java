@@ -31,7 +31,7 @@ public class IntakeCONE extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_led.expressState(LED.robotState.ENABLED);
+    m_led.setPattern(0, 0, 0, 0, 0, LED.robotState.ENABLED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,11 +45,11 @@ public class IntakeCONE extends CommandBase {
   // set in order of priority to be expressed from the least priority to the
   // highest priority
   if (disabled) {
-    m_led.expressState(LED.robotState.DISABLED);
+    m_led.setPattern(0, 0, 0, 0, 0, LED.robotState.DISABLED);
   } else if (Cone) {
-    m_led.expressState(LED.robotState.CONE);
+    m_led.setPattern(0, 0, 0, 0, 0, LED.robotState.CONE);
   } else if (enabled) {
-    m_led.expressState(LED.robotState.ENABLED);
+    m_led.setPattern(0, 0, 0, 0, 0, LED.robotState.ENABLED);
   }
 }
 

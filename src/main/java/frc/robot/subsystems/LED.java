@@ -5,6 +5,7 @@ import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -57,41 +58,41 @@ public class LED extends SubsystemBase {
 
   // will create LED patterns
   public void setPattern(
-      int red, int green, int blue, int white, double speed, AnimationTypes toChange) {}
-  /**
-   * @param state the dominant robot state that LEDs will epxress
-   */
-  // will set LEDs a coordinated color for an action !TBD!
-  public void expressState(robotState state) {
-    if (state != currentRobotState) {
-      switch (state) {
-        case INTAKING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case ELEVATING: 
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case WRIST: //Solid blue 
-          setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
-          break;
-        case CONE: //Solid Yellow
-          setPattern(250, 246, 17, 0, 0, AnimationTypes.Solid);
-          break;
-        case CUBE: //Solid purple 
-          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
-          break;
+      int red, int green, int blue, int white, double speed, robotState toChange) {
+        switch (toChange) {
+          case INTAKING:
+            m_Animation =
+              new ColorFlowAnimation(0, 0, 0, 0, 0, LEDcount, Direction.Forward);
+            break;
+          case ELEVATING: 
+            m_Animation =
+              new ColorFlowAnimation(0, 0, 0, 0, 0, LEDcount, Direction.Forward);
+            break;
+          case WRIST: //Solid blue 
+            m_Animation =
+              new ColorFlowAnimation(66, 95, 255, 0, 0, LEDcount, Direction.Forward);
+            break;
+          case CONE: //Solid Yellow
+            m_Animation =
+              new ColorFlowAnimation(250, 246, 17, 0, 0, LEDcount, Direction.Forward);
+            break;
+          case CUBE: //Solid purple 
+            m_Animation =
+              new ColorFlowAnimation(255, 0, 255, 0, 0, LEDcount, Direction.Forward);
+            break;
           case ENABLED: //Soild green
-          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case DISABLED: //Solid red
-          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        default:
-          break;
+            m_Animation =
+              new ColorFlowAnimation(0, 255, 0, 0, 0, LEDcount, Direction.Forward);
+            break;
+          case DISABLED: //Solid red
+            m_Animation =
+              new ColorFlowAnimation(255, 0, 0, 0, 0, LEDcount, Direction.Forward);
+            break;
+          default:
+            break;
+        }
       }
-    }
-    currentRobotState = state;
-  }
+ 
 
   @Override
   public void periodic() {
@@ -121,20 +122,6 @@ public class LED extends SubsystemBase {
       pieceIntent = type; 
   }
 
-  /** Different LED animation types */
-  public enum AnimationTypes {
-  ColorFlow,
-    Fire,
-    Larson,
-    Rainbow,
-    RgbFade,
-    SingleFade,
-    Strobe,
-    Twinkle,
-    TwinkleOff,
-    Solid
-  }
-
   /** Different robot states */
   public enum robotState {
     INTAKING,
@@ -151,4 +138,5 @@ public class LED extends SubsystemBase {
     CUBE,
     NONE,
   }
+
 }
