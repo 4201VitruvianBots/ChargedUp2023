@@ -170,8 +170,3 @@ simgui.json
 .vscode/settings.json
 
 *.wpilog
-
-# Memory log
-memorylog.txt
-
-.github/artifacts/
