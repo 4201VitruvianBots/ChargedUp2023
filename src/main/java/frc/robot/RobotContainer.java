@@ -21,8 +21,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.led.GetSubsystemStates;
-import frc.robot.commands.led.IntakeCONE;
-import frc.robot.commands.led.IntakeCUBE;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -33,7 +32,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Elevator.elevatorHeights;
-import frc.robot.subsystems.LED.robotState;
+import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
 
@@ -113,8 +112,8 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    xBoxTriggers[5].onTrue(new IntakeCONE(m_led, m_intake, robotState.CONE));
-    xBoxTriggers[6].onTrue(new IntakeCUBE(m_led, m_intake, robotState.CUBE));
+      xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+      xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
     m_driverController
         .a()
