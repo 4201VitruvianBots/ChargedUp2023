@@ -30,8 +30,8 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 
@@ -109,9 +109,9 @@ public class RobotContainer {
 
 
     xBoxTriggers[2].toggleOnTrue(new RunIntake(m_intake));
-    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
-    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
-    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
+    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, StateHandler.elevatorStates.LOW));
+    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, StateHandler.elevatorStates.MID));
+    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, StateHandler.elevatorStates.HIGH));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));

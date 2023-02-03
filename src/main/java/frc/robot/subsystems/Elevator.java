@@ -34,21 +34,21 @@ public class Elevator extends SubsystemBase {
   };
 
   // Used by RobotContainer to specify which button has been pressed
-  public enum elevatorHeights {
-    LOW,
-    MID,
-    HIGH,
-    JOYSTICK,
-    NONE
-  }
+  // public enum elevatorHeights {
+  //   LOW,
+  //   MID,
+  //   HIGH,
+  //   JOYSTICK,
+  //   NONE
+  // }
 
   // Limit switch at bottom of elevator
   private static DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
 
   private static double desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private static elevatorHeights desiredHeightState =
-      elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
+  private static StateHandler.elevatorStates desiredHeightState =
+      StateHandler.elevatorStates.NONE; // Think of this as our "next state" in our state machine.
 
   private static double elevatorJoystickY;
 
@@ -160,11 +160,11 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  public elevatorHeights getElevatorDesiredHeightState() {
+  public static StateHandler.elevatorStates getElevatorDesiredHeightState() {
     return desiredHeightState;
   }
 
-  public void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
+  public void setElevatorDesiredHeightState(StateHandler.elevatorStates heightEnum) {
     desiredHeightState = heightEnum;
   }
 

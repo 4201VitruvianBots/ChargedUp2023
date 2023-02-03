@@ -6,8 +6,8 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
 import java.util.function.DoubleSupplier;
+import frc.robot.subsystems.StateHandler;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. This is our default command */
@@ -33,9 +33,9 @@ public class IncrementElevatorHeight extends CommandBase {
     // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if
     // statement to prioritize shortcut buttons
     if (m_joystickY.getAsDouble() != 0.0) {
-      m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
-    } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-      m_elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
+      m_elevator.setElevatorDesiredHeightState(StateHandler.elevatorStates.JOYSTICK);
+    } else if (m_elevator.getElevatorDesiredHeightState() == StateHandler.elevatorStates.JOYSTICK) {
+      m_elevator.setElevatorDesiredHeightState(StateHandler.elevatorStates.NONE);
       //Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
       //Elevator.setElevatorPercentOutput(0.0);
     }
