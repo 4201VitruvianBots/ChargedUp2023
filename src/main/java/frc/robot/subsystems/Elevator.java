@@ -168,6 +168,10 @@ public class Elevator extends SubsystemBase {
     return desiredHeightState;
   }
 
+  public boolean getElevatingState() {
+    return !(Math.abs(getElevatorPercentOutput()) < 0.05);
+  }
+
   public void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
     desiredHeightState = heightEnum;
   }
@@ -245,7 +249,7 @@ public class Elevator extends SubsystemBase {
     updateElevatorHeight();
     switch (desiredHeightState) {
       case JOYSTICK:
-        Elevator.setElevatorPercentOutput(elevatorJoystickY * -0.8);
+        setElevatorPercentOutput(elevatorJoystickY * -0.8);
         return;
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
@@ -257,8 +261,17 @@ public class Elevator extends SubsystemBase {
         desiredHeightValue = maxElevatorHeight; // Placeholder values
         break;
       case NONE:
+        desiredHeightValue = elevatorHeight;
         break;
     }
+    // double distanceBetween = Math.abs(desiredHeightValue - elevatorHeight);
+    // System.out.println("Elevator Height: "+Double.toString(elevatorHeight));
+    // System.out.println("Desired Height Value: "+Double.toString(desiredHeightValue));
+    // System.out.println("Distance Between: "+Double.toString(distanceBetween));
+    // if (distanceBetween < maxElevatorHeight/100) {
+    //   setElevatorDesiredHeightState(elevatorHeights.NONE);
+    // }
+    System.out.println(getElevatingState());
     setElevatorMotionMagicMeters(desiredHeightValue);
   }
 }
