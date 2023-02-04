@@ -34,8 +34,8 @@ public final class Constants {
   public final class Pnuematics {}
 
   public static final class Elevator {
-    public static final int elevatorMotorLeft = 31;
-    public static final int elevatorMotorRight = 32;
+    public static final int elevatorMotorLeft = 32;
+    public static final int elevatorMotorRight = 33;
 
     public static final int elevatorLowerSwitch = 8;
 
@@ -63,7 +63,7 @@ public final class Constants {
   }
 
   public final class Intake {
-    public static final int intakeMotor = 33;
+    public static final int intakeMotor = 31;
   }
 
   public final class Wrist {
