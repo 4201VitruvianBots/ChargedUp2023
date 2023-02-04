@@ -76,7 +76,6 @@ public class MemoryLog {
           "Amount of memory used by robot code: "
               + Long.toString(this.usedMemory / 1048576)
               + " MB");
-
       // Checks if the robot code is using more than 192 MB of memory (3/4 of the roboRIO's memory)
       if (this.usedMemory / 1048576 > 192) {
         throwError();

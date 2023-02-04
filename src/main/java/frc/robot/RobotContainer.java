@@ -151,6 +151,9 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
+    if (System.getProperty("os.name") == "Linux") {
+      m_memorylog.simulationPeriodic();
+    }
   }
 
   public void periodic() {
