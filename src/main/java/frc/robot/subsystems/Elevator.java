@@ -271,7 +271,6 @@ public class Elevator extends SubsystemBase {
     // if (distanceBetween < maxElevatorHeight/100) {
     //   setElevatorDesiredHeightState(elevatorHeights.NONE);
     // }
-    System.out.println(getElevatingState());
     setElevatorMotionMagicMeters(desiredHeightValue);
   }
 }
