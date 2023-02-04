@@ -11,8 +11,8 @@ public class AutoRunIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
-  public AutoRunIntake(Intake m_Intake2) {
-    m_intake = m_Intake2;
+  public AutoRunIntake(Intake m_Intake) {
+    m_intake = m_Intake;
   }
 
   // Called when the command is initially scheduled.

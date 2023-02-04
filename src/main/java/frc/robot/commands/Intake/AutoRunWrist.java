@@ -4,16 +4,14 @@
 
 package frc.robot.commands.Intake;
 
-import org.ejml.dense.block.MatrixOps_DDRB;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 
 public class AutoRunWrist extends CommandBase {
-private final Wrist m_wrist;
-  
-public AutoRunWrist(Wrist wrist) {
-    m_wrist = wrist; 
+  private final Wrist m_wrist;
+
+  public AutoRunWrist(Wrist wrist) {
+    m_wrist = wrist;
   }
 
   // Called when the command is initially scheduled.
