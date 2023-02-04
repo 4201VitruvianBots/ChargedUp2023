@@ -299,8 +299,4 @@ public class SwerveDrive extends SubsystemBase {
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
   }
-
-  public double getPitchDegrees() {
-    return m_pigeon.getPitch();
-  }
 }

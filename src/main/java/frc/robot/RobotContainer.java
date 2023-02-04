@@ -25,6 +25,7 @@ import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -41,6 +42,7 @@ import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -129,6 +131,10 @@ public class RobotContainer {
     xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
     xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
 
+    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
+    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
+    
     leftTriggers[0].whileTrue(new SetSwerveDriveBalance(m_swerveDrive, null, null, null).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)); 
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));

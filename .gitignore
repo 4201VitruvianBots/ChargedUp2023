@@ -170,3 +170,5 @@ simgui.json
 .vscode/settings.json
 
 *.wpilog
+
+*.checksum
