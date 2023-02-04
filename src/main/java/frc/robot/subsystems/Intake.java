@@ -5,20 +5,20 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  private static final String Controlmode = null;
   /** Creates a new Intake. */
   private boolean isIntaking = false;
-
+  private final double kF = 0;
+  private final double kP = 0.2;
   private TalonFX intakeMotor = new TalonFX(Constants.Intake.intakeMotor);
-  private final PIDController intakePID = new PIDController(0.1, 0.01, 0.05);
   private double PercentOutput;
 
   public Intake() {
@@ -26,24 +26,25 @@ public class Intake extends SubsystemBase {
 
     // factory default cofigs
     intakeMotor.configFactoryDefault();
-    intakePID.setTolerance(1);
-    intakePID.enableContinuousInput(-180, 180);
     intakeMotor.setInverted(false);
+
+    intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+
 
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
     intakeMotor.configVoltageCompSaturation(10);
     intakeMotor.enableVoltageCompensation(true);
-  }
 
-  public void setIntakeSate(boolean state) {
-    boolean isIntaking = state;
+    intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    intakeMotor.config_kF(0, kF);
+    intakeMotor.config_kP(0, kP);
+
   }
 
   public void setSetpoint(double setpoint) {
     setpoint = PercentOutput;
-    intakePID.setSetpoint(setpoint);
   }
 
   public double getMeasurement() {
@@ -66,12 +67,11 @@ public class Intake extends SubsystemBase {
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
     SmartDashboard.putNumber("getIntake", 1);
-    // PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
+    PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // setIntakePercentOutput(intakePID.calculate(getMeasurement()));
   }
 }
