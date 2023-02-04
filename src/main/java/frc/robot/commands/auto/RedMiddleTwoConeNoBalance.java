@@ -26,11 +26,12 @@ public class RedMiddleTwoConeNoBalance extends SequentialCommandGroup {
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
             swerveDrive::setSwerveModuleStatesAuto,
+            false,
             swerveDrive);
 
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),
-        new SetSwerveOdometry(swerveDrive, trajectory.getInitialPose(), fieldSim),
+        new SetSwerveOdometry(swerveDrive, trajectory.getInitialHolonomicPose(), fieldSim),
         command,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

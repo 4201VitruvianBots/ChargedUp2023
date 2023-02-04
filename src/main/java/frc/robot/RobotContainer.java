@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.auto.BlueTopConeCubeBalance;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -37,11 +42,13 @@ import frc.robot.subsystems.Vision;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private final DataLog m_logger = DataLogManager.getLog();
+
   // The robot's subsystems and commands are defined here...
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final Vision m_vision = new Vision(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -66,8 +73,8 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
@@ -111,12 +118,10 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Coast);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Brake);
   }
 
   /**
@@ -126,13 +131,18 @@ public class RobotContainer {
    */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-    //   m_autoChooser.addOption("RedMiddleOneConeBalance", new
+    //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
-
-  public void disabledInit() {}
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
@@ -141,7 +151,9 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    m_memorylog.simulationPeriodic();
+    if (System.getProperty("os.name") == "Linux") {
+      m_memorylog.simulationPeriodic();
+    }
   }
 
   public void periodic() {

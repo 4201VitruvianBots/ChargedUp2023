@@ -21,8 +21,8 @@ public class MemoryLog {
   private long timeAtLastMemoryLog;
   private long timeSinceLastMemoryLog;
 
-  private final String mainPath = new File("").getAbsolutePath(); 
-  private final String logPath = mainPath+"/.github/artifacts/memorylog.txt";
+  private final String mainPath = new File("").getAbsolutePath();
+  private final String logPath = mainPath + "/.github/artifacts/memorylog.txt";
 
   private final long startTime = System.nanoTime();
 
@@ -76,7 +76,6 @@ public class MemoryLog {
           "Amount of memory used by robot code: "
               + Long.toString(this.usedMemory / 1048576)
               + " MB");
-      
       // Checks if the robot code is using more than 192 MB of memory (3/4 of the roboRIO's memory)
       if (this.usedMemory / 1048576 > 192) {
         throwError();
@@ -86,7 +85,11 @@ public class MemoryLog {
       this.timeAtLastMemoryLog = System.nanoTime();
 
       // Writes to the log list
-      writeToLogFile(Long.toString((timeAtLastMemoryLog-startTime)/1000000000L) + "s : " + Long.toString(freeMemory / 1048576) + " MB\n");
+      writeToLogFile(
+          Long.toString((timeAtLastMemoryLog - startTime) / 1000000000L)
+              + "s : "
+              + Long.toString(freeMemory / 1048576)
+              + " MB\n");
     } else if (timeSinceLastMemoryLog
         >= 57000000000L) { // Garbage collects 3 seconds before memory log
       garbageCollect();
