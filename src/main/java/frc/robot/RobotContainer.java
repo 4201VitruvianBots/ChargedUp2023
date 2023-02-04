@@ -25,18 +25,22 @@ import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.MoveToElevatorHeight;
+import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
+import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -54,6 +58,10 @@ public class RobotContainer {
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+  private final Controls m_controls = new Controls();
+  private final Wrist m_wrist = new Wrist();
+  private final LED m_led = new LED(m_controls);
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -79,6 +87,7 @@ public class RobotContainer {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_wrist));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
@@ -110,9 +119,10 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
+    xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
-
-      xBoxLeftTrigger =
+    xBoxLeftTrigger =
         new Trigger(
             () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
     xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
@@ -121,15 +131,9 @@ public class RobotContainer {
 
     leftTriggers[0].whileTrue(new SetSwerveDriveBalance(m_swerveDrive, null, null, null).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)); 
 
-
-
-    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
-    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
-    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
-
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
-    //SmartDashboard.putData(new SetGoalLEDState(m_vision, false));
+    // SmartDashboard.putData(new SetGoalLEDState(m_vision, false));
   }
 
   public void disableInit() {

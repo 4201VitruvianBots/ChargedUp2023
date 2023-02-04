@@ -153,6 +153,10 @@ public class SwerveDrive extends SubsystemBase {
     // return 0;
   }
 
+  public double getPitchDegrees() {
+    return m_pigeon.getPitch();
+  }
+
   public Rotation2d getHeadingRotation2d() {
     return Rotation2d.fromDegrees(getHeadingDegrees());
   }
