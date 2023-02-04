@@ -133,6 +133,7 @@ public class RobotContainer {
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+    //SmartDashboard.putData(new SetGoalLEDState(m_vision, false));
   }
 
   public void disableInit() {
