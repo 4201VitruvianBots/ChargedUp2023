@@ -60,7 +60,6 @@ public class RobotContainer {
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   private final Controls m_controls = new Controls();
-  private final Intake m_intake = new Intake();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
 
