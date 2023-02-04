@@ -3,6 +3,8 @@ package frc.robot.commands.swerve;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import java.util.function.DoubleSupplier;
@@ -14,7 +16,7 @@ public class SetSwerveDriveBalance extends CommandBase {
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
   SwerveModuleState[] states;
 
-  PIDController outputCalculator = new PIDController(0.01, 0, 0);
+  PIDController outputCalculator = new PIDController(0.05, 0, 0);
 
   /**
    * Creates a new ExampleCommand.
@@ -46,13 +48,13 @@ public class SetSwerveDriveBalance extends CommandBase {
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
-    outputCalculator.setTolerance(1);
+    outputCalculator.setTolerance(2);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double output = outputCalculator.calculate(-m_swerveDrive.getPitchDegrees());
+    double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
     states =
         new SwerveModuleState[] {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
@@ -61,6 +63,7 @@ public class SetSwerveDriveBalance extends CommandBase {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
+    SmartDashboard.putNumber("Balence output", output);
   }
 
   // Called once the command ends or is interrupted.

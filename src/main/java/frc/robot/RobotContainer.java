@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -28,6 +29,7 @@ import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Elevator;
@@ -116,6 +118,10 @@ public class RobotContainer {
     xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
     xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
     xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
+
+    leftTriggers[0].whileTrue(new SetSwerveDriveBalance(m_swerveDrive, null, null, null).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)); 
+
+
 
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
     m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));

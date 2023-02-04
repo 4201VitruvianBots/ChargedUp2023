@@ -24,6 +24,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -92,6 +93,7 @@ public class SwerveDrive extends SubsystemBase {
 
     Timer.delay(1);
     if (RobotBase.isReal()) resetModulesToAbsolute();
+    SmartDashboard.putData(this);
   }
 
   private void resetModulesToAbsolute() {
@@ -266,6 +268,7 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
+    SmartDashboard.putNumber("Pigeon Yaw", getHeadingDegrees());
     SmartDashboard.putNumber(
         "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
   }
@@ -291,5 +294,9 @@ public class SwerveDrive extends SubsystemBase {
 
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
+  }
+
+  public double getPitchDegrees() {
+    return m_pigeon.getPitch();
   }
 }
