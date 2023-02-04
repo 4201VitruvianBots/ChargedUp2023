@@ -40,8 +40,8 @@ public class BlueBottomConeCubeNoBalance extends SequentialCommandGroup {
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
 
     // OutTakeCOne
-     new AutoRunIntake(Intake,true),
-     new AutoRunWrist(true),
-     command1.andThen(() -> swerveDrive.drive(0, 0, 0, false, false));
+     //new AutoRunIntake(Intake,true),
+     //new AutoRunWrist(true),
+     //command1.andThen(() -> swerveDrive.drive(0, 0, 0, false, false));
   }
 }

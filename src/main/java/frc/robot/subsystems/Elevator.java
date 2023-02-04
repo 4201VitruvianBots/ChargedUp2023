@@ -261,7 +261,7 @@ public class Elevator extends SubsystemBase {
         desiredHeightValue = maxElevatorHeight; // Placeholder values
         break;
       case NONE:
-        desiredHeightValue = elevatorHeight;
+        //desiredHeightValue = elevatorHeight;
         break;
     }
     // double distanceBetween = Math.abs(desiredHeightValue - elevatorHeight);

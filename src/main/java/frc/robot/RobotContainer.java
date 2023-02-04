@@ -24,6 +24,7 @@ import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -32,6 +33,7 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.DistanceSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
@@ -39,6 +41,7 @@ import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -59,6 +62,7 @@ public class RobotContainer {
   private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -76,6 +80,7 @@ public class RobotContainer {
   public Trigger[] rightTriggers = new Trigger[2];
   public Trigger[] xBoxTriggers = new Trigger[10];
   public Trigger[] xBoxPOVTriggers = new Trigger[4];
+
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
 
   public void initializeSubsystems() {
@@ -89,7 +94,7 @@ public class RobotContainer {
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(m_elevator, () -> leftJoystick.getRawAxis(1)));
+        new IncrementElevatorHeight(m_elevator, () -> xBoxController.getLeftY()));
     m_fieldSim.initSim();
   }
 
@@ -126,6 +131,10 @@ public class RobotContainer {
     xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
     xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
     xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
+
+    xBoxTriggers[Constants.USB.xBoxButtonA].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
+    xBoxTriggers[Constants.USB.xBoxButtonB].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    xBoxTriggers[Constants.USB.xBoxButtonY].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
@@ -167,6 +176,9 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
+    // Since our GitHub action, which is what uses MemoryLog, runs on Ubuntu,
+    // this will make sure the memory log will only run on there.
+    // TODO: Implement environment variable instead
     if (System.getProperty("os.name") == "Linux") {
       m_memorylog.simulationPeriodic();
     }
