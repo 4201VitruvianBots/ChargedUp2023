@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
@@ -107,7 +108,15 @@ public class RobotContainer {
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
 
-    xBoxTriggers[2].toggleOnTrue(new RunIntake(m_intake));
+
+
+      xBoxLeftTrigger =
+        new Trigger(
+            () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
+    xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
+    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
+    xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
+
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
     m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
     m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));

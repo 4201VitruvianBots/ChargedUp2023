@@ -16,6 +16,7 @@ import frc.robot.Constants;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private boolean isIntaking = false;
+
   private final double kF = 0;
   private final double kP = 0.2;
   private TalonFX intakeMotor = new TalonFX(Constants.Intake.intakeMotor);
@@ -30,7 +31,6 @@ public class Intake extends SubsystemBase {
 
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
@@ -40,7 +40,6 @@ public class Intake extends SubsystemBase {
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     intakeMotor.config_kF(0, kF);
     intakeMotor.config_kP(0, kP);
-
   }
 
   public void setSetpoint(double setpoint) {
