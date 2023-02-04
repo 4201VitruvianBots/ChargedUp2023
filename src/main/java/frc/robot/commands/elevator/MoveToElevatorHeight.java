@@ -11,12 +11,11 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class MoveToElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
-
   private Elevator m_elevator;
+
   private elevatorHeights heightEnum;
 
-  public MoveToElevatorHeight(
-      Elevator elevator, elevatorHeights heightEnum) {
+  public MoveToElevatorHeight(Elevator elevator, elevatorHeights heightEnum) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -31,9 +30,9 @@ public class MoveToElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Elevator.getElevatorDesiredHeightState() != heightEnum) {
-      Elevator.setElevatorDesiredHeightState(heightEnum);
-    }
+    // if (m_elevator.getElevatorDesiredHeightState() != heightEnum) {
+    m_elevator.setElevatorDesiredHeightState(heightEnum);
+    // }
   }
 
   // Called once the command ends or is interrupted.
@@ -43,6 +42,6 @@ public class MoveToElevatorHeight extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

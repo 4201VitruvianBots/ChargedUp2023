@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
@@ -35,17 +34,32 @@ public final class Constants {
   public final class Pnuematics {}
 
   public static final class Elevator {
-    public static final int elevatorMotorLeft = 31;
-    public static final int elevatorMotorRight = 32;
+    public static final int elevatorMotorLeft = 32;
+    public static final int elevatorMotorRight = 33;
 
     public static final int elevatorLowerSwitch = 8;
 
+    // Elevator sim constants
     public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
     public static final double elevatorGearing = 10.0;
     public static final double elevatorMassKg = 4.0;
     public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
     public static final double elevatorMinHeightMeters = 0;
     public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
+
+    // PID
+    public static final double kSensorUnitsPerRotation = 2048.0;
+    public static final double kGearRatio = 1.0 / 5.0;
+    public static final double kMaxRPM = 6380.0;
+    public static final double kMaxVelocity =
+        (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
+
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopIdx = 0;
+    public static final int kTimeoutMs = 0;
+
+    public static final double metersToEncoderCounts =
+        (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
   public final class Intake {
@@ -112,8 +126,8 @@ public final class Constants {
   }
 
   public static final class SwerveDrive {
-    public static final double kTrackWidth = Units.inchesToMeters(30);
-    public static final double kWheelBase = Units.inchesToMeters(30);
+    public static final double kTrackWidth = Units.inchesToMeters(24);
+    public static final double kWheelBase = Units.inchesToMeters(24);
 
     public static final Map<ModulePosition, Translation2d> kModuleTranslations =
         Map.of(
@@ -122,10 +136,10 @@ public final class Constants {
             ModulePosition.BACK_LEFT, new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
             ModulePosition.BACK_RIGHT, new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 153.1054;
-    public static final double frontRightCANCoderOffset = 217.2665;
-    public static final double backLeftCANCoderOffset = 260.2441;
-    public static final double backRightCANCoderOffset = 143.9648;
+    public static final double frontLeftCANCoderOffset = 84.98628; // 85.957;
+    public static final double frontRightCANCoderOffset = 219.506836; // 41.748;
+    public static final double backLeftCANCoderOffset = 261.95906; // 261.475;
+    public static final double backRightCANCoderOffset = 148.183594; // 148.008; // 329.150;
 
     public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(
@@ -135,16 +149,12 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_X = 0.2;
+    public static final double kP_X = 0.6;
     public static final double kD_X = 0;
-    public static final double kP_Y = 0.2;
+    public static final double kP_Y = 0.6;
     public static final double kD_Y = 0;
-    public static final double kP_Theta = 8;
-    public static final double kD_Theta = 0;
-
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxRotationRadiansPerSecond, kMaxRotationRadiansPerSecondSquared);
+    public static final double kP_Theta = 4;
+    public static final double kD_Theta = 0.01;
 
     public enum ModulePosition {
       FRONT_LEFT,
@@ -157,7 +167,7 @@ public final class Constants {
   public static final class SwerveModule {
     public static final double kDriveMotorGearRatio = 6.12;
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3.94);
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final int kFalconEncoderCPR = 2048;
     public static final int kCANCoderCPR = 4096;
 
@@ -170,9 +180,9 @@ public final class Constants {
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
     public static final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
-    public static final double ksDriveVoltSecondsPerMeter = 0.667 / 12;
-    public static final double kvDriveVoltSecondsSquaredPerMeter = 2.44 / 12;
-    public static final double kaDriveVoltSecondsSquaredPerMeter = 0.27 / 12;
+    public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
+    public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
+    public static final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
 
     public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
     public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3

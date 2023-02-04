@@ -4,22 +4,18 @@
 
 package frc.robot.commands.elevator;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
+import java.util.function.DoubleSupplier;
 
 public class IncrementElevatorHeight extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. 
-   * This is our default command
-  */
+  /** Creates a new IncrementElevatorHeight. This is our default command */
   private DoubleSupplier m_joystickY;
 
   private Elevator m_elevator;
 
-  public IncrementElevatorHeight(
-    Elevator elevator, DoubleSupplier joystickY) {
+  public IncrementElevatorHeight(Elevator elevator, DoubleSupplier joystickY) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -34,13 +30,14 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if statement to prioritize shortcut buttons
+    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if
+    // statement to prioritize shortcut buttons
     if (m_joystickY.getAsDouble() != 0.0) {
-      Elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
-    }
-    else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-      Elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
-      Elevator.setElevatorPercentOutput(0.0);
+      m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
+    } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+      m_elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
+      // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
+      // Elevator.setElevatorPercentOutput(0.0);
     }
 
     Elevator.setElevatorJoystickY(m_joystickY);

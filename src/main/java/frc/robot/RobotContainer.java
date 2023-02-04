@@ -4,9 +4,9 @@
 
 package frc.robot;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -18,6 +18,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.Intake.RunReverseIntake;
+import frc.robot.commands.auto.BlueTopConeCubeBalance;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.led.GetSubsystemStates;
@@ -35,6 +40,8 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,10 +50,14 @@ import frc.robot.subsystems.Wrist;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+  private final DataLog m_logger = DataLogManager.getLog();
+
   // The robot's subsystems and commands are defined here...
+  private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
   private final Controls m_controls = new Controls();
   private final Intake m_intake = new Intake();
@@ -75,23 +86,22 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
     m_led.setDefaultCommand(
       new GetSubsystemStates(m_led, m_intake, m_wrist));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(
-            m_elevator, () -> leftJoystick.getRawAxis(1)));
+        new IncrementElevatorHeight(m_elevator, () -> leftJoystick.getRawAxis(1)));
     m_fieldSim.initSim();
   }
 
   public RobotContainer() {
     initializeSubsystems();
     initializeAutoChooser();
-     
+
     // Configure the button bindings
     configureBindings();
   }
@@ -111,25 +121,16 @@ public class RobotContainer {
       xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
     for (int i = 0; i < xBoxPOVTriggers.length; i++)
       xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
-
+      
       xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
       xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
-    m_driverController
-        .a()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.LOW));
-    m_driverController
-        .b()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.MID));
-    m_driverController
-        .y()
-        .whileTrue(
-            new MoveToElevatorHeight(
-                m_elevator, elevatorHeights.HIGH));
+  xBoxLeftTrigger =
+        new Trigger(
+            () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
+    xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
+    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
+    xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
@@ -137,12 +138,10 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Coast);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setElevatorNeutralMode(NeutralMode.Brake);
   }
 
   /**
@@ -152,13 +151,17 @@ public class RobotContainer {
    */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-    //   m_autoChooser.addOption("RedMiddleOneConeBalance", new
+    //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
-    SmartDashboard.putData("Auto Selector", m_autoChooser);
-  }
-  public void disabledInit(){
+    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
 
+    SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
   public Command getAutonomousCommand() {
@@ -168,7 +171,9 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    m_memorylog.simulationPeriodic();
+    if (System.getProperty("os.name") == "Linux") {
+      m_memorylog.simulationPeriodic();
+    }
   }
 
   public void periodic() {

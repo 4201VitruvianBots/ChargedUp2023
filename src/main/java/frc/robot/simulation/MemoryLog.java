@@ -4,6 +4,10 @@
 
 package frc.robot.simulation;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
  * Keeps a log of how much memory the robot code is using. This is used by the GitHub action
  * MemoryLeakTest to test for memory leaks. Ran by declaring the environment variable
@@ -16,6 +20,20 @@ public class MemoryLog {
 
   private long timeAtLastMemoryLog;
   private long timeSinceLastMemoryLog;
+
+  private final String mainPath = new File("").getAbsolutePath();
+  private final String logPath = mainPath + "/.github/artifacts/memorylog.txt";
+
+  private final long startTime = System.nanoTime();
+
+  public MemoryLog() {
+    try {
+      final FileWriter clearFile = new FileWriter(logPath, false);
+      clearFile.close();
+    } catch (IOException clearFailed) {
+      clearFailed.printStackTrace();
+    }
+  }
 
   // Throws an error that will be caught by the MemoryLeakTest action and cause it to fail
   private void throwError() {
@@ -36,9 +54,20 @@ public class MemoryLog {
     this.usedMemory = this.totalMemory - this.freeMemory;
   }
 
+  private void writeToLogFile(String string) {
+    try {
+      FileWriter logFile = new FileWriter(logPath, true);
+      logFile.write(string);
+      logFile.close();
+    } catch (IOException writeFailed) {
+      writeFailed.printStackTrace();
+    }
+  }
+
   // Run by RobotContainer once per scheduler run. Runs the methods defined above
   public void simulationPeriodic() {
     this.timeSinceLastMemoryLog = System.nanoTime() - this.timeAtLastMemoryLog;
+    // Writes to the log file if at almost an hour of running
     if (timeSinceLastMemoryLog >= 60000000000L) { // Runs memory log every 60 seconds
       updateMemoryValues();
 
@@ -47,7 +76,6 @@ public class MemoryLog {
           "Amount of memory used by robot code: "
               + Long.toString(this.usedMemory / 1048576)
               + " MB");
-
       // Checks if the robot code is using more than 192 MB of memory (3/4 of the roboRIO's memory)
       if (this.usedMemory / 1048576 > 192) {
         throwError();
@@ -55,6 +83,13 @@ public class MemoryLog {
 
       // Resets the timer
       this.timeAtLastMemoryLog = System.nanoTime();
+
+      // Writes to the log list
+      writeToLogFile(
+          Long.toString((timeAtLastMemoryLog - startTime) / 1000000000L)
+              + "s : "
+              + Long.toString(freeMemory / 1048576)
+              + " MB\n");
     } else if (timeSinceLastMemoryLog
         >= 57000000000L) { // Garbage collects 3 seconds before memory log
       garbageCollect();

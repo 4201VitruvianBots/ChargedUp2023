@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -23,33 +24,28 @@ public class Vision extends SubsystemBase {
   private final NetworkTable forwardLocalizer;
   private final NetworkTable rearLocalizer;
 
-  private DoubleLogEntry limelightTargetValidLog;
+  private DataLog m_logger;
+  private DoubleLogEntry limelightTargetValid;
+  private DoubleLogEntry forwardLocalizerTargetValid;
 
   Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
-  int[] deafaultIntArray = {0};
   double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0};
 
   int[] tagId = new int[10];
-  double[] xPoses = new double[10];
-  double[] yPoses = new double[10];
-  double[] zPoses = new double[10];
+  double[] robotPosX = new double[10];
+  double[] robotPosY = new double[10];
+  double[] robotPosZ = new double[10];
+  double[] tagPosX = new double[10];
+  double[] tagPosY = new double[10];
+  double[] tagPosZ = new double[10];
 
-  int[] pnpTagId = new int[10];
-  double[] pnpXPoses = new double[10];
-  double[] pnpyPoses = new double[10];
-
-  double avgXPose = 0;
-  double avgYPose = 0;
-  double headingPose = 0;
-
-  public Vision(SwerveDrive swerveDrive, Vision vision) {
-
+  public Vision(SwerveDrive swerveDrive, DataLog logger) {
     m_swerveDrive = swerveDrive;
 
     intake = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
-    forwardLocalizer = NetworkTableInstance.getDefault().getTable("limelight");
+    forwardLocalizer = NetworkTableInstance.getDefault().getTable("fLocalizer");
     rearLocalizer = NetworkTableInstance.getDefault().getTable("limelight");
 
     PortForwarder.add(5800, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5800);
@@ -58,6 +54,10 @@ public class Vision extends SubsystemBase {
     PortForwarder.add(5803, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5803);
     PortForwarder.add(5804, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5804);
     PortForwarder.add(5805, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5805);
+
+    m_logger = logger;
+    limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
+    forwardLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
   }
 
   /**
@@ -76,9 +76,10 @@ public class Vision extends SubsystemBase {
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case FORWARD_LOCALIZER:
-        return getAprilTagIds(position)[0];
       case REAR_LOCALIZER:
-        return getAprilTagIds(position)[0];
+        var tagIds = getAprilTagIds(position);
+        if (tagIds.length == 0) return 0;
+        return tagIds[0];
       default:
         return 0;
     }
@@ -150,7 +151,13 @@ public class Vision extends SubsystemBase {
       case FORWARD_LOCALIZER:
         return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
       case REAR_LOCALIZER:
-        return rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        var rawBotPose = rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        if (rawBotPose.length > 0) {
+          rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
+          rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
+          return rawBotPose;
+        }
+        return defaultDoubleArray;
       default:
         return defaultDoubleArray;
     }
@@ -174,28 +181,66 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
-    switch (position) {
-      case FORWARD_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      case REAR_LOCALIZER:
-        return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(4));
-      default:
-        return defaultPose;
-    }
+    return new Pose2d(pose[0], pose[1], m_swerveDrive.getHeadingRotation2d());
   }
 
-  // public Pose2d getLimelightPose() {
-  //   return new Pose2d()
-  // }
+  public Pose2d[] getRobotPoses2d(CAMERA_POSITION position) {
+    Pose2d[] poseArray = {defaultPose};
+
+    if (getValidTarget(position))
+      switch (position) {
+        case FORWARD_LOCALIZER:
+          robotPosX = forwardLocalizer.getEntry("Robot Pose X").getDoubleArray(new double[] {});
+          robotPosY = forwardLocalizer.getEntry("Robot Pose Y").getDoubleArray(new double[] {});
+          robotPosZ = forwardLocalizer.getEntry("Robot Pose Z").getDoubleArray(new double[] {});
+          poseArray = new Pose2d[robotPosX.length];
+          for (int i = 0; i < robotPosX.length; i++)
+            poseArray[i] = new Pose2d(robotPosX[i], robotPosY[i], Rotation2d.fromDegrees(0));
+          break;
+        case REAR_LOCALIZER:
+          break;
+      }
+
+    return poseArray;
+  }
+
+  public Pose2d[] getTagPoses2d(CAMERA_POSITION position) {
+    Pose2d[] poseArray = {defaultPose};
+
+    if (getValidTarget(position))
+      switch (position) {
+        case FORWARD_LOCALIZER:
+          tagPosX = forwardLocalizer.getEntry("Tag Pose X").getDoubleArray(new double[] {});
+          tagPosY = forwardLocalizer.getEntry("Tag Pose Y").getDoubleArray(new double[] {});
+          tagPosZ = forwardLocalizer.getEntry("Tag Pose Z").getDoubleArray(new double[] {});
+          poseArray = new Pose2d[tagPosX.length];
+          for (int i = 0; i < tagPosX.length; i++)
+            poseArray[i] = new Pose2d(tagPosX[i], tagPosY[i], Rotation2d.fromDegrees(0));
+          break;
+        case REAR_LOCALIZER:
+          break;
+      }
+
+    return poseArray;
+  }
+
+  private void updateVisionPose(CAMERA_POSITION position) {
+    if (getValidTarget(position))
+      m_swerveDrive
+          .getOdometry()
+          .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
+  }
 
   private void logData() {
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.INTAKE));
-    limelightTargetValidLog.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
+    limelightTargetValid.append(getValidTargetType(CAMERA_POSITION.INTAKE));
+    forwardLocalizerTargetValid.append(getValidTargetType(CAMERA_POSITION.OUTTAKE));
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateVisionPose(CAMERA_POSITION.FORWARD_LOCALIZER);
+    //    updateVisionPose(CAMERA_POSITION.REAR_LOCALIZER);
     logData();
   }
 

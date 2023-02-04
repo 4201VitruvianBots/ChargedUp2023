@@ -5,31 +5,58 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
-  private static final String Controlmode = null;
   /** Creates a new Intake. */
   private boolean isIntaking = false;
 
+  private final double kF = 0;
+  private final double kP = 0.2;
   private TalonFX intakeMotor = new TalonFX(Constants.Intake.intakeMotor);
+  private double PercentOutput;
 
   public Intake() {
-    // one motor for the intake
+    // one or two motors
 
-    intakeMotor.configFactoryDefault();
     // factory default cofigs
+    intakeMotor.configFactoryDefault();
+    intakeMotor.setInverted(false);
+
+    intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+
+    intakeMotor.setStatusFramePeriod(1, 255);
+    intakeMotor.setStatusFramePeriod(2, 255);
+    intakeMotor.setNeutralMode(NeutralMode.Brake);
+    intakeMotor.configVoltageCompSaturation(10);
+    intakeMotor.enableVoltageCompensation(true);
+
+    intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    intakeMotor.config_kF(0, kF);
+    intakeMotor.config_kP(0, kP);
   }
 
+  public void setSetpoint(double setpoint) {
+    setpoint = PercentOutput;
+  }
+
+  public double getMeasurement() {
+    return intakeMotor.getSelectedSensorPosition();
+  }
+
+  // control mode function
   public boolean getIntakeState() {
     return isIntaking;
   }
-  // control mode function
-  public void setIntakeState(boolean state) {
-    isIntaking = state;
+
+  public void setIntakeState(boolean b) {
+    isIntaking = b;
   }
   // set percent output function
   public void setIntakePercentOutput(double value) {
@@ -38,6 +65,8 @@ public class Intake extends SubsystemBase {
   // shuffleboard or smartdashboard funciton
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
+    SmartDashboard.putNumber("getIntake", 1);
+    PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
   }
 
   @Override

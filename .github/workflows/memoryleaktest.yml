@@ -2,11 +2,12 @@
 
 name: MemoryLeakTest
 
-# Controls when the action will run. Triggers the workflow at 8:00 am PST (16:00 UTC) every day
+# Controls when the action will run. Triggers the workflow at 8:00 am PST (16:00 UTC) every other day
+# Will use approx. 900/2000 allotted minutes per month
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '0 16 * * *'
+    - cron:  '0 16 */2 * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -42,3 +43,10 @@ jobs:
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
       run: timeout 3600 ./gradlew simulateJava || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
+
+    # Runs a single command using the runners shell
+    - name: Upload artifact of memory log
+      uses: actions/upload-artifact@v3
+      with:
+        name: memory-log-file
+        path: .github/artifacts/memorylog.txt
