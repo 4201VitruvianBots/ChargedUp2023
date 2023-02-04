@@ -10,7 +10,8 @@ import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent; 
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent; 
  
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard; 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase; 
 import frc.robot.Constants; 
  
@@ -109,20 +110,23 @@ public class LED extends SubsystemBase {
   public void expressState(robotState state) { 
     if (state != currentRobotState) { 
       switch (state) { 
-        case INTAKING: 
+        case INTAKING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid); 
-          break; 
+          break;
+        case ENABLED: //Solid green
+          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid); 
+          break;
         case ELEVATING:  
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid); 
           break; 
         case WRIST: //Solid blue  
           setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid); 
           break; 
-        case CONE: //Solid Yellow 
+        case CONE: //Solid yellow 
           setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid); 
           break; 
-        case CUBE: //Soild green 
-          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid); 
+        case CUBE: //Soild purple 
+          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid); 
           break; 
         case DISABLED: //Solid red 
           setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid); 
@@ -143,9 +147,11 @@ public class LED extends SubsystemBase {
     } else { 
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null 
     } 
-   // SmartDashboardTab.putString("Controls", "LED Mode", currentRobotState.toString()); 
-      Shuffleboard.getTab("Controls") 
-    .add("LED Mode", currentRobotState.toString()); 
+   SmartDashboard.putString("LED Mode", currentRobotState.toString()); 
+   
+   //the code below was printing out just LED Mode over and over again in the Led tab for some reason but the code above does show the current state
+   //   Shuffleboard.getTab("Controls") 
+    // .add("LED Mode", currentRobotState.toString()); 
  
   } 
  
