@@ -17,7 +17,8 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
 public class BlueBottomConeCubeNoBalance extends SequentialCommandGroup {
-  public BlueBottomConeCubeNoBalance(Intake intake, Wrist wrist, SwerveDrive swerveDrive, FieldSim fieldSim) {
+  public BlueBottomConeCubeNoBalance(
+      Intake intake, Wrist wrist, SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
             "BlueBottomConeCubeNoBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
