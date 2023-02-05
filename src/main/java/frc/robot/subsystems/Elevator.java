@@ -164,7 +164,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  public elevatorHeights getElevatorDesiredHeightState() {
+  public static elevatorHeights getElevatorDesiredHeightState() {
     return desiredHeightState;
   }
 
