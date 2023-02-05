@@ -73,7 +73,8 @@ public class VitruvianPPSwerveControllerCommand extends PPSwerveControllerComman
         new Pose2d(desiredState.poseMeters.getTranslation(), desiredState.holonomicRotation),
         currentPose);
 
-    ChassisSpeeds targetChassisSpeeds = this.controller.calculate(currentPose, desiredState, desiredState.holonomicRotation);
+    ChassisSpeeds targetChassisSpeeds =
+        this.controller.calculate(currentPose, desiredState, desiredState.holonomicRotation);
 
     if (this.useKinematics) {
       SwerveModuleState[] targetModuleStates =

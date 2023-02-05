@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
@@ -35,8 +34,8 @@ public final class Constants {
   public final class Pnuematics {}
 
   public static final class Elevator {
-    public static final int elevatorMotorLeft = 31;
-    public static final int elevatorMotorRight = 32;
+    public static final int elevatorMotorLeft = 32;
+    public static final int elevatorMotorRight = 33;
 
     public static final int elevatorLowerSwitch = 8;
 
@@ -50,20 +49,21 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static final double kGearRatio = 1.0/5.0;
+    public static final double kGearRatio = 1.0 / 5.0;
     public static final double kMaxRPM = 6380.0;
-    public static final double kMaxVelocity = (kMaxRPM  / 600) * (kSensorUnitsPerRotation / kGearRatio);
+    public static final double kMaxVelocity =
+        (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
 
     public static final double metersToEncoderCounts =
-    (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
+        (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
   public final class Intake {
-    public static final int intakeMotor = 33;
+    public static final int intakeMotor = 31;
   }
 
   public final class Wrist {

@@ -33,11 +33,11 @@ public class IncrementElevatorHeight extends CommandBase {
     // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if
     // statement to prioritize shortcut buttons
     if (m_joystickY.getAsDouble() != 0.0) {
-      m_elevator.setElevatorDesiredHeightState(StateHandler.elevatorStates.JOYSTICK);
-    } else if (m_elevator.getElevatorDesiredHeightState() == StateHandler.elevatorStates.JOYSTICK) {
-      m_elevator.setElevatorDesiredHeightState(StateHandler.elevatorStates.NONE);
-      //Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
-      //Elevator.setElevatorPercentOutput(0.0);
+      m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
+    } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+      m_elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
+      // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
+      // Elevator.setElevatorPercentOutput(0.0);
     }
 
     Elevator.setElevatorJoystickY(m_joystickY);

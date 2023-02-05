@@ -92,6 +92,7 @@ public class SwerveDrive extends SubsystemBase {
 
     Timer.delay(1);
     if (RobotBase.isReal()) resetModulesToAbsolute();
+    SmartDashboard.putData(this);
   }
 
   private void resetModulesToAbsolute() {
@@ -149,6 +150,10 @@ public class SwerveDrive extends SubsystemBase {
   public double getHeadingDegrees() {
     return m_pigeon.getYaw();
     // return 0;
+  }
+
+  public double getPitchDegrees() {
+    return m_pigeon.getPitch();
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -266,6 +271,7 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
+    SmartDashboard.putNumber("Pigeon Yaw", getHeadingDegrees());
     SmartDashboard.putNumber(
         "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
   }

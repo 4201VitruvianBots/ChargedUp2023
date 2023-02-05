@@ -12,11 +12,11 @@ public class RunIntake extends CommandBase {
   private final Intake m_intake;
 
   /** Creates a new RunIntake. */
-  public RunIntake(Intake intake) {
-    m_intake = intake;
+  public RunIntake(Intake m_intake2) {
+    m_intake = m_intake2;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(intake);
+    addRequirements(m_intake2);
   }
 
   // Called when the command is initially scheduled.
@@ -28,7 +28,7 @@ public class RunIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(0.58);
+    m_intake.setIntakePercentOutput(0.25);
   }
 
   // Called once the command ends or is interrupted.

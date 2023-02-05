@@ -2,40 +2,45 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.auto;
+package frc.robot.commands.Intake;
 
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Intake;
 
-public class PlotAutoTrajectory extends CommandBase {
-  FieldSim m_fieldSim;
-  Trajectory m_trajectory;
-  /** Creates a new PlotAutoTrajectory. */
-  public PlotAutoTrajectory(FieldSim fieldSim, Trajectory trajectory) {
-    m_fieldSim = fieldSim;
-    m_trajectory = trajectory;
+public class RunReverseIntake extends CommandBase {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  private final Intake m_intake;
+
+  /** Creates a new RunIntake. */
+  public RunReverseIntake(Intake m_intake2) {
+    m_intake = m_intake2;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_intake2);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_fieldSim.setTrajectory(m_trajectory);
+    m_intake.setIntakeState(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_intake.setIntakePercentOutput(-0.25);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_intake.setIntakePercentOutput(0);
+    m_intake.setIntakeState(false);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

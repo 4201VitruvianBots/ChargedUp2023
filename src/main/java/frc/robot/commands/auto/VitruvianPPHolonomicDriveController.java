@@ -1,7 +1,6 @@
 package frc.robot.commands.auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -81,10 +80,10 @@ public class VitruvianPPHolonomicDriveController {
       Pose2d currentPose,
       PathPlannerTrajectory.PathPlannerState referenceState,
       Rotation2d angleRef) {
-        
+
     if (m_firstRun) {
-        rotationController.reset();
-        m_firstRun = false;
+      rotationController.reset();
+      m_firstRun = false;
     }
 
     double xFF =
@@ -93,7 +92,8 @@ public class VitruvianPPHolonomicDriveController {
         referenceState.velocityMetersPerSecond * referenceState.poseMeters.getRotation().getSin();
     double rotationFF = referenceState.holonomicAngularVelocityRadPerSec;
     // double rotationFF =
-    //     rotationController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
+    //     rotationController.calculate(currentPose.getRotation().getRadians(),
+    // angleRef.getRadians());
 
     this.translationError = referenceState.poseMeters.relativeTo(currentPose).getTranslation();
     this.rotationError = referenceState.holonomicRotation.minus(currentPose.getRotation());

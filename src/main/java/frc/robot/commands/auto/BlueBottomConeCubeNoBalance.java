@@ -6,18 +6,23 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
+import frc.robot.commands.Intake.AutoRunIntake;
+import frc.robot.commands.Intake.AutoRunWrist;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
 public class BlueBottomConeCubeNoBalance extends SequentialCommandGroup {
-  public BlueBottomConeCubeNoBalance(SwerveDrive swerveDrive, FieldSim fieldSim) {
+  public BlueBottomConeCubeNoBalance(
+      Intake intake, Wrist wrist, SwerveDrive swerveDrive, FieldSim fieldSim) {
     PathPlannerTrajectory trajectory =
         TrajectoryUtils.readTrajectory(
             "BlueBottomConeCubeNoBalance", Units.feetToMeters(2), Units.feetToMeters(2), false);
-    PPSwerveControllerCommand command =
+    PPSwerveControllerCommand command1 =
         new PPSwerveControllerCommand(
             trajectory,
             swerveDrive::getPoseMeters,
@@ -32,8 +37,12 @@ public class BlueBottomConeCubeNoBalance extends SequentialCommandGroup {
     addCommands(
         new PlotAutoTrajectory(fieldSim, trajectory),
         new SetSwerveOdometry(swerveDrive, trajectory.getInitialHolonomicPose(), fieldSim),
-        command,
+        command1,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
-            .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
+            .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
+        // Outtake Cone
+        new AutoRunIntake(intake),
+        new AutoRunWrist(wrist),
+        command1.andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
 }
