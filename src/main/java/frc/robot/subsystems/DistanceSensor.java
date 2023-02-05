@@ -9,6 +9,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 
@@ -29,8 +34,16 @@ public class DistanceSensor extends SubsystemBase {
     }
   }
 
-  public String getRawData() {
+  public String getRawSensorData() {
     return receivedData;
+  }
+
+  public int getSensorValue(int sensor) throws ParseException {
+    String sensorName = "sensor"+Integer.toString(sensor)+".mm";
+
+    Object object = new JSONParser().parse(receivedData);
+    JSONObject jsonObject = (JSONObject) object;
+    return (int) jsonObject.get(sensorName);
   }
 
   @Override
@@ -54,6 +67,5 @@ public class DistanceSensor extends SubsystemBase {
     
     System.out.println(receivedData);
     socket.close();
-    */
   }
 }
