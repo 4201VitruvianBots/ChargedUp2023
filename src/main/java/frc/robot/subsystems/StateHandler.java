@@ -24,17 +24,9 @@ public class StateHandler extends SubsystemBase {
     CUBE
   }
 
-  public enum elevatorStates {
-    NONE,
-    LOW,
-    MID,
-    HIGH,
-    JOYSTICK
-  }
-
   public mainRobotStates currentMainState = mainRobotStates.STOWED;
   public scoringStates currentScoringState = scoringStates.NONE;
-  public elevatorStates currentElevatorState = elevatorStates.NONE;
+  public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.NONE;
 
   public StateHandler() {
     

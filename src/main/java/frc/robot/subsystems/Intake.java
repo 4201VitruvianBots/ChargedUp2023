@@ -15,7 +15,7 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  private boolean isIntaking = false;
+  private static boolean isIntaking = false;
 
   private final double kF = 0;
   private final double kP = 0.2;

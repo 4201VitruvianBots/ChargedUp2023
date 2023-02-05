@@ -7,7 +7,7 @@ package frc.robot.commands.elevator;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
-import frc.robot.subsystems.StateHandler;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. This is our default command */

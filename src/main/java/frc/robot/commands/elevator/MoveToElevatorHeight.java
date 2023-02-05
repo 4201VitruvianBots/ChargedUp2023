@@ -7,15 +7,15 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.StateHandler;
+import frc.robot.subsystems.Elevator.elevatorHeights;
 
 public class MoveToElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private Elevator m_elevator;
 
-  private StateHandler.elevatorStates heightEnum;
+  private elevatorHeights heightEnum;
 
-  public MoveToElevatorHeight(Elevator elevator, StateHandler.elevatorStates heightEnum) {
+  public MoveToElevatorHeight(Elevator elevator, elevatorHeights heightEnum) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
