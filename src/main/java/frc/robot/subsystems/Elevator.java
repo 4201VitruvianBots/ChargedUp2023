@@ -39,7 +39,7 @@ public class Elevator extends SubsystemBase {
     MID,
     HIGH,
     JOYSTICK,
-    NONE
+    STOWED
   }
 
   // Limit switch at bottom of elevator
@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase {
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState =
-      elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
+      elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
 
   private static double elevatorJoystickY;
 
@@ -260,7 +260,7 @@ public class Elevator extends SubsystemBase {
       case HIGH:
         desiredHeightValue = maxElevatorHeight; // Placeholder values
         break;
-      case NONE:
+      case STOWED:
         // desiredHeightValue = elevatorHeight;
         break;
     }
