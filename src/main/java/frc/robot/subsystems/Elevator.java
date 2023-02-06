@@ -9,6 +9,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -23,7 +25,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import java.util.function.DoubleSupplier;
 
 public class Elevator extends SubsystemBase {
 
@@ -63,6 +64,10 @@ public class Elevator extends SubsystemBase {
 
   private static final double maxElevatorHeight = Constants.Elevator.elevatorMaxHeightMeters;
 
+  // By default this is set to true as we use motion magic to determine what speed we should be at to get to our setpoint.
+  // If the sensors are acting up, we set this value to false to directly control the percent output of the motors.
+  private boolean elevatorIsClosedLoop = true;
+
   // Simulation setup
 
   private static final ElevatorSim elevatorSim =
@@ -88,6 +93,8 @@ public class Elevator extends SubsystemBase {
       elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
   public GenericEntry elevatorPerOutTab =
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
+  public GenericEntry elevatorControlLoopTab = 
+      elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
 
   // Mechanism2d visualization setup
 
@@ -176,8 +183,8 @@ public class Elevator extends SubsystemBase {
     desiredHeightState = heightEnum;
   }
 
-  public static void setElevatorJoystickY(DoubleSupplier m_joystickY) {
-    elevatorJoystickY = m_joystickY.getAsDouble();
+  public void setElevatorJoystickY(double m_joystickY) {
+    elevatorJoystickY = m_joystickY;
   }
 
   /*
@@ -189,6 +196,18 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[1].setNeutralMode(mode);
   }
 
+  /*
+   * Closed loop (default): Uses motion magic and a set setpoint to determine motor output
+   * Open loop: Changes motor output directly
+   */
+  public void setElevatorControlLoop(boolean isClosedLoop) {
+    elevatorIsClosedLoop = isClosedLoop;
+  }
+
+  public boolean getElevatorControlLoop() {
+    return elevatorIsClosedLoop;
+  }
+
   // Update elevator height using encoders and bottom limit switch
   public static void updateElevatorHeight() {
     /* Uses limit switch to act as a baseline
@@ -197,6 +216,7 @@ public class Elevator extends SubsystemBase {
     if (getElevatorLowerSwitch()) {
       setElevatorSensorPosition(0.0);
     }
+    elevatorHeight = getElevatorHeight();
   }
 
   public void updateShuffleboard() {
@@ -213,6 +233,13 @@ public class Elevator extends SubsystemBase {
      *  Example: -0.71247 -> -71%
      */
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
+
+    if (elevatorIsClosedLoop) {
+      elevatorControlLoopTab.setString("Closed");
+    }
+    else {
+      elevatorControlLoopTab.setString("Open");
+    }
   }
 
   @Override
@@ -249,8 +276,14 @@ public class Elevator extends SubsystemBase {
     updateElevatorHeight();
     switch (desiredHeightState) {
       case JOYSTICK:
-        setElevatorPercentOutput(elevatorJoystickY * -0.8);
-        return;
+        if (elevatorIsClosedLoop) {
+          desiredHeightValue = elevatorHeight + (-elevatorJoystickY * maxElevatorHeight);
+          break;
+        }
+        else {
+          setElevatorPercentOutput(-elevatorJoystickY * 0.8);
+          return;
+        }
       case LOW:
         desiredHeightValue = 0.0; // Placeholder values
         break;
@@ -261,16 +294,23 @@ public class Elevator extends SubsystemBase {
         desiredHeightValue = maxElevatorHeight; // Placeholder values
         break;
       case NONE:
-        // desiredHeightValue = elevatorHeight;
+        desiredHeightValue = elevatorHeight;
         break;
     }
-    // double distanceBetween = Math.abs(desiredHeightValue - elevatorHeight);
-    // System.out.println("Elevator Height: "+Double.toString(elevatorHeight));
-    // System.out.println("Desired Height Value: "+Double.toString(desiredHeightValue));
-    // System.out.println("Distance Between: "+Double.toString(distanceBetween));
-    // if (distanceBetween < maxElevatorHeight/100) {
-    //   setElevatorDesiredHeightState(elevatorHeights.NONE);
-    // }
-    setElevatorMotionMagicMeters(desiredHeightValue);
+    if (elevatorIsClosedLoop) {
+      setElevatorMotionMagicMeters(desiredHeightValue);
+    }
+    else {
+      double distanceBetween = MathUtil.applyDeadband(desiredHeightValue - elevatorHeight, maxElevatorHeight/100);
+      if (distanceBetween == 0) {
+        setElevatorPercentOutput(0.0);
+      }
+      else if (distanceBetween > 0) {
+        setElevatorPercentOutput(0.8);
+      }
+      else if (distanceBetween < 0) {
+        setElevatorPercentOutput(-0.8);
+      }
+    }
   }
 }

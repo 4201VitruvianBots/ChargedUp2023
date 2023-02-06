@@ -26,6 +26,7 @@ import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
+import frc.robot.commands.elevator.SetElevatorControlLoop;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -131,9 +132,13 @@ public class RobotContainer {
     xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
     xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
 
+    // Elevator button bindings
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
     m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
     m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
+
+    // Will switch behtween closed and open loop on button press
+    m_driverController.start().whileTrue(new SetElevatorControlLoop(m_elevator));
 
     leftTriggers[0].whileTrue(
         new SetSwerveDriveBalance(m_swerveDrive, null, null, null)
