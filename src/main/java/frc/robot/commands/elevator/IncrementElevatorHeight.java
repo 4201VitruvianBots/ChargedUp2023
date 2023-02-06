@@ -4,6 +4,7 @@
 
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
@@ -34,13 +35,18 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
     if (m_joystickY.getAsDouble() != 0.0) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
-    } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+    } else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
       // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
       // Elevator.setElevatorPercentOutput(0.0);
     }
 
-    Elevator.setElevatorJoystickY(m_joystickY);
+    // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(
+      Math.abs(m_joystickY.getAsDouble()), 0.05)
+      * Math.signum(m_joystickY.getAsDouble());
+
+    m_elevator.setElevatorJoystickY(joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
