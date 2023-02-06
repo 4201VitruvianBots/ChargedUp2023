@@ -29,6 +29,7 @@ import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetSwerveAutoLock;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveBalance;
@@ -136,7 +137,8 @@ public class RobotContainer {
     m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
     
     leftTriggers[0].whileTrue(new SetSwerveDriveBalance(m_swerveDrive, null, null, null).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)); 
-
+    leftTriggers[1].whileTrue(new SetSwerveAutoLock(m_swerveDrive)); 
+    
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
     // SmartDashboard.putData(new SetGoalLEDState(m_vision, false));
