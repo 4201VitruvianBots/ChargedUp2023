@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase {
     LOW,
     MID,
     HIGH,
-    JOYSTICK
+    JOYSTICK,
   }
 
   // Limit switch at bottom of elevator
