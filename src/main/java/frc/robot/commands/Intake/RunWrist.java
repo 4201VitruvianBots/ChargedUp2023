@@ -28,7 +28,7 @@ public class RunWrist extends CommandBase {
   @Override
   public void execute() {
     m_wrist.setWristPercentOutput(0.55);
-    m_wrist.setWristPercentOutput(-0.55);
+    
   }
 
   // Called once the command ends or is interrupted.

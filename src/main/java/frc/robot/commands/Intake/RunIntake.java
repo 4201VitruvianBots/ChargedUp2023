@@ -12,11 +12,11 @@ public class RunIntake extends CommandBase {
   private final Intake m_intake;
 
   /** Creates a new RunIntake. */
-  public RunIntake(Intake m_intake2) {
-    m_intake = m_intake2;
+  public RunIntake(Intake intake, double PercentOutput) {
+    m_intake = intake;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake2);
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
@@ -30,7 +30,7 @@ public class RunIntake extends CommandBase {
   public void execute() {
     m_intake.setIntakePercentOutput(0.25);
   }
-
+  
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

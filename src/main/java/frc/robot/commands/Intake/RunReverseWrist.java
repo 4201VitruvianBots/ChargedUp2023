@@ -5,24 +5,38 @@
 package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Wrist;
 
 public class RunReverseWrist extends CommandBase {
+  private final Wrist m_wrist;
+  private Wrist wrist;
+
   /** Creates a new RunReverseWrist. */
   public RunReverseWrist() {
+    m_wrist = wrist;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_wrist.setWristState(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_wrist.setWristPercentOutput(-0.55);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_wrist.setWristState(false);
+    m_wrist.setWristPercentOutput(0);
+    m_wrist.setWristState(false);
+  }
 
   // Returns true when the command should end.
   @Override

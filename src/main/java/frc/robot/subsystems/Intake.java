@@ -42,10 +42,6 @@ public class Intake extends SubsystemBase {
     intakeMotor.config_kP(0, kP);
   }
 
-  public void setSetpoint(double setpoint) {
-    setpoint = PercentOutput;
-  }
-
   public double getMeasurement() {
     return intakeMotor.getSelectedSensorPosition();
   }
