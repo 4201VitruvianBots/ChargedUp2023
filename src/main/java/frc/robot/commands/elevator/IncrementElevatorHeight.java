@@ -31,20 +31,21 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.NONE' to this if
+    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.STOWED' to this if
     // statement to prioritize shortcut buttons
-    if (m_joystickY.getAsDouble() != 0.0) {
-      m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
-    } else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-      m_elevator.setElevatorDesiredHeightState(elevatorHeights.NONE);
-      // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
-      // Elevator.setElevatorPercentOutput(0.0);
-    }
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
     double joystickYDeadbandOutput = MathUtil.applyDeadband(
       Math.abs(m_joystickY.getAsDouble()), 0.05)
       * Math.signum(m_joystickY.getAsDouble());
+    
+    if (joystickYDeadbandOutput != 0.0) {
+      m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
+    //} else if (Elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+      //m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
+      // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
+      // Elevator.setElevatorPercentOutput(0.0);
+    }
 
     m_elevator.setElevatorJoystickY(joystickYDeadbandOutput);
   }

@@ -36,11 +36,11 @@ public class Elevator extends SubsystemBase {
 
   // Used by RobotContainer to specify which button has been pressed
   public enum elevatorHeights {
+    STOWED,
     LOW,
     MID,
     HIGH,
-    JOYSTICK,
-    NONE
+    JOYSTICK
   }
 
   // Limit switch at bottom of elevator
@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase {
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private static elevatorHeights desiredHeightState =
-      elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
+      elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
 
   private static double elevatorJoystickY;
 
@@ -284,17 +284,17 @@ public class Elevator extends SubsystemBase {
           setElevatorPercentOutput(-elevatorJoystickY * 0.8);
           return;
         }
+      case STOWED:
+        desiredHeightValue = 0.0;
+        break;
       case LOW:
-        desiredHeightValue = 0.0; // Placeholder values
+        desiredHeightValue = maxElevatorHeight*0.25; // Placeholder values
         break;
       case MID:
-        desiredHeightValue = maxElevatorHeight / 2; // Placeholder values
+        desiredHeightValue = maxElevatorHeight*0.5; // Placeholder values
         break;
       case HIGH:
-        desiredHeightValue = maxElevatorHeight; // Placeholder values
-        break;
-      case NONE:
-        desiredHeightValue = elevatorHeight;
+        desiredHeightValue = maxElevatorHeight*0.75; // Placeholder values
         break;
     }
     if (elevatorIsClosedLoop) {

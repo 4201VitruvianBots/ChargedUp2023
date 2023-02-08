@@ -225,10 +225,10 @@ public class Vision extends SubsystemBase {
   }
 
   private void updateVisionPose(CAMERA_POSITION position) {
-    if (getValidTarget(position))
-      m_swerveDrive
-          .getOdometry()
-          .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
+    // if (getValidTarget(position))
+    //   m_swerveDrive
+    //       .getOdometry()
+    //       .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
   }
 
   private void logData() {

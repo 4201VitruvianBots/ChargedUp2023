@@ -135,6 +135,7 @@ public class RobotContainer {
     // Elevator button bindings
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
     m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    m_driverController.x().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
     m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
     // Will switch behtween closed and open loop on button press

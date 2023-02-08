@@ -25,7 +25,7 @@ public class StateHandler extends SubsystemBase {
 
   public mainRobotStates currentMainState = mainRobotStates.STOWED;
   public scoringStates currentScoringState = scoringStates.NONE;
-  public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.NONE;
+  public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.STOWED;
 
   public StateHandler() {}
 
