@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
@@ -64,8 +63,10 @@ public class Elevator extends SubsystemBase {
 
   private static final double maxElevatorHeight = Constants.Elevator.elevatorMaxHeightMeters;
 
-  // By default this is set to true as we use motion magic to determine what speed we should be at to get to our setpoint.
-  // If the sensors are acting up, we set this value to false to directly control the percent output of the motors.
+  // By default this is set to true as we use motion magic to determine what speed we should be at
+  // to get to our setpoint.
+  // If the sensors are acting up, we set this value to false to directly control the percent output
+  // of the motors.
   private boolean elevatorIsClosedLoop = true;
 
   // Simulation setup
@@ -93,7 +94,7 @@ public class Elevator extends SubsystemBase {
       elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
   public GenericEntry elevatorPerOutTab =
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
-  public GenericEntry elevatorControlLoopTab = 
+  public GenericEntry elevatorControlLoopTab =
       elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
 
   // Mechanism2d visualization setup
@@ -236,8 +237,7 @@ public class Elevator extends SubsystemBase {
 
     if (elevatorIsClosedLoop) {
       elevatorControlLoopTab.setString("Closed");
-    }
-    else {
+    } else {
       elevatorControlLoopTab.setString("Open");
     }
   }
@@ -279,8 +279,7 @@ public class Elevator extends SubsystemBase {
         if (elevatorIsClosedLoop) {
           desiredHeightValue = elevatorHeight + (-elevatorJoystickY * maxElevatorHeight);
           break;
-        }
-        else {
+        } else {
           setElevatorPercentOutput(-elevatorJoystickY * 0.8);
           return;
         }
@@ -288,27 +287,25 @@ public class Elevator extends SubsystemBase {
         desiredHeightValue = 0.0;
         break;
       case LOW:
-        desiredHeightValue = maxElevatorHeight*0.25; // Placeholder values
+        desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
         break;
       case MID:
-        desiredHeightValue = maxElevatorHeight*0.5; // Placeholder values
+        desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
         break;
       case HIGH:
-        desiredHeightValue = maxElevatorHeight*0.75; // Placeholder values
+        desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
         break;
     }
     if (elevatorIsClosedLoop) {
       setElevatorMotionMagicMeters(desiredHeightValue);
-    }
-    else {
-      double distanceBetween = MathUtil.applyDeadband(desiredHeightValue - elevatorHeight, maxElevatorHeight/100);
+    } else {
+      double distanceBetween =
+          MathUtil.applyDeadband(desiredHeightValue - elevatorHeight, maxElevatorHeight / 100);
       if (distanceBetween == 0) {
         setElevatorPercentOutput(0.0);
-      }
-      else if (distanceBetween > 0) {
+      } else if (distanceBetween > 0) {
         setElevatorPercentOutput(0.8);
-      }
-      else if (distanceBetween < 0) {
+      } else if (distanceBetween < 0) {
         setElevatorPercentOutput(-0.8);
       }
     }

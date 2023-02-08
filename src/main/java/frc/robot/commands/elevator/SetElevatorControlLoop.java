@@ -10,7 +10,7 @@ import frc.robot.subsystems.Elevator;
 public class SetElevatorControlLoop extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
   private Elevator m_elevator;
-  
+
   public SetElevatorControlLoop(Elevator elevator) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -26,8 +26,7 @@ public class SetElevatorControlLoop extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

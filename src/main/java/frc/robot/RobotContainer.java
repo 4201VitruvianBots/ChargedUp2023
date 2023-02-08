@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -27,7 +27,6 @@ import frc.robot.commands.auto.DriveSideway;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
-import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
@@ -38,9 +37,9 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
-import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
@@ -55,15 +54,15 @@ public class RobotContainer {
   private final DataLog m_logger = DataLogManager.getLog();
 
   // The robot's subsystems and commands are defined here...4
-  private final Intake m_intake = new Intake(); 
-  private final Elevator m_elevator = new Elevator(); 
-  private final SwerveDrive m_swerveDrive = new SwerveDrive(); 
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger); 
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision); 
-  private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>(); 
-  private final Controls m_controls = new Controls(); 
-  private final Wrist m_wrist = new Wrist(); 
-  private final LED m_led = new LED(m_controls); 
+  private final Intake m_intake = new Intake();
+  private final Elevator m_elevator = new Elevator();
+  private final SwerveDrive m_swerveDrive = new SwerveDrive();
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+  private final Controls m_controls = new Controls();
+  private final Wrist m_wrist = new Wrist();
+  private final LED m_led = new LED(m_controls);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);

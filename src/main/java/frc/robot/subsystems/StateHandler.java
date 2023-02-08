@@ -17,10 +17,9 @@ public class StateHandler extends SubsystemBase {
     INTAKING_GROUND,
     INTAKING_STATION,
     AUTO_BALANCE,
-   SCORE_LOW,
-   SCORE_MEDIUM,
-   SCORE_HIGH,
-  
+    SCORE_LOW,
+    SCORE_MEDIUM,
+    SCORE_HIGH,
   }
 
   public enum intakingStates {
@@ -33,17 +32,22 @@ public class StateHandler extends SubsystemBase {
   public mainRobotStates currentMainState = mainRobotStates.STOWED;
   public intakingStates currentScoringState = intakingStates.NONE;
   public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.STOWED;
-private final Intake m_Intake;
-private final Wrist m_Wrist;
-private final SwerveDrive m_Drive; 
-private final FieldSim m_FieldSim;
-private final Elevator m_Elevator;
-private final LED m_Led;
-private final Vision m_Vision;
+  private final Intake m_Intake;
+  private final Wrist m_Wrist;
+  private final SwerveDrive m_Drive;
+  private final FieldSim m_FieldSim;
+  private final Elevator m_Elevator;
+  private final LED m_Led;
+  private final Vision m_Vision;
 
-public StateHandler(
-    Intake intake, Wrist wrist, SwerveDrive swerveDrive, FieldSim fieldSim ,Elevator elevator, LED led, Vision vision
-  ) {
+  public StateHandler(
+      Intake intake,
+      Wrist wrist,
+      SwerveDrive swerveDrive,
+      FieldSim fieldSim,
+      Elevator elevator,
+      LED led,
+      Vision vision) {
     m_Intake = intake;
     m_Drive = swerveDrive;
     m_FieldSim = fieldSim;
@@ -61,44 +65,41 @@ public StateHandler(
 
   // Final part of our state machine
   public void advanceState() {
-    if (Intake.getIntakeState()) {
-    }
+    if (Intake.getIntakeState()) {}
     currentElevatorState = Elevator.getElevatorDesiredHeightState();
   }
 
   @Override
   public void periodic() {
-   switch(currentMainState){
-  
-    case SCORE_HIGH:
-    break;
+    switch (currentMainState) {
+      case SCORE_HIGH:
+        break;
 
-    case SCORE_MEDIUM:
-    break;
-    
-    case SCORE_LOW:
-    break;
-    
-    case INTAKING_GROUND:
-    break;
-    
-    case INTAKING_STATION:
-    break;
-   
-    case AUTO:
-    break;
-   
-    case AUTO_BALANCE:
-    break;
+      case SCORE_MEDIUM:
+        break;
 
-    case DISABLED:
-    break;
-    
-    default:
-    case STOWED:
-      m_Elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
-    break;
+      case SCORE_LOW:
+        break;
 
-   }
+      case INTAKING_GROUND:
+        break;
+
+      case INTAKING_STATION:
+        break;
+
+      case AUTO:
+        break;
+
+      case AUTO_BALANCE:
+        break;
+
+      case DISABLED:
+        break;
+
+      default:
+      case STOWED:
+        m_Elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
+        break;
+    }
   }
 }
