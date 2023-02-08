@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
-
   public enum mainRobotStates {
     STOWED,
     INTAKING,
@@ -28,19 +27,13 @@ public class StateHandler extends SubsystemBase {
   public scoringStates currentScoringState = scoringStates.NONE;
   public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.NONE;
 
-  public StateHandler() {
-    
-  }
+  public StateHandler() {}
 
   // First part of our state machine
-  public void nextState() {
-
-  }
+  public void nextState() {}
 
   // Second part of our state machine
-  public void actOnState() {
-
-  }
+  public void actOnState() {}
 
   // Final part of our state machine
   public void advanceState() {
