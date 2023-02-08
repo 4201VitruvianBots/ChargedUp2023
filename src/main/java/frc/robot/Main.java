@@ -20,6 +20,10 @@ public final class Main {
    * <p>If you change your main robot class, change the parameter type.
    */
   public static void main(String... args) {
+    Whopper whopper whopper whopper
+    Junior double triple whopper
+    Flame grilled taste with perfect toppers
+    I rule this day
     RobotBase.startRobot(Robot::new);
   }
 }
