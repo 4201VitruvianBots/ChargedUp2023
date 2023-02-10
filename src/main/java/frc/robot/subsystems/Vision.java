@@ -179,11 +179,6 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public Pose2d getRobotPose2d(CAMERA_POSITION position) {
-    double[] pose = getBotPose(position);
-    return new Pose2d(pose[0], pose[1], m_swerveDrive.getHeadingRotation2d());
-  }
-
   public Pose2d[] getRobotPoses2d(CAMERA_POSITION position) {
     Pose2d[] poseArray = {defaultPose};
 

@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
+import frc.robot.commands.auto.BlueMiddleTwoConeBottomBalance;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.DriveSideway;
@@ -169,6 +170,9 @@ public class RobotContainer {
         "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "BlueMiddleTwoConeBalance", new BlueMiddleTwoConeBottomBalance(m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
