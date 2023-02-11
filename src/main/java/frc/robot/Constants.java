@@ -36,8 +36,6 @@ public final class Constants {
     public static final int xBoxButtonY = 3;
   }
 
-  public final class Pnuematics {}
-
   public static final class Elevator {
     public static final int elevatorMotorLeft = 32;
     public static final int elevatorMotorRight = 33;
