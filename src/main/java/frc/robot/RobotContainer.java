@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
@@ -65,15 +65,15 @@ public class RobotContainer {
   private final LED m_led = new LED(m_controls);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
 
   private final MemoryLog m_memorylog = new MemoryLog();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(Constants.constants.USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
-  static XboxController xBoxController = new XboxController(Constants.USB.xBoxController);
+  static Joystick rightJoystick = new Joystick(Constants.constants.USB.rightJoystick);
+  static XboxController xBoxController = new XboxController(Constants.constants.USB.xBoxController);
 
   public Trigger[] leftTriggers = new Trigger[2];
   public Trigger[] rightTriggers = new Trigger[2];
