@@ -6,14 +6,11 @@ package frc.robot;
 
 import java.util.Map;
 
-import javax.management.OperationsException;
-
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.utils.ModuleMap;
-import frc.robot.Constants;
 import frc.robot.Constants.SwerveDriveModulePosition;
 
 public class ConstantsAlpha {

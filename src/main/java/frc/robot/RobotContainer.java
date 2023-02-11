@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
@@ -101,6 +102,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureBindings();
+
+    // Choose which constants class to use
+    chooseConstants();
   }
 
   /**
@@ -173,6 +177,18 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
+  // Switches between constants class depending on the MAC address of the roboRIO we're running on
+  public void chooseConstants() {
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
+    if (mac == Constants.alphaRobotMAC) {
+      Constants.constants = new ConstantsAlpha();
+    } 
+    else if (mac == Constants.betaRobotMAC) {
+      Constants.constants = new ConstantsBeta();
+    }
+  }
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return m_autoChooser.getSelected();
@@ -180,6 +196,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
+    m_memorylog.simulationPeriodic();
   }
 
   public void periodic() {

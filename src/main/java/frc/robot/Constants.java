@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -57,26 +55,9 @@ public final class Constants {
     BACK_RIGHT
   }
 
-  // Switches between constants class depending on the MAC address of the roboRIO we're running on
-  
+  public static ConstantsAlpha constants = new ConstantsAlpha();
+
+  // TODO: Get actual MAC address of alpha robot
   public static final String alphaRobotMAC = "00:00:00:00:00:01";
-  public static final String betaRobotMAC = "00:00:00:00:00:02";
-
-  public static ConstantsAlpha constants;
-  
-  public Constants() {
-
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
-    if (mac == alphaRobotMAC) {
-      final ConstantsAlpha constants = new ConstantsAlpha();
-    } 
-    else if (mac == betaRobotMAC) {
-      final ConstantsAlpha constants = new ConstantsBeta();
-    }
-    else {
-      final ConstantsAlpha constants = new ConstantsAlpha();
-    }
-
-  }
+  public static final String betaRobotMAC = "00:80:2F:25:BC:FD";
 }
