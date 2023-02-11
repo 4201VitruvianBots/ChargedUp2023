@@ -4,14 +4,23 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,7 +33,9 @@ import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.BlueMiddleTwoConeBottomBalance;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
 import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.DriveForwardIntakeTest;
 import frc.robot.commands.auto.DriveSideway;
+import frc.robot.commands.auto.Waypoint;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
@@ -44,6 +55,7 @@ import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
+import frc.robot.utils.TrajectoryUtils;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -64,6 +76,11 @@ public class RobotContainer {
   private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
+
+  
+  HashMap<String, Command> m_eventMap = new HashMap<>();
+  private SwerveAutoBuilder m_autoBuilder;
+  
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -98,6 +115,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     initializeSubsystems();
+    initAutoBuilder();
     initializeAutoChooser();
 
     // Configure the button bindings
@@ -148,31 +166,62 @@ public class RobotContainer {
   }
 
   public void disableInit() {
-    m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_swerveDrive.setNeutralMode(NeutralMode.Brake);
   }
 
   public void teleopeInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
   }
 
+  private void initAutoBuilder() {
+    m_eventMap.put("wait", new WaitCommand(5));
+
+    m_autoBuilder =
+        new SwerveAutoBuilder(
+            m_swerveDrive::getPoseMeters,
+            m_swerveDrive::setOdometry,
+            Constants.SwerveDrive.kSwerveKinematics,
+            new PIDConstants(
+                Constants.SwerveDrive.kP_Translation,
+                Constants.SwerveDrive.kI_Translation,
+                Constants.SwerveDrive.kD_Translation),
+            new PIDConstants(
+                Constants.SwerveDrive.kP_Rotation,
+                Constants.SwerveDrive.kI_Rotation,
+                Constants.SwerveDrive.kD_Rotation),
+            m_swerveDrive::setSwerveModuleStatesAuto,
+            m_eventMap,
+            false,
+            m_swerveDrive);
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public void initializeAutoChooser() {
+    var trajectory =
+        TrajectoryUtils.readTrajectory(
+            "NewPath", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(0)));
+
+    var autoPath = m_autoBuilder.fullAuto(trajectory);
+
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
     // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("DriveForward", new DriveForward(m_swerveDrive, m_fieldSim));
+        "BlueTopConeCubeBalance", new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("WayPoint2", new PrintCommand("TEST"));
 
     m_autoChooser.addOption(
-        "BlueMiddleTwoConeBalance", new BlueMiddleTwoConeBottomBalance(m_swerveDrive, m_fieldSim));
+        "BlueMiddleTwoConeBalance", new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }

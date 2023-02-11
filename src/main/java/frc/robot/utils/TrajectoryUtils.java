@@ -4,34 +4,55 @@
 
 package frc.robot.utils;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TrajectoryUtils {
-  public static PathPlannerTrajectory readTrajectory(
-      String fileName, double MaxVelocity, double MaxAcceleration, boolean reverse) {
+  public static List<PathPlannerTrajectory> readTrajectory(
+      String fileName, PathConstraints segmentConstraints) {
+    return readTrajectory(fileName, segmentConstraints, segmentConstraints);
+  }
 
+  public static List<PathPlannerTrajectory> readTrajectory(
+      String fileName, PathConstraints pathConstraint, PathConstraints... segmentConstraints) {
+
+    if(pathConstraint.maxVelocity == 0 || pathConstraint.maxAcceleration == 0) {
+      DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
+    }
+    for(var c:segmentConstraints) {
+      if(c.maxVelocity == 0 || c.maxAcceleration == 0) {
+        DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
+      }
+    }
+    
     if (fileName.startsWith("Red")) {
       try {
-        return PathPlanner.loadPath(fileName, MaxVelocity, MaxAcceleration, reverse);
+        return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
         // TODO: handle exception
-        DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, null);
+        DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, e.getStackTrace());
         fileName = fileName.replace("Red", "Blue");
-        PathPlannerTrajectory trajectory =
-            readTrajectory(fileName, MaxVelocity, MaxAcceleration, reverse);
-        trajectory =
-            PathPlannerTrajectory.transformTrajectoryForAlliance(
-                trajectory, DriverStation.Alliance.Red);
-        return trajectory;
+        List<PathPlannerTrajectory> trajectory =
+            readTrajectory(fileName, pathConstraint, segmentConstraints);
+        return trajectory.stream()
+            .map(
+                t ->
+                    PathPlannerTrajectory.transformTrajectoryForAlliance(
+                        t, DriverStation.Alliance.Red))
+            .collect(Collectors.toList());
       }
     } else {
       try {
-        return PathPlanner.loadPath(fileName, MaxVelocity, MaxAcceleration, reverse);
+        return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
         DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-        return new PathPlannerTrajectory();
+        return new ArrayList<PathPlannerTrajectory>();
         // TODO: handle exception
       }
     }

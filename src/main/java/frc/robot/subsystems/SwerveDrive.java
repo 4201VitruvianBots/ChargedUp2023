@@ -11,7 +11,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
-import edu.wpi.first.math.controller.PIDController;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,7 +26,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.utils.ModuleMap;
@@ -71,18 +74,11 @@ public class SwerveDrive extends SubsystemBase {
   private boolean Initialize = false;
 
   private final SwerveDrivePoseEstimator m_odometry;
-
-  private PIDController m_xController = new PIDController(kP_X, 0, kD_X);
-  private PIDController m_yController = new PIDController(kP_Y, 0, kD_Y);
-  private PIDController m_turnController = new PIDController(kP_Theta, 0, kD_Theta);
-
   private double m_simYaw;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
-    m_turnController.enableContinuousInput(-Math.PI, Math.PI);
-    SmartDashboard.putData(m_turnController);
     m_odometry =
         new SwerveDrivePoseEstimator(
             Constants.SwerveDrive.kSwerveKinematics,
@@ -202,18 +198,6 @@ public class SwerveDrive extends SubsystemBase {
     return true;
   }
 
-  public PIDController getXPidController() {
-    return m_xController;
-  }
-
-  public PIDController getYPidController() {
-    return m_yController;
-  }
-
-  public PIDController getThetaPidController() {
-    return m_turnController;
-  }
-
   public void setNeutralMode(NeutralMode mode) {
     for (SwerveModule module : m_swerveModules.values()) {
       module.setDriveNeutralMode(mode);
@@ -268,7 +252,6 @@ public class SwerveDrive extends SubsystemBase {
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
-    SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
     SmartDashboard.putNumber("Pigeon Yaw", getHeadingDegrees());

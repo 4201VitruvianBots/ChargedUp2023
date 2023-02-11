@@ -148,12 +148,12 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_X = 0.6;
-    public static final double kD_X = 0;
-    public static final double kP_Y = 0.6;
-    public static final double kD_Y = 0;
-    public static final double kP_Theta = 4;
-    public static final double kD_Theta = 0.01;
+    public static final double kP_Translation = 0.6;
+    public static final double kI_Translation = 0;
+    public static final double kD_Translation = 0;
+    public static final double kP_Rotation = 4;
+    public static final double kI_Rotation = 0;
+    public static final double kD_Rotation = 0.01;
 
     public enum ModulePosition {
       FRONT_LEFT,
