@@ -35,6 +35,7 @@ import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.DistanceSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
@@ -63,6 +64,8 @@ public class RobotContainer {
   private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -79,6 +82,7 @@ public class RobotContainer {
   public Trigger[] rightTriggers = new Trigger[2];
   public Trigger[] xBoxTriggers = new Trigger[10];
   public Trigger[] xBoxPOVTriggers = new Trigger[4];
+
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
 
   public void initializeSubsystems() {
@@ -91,7 +95,7 @@ public class RobotContainer {
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(m_elevator, () -> leftJoystick.getRawAxis(1)));
+        new IncrementElevatorHeight(m_elevator, () -> xBoxController.getLeftY()));
     m_fieldSim.initSim();
   }
 
@@ -180,6 +184,12 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
+    // Since our GitHub action, which is what uses MemoryLog, runs on Ubuntu,
+    // this will make sure the memory log will only run on there.
+    // TODO: Implement environment variable instead
+    if (System.getProperty("os.name") == "Linux") {
+      m_memorylog.simulationPeriodic();
+    }
   }
 
   public void periodic() {

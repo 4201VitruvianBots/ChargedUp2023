@@ -29,6 +29,11 @@ public final class Constants {
     public static final int leftJoystick = 0;
     public static final int rightJoystick = 1;
     public static final int xBoxController = 2;
+
+    public static final int xBoxButtonA = 0;
+    public static final int xBoxButtonB = 1;
+    public static final int xBoxButtonX = 2;
+    public static final int xBoxButtonY = 3;
   }
 
   public final class Pnuematics {}
