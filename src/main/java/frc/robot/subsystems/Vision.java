@@ -11,6 +11,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Vision.CAMERA_POSITION;
@@ -18,6 +19,7 @@ import frc.robot.Constants.Vision.CAMERA_POSITION;
 public class Vision extends SubsystemBase {
 
   private final SwerveDrive m_swerveDrive;
+  private final Controls m_controls;
 
   private final NetworkTable intake;
   private final NetworkTable outtake;
@@ -40,8 +42,9 @@ public class Vision extends SubsystemBase {
   double[] tagPosY = new double[10];
   double[] tagPosZ = new double[10];
 
-  public Vision(SwerveDrive swerveDrive, DataLog logger) {
+  public Vision(SwerveDrive swerveDrive, DataLog logger, Controls controls) {
     m_swerveDrive = swerveDrive;
+    m_controls = controls;
 
     intake = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
@@ -130,7 +133,7 @@ public class Vision extends SubsystemBase {
   }
 
   /*
-   * json: Full JSON dump of targeting results
+   * Full JSON dump of targeting results
    */
   public double getJSON(CAMERA_POSITION position) {
     switch (position) {
@@ -144,20 +147,33 @@ public class Vision extends SubsystemBase {
   }
 
   /*
-   * botpose: Robot transform in field-space. Translation (X,Y,Z) Rotation(X,Y,Z)
+   * Collects transformation/rotation data from limelight
    */
   public double[] getBotPose(CAMERA_POSITION position) {
+    DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
     switch (position) {
       case FORWARD_LOCALIZER:
         return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
       case REAR_LOCALIZER:
-        var rawBotPose = rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
-        if (rawBotPose.length > 0) {
-          rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
-          rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
-          return rawBotPose;
+        var rawBotPose = defaultDoubleArray;
+        switch(allianceColor) {
+          case Red:
+            rawBotPose = rearLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
+            break;
+          case Blue:
+            rawBotPose = rearLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
+            break;
+          default:
+            rawBotPose = rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+
+            if (rawBotPose.length > 0) {
+              rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
+              rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
+              return rawBotPose;
+            }
+            break;
         }
-        return defaultDoubleArray;
+        return rawBotPose;
       default:
         return defaultDoubleArray;
     }
@@ -166,7 +182,7 @@ public class Vision extends SubsystemBase {
   /**
    * Get the timestamp of the detection results.
    *
-   * @return Robot Pose in m/eters
+   * @return Robot Pose in meters
    */
   public double getDetectionTimestamp(CAMERA_POSITION position) {
     switch (position) {
@@ -181,7 +197,7 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getRobotPose2d(CAMERA_POSITION position) {
     double[] pose = getBotPose(position);
-    return new Pose2d(pose[0], pose[1], m_swerveDrive.getHeadingRotation2d());
+    return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[2]));
   }
 
   public Pose2d[] getRobotPoses2d(CAMERA_POSITION position) {
@@ -225,10 +241,10 @@ public class Vision extends SubsystemBase {
   }
 
   private void updateVisionPose(CAMERA_POSITION position) {
-    // if (getValidTarget(position))
-    //   m_swerveDrive
-    //       .getOdometry()
-    //       .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
+    if (getValidTarget(position))
+      m_swerveDrive
+          .getOdometry()
+          .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
   }
 
   private void logData() {

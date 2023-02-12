@@ -34,8 +34,6 @@ public class OverrideAllianceColor extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_controls.setOverrideFmsAlliance(true);
-    m_controls.setOverrideFmsAllianceColor(m_color);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,8 +43,6 @@ public class OverrideAllianceColor extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_controls.setOverrideFmsAlliance(false);
-    m_controls.setOverrideFmsAllianceColor(DriverStation.Alliance.Invalid);
   }
 
   // Returns true when the command should end.
