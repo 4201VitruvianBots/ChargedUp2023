@@ -23,7 +23,7 @@ public class TestPPSwerveControllerCommand extends PPSwerveControllerCommand {
     super(
         trajectory,
         swerveDrive::getPoseMeters,
-        Constants.SwerveDrive.kSwerveKinematics,
+        Constants.constants.SwerveDrive.kSwerveKinematics,
         swerveDrive.getXPidController(),
         swerveDrive.getYPidController(),
         swerveDrive.getThetaPidController(),
@@ -32,7 +32,7 @@ public class TestPPSwerveControllerCommand extends PPSwerveControllerCommand {
         swerveDrive);
     m_trajectory = trajectory;
     m_poseSupplier = swerveDrive::getPoseMeters;
-    m_kinematics = Constants.SwerveDrive.kSwerveKinematics;
+    m_kinematics = Constants.constants.SwerveDrive.kSwerveKinematics;
     m_controller =
         new PPHolonomicDriveController(
             swerveDrive.getXPidController(),
