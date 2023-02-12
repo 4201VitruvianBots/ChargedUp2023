@@ -30,7 +30,7 @@ public class RunIntake extends CommandBase {
   public void execute() {
     m_intake.setIntakePercentOutput(0.25);
   }
-  
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

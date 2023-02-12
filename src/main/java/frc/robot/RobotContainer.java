@@ -73,17 +73,15 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
-  
+
   static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
   static XboxController xBoxController = new XboxController(Constants.USB.xBoxController);
-  
+
   public Trigger[] leftTriggers = new Trigger[2];
   public Trigger[] rightTriggers = new Trigger[2];
   public Trigger[] xBoxTriggers = new Trigger[10];
   public Trigger[] xBoxPOVTriggers = new Trigger[4];
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
-  public Joystick xBoxLeftJoystick, xBoxRightJoystick;
-  public Joystick[] xBoxRightJoysticks = new Joystick[4];
 
   public void initializeSubsystems() {
     m_swerveDrive.setDefaultCommand(
@@ -98,7 +96,6 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(
         new IncrementElevatorHeight(m_elevator, () -> leftJoystick.getRawAxis(1)));
     m_fieldSim.initSim();
-    
   }
 
   public RobotContainer() {
@@ -127,13 +124,13 @@ public class RobotContainer {
 
     xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
     xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-    xBoxTriggers[8].whileTrue(new RunWrist(m_wrist));
+    xBoxTriggers[8].whileTrue(new RunWrist(m_wrist, 0));
 
     xBoxLeftTrigger =
         new Trigger(
             () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
     xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
-    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake, 0));
+    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake, 0.5));
     xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
 
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));

@@ -9,13 +9,15 @@ import frc.robot.subsystems.Wrist;
 
 public class RunWrist extends CommandBase {
   private final Wrist m_wrist;
+  private double m_percentOutput;
 
   /** Creates a new RunWrist. */
-  public RunWrist(Wrist wrist) {
+  public RunWrist(Wrist wrist, double PercentOutput) {
     m_wrist = wrist;
+    m_percentOutput = PercentOutput;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_wrist);
+    addRequirements(wrist);
   }
 
   // Called when the command is initially scheduled.
@@ -27,8 +29,7 @@ public class RunWrist extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristPercentOutput(0.55);
-    
+    m_wrist.setWristPercentOutput(m_percentOutput);
   }
 
   // Called once the command ends or is interrupted.

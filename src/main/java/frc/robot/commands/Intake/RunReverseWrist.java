@@ -10,10 +10,13 @@ import frc.robot.subsystems.Wrist;
 public class RunReverseWrist extends CommandBase {
   private final Wrist m_wrist;
   private Wrist wrist;
+  private double m_PercentOutput;
 
   /** Creates a new RunReverseWrist. */
-  public RunReverseWrist() {
+  public RunReverseWrist(Wrist wrist, double PercentOutput) {
     m_wrist = wrist;
+    m_PercentOutput = PercentOutput;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
   }
@@ -27,7 +30,7 @@ public class RunReverseWrist extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristPercentOutput(-0.55);
+    m_wrist.setWristPercentOutput(m_PercentOutput);
   }
 
   // Called once the command ends or is interrupted.
