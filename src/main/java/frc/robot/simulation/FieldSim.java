@@ -4,7 +4,10 @@
 
 package frc.robot.simulation;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -15,6 +18,7 @@ import frc.robot.Constants.Vision.CAMERA_POSITION;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.utils.ModuleMap;
+import frc.robot.simulation.SimConstants.Grids;
 
 public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
@@ -22,7 +26,20 @@ public class FieldSim extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
+  private ArrayList<Pose2d> gridNodes = new ArrayList<>();
+
   public FieldSim(SwerveDrive swerveDrive, Vision vision) {
+  
+    for (int i = 0; i < Grids.nodeRowCount; i++) {
+      gridNodes.add(new Pose2d(Grids.outerX/2+Grids.lowX, Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+      gridNodes.add(new Pose2d(Grids.outerX/2+Grids.midX, Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+      gridNodes.add(new Pose2d(Grids.outerX/2+Grids.highX, Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+
+      gridNodes.add(new Pose2d(SimConstants.fieldLength-(Grids.outerX/2+Grids.lowX), Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+      gridNodes.add(new Pose2d(SimConstants.fieldLength-(Grids.outerX/2+Grids.midX), Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+      gridNodes.add(new Pose2d(SimConstants.fieldLength-(Grids.outerX/2+Grids.highX), Grids.nodeFirstY+(Grids.nodeSeparationY*i), new Rotation2d(0)));
+    }
+
     m_swerveDrive = swerveDrive;
     m_vision = vision;
   }
@@ -56,7 +73,15 @@ public class FieldSim extends SubsystemBase {
     m_field2d
         .getObject("Limelight Pose")
         .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.REAR_LOCALIZER));
-
+    
+    int i = 1;
+    for (Pose2d node : gridNodes) {
+      m_field2d
+        .getObject("Node "+Integer.toString(i))
+        .setPose(node);
+      i++;
+    }
+    
     if (RobotBase.isSimulation()) {
       m_field2d
           .getObject("Swerve Modules")

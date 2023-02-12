@@ -1,65 +1,67 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+// // Copyright (c) FIRST and other WPILib contributors.
+// // Open Source Software; you can modify and/or share it under the terms of
+// // the WPILib BSD license file in the root directory of this project.
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+// package frc.robot.subsystems;
 
-public class DistanceSensor extends SubsystemBase {
-  private final int socketPort = 25000;
-  private final byte[] socketBuffer = new byte[85];
+// import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import java.io.IOException;
+// import java.net.DatagramPacket;
+// import java.net.DatagramSocket;
+// import java.net.InetAddress;
+// import java.net.SocketException;
+// import org.json.simple.JSONObject;
+// import org.json.simple.parser.JSONParser;
+// import org.json.simple.parser.ParseException;
 
-  private DatagramSocket socket;
-  private String receivedData;
+// public class DistanceSensor extends SubsystemBase {
+//   private final int socketPort = 25000;
+//   private final byte[] socketBuffer = new byte[85];
 
-  /** Creates a new DistanceSensor. */
-  public DistanceSensor() {
-    try {
-      socket = new DatagramSocket(socketPort);
-    } catch (SocketException socketFail) {
-      socketFail.printStackTrace();
-    }
-  }
+//   private DatagramSocket socket;
+//   private String receivedData;
 
-  public String getRawSensorData() {
-    return receivedData;
-  }
+//   /** Creates a new DistanceSensor. */
+//   public DistanceSensor() {
+//     try {
+//       socket = new DatagramSocket(socketPort);
+//     } catch (SocketException socketFail) {
+//       socketFail.printStackTrace();
+//     }
+//   }
 
-  public int getSensorValue(int sensor) throws ParseException {
-    String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
+//   public String getRawSensorData() {
+//     return receivedData;
+//   }
 
-    Object object = new JSONParser().parse(receivedData);
-    JSONObject jsonObject = (JSONObject) object;
-    return (int) jsonObject.get(sensorName);
-  }
+//   public int getSensorValue(int sensor) throws ParseException {
+//     String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+//     Object object = new JSONParser().parse(receivedData);
+//     JSONObject jsonObject = (JSONObject) object;
+//     return (int) jsonObject.get(sensorName);
+//   }
 
-    DatagramPacket packet = new DatagramPacket(socketBuffer, socketBuffer.length);
+//   @Override
+//   public void periodic() {
+//     // This method will be called once per scheduler run
 
-    try {
-      socket.receive(packet);
-    } catch (IOException recieveFail) {
-      recieveFail.printStackTrace();
-    }
+//     DatagramPacket packet = new DatagramPacket(socketBuffer, socketBuffer.length);
 
-    InetAddress address = packet.getAddress();
-    int port = packet.getPort();
-    packet = new DatagramPacket(socketBuffer, socketBuffer.length, address, port);
-    String receivedData = new String(packet.getData(), 0, packet.getLength());
+//     try {
+//       socket.receive(packet);
+//     } catch (IOException recieveFail) {
+//       recieveFail.printStackTrace();
+//     }
 
-    System.out.println(receivedData);
-    socket.close();
-  }
-}
+//     InetAddress address = packet.getAddress();
+//     int port = packet.getPort();
+//     packet = new DatagramPacket(socketBuffer, socketBuffer.length, address, port);
+//     String receivedData = new String(packet.getData(), 0, packet.getLength());
+
+//     System.out.println(receivedData);
+//     socket.close();
+//   }
+// }
+

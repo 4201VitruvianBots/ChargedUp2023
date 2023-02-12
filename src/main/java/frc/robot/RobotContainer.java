@@ -36,7 +36,7 @@ import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.DistanceSensor;
+//import frc.robot.subsystems.DistanceSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
@@ -65,7 +65,7 @@ public class RobotContainer {
   private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  //private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
