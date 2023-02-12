@@ -22,7 +22,7 @@ public class BlueMiddleOneConeBalance extends SequentialCommandGroup {
         new PPSwerveControllerCommand(
             trajectory,
             swerveDrive::getPoseMeters,
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.constants.SwerveDrive.kSwerveKinematics,
             swerveDrive.getXPidController(),
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),
