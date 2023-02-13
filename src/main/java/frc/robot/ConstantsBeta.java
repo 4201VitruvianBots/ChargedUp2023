@@ -4,6 +4,4 @@
 
 package frc.robot;
 
-public class ConstantsBeta extends ConstantsAlpha {
-
-}
+public class ConstantsBeta extends ConstantsAlpha {}

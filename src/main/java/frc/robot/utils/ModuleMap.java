@@ -3,19 +3,19 @@ package frc.robot.utils;
 import java.util.*;
 
 /**
- * Contains functions to convert {@link Map}s with {@link SwerveDriveModulePosition} keys to and from arrays so
- * that it's easier to use WPILib swerve functions.
+ * Contains functions to convert {@link Map}s with {@link SwerveDriveModulePosition} keys to and
+ * from arrays so that it's easier to use WPILib swerve functions.
  */
 public class ModuleMap {
 
   /**
-   * Creates a {@code Map} with {@link SwerveDriveModulePosition} keys from multiple values, in the order
-   * specified in the {@link SwerveDriveModulePosition} enum.
+   * Creates a {@code Map} with {@link SwerveDriveModulePosition} keys from multiple values, in the
+   * order specified in the {@link SwerveDriveModulePosition} enum.
    *
    * <p>For processing the output of a WPILib swerve function which returns an array.
    *
-   * @param values Must have at least as many elements as {@link SwerveDriveModulePosition} has entries. Any
-   *     entries after will be ignored.
+   * @param values Must have at least as many elements as {@link SwerveDriveModulePosition} has
+   *     entries. Any entries after will be ignored.
    */
   @SafeVarargs
   public static <V> Map<frc.robot.Constants.SwerveDriveModulePosition, V> of(V... values) {
@@ -33,9 +33,11 @@ public class ModuleMap {
    * <p>You can use this in a for/in loop without needing to supply an empty array like in {@link
    * #orderedValues(Map, Object[]) orderedValues}.
    */
-  public static <V> List<V> orderedValuesList(Map<frc.robot.Constants.SwerveDriveModulePosition, V> map) {
+  public static <V> List<V> orderedValuesList(
+      Map<frc.robot.Constants.SwerveDriveModulePosition, V> map) {
     ArrayList<V> list = new ArrayList<>();
-    for (frc.robot.Constants.SwerveDriveModulePosition i : frc.robot.Constants.SwerveDriveModulePosition.values()) {
+    for (frc.robot.Constants.SwerveDriveModulePosition i :
+        frc.robot.Constants.SwerveDriveModulePosition.values()) {
       list.add(map.get(i));
     }
     return list;
@@ -51,7 +53,8 @@ public class ModuleMap {
    *     moduleTranslations.valuesArray(new Translation2d[0])}. Required because Java can't make an
    *     array of generics.
    */
-  public static <V> V[] orderedValues(Map<frc.robot.Constants.SwerveDriveModulePosition, V> map, V[] array) {
+  public static <V> V[] orderedValues(
+      Map<frc.robot.Constants.SwerveDriveModulePosition, V> map, V[] array) {
     return orderedValuesList(map).toArray(array);
   }
 }
