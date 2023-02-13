@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Vision.CAMERA_POSITION;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Vision.CAMERA_POSITION;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.utils.ModuleMap;
@@ -47,11 +47,11 @@ public class FieldSim extends SubsystemBase {
         .getObject("fLocalizerTagPoses")
         .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-            .getObject("fLocalizerPoses")
-            .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
+        .getObject("fLocalizerPoses")
+        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-            .getObject("fLocalizerPose")
-            .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
+        .getObject("fLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
         .getObject("Limelight Pose")
         .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));

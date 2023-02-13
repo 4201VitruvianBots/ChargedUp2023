@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -25,7 +24,7 @@ public class DistanceSensor {
   public DistanceSensor() {
     try {
       socket = new DatagramSocket(socketPort);
-      socket.setSoTimeout(20);  // 20ms
+      socket.setSoTimeout(20); // 20ms
     } catch (SocketException socketFail) {
       socketFail.printStackTrace();
     }

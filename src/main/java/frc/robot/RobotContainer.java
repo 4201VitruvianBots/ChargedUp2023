@@ -5,11 +5,9 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -34,6 +32,9 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveBalance;
+import frc.robot.constants.Constants;
+import frc.robot.constants.ConstantsAlpha;
+import frc.robot.constants.ConstantsBeta;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
@@ -70,7 +71,7 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(Constants.constants.OperatorConstants.kDriverControllerPort);
 
   private final MemoryLog m_memorylog = new MemoryLog();
 
@@ -188,8 +189,7 @@ public class RobotContainer {
     String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
     if (mac == Constants.alphaRobotMAC) {
       Constants.constants = new ConstantsAlpha();
-    } 
-    else if (mac == Constants.betaRobotMAC) {
+    } else if (mac == Constants.betaRobotMAC) {
       Constants.constants = new ConstantsBeta();
     }
   }

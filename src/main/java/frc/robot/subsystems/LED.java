@@ -11,13 +11,14 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.constants.Constants;
 
 // creates LED subsystem
 public class LED extends SubsystemBase {
   private PieceType pieceIntent = PieceType.NONE;
   private final CANdle m_candle =
-      new CANdle(Constants.constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
+      new CANdle(
+          Constants.constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot actiates
   int blue = 0;

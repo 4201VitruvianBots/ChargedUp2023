@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -36,14 +36,20 @@ public final class Constants {
     }
 
     public static Transform3d[] cameraPositions = {
-      new Transform3d(new Translation3d(Units.inchesToMeters(-(3 + (3.0/8.0))),
-                                        Units.inchesToMeters(12),
-                                        Units.inchesToMeters(20)),
-                      new Rotation3d()),
-      new Transform3d(new Translation3d(Units.inchesToMeters(-(3 + (3.0/8.0))),
-                                        Units.inchesToMeters(-12),
-                                        Units.inchesToMeters(20)),
-                      new Rotation3d()),
+      // Robot Center to Left Camera
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(-(3 + (3.0 / 8.0))),
+              Units.inchesToMeters(12),
+              Units.inchesToMeters(20)),
+          new Rotation3d()),
+      // Robot Center to Right Camera
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(-(3 + (3.0 / 8.0))),
+              Units.inchesToMeters(-12),
+              Units.inchesToMeters(20)),
+          new Rotation3d()),
     };
 
     public enum SERVER_IPS {

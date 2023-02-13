@@ -13,9 +13,8 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Vision.CAMERA_POSITION;
-
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Vision.CAMERA_POSITION;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase {
@@ -63,15 +62,31 @@ public class Vision extends SubsystemBase {
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
 
     var lCameraT = Constants.Vision.cameraPositions[0];
-    NetworkTableInstance.getDefault().getTable("lLocalizer").getDoubleArrayTopic("camToRobotT3D").publish().set(
-            new double[]{lCameraT.getTranslation().getX(), lCameraT.getTranslation().getY(), lCameraT.getTranslation().getZ(),
-                         lCameraT.getRotation().getX(), lCameraT.getRotation().getY(), lCameraT.getRotation().getZ()}
-    );
+    NetworkTableInstance.getDefault()
+        .getTable("lLocalizer")
+        .getDoubleArrayTopic("camToRobotT3D")
+        .publish()
+        .set(
+            new double[] {
+              lCameraT.getTranslation().getX(), lCameraT.getTranslation().getY(),
+                  lCameraT.getTranslation().getZ(),
+              lCameraT.getRotation().getX(), lCameraT.getRotation().getY(),
+                  lCameraT.getRotation().getZ()
+            });
     var rCameraT = Constants.Vision.cameraPositions[1];
-    NetworkTableInstance.getDefault().getTable("rLocalizer").getDoubleArrayTopic("camToRobotT3D").publish().set(
-            new double[]{rCameraT.getTranslation().getX(), rCameraT.getTranslation().getY(), rCameraT.getTranslation().getZ(),
-                    rCameraT.getRotation().getX(), rCameraT.getRotation().getY(), rCameraT.getRotation().getZ()}
-    );
+    NetworkTableInstance.getDefault()
+        .getTable("rLocalizer")
+        .getDoubleArrayTopic("camToRobotT3D")
+        .publish()
+        .set(
+            new double[] {
+              rCameraT.getTranslation().getX(),
+              rCameraT.getTranslation().getY(),
+              rCameraT.getTranslation().getZ(),
+              rCameraT.getRotation().getX(),
+              rCameraT.getRotation().getY(),
+              rCameraT.getRotation().getZ()
+            });
   }
 
   /**
@@ -166,16 +181,17 @@ public class Vision extends SubsystemBase {
       case LEFT_LOCALIZER:
         var botPose = m_leftLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
 
-        if(botPose.length > 0)
-          return botPose;
+        if (botPose.length > 0) return botPose;
       case RIGHT_LOCALIZER:
         var rawBotPose = defaultDoubleArray;
-        switch(allianceColor) {
+        switch (allianceColor) {
           case Red:
-            rawBotPose = m_rightLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
+            rawBotPose =
+                m_rightLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
             break;
           case Blue:
-            rawBotPose = m_rightLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
+            rawBotPose =
+                m_rightLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
             break;
           default:
             rawBotPose = m_rightLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
@@ -191,7 +207,7 @@ public class Vision extends SubsystemBase {
       default:
         return defaultDoubleArray;
     }
-//    return defaultDoubleArray;
+    //    return defaultDoubleArray;
   }
 
   /**
@@ -242,14 +258,14 @@ public class Vision extends SubsystemBase {
       switch (position) {
         case LEFT_LOCALIZER:
           try {
-            tagPosX = m_leftLocalizer.getEntry("Tag Pose X").getDoubleArray(new double[]{});
-            tagPosY = m_leftLocalizer.getEntry("Tag Pose Y").getDoubleArray(new double[]{});
-            tagPosZ = m_leftLocalizer.getEntry("Tag Pose Z").getDoubleArray(new double[]{});
+            tagPosX = m_leftLocalizer.getEntry("Tag Pose X").getDoubleArray(new double[] {});
+            tagPosY = m_leftLocalizer.getEntry("Tag Pose Y").getDoubleArray(new double[] {});
+            tagPosZ = m_leftLocalizer.getEntry("Tag Pose Z").getDoubleArray(new double[] {});
             poseArray = new Pose2d[tagPosX.length];
             for (int i = 0; i < tagPosX.length; i++)
               poseArray[i] = new Pose2d(tagPosX[i], tagPosY[i], Rotation2d.fromDegrees(0));
-          } catch(Exception e) {
-            poseArray = new Pose2d[]{defaultPose};
+          } catch (Exception e) {
+            poseArray = new Pose2d[] {defaultPose};
           }
           break;
         case RIGHT_LOCALIZER:
@@ -264,9 +280,9 @@ public class Vision extends SubsystemBase {
     if (getValidTarget(position)) {
       switch (position) {
         case LEFT_LOCALIZER:
-           double[] rawTags = m_leftLocalizer.getEntry("tid").getDoubleArray(new double[]{});
-           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
-           break;
+          double[] rawTags = m_leftLocalizer.getEntry("tid").getDoubleArray(new double[] {});
+          tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
+          break;
         case RIGHT_LOCALIZER:
           break;
       }
@@ -288,7 +304,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-//    System.out.println("Vision Periodic");
+    //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_POSITION.LEFT_LOCALIZER);
     //    updateVisionPose(CAMERA_POSITION.REAR_LOCALIZER);

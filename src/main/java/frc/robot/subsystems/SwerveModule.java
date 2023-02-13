@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.SwerveDriveModulePosition;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase {
@@ -48,12 +48,16 @@ public class SwerveModule extends SubsystemBase {
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(0.1, 0.0001), Constants.constants.SwerveModule.kTurnGearbox, Constants.constants.SwerveModule.kTurningMotorGearRatio);
+          LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
+          Constants.constants.SwerveModule.kTurnGearbox,
+          Constants.constants.SwerveModule.kTurningMotorGearRatio);
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(1.5, 0.6), Constants.constants.SwerveModule.kDriveGearbox, Constants.constants.SwerveModule.kDriveMotorGearRatio);
+          LinearSystemId.identifyVelocitySystem(1.5, 0.6),
+          Constants.constants.SwerveModule.kDriveGearbox,
+          Constants.constants.SwerveModule.kDriveMotorGearRatio);
 
   private double m_drivePercentOutput;
   private double m_turnPercentOutput;
@@ -107,11 +111,13 @@ public class SwerveModule extends SubsystemBase {
 
   public void resetAngleToAbsolute() {
     double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset;
-    m_turnMotor.setSelectedSensorPosition(angle / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse);
+    m_turnMotor.setSelectedSensorPosition(
+        angle / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse);
   }
 
   public double getHeadingDegrees() {
-    return m_turnMotor.getSelectedSensorPosition() * Constants.constants.SwerveModule.kTurningMotorDistancePerPulse;
+    return m_turnMotor.getSelectedSensorPosition()
+        * Constants.constants.SwerveModule.kTurningMotorDistancePerPulse;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -119,7 +125,9 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public double getVelocityMetersPerSecond() {
-    return m_driveMotor.getSelectedSensorVelocity() * Constants.constants.SwerveModule.kDriveMotorDistancePerPulse * 10;
+    return m_driveMotor.getSelectedSensorVelocity()
+        * Constants.constants.SwerveModule.kDriveMotorDistancePerPulse
+        * 10;
   }
 
   public double getDriveMeters() {
@@ -131,10 +139,14 @@ public class SwerveModule extends SubsystemBase {
     desiredState = CtreUtils.optimize(desiredState, getHeadingRotation2d());
 
     if (isOpenLoop) {
-      double percentOutput = desiredState.speedMetersPerSecond / Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
+      double percentOutput =
+          desiredState.speedMetersPerSecond
+              / Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
       m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
-      double velocity = desiredState.speedMetersPerSecond / (Constants.constants.SwerveModule.kDriveMotorDistancePerPulse * 10);
+      double velocity =
+          desiredState.speedMetersPerSecond
+              / (Constants.constants.SwerveModule.kDriveMotorDistancePerPulse * 10);
       m_driveMotor.set(
           ControlMode.Velocity,
           velocity,
@@ -143,12 +155,15 @@ public class SwerveModule extends SubsystemBase {
     }
 
     double angle =
-        (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond * 0.01))
+        (Math.abs(desiredState.speedMetersPerSecond)
+                <= (Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
                 .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
-    m_turnMotor.set(ControlMode.Position, angle / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse);
+    m_turnMotor.set(
+        ControlMode.Position,
+        angle / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse);
     m_lastAngle = angle;
 
     m_drivePercentOutput = m_driveMotor.getMotorOutputPercent();
@@ -222,7 +237,9 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (m_turnMotorSimDistance / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse));
+            (int)
+                (m_turnMotorSimDistance
+                    / Constants.constants.SwerveModule.kTurningMotorDistancePerPulse));
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
@@ -232,7 +249,9 @@ public class SwerveModule extends SubsystemBase {
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (m_driveMotorSimDistance / Constants.constants.SwerveModule.kDriveMotorDistancePerPulse));
+            (int)
+                (m_driveMotorSimDistance
+                    / Constants.constants.SwerveModule.kDriveMotorDistancePerPulse));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
