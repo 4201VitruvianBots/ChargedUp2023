@@ -54,7 +54,7 @@ public class Controls extends SubsystemBase {
     // SmartDashboard.putBoolean("Alliance", getAllianceColorBoolean());
     allianceString.set(getAllianceColor().toString());
     allianceBoolean.set(getAllianceColorBoolean());
-    System.out.println("Alliance Color: " + getAllianceColor().toString());
+//    System.out.println("Alliance Color: " + getAllianceColor().toString());
     // TODO: fix
   }
 
@@ -62,12 +62,12 @@ public class Controls extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    System.out.println("Test1");
+//    System.out.println("Test1");
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    System.out.println("Test2");
+//    System.out.println("Test2");
   }
 }

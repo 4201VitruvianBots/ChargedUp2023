@@ -44,18 +44,17 @@ public class FieldSim extends SubsystemBase {
   private void updateRobotPoses() {
     m_field2d.setRobotPose(m_swerveDrive.getPoseMeters());
     m_field2d
-        .getObject("oakAvgRobotPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+        .getObject("fLocalizerTagPoses")
+        .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-        .getObject("oakRobotPoses")
-        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.FORWARD_LOCALIZER));
+            .getObject("fLocalizerPoses")
+            .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-        .getObject("oakTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.FORWARD_LOCALIZER));
-
+            .getObject("fLocalizerPose")
+            .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
         .getObject("Limelight Pose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.REAR_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
 
     if (RobotBase.isSimulation()) {
       m_field2d

@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -26,14 +31,25 @@ public final class Constants {
     public enum CAMERA_POSITION {
       INTAKE,
       OUTTAKE,
-      FORWARD_LOCALIZER,
-      REAR_LOCALIZER
+      LEFT_LOCALIZER,
+      RIGHT_LOCALIZER
     }
+
+    public static Transform3d[] cameraPositions = {
+      new Transform3d(new Translation3d(Units.inchesToMeters(-(3 + (3.0/8.0))),
+                                        Units.inchesToMeters(12),
+                                        Units.inchesToMeters(20)),
+                      new Rotation3d()),
+      new Transform3d(new Translation3d(Units.inchesToMeters(-(3 + (3.0/8.0))),
+                                        Units.inchesToMeters(-12),
+                                        Units.inchesToMeters(20)),
+                      new Rotation3d()),
+    };
 
     public enum SERVER_IPS {
       INTAKE("10.42.1.10"),
       FORWARD_LOCALIZER("10.42.1.11"),
-      REAR_LOCALIZER("10.42.1.12");
+      RIGHT_LOCALIZER("10.42.1.12");
 
       private final String ip;
 
