@@ -20,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -81,6 +82,7 @@ public class SwerveDrive extends SubsystemBase {
           Constants.constants.SwerveDrive.kP_Theta, 0, Constants.constants.SwerveDrive.kD_Theta);
 
   private double m_simYaw;
+  private DoublePublisher swervePitch, swerveRoll, swerveYaw;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
@@ -96,7 +98,7 @@ public class SwerveDrive extends SubsystemBase {
 
     Timer.delay(1);
     if (RobotBase.isReal()) resetModulesToAbsolute();
-    SmartDashboard.putData(this);
+    initSmartDashboard();
   }
 
   private void resetModulesToAbsolute() {
@@ -280,17 +282,27 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  private void initSmartDashboard() {
+    SmartDashboard.putData(this);
+
+    var swerveTab = NetworkTableInstance.getDefault().getTable("Swerve");
+    swervePitch = swerveTab.getDoubleTopic("Pitch").publish();
+    swerveRoll = swerveTab.getDoubleTopic("Roll").publish();
+    swerveYaw = swerveTab.getDoubleTopic("Yaw").publish();
+  }
+
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
     SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber("Pitch", getPitchDegrees());
-    SmartDashboard.putNumber("Roll", getRollDegrees());
-    SmartDashboard.putNumber("Yaw", getHeadingDegrees());
     SmartDashboard.putNumber(
         "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+
+    swervePitch.set(getPitchDegrees());
+    swerveRoll.set(getRollDegrees());
+    swerveYaw.set(getHeadingDegrees());
   }
 
   @Override

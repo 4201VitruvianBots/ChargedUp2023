@@ -58,7 +58,7 @@ public class DistanceSensor {
     packet = new DatagramPacket(socketBuffer, socketBuffer.length, address, port);
     String receivedData = new String(packet.getData(), 0, packet.getLength());
 
-    System.out.println(receivedData);
+    //    System.out.println(receivedData);
     socket.close();
   }
 }
