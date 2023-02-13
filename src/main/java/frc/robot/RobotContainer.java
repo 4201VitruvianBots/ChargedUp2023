@@ -98,8 +98,7 @@ public class RobotContainer {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
+    m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
   }
 
@@ -179,10 +178,7 @@ public class RobotContainer {
             false,
             m_swerveDrive);
   }
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   */
+  /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
