@@ -16,15 +16,6 @@ public class Waypoint extends SequentialCommandGroup {
         TrajectoryUtils.readTrajectory(
             "NewPath", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
 
-    // for(var t:trajectory) {
-    //     DriverStation.reportWarning("Time: " + String.valueOf(t.getTotalTimeSeconds()), false);
-    //     var time = Math.ceil(t.getTotalTimeSeconds());
-
-    //     for(int i =0; i < time * 100; i++) {
-    //         DriverStation.reportWarning(t.sample(i / 100.0).toString(), false);
-    //     }
-    // }
-
     var autoPath = autoBuilder.fullAuto(trajectory);
     autoPath.addRequirements(swerveDrive);
 

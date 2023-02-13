@@ -243,9 +243,7 @@ public class SwerveDrive extends SubsystemBase {
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
-          Constants.constants
-              .SwerveDrive
-              .kModuleTranslations
+              Constants.constants.SwerveDrive.kModuleTranslations
               .get(module.getModulePosition())
               .rotateBy(getHeadingRotation2d())
               .plus(getPoseMeters().getTranslation());

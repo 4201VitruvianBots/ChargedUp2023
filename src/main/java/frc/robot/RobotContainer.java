@@ -5,10 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -50,8 +48,8 @@ import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
-import frc.robot.utils.TrajectoryUtils;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -69,7 +67,7 @@ public class RobotContainer {
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
-  private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
@@ -101,7 +99,7 @@ public class RobotContainer {
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(m_elevator, () -> xboxController.getLeftY()));
+        new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
   }
 
@@ -184,15 +182,8 @@ public class RobotContainer {
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
-   * @return the command to run in autonomous
    */
   public void initializeAutoChooser() {
-    var trajectory =
-        TrajectoryUtils.readTrajectory(
-            "NewPath", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
-
-    var autoPath = m_autoBuilder.fullAuto(trajectory);
-
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
@@ -222,9 +213,9 @@ public class RobotContainer {
   public void chooseConstants() {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
-    if (mac == Constants.alphaRobotMAC) {
+    if (Objects.equals(mac, Constants.alphaRobotMAC)) {
       Constants.constants = new ConstantsAlpha();
-    } else if (mac == Constants.betaRobotMAC) {
+    } else if (Objects.equals(mac, Constants.betaRobotMAC)) {
       Constants.constants = new ConstantsBeta();
     }
   }

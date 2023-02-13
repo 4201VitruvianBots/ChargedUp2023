@@ -14,14 +14,17 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class DistanceSensor {
-  private final int socketPort = 25000;
   private final byte[] socketBuffer = new byte[85];
 
   private DatagramSocket socket;
   private String receivedData;
 
-  /** Creates a new DistanceSensor. */
   public DistanceSensor() {
+    this(25000);
+  }
+
+  /** Creates a new DistanceSensor. */
+  public DistanceSensor(int socketPort) {
     try {
       socket = new DatagramSocket(socketPort);
       socket.setSoTimeout(20); // 20ms
