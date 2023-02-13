@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator.elevatorHeights;
@@ -32,6 +33,8 @@ public class StateHandler extends SubsystemBase {
   public mainRobotStates currentMainState = mainRobotStates.STOWED;
   public intakingStates currentScoringState = intakingStates.NONE;
   public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.STOWED;
+  public Pose2d targetNode;
+
   private final Intake m_Intake;
   private final Wrist m_Wrist;
   private final SwerveDrive m_Drive;
@@ -71,6 +74,7 @@ public class StateHandler extends SubsystemBase {
 
   @Override
   public void periodic() {
+    targetNode = m_FieldSim.getTargetNode(currentScoringState, currentMainState);
     switch (currentMainState) {
       case SCORE_HIGH:
         break;

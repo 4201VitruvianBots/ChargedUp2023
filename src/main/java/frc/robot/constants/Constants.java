@@ -21,6 +21,12 @@ public final class Constants {
 
   // Add any constants that do not change between robots here, as well as all enums
 
+  public static class USB {
+    public static final int leftJoystick = 0;
+    public static final int rightJoystick = 1;
+    public static final int xBoxController = 2;
+  }
+
   public static final class Vision {
     public enum CAMERA_TYPE {
       OAK,
