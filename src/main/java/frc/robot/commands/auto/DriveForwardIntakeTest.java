@@ -11,12 +11,14 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class DriveForward extends SequentialCommandGroup {
-  public DriveForward(SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
+public class DriveForwardIntakeTest extends SequentialCommandGroup {
+  public DriveForwardIntakeTest(
+      SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "DriveForward", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
+            "DriveForwardIntakeTes",
+            new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(

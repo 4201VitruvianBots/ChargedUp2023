@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -70,25 +69,12 @@ public class SwerveDrive extends SubsystemBase {
   private boolean Initialize = false;
 
   private final SwerveDrivePoseEstimator m_odometry;
-
-  private PIDController m_xController =
-      new PIDController(
-          Constants.constants.SwerveDrive.kP_X, 0, Constants.constants.SwerveDrive.kD_X);
-  private PIDController m_yController =
-      new PIDController(
-          Constants.constants.SwerveDrive.kP_Y, 0, Constants.constants.SwerveDrive.kD_Y);
-  private PIDController m_turnController =
-      new PIDController(
-          Constants.constants.SwerveDrive.kP_Theta, 0, Constants.constants.SwerveDrive.kD_Theta);
-
   private double m_simYaw;
   private DoublePublisher swervePitch, swerveRoll, swerveYaw;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
-    m_turnController.enableContinuousInput(-Math.PI, Math.PI);
-    SmartDashboard.putData(m_turnController);
     m_odometry =
         new SwerveDrivePoseEstimator(
             Constants.constants.SwerveDrive.kSwerveKinematics,
@@ -217,18 +203,6 @@ public class SwerveDrive extends SubsystemBase {
     return true;
   }
 
-  public PIDController getXPidController() {
-    return m_xController;
-  }
-
-  public PIDController getYPidController() {
-    return m_yController;
-  }
-
-  public PIDController getThetaPidController() {
-    return m_turnController;
-  }
-
   public void setNeutralMode(NeutralMode mode) {
     for (SwerveModule module : m_swerveModules.values()) {
       module.setDriveNeutralMode(mode);
@@ -294,7 +268,6 @@ public class SwerveDrive extends SubsystemBase {
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
-    SmartDashboard.putNumber("turnError", m_turnController.getPositionError());
     SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
     SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
     SmartDashboard.putNumber(
