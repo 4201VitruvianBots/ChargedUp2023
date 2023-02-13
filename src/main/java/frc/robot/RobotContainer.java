@@ -26,11 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
-import frc.robot.commands.auto.BlueMiddleTwoConeBottomBalance;
-import frc.robot.commands.auto.BlueTopConeCubeBalance;
-import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.DriveSideway;
-import frc.robot.commands.auto.Waypoint;
+import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
@@ -194,7 +190,7 @@ public class RobotContainer {
   public void initializeAutoChooser() {
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "NewPath", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(0)));
+            "NewPath", new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
 
     var autoPath = m_autoBuilder.fullAuto(trajectory);
 
@@ -207,13 +203,15 @@ public class RobotContainer {
         "BlueTopConeCubeBalance",
         new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
+            "RedTopTwoConeBalance",
+            new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
         "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
         "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption(
     //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("WayPoint2", new PrintCommand("TEST"));
 
     m_autoChooser.addOption(
         "BlueMiddleTwoConeBalance",

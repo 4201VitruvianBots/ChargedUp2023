@@ -8,6 +8,10 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,22 +35,13 @@ public class TrajectoryUtils {
     }
 
     if (fileName.startsWith("Red")) {
-      try {
-        return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
-      } catch (Exception e) {
+      var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+      if (!file.exists()) {
         // TODO: handle exception
-        DriverStation.reportWarning(
-            "TrajectoryUtils::readTrajectory failed for " + fileName, e.getStackTrace());
+        DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
-        List<PathPlannerTrajectory> trajectory =
-            readTrajectory(fileName, pathConstraint, segmentConstraints);
-        return trajectory.stream()
-            .map(
-                t ->
-                    PathPlannerTrajectory.transformTrajectoryForAlliance(
-                        t, DriverStation.Alliance.Red))
-            .collect(Collectors.toList());
       }
+      return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
       try {
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
