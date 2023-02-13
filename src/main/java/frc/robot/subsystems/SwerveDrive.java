@@ -39,33 +39,33 @@ public class SwerveDrive extends SubsystemBase {
               SwerveDriveModulePosition.FRONT_LEFT,
                   new SwerveModule(
                       SwerveDriveModulePosition.FRONT_LEFT,
-                      new TalonFX(Constants.constants.CAN.frontLeftTurnMotor),
-                      new TalonFX(Constants.constants.CAN.frontLeftDriveMotor),
-                      new CANCoder(Constants.constants.CAN.frontLeftCanCoder),
+                      new TalonFX(Constants.CAN.frontLeftTurnMotor),
+                      new TalonFX(Constants.CAN.frontLeftDriveMotor),
+                      new CANCoder(Constants.CAN.frontLeftCanCoder),
                       Constants.constants.SwerveDrive.frontLeftCANCoderOffset),
               SwerveDriveModulePosition.FRONT_RIGHT,
                   new SwerveModule(
                       SwerveDriveModulePosition.FRONT_RIGHT,
-                      new TalonFX(Constants.constants.CAN.frontRightTurnMotor),
-                      new TalonFX(Constants.constants.CAN.frontRightDriveMotor),
-                      new CANCoder(Constants.constants.CAN.frontRightCanCoder),
+                      new TalonFX(Constants.CAN.frontRightTurnMotor),
+                      new TalonFX(Constants.CAN.frontRightDriveMotor),
+                      new CANCoder(Constants.CAN.frontRightCanCoder),
                       Constants.constants.SwerveDrive.frontRightCANCoderOffset),
               SwerveDriveModulePosition.BACK_LEFT,
                   new SwerveModule(
                       SwerveDriveModulePosition.BACK_LEFT,
-                      new TalonFX(Constants.constants.CAN.backLeftTurnMotor),
-                      new TalonFX(Constants.constants.CAN.backLeftDriveMotor),
-                      new CANCoder(Constants.constants.CAN.backLeftCanCoder),
+                      new TalonFX(Constants.CAN.backLeftTurnMotor),
+                      new TalonFX(Constants.CAN.backLeftDriveMotor),
+                      new CANCoder(Constants.CAN.backLeftCanCoder),
                       Constants.constants.SwerveDrive.backLeftCANCoderOffset),
               SwerveDriveModulePosition.BACK_RIGHT,
                   new SwerveModule(
                       SwerveDriveModulePosition.BACK_RIGHT,
-                      new TalonFX(Constants.constants.CAN.backRightTurnMotor),
-                      new TalonFX(Constants.constants.CAN.backRightDriveMotor),
-                      new CANCoder(Constants.constants.CAN.backRightCanCoder),
+                      new TalonFX(Constants.CAN.backRightTurnMotor),
+                      new TalonFX(Constants.CAN.backRightDriveMotor),
+                      new CANCoder(Constants.CAN.backRightCanCoder),
                       Constants.constants.SwerveDrive.backRightCANCoderOffset)));
 
-  private final Pigeon2 m_pigeon = new Pigeon2(Constants.constants.CAN.pigeon, "rio");
+  private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private Trajectory m_trajectory;
   private boolean Initialize = false;
 

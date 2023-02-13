@@ -29,8 +29,7 @@ public class Elevator extends SubsystemBase {
 
   // Initializing both motors
   public static final TalonFX[] elevatorMotors = {
-    new TalonFX(Constants.constants.Elevator.elevatorMotorLeft),
-    new TalonFX(Constants.constants.Elevator.elevatorMotorRight)
+    new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
   };
 
   // Used by RobotContainer to specify which button has been pressed
@@ -44,7 +43,7 @@ public class Elevator extends SubsystemBase {
 
   // Limit switch at bottom of elevator
   private static DigitalInput elevatorLowerSwitch =
-      new DigitalInput(Constants.constants.Elevator.elevatorLowerSwitch);
+      new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach

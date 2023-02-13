@@ -15,11 +15,6 @@ import java.util.Map;
 public class ConstantsAlpha {
 
   public static final class ElevatorDef {
-    public static final int elevatorMotorLeft = 32;
-    public static final int elevatorMotorRight = 33;
-
-    public static final int elevatorLowerSwitch = 8;
-
     // Elevator sim constants
     public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
     public static final double elevatorGearing = 10.0;
@@ -43,35 +38,11 @@ public class ConstantsAlpha {
         (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
-  public final class IntakeDef {
-    public static final int intakeMotor = 31;
-  }
+  public final class IntakeDef {}
 
-  public final class WristDef {
-    public static final int wristMotor = 30;
-  }
+  public final class WristDef {}
 
-  public final class LEDDef {
-    public static final int CANdleID = 0;
-  }
-
-  public static final class CANDef { // TODO Not real number change tbt//
-    public static final int pigeon = 9;
-
-    public static final int frontLeftCanCoder = 10;
-    public static final int frontRightCanCoder = 11;
-    public static final int backLeftCanCoder = 12;
-    public static final int backRightCanCoder = 13;
-
-    public static final int frontLeftDriveMotor = 20;
-    public static final int frontLeftTurnMotor = 21;
-    public static final int frontRightDriveMotor = 22;
-    public static final int frontRightTurnMotor = 23;
-    public static final int backLeftDriveMotor = 24;
-    public static final int backLeftTurnMotor = 25;
-    public static final int backRightDriveMotor = 26;
-    public static final int backRightTurnMotor = 27;
-  }
+  public final class LEDDef {}
 
   public static final class SwerveDriveDef {
     public static final double kTrackWidth = Units.inchesToMeters(24);
@@ -137,7 +108,6 @@ public class ConstantsAlpha {
   public final IntakeDef Intake;
   public final WristDef Wrist;
   public final LEDDef LED;
-  public final CANDef CAN;
   public final SwerveDriveDef SwerveDrive;
   public final SwerveModuleDef SwerveModule;
 
@@ -146,7 +116,6 @@ public class ConstantsAlpha {
     Intake = new IntakeDef();
     Wrist = new WristDef();
     LED = new LEDDef();
-    CAN = new CANDef();
     SwerveDrive = new SwerveDriveDef();
     SwerveModule = new SwerveModuleDef();
   }

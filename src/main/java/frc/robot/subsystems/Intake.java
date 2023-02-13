@@ -19,7 +19,7 @@ public class Intake extends SubsystemBase {
 
   private final double kF = 0;
   private final double kP = 0.2;
-  private TalonFX intakeMotor = new TalonFX(Constants.constants.Intake.intakeMotor);
+  private TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double PercentOutput;
 
   public Intake() {

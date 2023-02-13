@@ -14,7 +14,7 @@ import frc.robot.constants.Constants;
 
 public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
-  private TalonFX wristMotor = new TalonFX(Constants.constants.Wrist.wristMotor);
+  private TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
   private boolean isWristtaking;
   private final double kF = 0;
