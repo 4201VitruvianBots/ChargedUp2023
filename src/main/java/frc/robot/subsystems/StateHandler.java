@@ -34,7 +34,7 @@ public class StateHandler extends SubsystemBase {
   public intakingStates currentScoringState = intakingStates.NONE;
   public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.STOWED;
   public Pose2d targetNode;
-  
+
   private final Intake m_Intake;
   private final Wrist m_Wrist;
   private final SwerveDrive m_Drive;

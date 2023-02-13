@@ -8,7 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
+import frc.robot.constants.Constants;
 import frc.robot.subsystems.SwerveDrive;
 import java.util.function.Supplier;
 
@@ -63,12 +63,12 @@ public class TestPPSwerveControllerCommand extends PPSwerveControllerCommand {
     ChassisSpeeds targetChassisSpeeds = this.m_controller.calculate(currentPose, desiredState);
     SwerveModuleState[] targetModuleStates =
         this.m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
-    System.out.println("Current Pose " + currentPose);
-    System.out.println("Desired Translation " + desiredState.poseMeters);
-    System.out.println("Desired Rotation " + desiredState.holonomicRotation.getDegrees());
-    System.out.println("Target Speeds " + targetChassisSpeeds);
-    for (int i = 0; i < targetModuleStates.length; i++)
-      System.out.println("Module " + i + " Target State " + targetModuleStates[i]);
+    //    System.out.println("Current Pose " + currentPose);
+    //    System.out.println("Desired Translation " + desiredState.poseMeters);
+    //    System.out.println("Desired Rotation " + desiredState.holonomicRotation.getDegrees());
+    //    System.out.println("Target Speeds " + targetChassisSpeeds);
+    //    for (int i = 0; i < targetModuleStates.length; i++)
+    //      System.out.println("Module " + i + " Target State " + targetModuleStates[i]);
   }
 
   // Called once the command ends or is interrupted.

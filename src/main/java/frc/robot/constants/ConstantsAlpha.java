@@ -2,29 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants.SwerveDriveModulePosition;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
 
 public class ConstantsAlpha {
-
-  public static final class OperatorConstantsDef {
-    public static final int kDriverControllerPort = 0;
-  }
-
-  public static class USBDef {
-    public static final int leftJoystick = 0;
-    public static final int rightJoystick = 1;
-    public static final int xBoxController = 2;
-  }
-
-  public final class PnuematicsDef {}
 
   public static final class ElevatorDef {
     public static final int elevatorMotorLeft = 32;
@@ -145,27 +133,21 @@ public class ConstantsAlpha {
     public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
 
-  public OperatorConstantsDef OperatorConstants;
-  public USBDef USB;
-  public PnuematicsDef Pnuematics;
-  public ElevatorDef Elevator;
-  public IntakeDef Intake;
-  public WristDef Wrist;
-  public LEDDef LED;
-  public CANDef CAN;
-  public SwerveDriveDef SwerveDrive;
-  public SwerveModuleDef SwerveModule;
+  public final ElevatorDef Elevator;
+  public final IntakeDef Intake;
+  public final WristDef Wrist;
+  public final LEDDef LED;
+  public final CANDef CAN;
+  public final SwerveDriveDef SwerveDrive;
+  public final SwerveModuleDef SwerveModule;
 
-  // public ConstantsAlpha() {
-  // final OperatorConstantsDef OperatorConstants = new OperatorConstantsDef();
-  // final USBDef USB = new USBDef();
-  // final PnuematicsDef Pnuematics = new PnuematicsDef();
-  // final ElevatorDef Elevator = new ElevatorDef();
-  // final IntakeDef Intake = new IntakeDef();
-  // final WristDef Wrist = new WristDef();
-  // final LEDDef LED = new LEDDef();
-  // final CANDef CAN = new CANDef();
-  // final SwerveDriveDef SwerveDrive = new SwerveDriveDef();
-  // final SwerveModuleDef SwerveModule = new SwerveModuleDef();
-  // }
+  public ConstantsAlpha() {
+    Elevator = new ElevatorDef();
+    Intake = new IntakeDef();
+    Wrist = new WristDef();
+    LED = new LEDDef();
+    CAN = new CANDef();
+    SwerveDrive = new SwerveDriveDef();
+    SwerveModule = new SwerveModuleDef();
+  }
 }

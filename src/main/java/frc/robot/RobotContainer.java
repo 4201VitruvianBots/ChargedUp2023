@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
@@ -32,6 +31,10 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveBalance;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.USB;
+import frc.robot.constants.ConstantsAlpha;
+import frc.robot.constants.ConstantsBeta;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
@@ -58,33 +61,27 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
+  private final Controls m_controls = new Controls();
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
-  private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(
-          frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
 
   private final MemoryLog m_memorylog = new MemoryLog();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(Constants.constants.USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(Constants.constants.USB.rightJoystick);
-  static XboxController xBoxController = new XboxController(Constants.constants.USB.xBoxController);
+  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
+  private final CommandXboxController xboxController =
+      new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftTriggers = new Trigger[2];
-  public Trigger[] rightTriggers = new Trigger[2];
-  public Trigger[] xBoxTriggers = new Trigger[10];
-  public Trigger[] xBoxPOVTriggers = new Trigger[4];
-
-  public Trigger xBoxLeftTrigger, xBoxRightTrigger;
+  public Trigger[] leftJoystickTriggers = new Trigger[2];
+  public Trigger[] rightJoystickTriggers = new Trigger[2];
 
   public void initializeSubsystems() {
     m_swerveDrive.setDefaultCommand(
@@ -96,7 +93,7 @@ public class RobotContainer {
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(
-        new IncrementElevatorHeight(m_elevator, () -> xBoxController.getLeftY()));
+        new IncrementElevatorHeight(m_elevator, () -> xboxController.getLeftY()));
     m_fieldSim.initSim();
   }
 
@@ -118,35 +115,27 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureBindings() { // TODO: Replace Joystick Button?
-    for (int i = 0; i < leftTriggers.length; i++)
-      leftTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
-    for (int i = 0; i < rightTriggers.length; i++)
-      rightTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
-    for (int i = 0; i < xBoxTriggers.length; i++)
-      xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
-    for (int i = 0; i < xBoxPOVTriggers.length; i++)
-      xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+    for (int i = 0; i < leftJoystickTriggers.length; i++)
+      leftJoystickTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
+    for (int i = 0; i < rightJoystickTriggers.length; i++)
+      rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-    xBoxTriggers[5].whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController.leftBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController.rightBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
-    xBoxLeftTrigger =
-        new Trigger(
-            () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
-    xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
-    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake));
-    xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
+    xboxController.leftTrigger().whileTrue(new RunIntake(m_intake));
+    xboxController.rightTrigger().whileTrue(new RunReverseIntake(m_intake));
 
     // Elevator button bindings
-    m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
-    m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
-    m_driverController.x().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
-    m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
+    xboxController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
+    xboxController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    xboxController.x().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
+    xboxController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
-    // Will switch behtween closed and open loop on button press
-    m_driverController.start().whileTrue(new SetElevatorControlLoop(m_elevator));
+    // Will switch between closed and open loop on button press
+    xboxController.start().onTrue(new SetElevatorControlLoop(m_elevator));
 
-    leftTriggers[0].whileTrue(
+    leftJoystickTriggers[0].whileTrue(
         new SetSwerveDriveBalance(m_swerveDrive, null, null, null)
             .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
@@ -158,7 +147,7 @@ public class RobotContainer {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
   }
 
-  public void teleopeInit() {
+  public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
   }
 

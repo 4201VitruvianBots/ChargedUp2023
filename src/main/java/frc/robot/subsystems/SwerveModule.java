@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.SwerveDriveModulePosition;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase {
@@ -159,7 +159,7 @@ public class SwerveModule extends SubsystemBase {
                 <= (Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
-                .getDegrees(); // Prevent rotating module if speed is less then 1%. Prevents
+                .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
     m_turnMotor.set(
         ControlMode.Position,
