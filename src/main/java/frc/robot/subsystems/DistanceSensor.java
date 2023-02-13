@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class DistanceSensor extends SubsystemBase {
+public class DistanceSensor {
   private final int socketPort = 25000;
   private final byte[] socketBuffer = new byte[85];
 
@@ -25,6 +25,7 @@ public class DistanceSensor extends SubsystemBase {
   public DistanceSensor() {
     try {
       socket = new DatagramSocket(socketPort);
+      socket.setSoTimeout(20);  // 20ms
     } catch (SocketException socketFail) {
       socketFail.printStackTrace();
     }
@@ -42,7 +43,6 @@ public class DistanceSensor extends SubsystemBase {
     return (int) jsonObject.get(sensorName);
   }
 
-  @Override
   public void periodic() {
     // This method will be called once per scheduler run
 

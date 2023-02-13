@@ -22,7 +22,7 @@ public class DriveForward extends SequentialCommandGroup {
         new VitruvianPPSwerveControllerCommand(
             trajectory,
             swerveDrive::getPoseMeters,
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.constants.SwerveDrive.kSwerveKinematics,
             swerveDrive.getXPidController(),
             swerveDrive.getYPidController(),
             swerveDrive.getThetaPidController(),

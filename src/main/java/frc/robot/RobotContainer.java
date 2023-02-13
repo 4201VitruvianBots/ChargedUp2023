@@ -5,8 +5,11 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -18,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.BlueTopConeCubeBalance;
@@ -58,25 +60,25 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
+  private final Controls m_controls = new Controls();
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
-  private final Controls m_controls = new Controls();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
   private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
 
   private final MemoryLog m_memorylog = new MemoryLog();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(Constants.constants.USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
-  static XboxController xBoxController = new XboxController(Constants.USB.xBoxController);
+  static Joystick rightJoystick = new Joystick(Constants.constants.USB.rightJoystick);
+  static XboxController xBoxController = new XboxController(Constants.constants.USB.xBoxController);
 
   public Trigger[] leftTriggers = new Trigger[2];
   public Trigger[] rightTriggers = new Trigger[2];
@@ -105,6 +107,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureBindings();
+
+    // Choose which constants class to use
+    chooseConstants();
   }
 
   /**
@@ -177,6 +182,18 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
+  // Switches between constants class depending on the MAC address of the roboRIO we're running on
+  public void chooseConstants() {
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
+    if (mac == Constants.alphaRobotMAC) {
+      Constants.constants = new ConstantsAlpha();
+    } 
+    else if (mac == Constants.betaRobotMAC) {
+      Constants.constants = new ConstantsBeta();
+    }
+  }
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return m_autoChooser.getSelected();
@@ -184,12 +201,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    // Since our GitHub action, which is what uses MemoryLog, runs on Ubuntu,
-    // this will make sure the memory log will only run on there.
-    // TODO: Implement environment variable instead
-    if (System.getProperty("os.name") == "Linux") {
-      m_memorylog.simulationPeriodic();
-    }
+    m_memorylog.simulationPeriodic();
   }
 
   public void periodic() {
