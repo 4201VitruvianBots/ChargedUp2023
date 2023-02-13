@@ -9,12 +9,9 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TrajectoryUtils {
   public static List<PathPlannerTrajectory> readTrajectory(
@@ -38,7 +35,8 @@ public class TrajectoryUtils {
       var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
       if (!file.exists()) {
         // TODO: handle exception
-        DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, false);
+        DriverStation.reportWarning(
+            "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);

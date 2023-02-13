@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -203,8 +202,7 @@ public class RobotContainer {
         "BlueTopConeCubeBalance",
         new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-            "RedTopTwoConeBalance",
-            new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
         "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
