@@ -17,7 +17,8 @@ import frc.robot.Constants;
 public class LED extends SubsystemBase {
   private PieceType pieceIntent = PieceType.NONE;
   private final CANdle m_candle =
-      new CANdle(Constants.constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
+      new CANdle(
+          Constants.constants.LED.CANdleID); // LED In constants implecation later (the errors fine)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot actiates
   int blue = 0;
