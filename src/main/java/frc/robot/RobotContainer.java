@@ -139,8 +139,8 @@ public class RobotContainer {
     m_driverController.x().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
     m_driverController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
-    // Will switch behtween closed and open loop on button press
-    m_driverController.start().whileTrue(new SetElevatorControlLoop(m_elevator));
+    // Will switch between closed and open loop on button press
+    m_driverController.start().onTrue(new SetElevatorControlLoop(m_elevator));
 
     leftTriggers[0].whileTrue(
         new SetSwerveDriveBalance(m_swerveDrive, null, null, null)
@@ -154,7 +154,7 @@ public class RobotContainer {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
   }
 
-  public void teleopeInit() {
+  public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
   }
 

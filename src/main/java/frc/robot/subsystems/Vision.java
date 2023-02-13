@@ -11,9 +11,14 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Vision.CAMERA_POSITION;
+
+import java.util.Arrays;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 public class Vision extends SubsystemBase {
 
@@ -24,7 +29,6 @@ public class Vision extends SubsystemBase {
   private final NetworkTable forwardLocalizer;
   private final NetworkTable rearLocalizer;
 
-  private DataLog m_logger;
   private DoubleLogEntry limelightTargetValid;
   private DoubleLogEntry forwardLocalizerTargetValid;
 
@@ -32,7 +36,7 @@ public class Vision extends SubsystemBase {
 
   double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0};
 
-  int[] tagId = new int[10];
+  int[] tagIds = new int[10];
   double[] robotPosX = new double[10];
   double[] robotPosY = new double[10];
   double[] robotPosZ = new double[10];
@@ -55,7 +59,6 @@ public class Vision extends SubsystemBase {
     PortForwarder.add(5804, Constants.Vision.SERVER_IPS.REAR_LOCALIZER.toString(), 5804);
     PortForwarder.add(5805, Constants.Vision.SERVER_IPS.REAR_LOCALIZER.toString(), 5805);
 
-    m_logger = logger;
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     forwardLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
   }
@@ -147,20 +150,30 @@ public class Vision extends SubsystemBase {
    * botpose: Robot transform in field-space. Translation (X,Y,Z) Rotation(X,Y,Z)
    */
   public double[] getBotPose(CAMERA_POSITION position) {
-    switch (position) {
-      case FORWARD_LOCALIZER:
-        return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
-      case REAR_LOCALIZER:
-        var rawBotPose = rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
-        if (rawBotPose.length > 0) {
-          rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
-          rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
+    if(getValidTarget(position)) {
+      switch (position) {
+        case FORWARD_LOCALIZER:
+          return forwardLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        case REAR_LOCALIZER:
+          var rawBotPose = defaultDoubleArray;
+          if(DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            rawBotPose = rearLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
+          } else if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+            rawBotPose = rearLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
+          }
+
+          if(rawBotPose == defaultDoubleArray) {
+            rawBotPose = rearLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+
+            if (rawBotPose.length > 0) {
+              rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
+              rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
+            }
+          }
           return rawBotPose;
-        }
-        return defaultDoubleArray;
-      default:
-        return defaultDoubleArray;
+      }
     }
+    return defaultDoubleArray;
   }
 
   /**
@@ -224,11 +237,28 @@ public class Vision extends SubsystemBase {
     return poseArray;
   }
 
+  public int[] getTagIds(CAMERA_POSITION position) {
+    var tags = tagIds;
+    if (getValidTarget(position)) {
+      switch (position) {
+        case FORWARD_LOCALIZER:
+           double[] rawTags = forwardLocalizer.getEntry("tid").getDoubleArray(new double[]{});
+           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
+           break;
+        case REAR_LOCALIZER:
+          break;
+      }
+    }
+    return tags;
+  }
+
   private void updateVisionPose(CAMERA_POSITION position) {
-    // if (getValidTarget(position))
-    //   m_swerveDrive
-    //       .getOdometry()
-    //       .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
+     if (getValidTarget(position)) {
+      System.out.println("Vision Pose Update: " + getRobotPose2d(position));
+       m_swerveDrive
+               .getOdometry()
+               .addVisionMeasurement(getRobotPose2d(position), getDetectionTimestamp(position));
+     }
   }
 
   private void logData() {
@@ -238,6 +268,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_POSITION.FORWARD_LOCALIZER);
     //    updateVisionPose(CAMERA_POSITION.REAR_LOCALIZER);

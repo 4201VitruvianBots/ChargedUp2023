@@ -150,7 +150,7 @@ public class SwerveModule extends SubsystemBase {
         (Math.abs(desiredState.speedMetersPerSecond) <= (kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
-                .getDegrees(); // Prevent rotating module if speed is less then 1%. Prevents
+                .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
     m_turnMotor.set(ControlMode.Position, angle / kTurningMotorDistancePerPulse);
     m_lastAngle = angle;
