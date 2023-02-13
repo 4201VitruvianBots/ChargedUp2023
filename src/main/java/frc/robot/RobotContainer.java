@@ -131,7 +131,7 @@ public class RobotContainer {
             () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
     xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
     xBoxLeftTrigger.whileTrue(new RunIntake(m_intake, 0.5));
-    xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake));
+    xBoxRightTrigger.whileTrue(new RunReverseIntake(m_intake, -0.5));
 
     m_driverController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
     m_driverController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));

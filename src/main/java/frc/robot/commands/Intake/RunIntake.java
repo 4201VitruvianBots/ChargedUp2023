@@ -10,6 +10,7 @@ import frc.robot.subsystems.Intake;
 public class RunIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+  private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
   public RunIntake(Intake intake, double PercentOutput) {
@@ -28,7 +29,7 @@ public class RunIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(0.25);
+    m_intake.setIntakePercentOutput(m_PercentOutput);
   }
 
   // Called once the command ends or is interrupted.

@@ -57,7 +57,9 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kP(0, kP);
   }
 
-  public void setSetpoint(double setpoint) {}
+  public void setSetpoint(double setpoint) {
+    
+  }
 
   public double getMeasurement() {
     return wristMotor.getSelectedSensorPosition();
