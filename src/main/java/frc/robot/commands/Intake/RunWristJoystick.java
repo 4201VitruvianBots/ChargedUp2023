@@ -27,7 +27,7 @@ public class RunWristJoystick extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_JoystickX.getAsDouble() != 0.58) {
+    if (m_JoystickX.getAsDouble() != 0.00) {
       m_wrist.setWristDesiredRotationState(WristRotations.JOYSTICK);
     } else if (m_wrist.getWristDesiredRotations() == WristRotations.JOYSTICK) {
       m_wrist.setWristDesiredRotationState(WristRotations.NONE);
