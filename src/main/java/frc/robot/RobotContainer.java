@@ -150,7 +150,8 @@ public class RobotContainer {
   }
 
   public void disableInit() {
-    m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_swerveDrive.disabledInit();
   }
 
   public void teleopInit() {

@@ -278,6 +278,12 @@ public class SwerveDrive extends SubsystemBase {
     swerveYaw.set(getHeadingDegrees());
   }
 
+  public void disabledInit() {
+    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+      module.updateCanCoderHealth();
+    }
+  }
+
   @Override
   public void periodic() {
     if (Initialize == false) {
