@@ -113,8 +113,7 @@ public final class Constants {
   }
 
   public static ConstantsAlpha constants = new ConstantsAlpha();
-
-  // TODO: Get actual MAC address of alpha robot
-  public static final String alphaRobotMAC = "00:00:00:00:00:01";
+  
+  public static final String alphaRobotMAC = "00:80:2F:19:30:B7";
   public static final String betaRobotMAC = "00:80:2F:25:BC:FD";
 }
