@@ -5,7 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -43,6 +42,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 
@@ -59,6 +59,7 @@ public class RobotContainer {
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
+  private final SwerveModule m_swerveModule = new SwerveModule(null, null, null, null, 0);
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
@@ -69,7 +70,8 @@ public class RobotContainer {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(
+          frc.robot.Constants.constants.OperatorConstants.kDriverControllerPort);
 
   private final MemoryLog m_memorylog = new MemoryLog();
 
@@ -156,6 +158,7 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_swerveDrive.disabledInit();
   }
 
   public void teleopeInit() {
@@ -187,8 +190,7 @@ public class RobotContainer {
     String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
     if (mac == Constants.alphaRobotMAC) {
       Constants.constants = new ConstantsAlpha();
-    } 
-    else if (mac == Constants.betaRobotMAC) {
+    } else if (mac == Constants.betaRobotMAC) {
       Constants.constants = new ConstantsBeta();
     }
   }

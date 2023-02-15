@@ -61,7 +61,8 @@ public class Elevator extends SubsystemBase {
   private static double elevatorHeight =
       0; // the amount of rotations the motor has gone up from the initial low position
 
-  private static final double maxElevatorHeight = Constants.constants.Elevator.elevatorMaxHeightMeters;
+  private static final double maxElevatorHeight =
+      Constants.constants.Elevator.elevatorMaxHeightMeters;
 
   // By default this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
@@ -113,11 +114,16 @@ public class Elevator extends SubsystemBase {
       motor.setSelectedSensorPosition(elevatorHeight);
 
       // Config PID
-      motor.selectProfileSlot(Constants.constants.Elevator.kSlotIdx, Constants.constants.Elevator.kPIDLoopIdx);
-      motor.config_kF(Constants.constants.Elevator.kSlotIdx, kF, Constants.constants.Elevator.kTimeoutMs);
-      motor.config_kP(Constants.constants.Elevator.kSlotIdx, kP, Constants.constants.Elevator.kTimeoutMs);
-      motor.config_kI(Constants.constants.Elevator.kSlotIdx, kI, Constants.constants.Elevator.kTimeoutMs);
-      motor.config_kD(Constants.constants.Elevator.kSlotIdx, kD, Constants.constants.Elevator.kTimeoutMs);
+      motor.selectProfileSlot(
+          Constants.constants.Elevator.kSlotIdx, Constants.constants.Elevator.kPIDLoopIdx);
+      motor.config_kF(
+          Constants.constants.Elevator.kSlotIdx, kF, Constants.constants.Elevator.kTimeoutMs);
+      motor.config_kP(
+          Constants.constants.Elevator.kSlotIdx, kP, Constants.constants.Elevator.kTimeoutMs);
+      motor.config_kI(
+          Constants.constants.Elevator.kSlotIdx, kI, Constants.constants.Elevator.kTimeoutMs);
+      motor.config_kD(
+          Constants.constants.Elevator.kSlotIdx, kD, Constants.constants.Elevator.kTimeoutMs);
 
       motor.configPeakOutputForward(1, Constants.constants.Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-1, Constants.constants.Elevator.kTimeoutMs);
@@ -150,14 +156,16 @@ public class Elevator extends SubsystemBase {
 
   public static void setElevatorMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
-        TalonFXControlMode.MotionMagic, setpoint / Constants.constants.Elevator.metersToEncoderCounts);
+        TalonFXControlMode.MotionMagic,
+        setpoint / Constants.constants.Elevator.metersToEncoderCounts);
   }
 
   /*
    * Elevator's height position
    */
   public static double getElevatorHeight() {
-    return elevatorMotors[0].getSelectedSensorPosition() * Constants.constants.Elevator.metersToEncoderCounts;
+    return elevatorMotors[0].getSelectedSensorPosition()
+        * Constants.constants.Elevator.metersToEncoderCounts;
   }
 
   public double getElevatorMotorVoltage() {
@@ -252,7 +260,9 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (elevatorSim.getPositionMeters() / Constants.constants.Elevator.metersToEncoderCounts));
+            (int)
+                (elevatorSim.getPositionMeters()
+                    / Constants.constants.Elevator.metersToEncoderCounts));
 
     elevatorMotors[0]
         .getSimCollection()
