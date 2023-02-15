@@ -156,7 +156,6 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    System.out.println("CanCoder");
   }
 
   public void teleopeInit() {
