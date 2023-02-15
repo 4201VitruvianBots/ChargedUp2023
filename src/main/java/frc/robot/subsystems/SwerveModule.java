@@ -194,7 +194,10 @@ public class SwerveModule extends SubsystemBase {
         "backLeftCANCoderOffset", Constants.constants.SwerveDrive.backLeftCANCoderOffset);
     SmartDashboard.getNumber(
         "backRightCANCoderOffset", Constants.constants.SwerveDrive.backRightCANCoderOffset);
-  }
+        
+        SmartDashboard.putBoolean(
+          "module " + m_angleEncoder + " CANCoder Health", m_angleEncoder.getDeviceID() > 0 );  
+    }
 
   @Override
   public void periodic() {
