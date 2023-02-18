@@ -6,16 +6,21 @@ package frc.robot.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Vision.CAMERA_POSITION;
 import frc.robot.simulation.SimConstants.Grids;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
@@ -25,10 +30,12 @@ import java.util.ArrayList;
 public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
   private final Vision m_vision;
+  private final Elevator m_elevator;
 
   private final Field2d m_field2d = new Field2d();
 
   private static Pose2d robotPose;
+  private static Pose2d elevatorPose;
 
   /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
     - Cones and cubes
@@ -50,7 +57,7 @@ public class FieldSim extends SubsystemBase {
 
   private ArrayList<Pose2d> coopertitionNodes = new ArrayList<>();
 
-  public FieldSim(SwerveDrive swerveDrive, Vision vision) {
+  public FieldSim(SwerveDrive swerveDrive, Vision vision, Elevator elevator) {
 
     boolean cone = true;
 
@@ -126,6 +133,7 @@ public class FieldSim extends SubsystemBase {
 
     m_swerveDrive = swerveDrive;
     m_vision = vision;
+    m_elevator = elevator;
   }
 
   public void initSim() {}
@@ -158,11 +166,9 @@ public class FieldSim extends SubsystemBase {
         .getObject("Limelight Pose")
         .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
 
-    int i = 1;
-    for (Pose2d node : gridNodes) {
-      m_field2d.getObject("Grid Node " + Integer.toString(i)).setPose(node);
-      i++;
-    }
+    m_field2d
+        .getObject("Grid Node")
+        .setPoses(gridNodes);
 
     if (RobotBase.isSimulation()) {
       m_field2d
@@ -202,7 +208,34 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(highNodes);
     }
 
+    // Only works on WPILIB version 2023.3.2 and above
     return robotPose.nearest(possibleNodes);
+  }
+
+  // Whopper whopper whopper whopper
+  // junior double triple whopper
+  // flame grilled taste with perfect toppers
+  // i rule this day
+  public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
+    // TODO: Fix elevator pose math
+    double elevatorRotation = robotPose.getRotation().getRadians();
+    double elevatorDistance = m_elevator.getElevatorHeight();
+
+    double elevatorDeltaX = Math.cos(elevatorRotation)*elevatorDistance;
+    double elevatorDeltaY = Math.sin(elevatorRotation)*elevatorDistance;
+
+    elevatorPose = new Pose2d(robotPose.getX()+elevatorDeltaX, robotPose.getX()+elevatorDeltaY, robotPose.getRotation());
+
+    m_field2d
+        .getObject("Elevator Pose")
+        .setPose(elevatorPose);
+
+    double deltaX = Math.abs(targetPose.getX()-elevatorPose.getX());
+    double deltaY = Math.abs(targetPose.getY()-elevatorPose.getY());
+
+    double distance = Math.sqrt(Math.pow(deltaX, 2)+Math.pow(deltaY, 2)); // Standard distance formula
+
+    return distance < margin ? true : false; // Returns true if the robot is on target, returns false if not on target
   }
 
   @Override

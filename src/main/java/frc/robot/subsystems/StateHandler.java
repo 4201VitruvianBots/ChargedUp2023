@@ -34,6 +34,7 @@ public class StateHandler extends SubsystemBase {
   public intakingStates currentScoringState = intakingStates.NONE;
   public Elevator.elevatorHeights currentElevatorState = Elevator.elevatorHeights.STOWED;
   public Pose2d targetNode;
+  public boolean isOnTarget;
 
   private final Intake m_Intake;
   private final Wrist m_Wrist;
@@ -75,6 +76,7 @@ public class StateHandler extends SubsystemBase {
   @Override
   public void periodic() {
     targetNode = m_FieldSim.getTargetNode(currentScoringState, currentMainState);
+    isOnTarget = m_FieldSim.isRobotOnTarget(targetNode, 0.1);
     switch (currentMainState) {
       case SCORE_HIGH:
         break;
@@ -102,7 +104,7 @@ public class StateHandler extends SubsystemBase {
 
       default:
       case STOWED:
-        m_Elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
+        // m_Elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
         break;
     }
   }
