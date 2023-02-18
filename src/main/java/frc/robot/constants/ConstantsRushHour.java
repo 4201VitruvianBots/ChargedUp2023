@@ -12,7 +12,7 @@ import frc.robot.constants.Constants.SwerveDriveModulePosition;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
 
-public class ConstantsAlpha {
+public class ConstantsRushHour {
 
   public static final class ElevatorDef {
     // Elevator sim constants
@@ -111,7 +111,7 @@ public class ConstantsAlpha {
   public final SwerveDriveDef SwerveDrive;
   public final SwerveModuleDef SwerveModule;
 
-  public ConstantsAlpha() {
+  public ConstantsRushHour() {
     Elevator = new ElevatorDef();
     Intake = new IntakeDef();
     Wrist = new WristDef();

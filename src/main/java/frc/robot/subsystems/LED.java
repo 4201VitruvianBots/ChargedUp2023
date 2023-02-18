@@ -26,7 +26,7 @@ public class LED extends SubsystemBase {
 
   private final Controls m_controls; // fiugure out during robtoics class
 
-  private final int LEDcount = 10; // TODO: Change LEDCount
+  private final int LEDcount = 144; // TODO: Change LEDCount
 
   // Create LED strip
   public LED(Controls controls) {
@@ -140,8 +140,8 @@ public class LED extends SubsystemBase {
   public void periodic() {
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
-      m_candle.setLEDs(255, 30, 0, 0, 0, 125);
-      m_candle.setLEDs(red, green, blue, 0, 20, 35); // setting all LEDs to color
+      m_candle.setLEDs(255, 30, 0, 0, 0, LEDcount);
+      // m_candle.setLEDs(red, green, blue, 0, 20, 35); // setting all LEDs to color
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }

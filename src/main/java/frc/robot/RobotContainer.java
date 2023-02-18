@@ -34,8 +34,8 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.USB;
-import frc.robot.constants.ConstantsAlpha;
-import frc.robot.constants.ConstantsBeta;
+import frc.robot.constants.ConstantsGridLock;
+import frc.robot.constants.ConstantsRushHour;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
@@ -150,7 +150,8 @@ public class RobotContainer {
   }
 
   public void disableInit() {
-    m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_swerveDrive.setNeutralMode(NeutralMode.Coast);
+    m_swerveDrive.disabledInit();
   }
 
   public void teleopInit() {
@@ -210,9 +211,9 @@ public class RobotContainer {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
     if (Objects.equals(mac, Constants.alphaRobotMAC)) {
-      Constants.constants = new ConstantsAlpha();
+      Constants.constants = new ConstantsRushHour();
     } else if (Objects.equals(mac, Constants.betaRobotMAC)) {
-      Constants.constants = new ConstantsBeta();
+      Constants.constants = new ConstantsGridLock();
     }
   }
 
