@@ -139,7 +139,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    SmartDashboard.putData(this);
+    SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
   }
   /*
@@ -275,6 +275,7 @@ public class Elevator extends SubsystemBase {
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 
     elevatorLigament2d.setLength(Units.metersToInches(elevatorSim.getPositionMeters()));
+
   }
 
   @Override
