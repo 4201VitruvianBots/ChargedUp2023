@@ -13,6 +13,35 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains two jobs, one for testing build and simulation, and one for automatically applying spotless
+  spotless:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # This grabs the WPILib docker container
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Declares the repository safe and not under dubious ownership.
+      - name: Add repository to git safe directories
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      # Runs a single command using the runners shell
+      - name: Applying spotless formatting
+        run: ./gradlew spotlessApply
+      
+      # Runs a single command using the runners shell
+      - name: Commiting changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Automatically applied spotless
+  
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -34,34 +63,13 @@ jobs:
       run: chmod +x gradlew
     
     # Runs a single command using the runners shell
+    - name: Applying spotless formatting
+      run: ./gradlew spotlessApply
+
+    # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
       run: ./gradlew build
     
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
       run: timeout 30 ./gradlew simulateJava || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
-
-  spotlessApply:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # This grabs the WPILib docker container
-    container: wpilib/roborio-cross-ubuntu:2023-22.04
-
-    permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the
-      # added or changed files to the repository.
-      contents: write
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      # Runs a single command using the runners shell
-      - name: Applying spotless formatting
-        run: ./gradlew spotlessApply
-      
-      # Runs a single command using the runners shell
-      - name: Commiting changes
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Automatically applied spotless
