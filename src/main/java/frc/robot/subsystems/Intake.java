@@ -9,6 +9,10 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -22,6 +26,10 @@ public class Intake extends SubsystemBase {
   private TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double PercentOutput;
 
+  // Log setup
+  public DataLog log = DataLogManager.getLog();
+  public DoubleLogEntry intakeCurrentEntry = new DoubleLogEntry(log, "/intake/intakeCurrent");
+  
   public Intake() {
     // one or two motors
 
@@ -55,6 +63,10 @@ public class Intake extends SubsystemBase {
     return isIntaking;
   }
 
+  public double getIntakeMotorVoltage() {
+    return intakeMotor.getMotorOutputVoltage();
+  }
+
   public void setIntakeState(boolean b) {
     isIntaking = b;
   }
@@ -69,8 +81,13 @@ public class Intake extends SubsystemBase {
     PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
   }
 
+  public void updateLog() {
+    intakeCurrentEntry.append(getIntakeMotorVoltage());
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateLog();
   }
 }
