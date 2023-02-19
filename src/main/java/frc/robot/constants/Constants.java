@@ -89,7 +89,7 @@ public final class Constants {
 
     public enum SERVER_IPS {
       INTAKE("10.42.1.10"),
-      FORWARD_LOCALIZER("10.42.1.11"),
+      LEFT_LOCALIZER("10.42.1.11"),
       RIGHT_LOCALIZER("10.42.1.12");
 
       private final String ip;

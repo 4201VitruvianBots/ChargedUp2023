@@ -93,10 +93,9 @@ public class Vision extends SubsystemBase {
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
+        return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
-        var tagIds = getAprilTagIds(position);
-        if (tagIds.length == 0) return 0;
-        return tagIds[0];
+        return m_rightLocalizer.getEntry("tv").getDouble(0);
       default:
         return 0;
     }
@@ -260,6 +259,7 @@ public class Vision extends SubsystemBase {
         case RIGHT_LOCALIZER:
           localizer = m_rightLocalizer;
           break;
+        default:
         case LEFT_LOCALIZER:
           localizer = m_leftLocalizer;
           break;
