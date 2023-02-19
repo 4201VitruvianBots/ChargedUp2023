@@ -10,7 +10,6 @@ package frc.robot.simulation;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-
 import java.util.Map;
 
 /**
@@ -284,9 +283,9 @@ public final class SimConstants {
   public static Pose2d allianceFlip(Pose2d pose) {
     if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       return new Pose2d(
-              fieldLength - pose.getX(),
-              pose.getY(),
-              new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+          fieldLength - pose.getX(),
+          pose.getY(),
+          new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
     } else {
       return pose;
     }
