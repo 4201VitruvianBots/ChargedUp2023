@@ -56,8 +56,9 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
   }
-
+// talk to dao about setpoint 
   public void setSetpoint(double setpoint) {
+    this.desiredRotationValue = 0; 
     
   }
 
@@ -78,13 +79,13 @@ public class Wrist extends SubsystemBase {
         * (360.0 / Constants.Wrist.encoderUnitsPerRotation)
         / Constants.Wrist.wristGearRatio;
   }
-
+// this is get current angle 
   public double getAngle() {
     return getPosition() / encoderCountsPerAngle;
   }
 
-  private int getPosition() {
-    return 0;
+  private double getPosition() {
+    return wristMotor.getSelectedSensorPosition();
   }
 
   public void zeroEncoder() {
@@ -104,11 +105,11 @@ public class Wrist extends SubsystemBase {
   public void setEncoderPosition(int position) {
     wristMotor.setSelectedSensorPosition(position, 0, 0);
   }
-
+// reset angle of the wrist
   public void ResetWrist() {
     setSetpoint(0);
   }
-
+// code to limit the minimum/maximum setpoint of the wrist/ might be status frames
   // set percent output function
   public void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
@@ -138,7 +139,7 @@ public class Wrist extends SubsystemBase {
   private double getWristPosition() {
     return wristMotor.getSelectedSensorPosition();
   }
-
+//reset wrist angle function based off of a limit switch/hall effect sensor
   public static void updateWristRotation() {
     if (getWristLowerSwitch()) {
       setWristSensorPosition(0.0);
