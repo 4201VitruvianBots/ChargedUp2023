@@ -174,7 +174,7 @@ public class Elevator extends SubsystemBase {
   /*
    * Elevator's height position
    */
-  public static double getElevatorHeight() {
+  public double getElevatorHeight() {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.constants.Elevator.metersToEncoderCounts;
   }
@@ -229,7 +229,7 @@ public class Elevator extends SubsystemBase {
   }
 
   // Update elevator height using encoders and bottom limit switch
-  public static void updateElevatorHeight() {
+  public void updateElevatorHeight() {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
