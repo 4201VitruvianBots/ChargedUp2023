@@ -307,27 +307,17 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var lCameraPos = Constants.Vision.cameraPositions[0];
     m_leftLocalizerPositionPub.set(new double[] {
-            lCameraPos.getTranslation().getX(),
-            lCameraPos.getTranslation().getY(),
-            lCameraPos.getTranslation().getZ(),
-            0,
-            0,
-//            -m_swerveDrive.getHeadingRotation2d().getRadians(),
-            0,
-            0,
+            Constants.Vision.cameraPositions[0].getTranslation().getX(),
+            Constants.Vision.cameraPositions[0].getTranslation().getY(),
+            Constants.Vision.cameraPositions[0].getTranslation().getZ(),
+            0, 0, 0
     });
-    var rCameraPos = Constants.Vision.cameraPositions[1];
     m_rightLocalizerPositionPub.set(new double[] {
-            rCameraPos.getTranslation().getX(),
-            rCameraPos.getTranslation().getY(),
-            rCameraPos.getTranslation().getZ(),
-            0,
-            0,
-//            -m_swerveDrive.getHeadingRotation2d().getRadians(),
-            0,
-            0
+            Constants.Vision.cameraPositions[1].getTranslation().getX(),
+            Constants.Vision.cameraPositions[1].getTranslation().getY(),
+            Constants.Vision.cameraPositions[1].getTranslation().getZ(),
+            0, 0, 0
     });
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run

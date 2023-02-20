@@ -75,14 +75,14 @@ public final class Constants {
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(-(3 + (3.0 / 8.0))),
-              Units.inchesToMeters(9), // 12
+              Units.inchesToMeters(12),
               Units.inchesToMeters(20)),
           new Rotation3d()),
       // Robot Center to Right Camera
       new Transform3d(
           new Translation3d(
               Units.inchesToMeters(-(3 + (3.0 / 8.0))),
-              Units.inchesToMeters(-9), // -12
+              Units.inchesToMeters(-12),
               Units.inchesToMeters(20)),
           new Rotation3d()),
     };
