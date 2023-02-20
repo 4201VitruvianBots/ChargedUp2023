@@ -65,16 +65,17 @@ public class Vision extends SubsystemBase {
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
 
+    m_leftLocalizerPositionPub =
+        NetworkTableInstance.getDefault()
+            .getTable("lLocalizer")
+            .getDoubleArrayTopic("camToRobotT3D")
+            .publish();
 
-    m_leftLocalizerPositionPub = NetworkTableInstance.getDefault()
-        .getTable("lLocalizer")
-        .getDoubleArrayTopic("camToRobotT3D")
-        .publish();
-
-    m_rightLocalizerPositionPub = NetworkTableInstance.getDefault()
-        .getTable("rLocalizer")
-        .getDoubleArrayTopic("camToRobotT3D")
-        .publish();
+    m_rightLocalizerPositionPub =
+        NetworkTableInstance.getDefault()
+            .getTable("rLocalizer")
+            .getDoubleArrayTopic("camToRobotT3D")
+            .publish();
   }
 
   /**
@@ -307,18 +308,24 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_leftLocalizerPositionPub.set(new double[] {
-            Constants.Vision.cameraPositions[0].getTranslation().getX(),
-            Constants.Vision.cameraPositions[0].getTranslation().getY(),
-            Constants.Vision.cameraPositions[0].getTranslation().getZ(),
-            0, 0, 0
-    });
-    m_rightLocalizerPositionPub.set(new double[] {
-            Constants.Vision.cameraPositions[1].getTranslation().getX(),
-            Constants.Vision.cameraPositions[1].getTranslation().getY(),
-            Constants.Vision.cameraPositions[1].getTranslation().getZ(),
-            0, 0, 0
-    });
+    m_leftLocalizerPositionPub.set(
+        new double[] {
+          Constants.Vision.cameraPositions[0].getTranslation().getX(),
+          Constants.Vision.cameraPositions[0].getTranslation().getY(),
+          Constants.Vision.cameraPositions[0].getTranslation().getZ(),
+          0,
+          0,
+          0
+        });
+    m_rightLocalizerPositionPub.set(
+        new double[] {
+          Constants.Vision.cameraPositions[1].getTranslation().getX(),
+          Constants.Vision.cameraPositions[1].getTranslation().getY(),
+          Constants.Vision.cameraPositions[1].getTranslation().getZ(),
+          0,
+          0,
+          0
+        });
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_POSITION.LEFT_LOCALIZER);

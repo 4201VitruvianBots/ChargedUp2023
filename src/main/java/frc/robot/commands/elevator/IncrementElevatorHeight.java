@@ -39,14 +39,9 @@ public class IncrementElevatorHeight extends CommandBase {
         MathUtil.applyDeadband(Math.abs(m_joystickY.getAsDouble()), 0.05)
             * Math.signum(m_joystickY.getAsDouble());
 
-    if (joystickYDeadbandOutput != 0.0) {
+    if (m_elevator.getElevatorControlLoop()) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
-    } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-      m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
-      // Elevator.setElevatorMotionMagic(Elevator.getElevatorHeight());
-      // Elevator.setElevatorPercentOutput(0.0);
     }
-
     m_elevator.setElevatorJoystickY(joystickYDeadbandOutput);
   }
 

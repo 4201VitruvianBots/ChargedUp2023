@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
@@ -50,6 +51,7 @@ public class Elevator extends SubsystemBase {
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
+  private double setpointMultiplier = 1;
   private static elevatorHeights desiredHeightState =
       elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
 
@@ -70,7 +72,7 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = true;
+  private boolean elevatorIsClosedLoop = false;
 
   // Simulation setup
 
@@ -139,17 +141,17 @@ public class Elevator extends SubsystemBase {
       motor.configPeakOutputForward(1, Constants.constants.Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-1, Constants.constants.Elevator.kTimeoutMs);
 
-      motor.setSensorPhase(
-          true); // Forward direction = positive, forward velocity = positive, positive x positive =
-      // positive
 
       motor.configMotionCruiseVelocity(15000, Constants.constants.Elevator.kTimeoutMs);
       motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
     }
-
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
+
+    elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
+    elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
@@ -161,7 +163,7 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
-  public static void setElevatorPercentOutput(double output) {
+  public void setElevatorPercentOutput(double output) {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
@@ -305,40 +307,27 @@ public class Elevator extends SubsystemBase {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateElevatorHeight();
-    switch (desiredHeightState) {
-      case JOYSTICK:
-        if (elevatorIsClosedLoop) {
-          desiredHeightValue = elevatorHeight + (-elevatorJoystickY * maxElevatorHeight);
+    if(elevatorIsClosedLoop) {
+      switch (desiredHeightState) {
+        case JOYSTICK:
+          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
           break;
-        } else {
-          setElevatorPercentOutput(-elevatorJoystickY * 0.8);
-          return;
-        }
-      case STOWED:
-        desiredHeightValue = 0.0;
-        break;
-      case LOW:
-        desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-        break;
-      case MID:
-        desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-        break;
-      case HIGH:
-        desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-        break;
-    }
-    if (elevatorIsClosedLoop) {
+        case STOWED:
+          desiredHeightValue = 0.0;
+          break;
+        case LOW:
+          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+          break;
+        case MID:
+          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+          break;
+        case HIGH:
+          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+          break;
+      }
       setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
-      double distanceBetween =
-          MathUtil.applyDeadband(desiredHeightValue - elevatorHeight, maxElevatorHeight / 100);
-      if (distanceBetween == 0) {
-        setElevatorPercentOutput(0.0);
-      } else if (distanceBetween > 0) {
-        setElevatorPercentOutput(0.8);
-      } else if (distanceBetween < 0) {
-        setElevatorPercentOutput(-0.8);
-      }
+      setElevatorPercentOutput(elevatorJoystickY);
     }
   }
 }
