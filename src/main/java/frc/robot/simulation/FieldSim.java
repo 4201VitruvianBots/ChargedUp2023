@@ -154,17 +154,26 @@ public class FieldSim extends SubsystemBase {
     robotPose = m_swerveDrive.getPoseMeters();
     m_field2d.setRobotPose(robotPose);
     m_field2d
-        .getObject("fLocalizerTagPoses")
+        .getObject("lLocalizerTagPoses")
         .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-        .getObject("fLocalizerPoses")
+        .getObject("lLocalizerPoses")
         .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
     m_field2d
-        .getObject("fLocalizerPose")
+        .getObject("lLocalizerPose")
         .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
+    //    m_field2d
+    //        .getObject("Limelight Pose")
+    //        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
     m_field2d
-        .getObject("Limelight Pose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
+        .getObject("rLocalizerTagPoses")
+        .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.RIGHT_LOCALIZER));
+    m_field2d
+        .getObject("rLocalizerPoses")
+        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.RIGHT_LOCALIZER));
+    m_field2d
+        .getObject("rLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.RIGHT_LOCALIZER));
 
     m_field2d
         .getObject("Grid Node")

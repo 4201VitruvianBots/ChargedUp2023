@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -27,6 +28,9 @@ public class Vision extends SubsystemBase {
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
 
+  private final DoubleArrayPublisher m_leftLocalizerPositionPub;
+  private final DoubleArrayPublisher m_rightLocalizerPositionPub;
+
   private DoubleLogEntry limelightTargetValid;
   private DoubleLogEntry leftLocalizerTargetValid;
 
@@ -37,10 +41,10 @@ public class Vision extends SubsystemBase {
   int[] tagIds = new int[10];
   double[] robotPosX = new double[10];
   double[] robotPosY = new double[10];
-  double[] robotPosZ = new double[10];
+  double[] robotPosYaw = new double[10];
+
   double[] tagPosX = new double[10];
   double[] tagPosY = new double[10];
-  double[] tagPosZ = new double[10];
 
   public Vision(SwerveDrive swerveDrive, DataLog logger, Controls controls) {
     m_swerveDrive = swerveDrive;
@@ -49,7 +53,7 @@ public class Vision extends SubsystemBase {
     intake = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
-    m_rightLocalizer = NetworkTableInstance.getDefault().getTable("limelight");
+    m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
 
     PortForwarder.add(5800, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
     PortForwarder.add(5801, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
@@ -61,32 +65,16 @@ public class Vision extends SubsystemBase {
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
 
-    var lCameraT = Constants.Vision.cameraPositions[0];
-    NetworkTableInstance.getDefault()
+
+    m_leftLocalizerPositionPub = NetworkTableInstance.getDefault()
         .getTable("lLocalizer")
         .getDoubleArrayTopic("camToRobotT3D")
-        .publish()
-        .set(
-            new double[] {
-              lCameraT.getTranslation().getX(), lCameraT.getTranslation().getY(),
-                  lCameraT.getTranslation().getZ(),
-              lCameraT.getRotation().getX(), lCameraT.getRotation().getY(),
-                  lCameraT.getRotation().getZ()
-            });
-    var rCameraT = Constants.Vision.cameraPositions[1];
-    NetworkTableInstance.getDefault()
+        .publish();
+
+    m_rightLocalizerPositionPub = NetworkTableInstance.getDefault()
         .getTable("rLocalizer")
         .getDoubleArrayTopic("camToRobotT3D")
-        .publish()
-        .set(
-            new double[] {
-              rCameraT.getTranslation().getX(),
-              rCameraT.getTranslation().getY(),
-              rCameraT.getTranslation().getZ(),
-              rCameraT.getRotation().getX(),
-              rCameraT.getRotation().getY(),
-              rCameraT.getRotation().getZ()
-            });
+        .publish();
   }
 
   /**
@@ -105,10 +93,9 @@ public class Vision extends SubsystemBase {
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
+        return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
-        var tagIds = getAprilTagIds(position);
-        if (tagIds.length == 0) return 0;
-        return tagIds[0];
+        return m_rightLocalizer.getEntry("tv").getDouble(0);
       default:
         return 0;
     }
@@ -177,33 +164,40 @@ public class Vision extends SubsystemBase {
    */
   public double[] getBotPose(CAMERA_POSITION position) {
     DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
+    double[] botPose;
     switch (position) {
       case LEFT_LOCALIZER:
-        var botPose = m_leftLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        botPose = m_leftLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
 
         if (botPose.length > 0) return botPose;
+        //      case RIGHT_LOCALIZER:
+        //        var rawBotPose = defaultDoubleArray;
+        //        switch (allianceColor) {
+        //          case Red:
+        //            rawBotPose =
+        //
+        // m_rightLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
+        //            break;
+        //          case Blue:
+        //            rawBotPose =
+        //
+        // m_rightLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
+        //            break;
+        //          default:
+        //            rawBotPose =
+        // m_rightLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        //
+        //            if (rawBotPose.length > 0) {
+        //              rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
+        //              rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
+        //              return rawBotPose;
+        //            }
+        //            break;
+        //        }
       case RIGHT_LOCALIZER:
-        var rawBotPose = defaultDoubleArray;
-        switch (allianceColor) {
-          case Red:
-            rawBotPose =
-                m_rightLocalizer.getEntry("botpose_wpired").getDoubleArray(defaultDoubleArray);
-            break;
-          case Blue:
-            rawBotPose =
-                m_rightLocalizer.getEntry("botpose_wpiblue").getDoubleArray(defaultDoubleArray);
-            break;
-          default:
-            rawBotPose = m_rightLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        botPose = m_rightLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
 
-            if (rawBotPose.length > 0) {
-              rawBotPose[0] = 15.980 / 2 + rawBotPose[0];
-              rawBotPose[1] = 8.210 / 2 + rawBotPose[1];
-              return rawBotPose;
-            }
-            break;
-        }
-        return rawBotPose;
+        if (botPose.length > 0) return botPose;
       default:
         return defaultDoubleArray;
     }
@@ -233,44 +227,53 @@ public class Vision extends SubsystemBase {
 
   public Pose2d[] getRobotPoses2d(CAMERA_POSITION position) {
     Pose2d[] poseArray = {defaultPose};
+    NetworkTable localizer = null;
 
-    if (getValidTarget(position))
+    if (getValidTarget(position)) {
       switch (position) {
-        case LEFT_LOCALIZER:
-          robotPosX = m_leftLocalizer.getEntry("Robot Pose X").getDoubleArray(new double[] {});
-          robotPosY = m_leftLocalizer.getEntry("Robot Pose Y").getDoubleArray(new double[] {});
-          robotPosZ = m_leftLocalizer.getEntry("Robot Pose Z").getDoubleArray(new double[] {});
-          poseArray = new Pose2d[robotPosX.length];
-          for (int i = 0; i < robotPosX.length; i++)
-            poseArray[i] = new Pose2d(robotPosX[i], robotPosY[i], Rotation2d.fromDegrees(0));
-          break;
         case RIGHT_LOCALIZER:
+          localizer = m_rightLocalizer;
+          break;
+        case LEFT_LOCALIZER:
+          localizer = m_leftLocalizer;
           break;
       }
+      robotPosX = localizer.getEntry("Robot Pose X").getDoubleArray(new double[] {});
+      robotPosY = localizer.getEntry("Robot Pose Y").getDoubleArray(new double[] {});
+      robotPosYaw = localizer.getEntry("Robot Pose Yaw").getDoubleArray(new double[] {});
+      poseArray = new Pose2d[robotPosX.length];
+      for (int i = 0; i < robotPosX.length; i++)
+        poseArray[i] =
+            new Pose2d(robotPosX[i], robotPosY[i], Rotation2d.fromDegrees(robotPosYaw[i]));
+    }
 
     return poseArray;
   }
 
   public Pose2d[] getTagPoses2d(CAMERA_POSITION position) {
+    NetworkTable localizer = null;
     Pose2d[] poseArray = {defaultPose};
 
-    if (getValidTarget(position))
+    if (getValidTarget(position)) {
       switch (position) {
-        case LEFT_LOCALIZER:
-          try {
-            tagPosX = m_leftLocalizer.getEntry("Tag Pose X").getDoubleArray(new double[] {});
-            tagPosY = m_leftLocalizer.getEntry("Tag Pose Y").getDoubleArray(new double[] {});
-            tagPosZ = m_leftLocalizer.getEntry("Tag Pose Z").getDoubleArray(new double[] {});
-            poseArray = new Pose2d[tagPosX.length];
-            for (int i = 0; i < tagPosX.length; i++)
-              poseArray[i] = new Pose2d(tagPosX[i], tagPosY[i], Rotation2d.fromDegrees(0));
-          } catch (Exception e) {
-            poseArray = new Pose2d[] {defaultPose};
-          }
-          break;
         case RIGHT_LOCALIZER:
+          localizer = m_rightLocalizer;
+          break;
+        default:
+        case LEFT_LOCALIZER:
+          localizer = m_leftLocalizer;
           break;
       }
+      try {
+        tagPosX = localizer.getEntry("Tag Pose X").getDoubleArray(new double[] {});
+        tagPosY = localizer.getEntry("Tag Pose Y").getDoubleArray(new double[] {});
+        poseArray = new Pose2d[tagPosY.length];
+        for (int i = 0; i < tagPosY.length; i++)
+          poseArray[i] = new Pose2d(tagPosX[i], tagPosY[i], Rotation2d.fromDegrees(0));
+      } catch (Exception e) {
+        poseArray = new Pose2d[] {defaultPose};
+      }
+    }
 
     return poseArray;
   }
@@ -304,6 +307,18 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    m_leftLocalizerPositionPub.set(new double[] {
+            Constants.Vision.cameraPositions[0].getTranslation().getX(),
+            Constants.Vision.cameraPositions[0].getTranslation().getY(),
+            Constants.Vision.cameraPositions[0].getTranslation().getZ(),
+            0, 0, 0
+    });
+    m_rightLocalizerPositionPub.set(new double[] {
+            Constants.Vision.cameraPositions[1].getTranslation().getX(),
+            Constants.Vision.cameraPositions[1].getTranslation().getY(),
+            Constants.Vision.cameraPositions[1].getTranslation().getZ(),
+            0, 0, 0
+    });
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_POSITION.LEFT_LOCALIZER);
