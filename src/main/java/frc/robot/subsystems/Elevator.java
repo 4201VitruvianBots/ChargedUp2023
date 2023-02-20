@@ -12,6 +12,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -58,7 +61,7 @@ public class Elevator extends SubsystemBase {
   private final double kF = 0.01;
 
   private static double elevatorHeight =
-      0; // the amount of rotations the motor has gone up from the initial low position
+      0; // the amount of meters the motor has gone up from the initial stowed position
 
   private static final double maxElevatorHeight =
       Constants.constants.Elevator.elevatorMaxHeightMeters;
@@ -104,6 +107,15 @@ public class Elevator extends SubsystemBase {
   public MechanismLigament2d elevatorLigament2d =
       root2d.append(new MechanismLigament2d("Elevator", elevatorHeight, 90));
 
+  // Logging setup
+
+  public DataLog log = DataLogManager.getLog();
+  public DoubleLogEntry elevatorCurrentEntry = new DoubleLogEntry(log, "/elevator/elevatorCurrent");
+  public DoubleLogEntry elevatorSetpointEntry =
+      new DoubleLogEntry(log, "/elevator/elevatorSetpoint");
+  public DoubleLogEntry elevatorPositionEntry =
+      new DoubleLogEntry(log, "/elevator/elevatorPosition");
+
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
     for (TalonFX motor : elevatorMotors) {
@@ -139,7 +151,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    SmartDashboard.putData(this);
+    SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
   }
   /*
@@ -162,7 +174,7 @@ public class Elevator extends SubsystemBase {
   /*
    * Elevator's height position
    */
-  public static double getElevatorHeight() {
+  public double getElevatorHeight() {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.constants.Elevator.metersToEncoderCounts;
   }
@@ -217,7 +229,7 @@ public class Elevator extends SubsystemBase {
   }
 
   // Update elevator height using encoders and bottom limit switch
-  public static void updateElevatorHeight() {
+  public void updateElevatorHeight() {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
@@ -249,6 +261,12 @@ public class Elevator extends SubsystemBase {
     }
   }
 
+  public void updateLog() {
+    elevatorCurrentEntry.append(getElevatorMotorVoltage());
+    elevatorSetpointEntry.append(desiredHeightValue);
+    elevatorPositionEntry.append(elevatorHeight);
+  }
+
   @Override
   public void simulationPeriodic() {
     elevatorSim.setInput(getElevatorPercentOutput() * 12);
@@ -274,14 +292,18 @@ public class Elevator extends SubsystemBase {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 
+    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
+    // directly setting the length to meters
+    // TODO: Make the mech2d proportional
     elevatorLigament2d.setLength(Units.metersToInches(elevatorSim.getPositionMeters()));
   }
 
+  // This method will be called once per scheduler run
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
-    // work without this
+    updateLog();
+    // Yes, this needs to be called in the periodic. The simulation does not work without this
+    updateShuffleboard();
     updateElevatorHeight();
     switch (desiredHeightState) {
       case JOYSTICK:

@@ -172,3 +172,5 @@ simgui.json
 *.wpilog
 
 *.checksum
+
+.github/artifacts/

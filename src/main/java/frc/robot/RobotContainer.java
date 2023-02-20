@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,6 +46,7 @@ import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.LED.PieceType;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
@@ -66,10 +68,11 @@ public class RobotContainer {
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator); 
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
+  private final StateHandler m_stateHandler = new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -83,7 +86,7 @@ public class RobotContainer {
   static Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
   static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  private final CommandXboxController xboxController =
+  public final CommandXboxController xboxController =
       new CommandXboxController(USB.xBoxController);
 
   public Trigger[] leftJoystickTriggers = new Trigger[2];
@@ -229,5 +232,7 @@ public class RobotContainer {
 
   public void periodic() {
     m_fieldSim.periodic();
+    // Rumbles the controller if the robot is on target based off FieldSim
+    xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget ? 1 : 0);
   }
 }

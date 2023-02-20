@@ -8,6 +8,9 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -19,6 +22,13 @@ public class Wrist extends SubsystemBase {
   private boolean isWristtaking;
   private final double kF = 0;
   private final double kP = 0.2;
+
+  // Logging setup
+
+  public DataLog log = DataLogManager.getLog();
+  public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/wristCurrent");
+  public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/elevator/wristSetpoint");
+  public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/elevator/wristPosition");
 
   public Wrist() {
     // One motor for the wrist
@@ -54,6 +64,10 @@ public class Wrist extends SubsystemBase {
     boolean isWristtaking = state;
   }
 
+  public double getWristMotorVoltage() {
+    return wristMotor.getMotorOutputVoltage();
+  }
+
   // set percent output function
   public void setWristPercentOutput(double output) {
     wristMotor.set(ControlMode.PercentOutput, output);
@@ -62,6 +76,12 @@ public class Wrist extends SubsystemBase {
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Wrist", getWristState());
     SmartDashboard.putNumber("getWrist", 1);
+  }
+
+  public void updateLog() {
+    wristCurrentEntry.append(getWristMotorVoltage());
+    // wristSetpointEntry.append();
+    wristPositionEntry.append(getMeasurement());
   }
 
   @Override

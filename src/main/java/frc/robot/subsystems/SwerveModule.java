@@ -17,6 +17,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -66,6 +69,14 @@ public class SwerveModule extends SubsystemBase {
 
   private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
 
+  // Logging setup
+
+  public DataLog log = DataLogManager.getLog();
+  public DoubleLogEntry swerveModuleTurnCurrentEntry;
+  public DoubleLogEntry swerveModuleDriveCurrentEntry;
+  public DoubleLogEntry swerveModuleXPositionEntry;
+  public DoubleLogEntry swerveModuleYPositionEntry;
+
   public SwerveModule(
       SwerveDriveModulePosition modulePosition,
       TalonFX turnMotor,
@@ -92,6 +103,15 @@ public class SwerveModule extends SubsystemBase {
 
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
     m_lastAngle = getHeadingDegrees();
+
+    swerveModuleTurnCurrentEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
+    swerveModuleDriveCurrentEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
+    swerveModuleXPositionEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/xPosition");
+    swerveModuleYPositionEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/yPosition");
   }
 
   private void initCanCoder() {
@@ -216,9 +236,17 @@ public class SwerveModule extends SubsystemBase {
         "module " + m_angleEncoder + " CANCoder Health", m_angleEncoder.getDeviceID() > 0);
   }
 
+  public void updateLog() {
+    swerveModuleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
+    swerveModuleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
+    swerveModuleXPositionEntry.append(getModulePose().getX());
+    swerveModuleYPositionEntry.append(getModulePose().getY());
+  }
+
   @Override
   public void periodic() {
     updateSmartDashboard();
+    updateLog();
   }
 
   @Override
