@@ -35,8 +35,7 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
-    double joystickYDeadbandOutput =
-        MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
 
     if (joystickYDeadbandOutput != 0.0) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);

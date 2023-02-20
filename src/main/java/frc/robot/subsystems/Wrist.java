@@ -9,18 +9,16 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
@@ -47,15 +45,18 @@ public class Wrist extends SubsystemBase {
 
   private static final double kDt = 0.02;
 
-  private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(Constants.constants.Wrist.kV, Constants.constants.Wrist.kA);
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(Constants.constants.Wrist.kV, Constants.constants.Wrist.kA);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
-  private ArmFeedforward m_feedforward = new ArmFeedforward(Constants.constants.Wrist.FFkS,
-  Constants.constants.Wrist.kG,
-  Constants.constants.Wrist.FFkV,
-  Constants.constants.Wrist.kA);
+  private ArmFeedforward m_feedforward =
+      new ArmFeedforward(
+          Constants.constants.Wrist.FFkS,
+          Constants.constants.Wrist.kG,
+          Constants.constants.Wrist.FFkV,
+          Constants.constants.Wrist.kA);
 
   private boolean isWristMoving;
   private final double kF = 0;
@@ -182,7 +183,7 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+
     // Create a motion profile with the given maximum velocity and maximum
     // acceleration constraints for the next setpoint, the desired goal, and the
     // current setpoint.
@@ -193,16 +194,16 @@ public class Wrist extends SubsystemBase {
     m_setpoint = profile.calculate(kDt);
 
     wristHeightTab.setDouble(getWristPosition());
-    wristDesiredTab.setDouble(desiredRotationValue); 
+    wristDesiredTab.setDouble(desiredRotationValue);
 
-    wristMotor.set(TalonFXControlMode.Position,
-    m_feedforward.calculate(Math.toRadians(getWristPosition()), m_setpoint.velocity)
-    );
+    wristMotor.set(
+        TalonFXControlMode.Position,
+        m_feedforward.calculate(Math.toRadians(getWristPosition()), m_setpoint.velocity));
 
     // This method will be called once per scheduler run
     switch (desiredRotationState) {
       case JOYSTICK:
-      setWristPercentOutput(wristJoystickX);
+        setWristPercentOutput(wristJoystickX);
       case LOW:
         setSetpoint(0.0);
         break;
@@ -218,7 +219,8 @@ public class Wrist extends SubsystemBase {
     return desiredRotationValue;
   }
 
-  public static void setWristJoystickX(double m_JoystickX) { //change name to call what its used for 
+  public static void setWristJoystickX(
+      double m_JoystickX) { // change name to call what its used for
     wristJoystickX = m_JoystickX;
   }
 

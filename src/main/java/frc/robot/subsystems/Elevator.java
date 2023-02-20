@@ -10,7 +10,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -305,45 +304,31 @@ public class Elevator extends SubsystemBase {
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
-    // updateLog();
-    // // Yes, this needs to be called in the periodic. The simulation does not work without this
-    // updateShuffleboard();
-    // updateElevatorHeight();
-    // switch (desiredHeightState) {
-    //   case JOYSTICK:
-    //     if (elevatorIsClosedLoop) {
-    //       desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
-    //       break;
-    //     } else {
-    //       setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
-    //       return;
-    //     }
-    //   case STOWED:
-    //     desiredHeightValue = 0.0;
-    //     break;
-    //   case LOW:
-    //     desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-    //     break;
-    //   case MID:
-    //     desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-    //     break;
-    //   case HIGH:
-    //     desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-    //     break;
-    // }
-    // if (elevatorIsClosedLoop) {
-    //   setElevatorMotionMagicMeters(desiredHeightValue);
-    // } else {
-    //   double distanceBetween =
-    //       MathUtil.applyDeadband(
-    //           desiredHeightValue - elevatorHeight, maxElevatorHeight / openLoopDeadband);
-    //   if (distanceBetween == 0) {
-    //     setElevatorPercentOutput(0.0);
-    //   } else if (distanceBetween > 0) {
-    //     setElevatorPercentOutput(maxPercentOutput);
-    //   } else if (distanceBetween < 0) {
-    //     setElevatorPercentOutput(-maxPercentOutput);
-    //   }
-    // }
+    updateLog();
+    // Yes, this needs to be called in the periodic. The simulation does not work without this
+    updateShuffleboard();
+    updateElevatorHeight();
+    if (elevatorIsClosedLoop) {
+      switch (desiredHeightState) {
+        case JOYSTICK:
+          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
+          break;
+        case STOWED:
+          desiredHeightValue = 0.0;
+          break;
+        case LOW:
+          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+          break;
+        case MID:
+          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+          break;
+        case HIGH:
+          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+          break;
+      }
+      setElevatorMotionMagicMeters(desiredHeightValue);
+    } else {
+      setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
+    }
   }
 }
