@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -189,6 +191,16 @@ public class Wrist extends SubsystemBase {
         break;
       case NONE:
         break;
+    }
+    double distanceBetween =
+    MathUtil.applyDeadband(
+        desiredRotationValue - getWristPosition(), maxRotationValue / 10);
+    if (distanceBetween == 0) {
+      setWristPercentOutput(0.0);
+    } else if (distanceBetween > 0) {
+      setWristPercentOutput(0.2);
+    } else if (distanceBetween < 0) {
+      setWristPercentOutput(-0.2);
     }
   }
 
