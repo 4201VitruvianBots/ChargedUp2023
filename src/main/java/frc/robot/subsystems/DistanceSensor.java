@@ -54,7 +54,7 @@ public class DistanceSensor extends SubsystemBase {
     try {
       InetAddress address = InetAddress.getByName("239, 42, 01, 1");
       DatagramSocket socket = new DatagramSocket();
-       
+       // change this js line to java 
       setTimeout(() -> {console.log("this is the first message");}, 1000);
         
           byte[] buffer = new byte[512];

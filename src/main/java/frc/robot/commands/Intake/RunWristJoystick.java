@@ -25,6 +25,7 @@ public class RunWristJoystick extends CommandBase {
   public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
+  // commands to move wrist (Move using joystick values, go to a setpoint)
   @Override
   public void execute() {
     if (m_JoystickX.getAsDouble() != 0.00) {

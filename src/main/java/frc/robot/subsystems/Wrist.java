@@ -56,9 +56,9 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
   }
-// talk to dao about setpoint 
+//  setpoint for the wrist
   public void setSetpoint(double setpoint) {
-    this.desiredRotationValue = 0; 
+    this.desiredRotationValue = setpoint; 
     
   }
 
@@ -106,11 +106,13 @@ public class Wrist extends SubsystemBase {
     wristMotor.setSelectedSensorPosition(position, 0, 0);
   }
 // reset angle of the wrist
+// set sensor to 0
   public void ResetWrist() {
-    setSetpoint(0);
+  setSetpoint(desiredRotationValue);//setWristSensorPosition(0);
   }
 // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
   // set percent output function
+// period function that edits the elevators height, from there make sure it obeys the limit (27.7 rotation)
   public void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
     wristPosition = getWristPosition();
