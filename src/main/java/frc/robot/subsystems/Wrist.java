@@ -6,9 +6,13 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -40,6 +44,18 @@ public class Wrist extends SubsystemBase {
       new DigitalInput(Constants.constants.Wrist.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static TalonFX wristMotor = new TalonFX(Constants.constants.Wrist.wristMotor);
+
+  private static final double kDt = 0.02;
+
+  private final TrapezoidProfile.Constraints m_constraints = new TrapezoidProfile.Constraints(Constants.constants.Wrist.kV, Constants.constants.Wrist.kA);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+
+  // Create a new ArmFeedforward with gains kS, kG, kV, and kA
+  private ArmFeedforward m_feedforward = new ArmFeedforward(Constants.constants.Wrist.FFkS,
+  Constants.constants.Wrist.kG,
+  Constants.constants.Wrist.FFkV,
+  Constants.constants.Wrist.kA);
 
   private boolean isWristMoving;
   private final double kF = 0;
@@ -78,6 +94,7 @@ public class Wrist extends SubsystemBase {
   //  setpoint for the wrist
   public void setSetpoint(double setpoint) {
     this.desiredRotationValue = setpoint;
+    this.m_goal = new TrapezoidProfile.State(desiredRotationValue, 0);
   }
 
   public boolean getWristState() {
@@ -149,7 +166,7 @@ public class Wrist extends SubsystemBase {
   public static boolean getWristLowerSwitch() {
     return !wristLowerSwitch.get();
   }
-  // smartdashboard funciton
+  // smartdashboard function
   public void updateSmartDashboard() {
     // ShuffleboardTab.putNumber("Wrist", getWristState());
     SmartDashboard.putNumber("getWrist", 1);
@@ -165,17 +182,32 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
+    
+    // Create a motion profile with the given maximum velocity and maximum
+    // acceleration constraints for the next setpoint, the desired goal, and the
+    // current setpoint.
+    TrapezoidProfile profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+
+    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
+    // toward the goal while obeying the constraints.
+    m_setpoint = profile.calculate(kDt);
+
     wristHeightTab.setDouble(getWristPosition());
     wristDesiredTab.setDouble(desiredRotationValue); 
+
+    wristMotor.set(TalonFXControlMode.Position,
+    m_feedforward.calculate(Math.toRadians(getWristPosition()), m_setpoint.velocity)
+    );
+
     // This method will be called once per scheduler run
     switch (desiredRotationState) {
       case JOYSTICK:
       setWristPercentOutput(wristJoystickX);
       case LOW:
-        desiredRotationValue = 0.0; // Placeholder values
+        setSetpoint(0.0);
         break;
       case MEDIUM:
-        desiredRotationValue = maxRotationValue / 2; // Placeholder values
+        setSetpoint(maxRotationValue / 2); // Placeholder values
         break;
       case NONE:
         break;
