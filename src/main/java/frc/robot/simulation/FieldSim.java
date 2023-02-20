@@ -6,17 +6,13 @@ package frc.robot.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Vision.CAMERA_POSITION;
 import frc.robot.simulation.SimConstants.Grids;
@@ -166,9 +162,7 @@ public class FieldSim extends SubsystemBase {
         .getObject("Limelight Pose")
         .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
 
-    m_field2d
-        .getObject("Grid Node")
-        .setPoses(gridNodes);
+    m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
     if (RobotBase.isSimulation()) {
       m_field2d
@@ -221,21 +215,26 @@ public class FieldSim extends SubsystemBase {
     double elevatorRotation = robotPose.getRotation().getRadians();
     double elevatorDistance = m_elevator.getElevatorHeight();
 
-    double elevatorDeltaX = Math.cos(elevatorRotation)*elevatorDistance;
-    double elevatorDeltaY = Math.sin(elevatorRotation)*elevatorDistance;
+    double elevatorDeltaX = Math.cos(elevatorRotation) * elevatorDistance;
+    double elevatorDeltaY = Math.sin(elevatorRotation) * elevatorDistance;
 
-    elevatorPose = new Pose2d(robotPose.getX()+elevatorDeltaX, robotPose.getX()+elevatorDeltaY, robotPose.getRotation());
+    elevatorPose =
+        new Pose2d(
+            robotPose.getX() + elevatorDeltaX,
+            robotPose.getX() + elevatorDeltaY,
+            robotPose.getRotation());
 
-    m_field2d
-        .getObject("Elevator Pose")
-        .setPose(elevatorPose);
+    m_field2d.getObject("Elevator Pose").setPose(elevatorPose);
 
-    double deltaX = Math.abs(targetPose.getX()-elevatorPose.getX());
-    double deltaY = Math.abs(targetPose.getY()-elevatorPose.getY());
+    double deltaX = Math.abs(targetPose.getX() - elevatorPose.getX());
+    double deltaY = Math.abs(targetPose.getY() - elevatorPose.getY());
 
-    double distance = Math.sqrt(Math.pow(deltaX, 2)+Math.pow(deltaY, 2)); // Standard distance formula
+    double distance =
+        Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)); // Standard distance formula
 
-    return distance < margin ? true : false; // Returns true if the robot is on target, returns false if not on target
+    return distance < margin
+        ? true
+        : false; // Returns true if the robot is on target, returns false if not on target
   }
 
   @Override

@@ -11,9 +11,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -68,11 +68,12 @@ public class RobotContainer {
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator); 
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
-  private final StateHandler m_stateHandler = new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+  private final StateHandler m_stateHandler =
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -86,8 +87,7 @@ public class RobotContainer {
   static Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
   static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  public final CommandXboxController xboxController =
-      new CommandXboxController(USB.xBoxController);
+  public final CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
   public Trigger[] leftJoystickTriggers = new Trigger[2];
   public Trigger[] rightJoystickTriggers = new Trigger[2];
