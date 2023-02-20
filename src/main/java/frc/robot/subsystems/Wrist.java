@@ -24,7 +24,7 @@ public class Wrist extends SubsystemBase {
   private static double desiredRotationValue;
   private static WristRotations desiredRotationState = WristRotations.NONE;
   private double wristPosition = 0;
-  private static double wristJoystickY;
+  private static double wristJoystickX;
 
   public enum WristRotations {
     LOW,
@@ -181,7 +181,7 @@ public class Wrist extends SubsystemBase {
     // This method will be called once per scheduler run
     switch (desiredRotationState) {
       case JOYSTICK:
-        desiredRotationValue = wristJoystickY * setpointMultiplier + getWristPosition();
+        desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
       case LOW:
         desiredRotationValue = 0.0; // Placeholder values
         break;
@@ -197,7 +197,9 @@ public class Wrist extends SubsystemBase {
     return desiredRotationValue;
   }
 
-  public static void setWristJoystickX(DoubleSupplier m_JoystickX) {}
+  public static void setWristJoystickX(double m_JoystickX) {
+    wristJoystickX = m_JoystickX;
+  }
 
   public Object getWristDesiredRotations() {
     return desiredRotationState;
