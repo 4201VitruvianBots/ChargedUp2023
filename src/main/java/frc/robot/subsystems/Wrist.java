@@ -8,13 +8,15 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
@@ -48,8 +50,11 @@ public class Wrist extends SubsystemBase {
 
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/wristCurrent");
-  public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/elevator/wristSetpoint");
-  public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/elevator/wristPosition");
+  public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/wrist/wristSetpoint");
+  public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/wrist/wristPosition");
+  public static ShuffleboardTab wristTab = Shuffleboard.getTab("Wrist");
+  public GenericEntry wristHeightTab = wristTab.add("Wrist Position", 0).getEntry();
+  public GenericEntry wristDesiredTab = wristTab.add("Wrist DesiredRotation", 0).getEntry();
 
   public Wrist() {
     // One motor for the wrist
@@ -57,7 +62,7 @@ public class Wrist extends SubsystemBase {
     // factory default configs
     wristMotor.configFactoryDefault();
 
-    wristMotor.setInverted(false);
+    wristMotor.setInverted(true);
 
     wristMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
@@ -125,31 +130,10 @@ public class Wrist extends SubsystemBase {
   // rotation)
   public void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
-    wristPosition = getWristPosition();
-    if (value > 0) {
-      if (wristPosition < Constants.constants.Wrist.wristEncoderUpperLimit) {
-        if (Math.abs(wristPosition - Constants.constants.Wrist.wristEncoderUpperLimit)
-            < Constants.constants.Wrist.wristEncoderSlowdown) {
-          wristMotor.set(
-              ControlMode.PercentOutput,
-              Math.min(value, Constants.constants.Wrist.maxSpeedLimitsPercent)
-                  * Math.abs(wristPosition - Constants.constants.Wrist.wristEncoderUpperLimit)
-                  / Constants.constants.Wrist.wristEncoderSlowdown);
-        } else {
-          wristMotor.set(ControlMode.PercentOutput, value);
-        }
-      } else wristMotor.set(ControlMode.PercentOutput, 0);
-    } else {
-      if (!wristLowerLimitOverride) {
-        wristMotor.set(ControlMode.PercentOutput, 0);
-      } else {
-        wristMotor.set(ControlMode.PercentOutput, value);
-      }
-    }
   }
 
   private double getWristPosition() {
-    return wristMotor.getSelectedSensorPosition();
+    return wristMotor.getSelectedSensorPosition() / Constants.constants.Wrist.wristGearRatio;
   }
   // reset wrist angle function based off of a limit switch/hall effect sensor
   public static void updateWristRotation() {
@@ -167,8 +151,10 @@ public class Wrist extends SubsystemBase {
   }
   // smartdashboard funciton
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Wrist", getWristState());
+    // ShuffleboardTab.putNumber("Wrist", getWristState());
     SmartDashboard.putNumber("getWrist", 1);
+    SmartDashboard.putNumber("Wrist Position", getWristPosition());
+    SmartDashboard.putNumber("Elevator desiredrotationvalue", desiredRotationValue);
   }
 
   public void updateLog() {
@@ -179,6 +165,8 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
+    wristHeightTab.setDouble(getWristPosition());
+    wristDesiredTab.setDouble(desiredRotationValue); 
     // This method will be called once per scheduler run
     switch (desiredRotationState) {
       case JOYSTICK:
@@ -192,23 +180,14 @@ public class Wrist extends SubsystemBase {
       case NONE:
         break;
     }
-    double distanceBetween =
-    MathUtil.applyDeadband(
-        desiredRotationValue - getWristPosition(), maxRotationValue / 10);
-    if (distanceBetween == 0) {
-      setWristPercentOutput(0.0);
-    } else if (distanceBetween > 0) {
-      setWristPercentOutput(0.2);
-    } else if (distanceBetween < 0) {
-      setWristPercentOutput(-0.2);
-    }
+    setWristPercentOutput(wristJoystickX);
   }
 
   public Object getWristDesiredRotationState() {
     return desiredRotationValue;
   }
 
-  public static void setWristJoystickX(double m_JoystickX) {
+  public static void setWristJoystickX(double m_JoystickX) { //change name to call what its used for 
     wristJoystickX = m_JoystickX;
   }
 

@@ -36,8 +36,7 @@ public class IncrementElevatorHeight extends CommandBase {
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
     double joystickYDeadbandOutput =
-        MathUtil.applyDeadband(Math.abs(m_joystickY.getAsDouble()), 0.05)
-            * Math.signum(m_joystickY.getAsDouble());
+        MathUtil.applyDeadband((m_joystickY.getAsDouble()), 0.05);
 
     if (joystickYDeadbandOutput != 0.0) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);

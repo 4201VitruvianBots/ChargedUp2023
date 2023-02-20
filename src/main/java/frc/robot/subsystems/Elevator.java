@@ -305,45 +305,45 @@ public class Elevator extends SubsystemBase {
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
-    updateLog();
-    // Yes, this needs to be called in the periodic. The simulation does not work without this
-    updateShuffleboard();
-    updateElevatorHeight();
-    switch (desiredHeightState) {
-      case JOYSTICK:
-        if (elevatorIsClosedLoop) {
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
-          break;
-        } else {
-          setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
-          return;
-        }
-      case STOWED:
-        desiredHeightValue = 0.0;
-        break;
-      case LOW:
-        desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-        break;
-      case MID:
-        desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-        break;
-      case HIGH:
-        desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-        break;
-    }
-    if (elevatorIsClosedLoop) {
-      setElevatorMotionMagicMeters(desiredHeightValue);
-    } else {
-      double distanceBetween =
-          MathUtil.applyDeadband(
-              desiredHeightValue - elevatorHeight, maxElevatorHeight / openLoopDeadband);
-      if (distanceBetween == 0) {
-        setElevatorPercentOutput(0.0);
-      } else if (distanceBetween > 0) {
-        setElevatorPercentOutput(maxPercentOutput);
-      } else if (distanceBetween < 0) {
-        setElevatorPercentOutput(-maxPercentOutput);
-      }
-    }
+    // updateLog();
+    // // Yes, this needs to be called in the periodic. The simulation does not work without this
+    // updateShuffleboard();
+    // updateElevatorHeight();
+    // switch (desiredHeightState) {
+    //   case JOYSTICK:
+    //     if (elevatorIsClosedLoop) {
+    //       desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
+    //       break;
+    //     } else {
+    //       setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
+    //       return;
+    //     }
+    //   case STOWED:
+    //     desiredHeightValue = 0.0;
+    //     break;
+    //   case LOW:
+    //     desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+    //     break;
+    //   case MID:
+    //     desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+    //     break;
+    //   case HIGH:
+    //     desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+    //     break;
+    // }
+    // if (elevatorIsClosedLoop) {
+    //   setElevatorMotionMagicMeters(desiredHeightValue);
+    // } else {
+    //   double distanceBetween =
+    //       MathUtil.applyDeadband(
+    //           desiredHeightValue - elevatorHeight, maxElevatorHeight / openLoopDeadband);
+    //   if (distanceBetween == 0) {
+    //     setElevatorPercentOutput(0.0);
+    //   } else if (distanceBetween > 0) {
+    //     setElevatorPercentOutput(maxPercentOutput);
+    //   } else if (distanceBetween < 0) {
+    //     setElevatorPercentOutput(-maxPercentOutput);
+    //   }
+    // }
   }
 }
