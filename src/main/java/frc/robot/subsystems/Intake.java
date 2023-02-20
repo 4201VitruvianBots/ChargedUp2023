@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -29,7 +28,7 @@ public class Intake extends SubsystemBase {
   // Log setup
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry intakeCurrentEntry = new DoubleLogEntry(log, "/intake/intakeCurrent");
-  
+
   public Intake() {
     // one or two motors
 

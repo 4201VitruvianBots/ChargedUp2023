@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -30,7 +29,7 @@ public class Wrist extends SubsystemBase {
   public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/wristCurrent");
   public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/elevator/wristSetpoint");
   public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/elevator/wristPosition");
-  
+
   public Wrist() {
     // One motor for the wrist
 
@@ -81,7 +80,7 @@ public class Wrist extends SubsystemBase {
 
   public void updateLog() {
     wristCurrentEntry.append(getWristMotorVoltage());
-    //wristSetpointEntry.append();
+    // wristSetpointEntry.append();
     wristPositionEntry.append(getMeasurement());
   }
 

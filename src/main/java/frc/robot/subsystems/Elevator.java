@@ -111,9 +111,11 @@ public class Elevator extends SubsystemBase {
 
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry elevatorCurrentEntry = new DoubleLogEntry(log, "/elevator/elevatorCurrent");
-  public DoubleLogEntry elevatorSetpointEntry = new DoubleLogEntry(log, "/elevator/elevatorSetpoint");
-  public DoubleLogEntry elevatorPositionEntry = new DoubleLogEntry(log, "/elevator/elevatorPosition");
-  
+  public DoubleLogEntry elevatorSetpointEntry =
+      new DoubleLogEntry(log, "/elevator/elevatorSetpoint");
+  public DoubleLogEntry elevatorPositionEntry =
+      new DoubleLogEntry(log, "/elevator/elevatorPosition");
+
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
     for (TalonFX motor : elevatorMotors) {
@@ -290,10 +292,10 @@ public class Elevator extends SubsystemBase {
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 
-    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of directly setting the length to meters
+    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
+    // directly setting the length to meters
     // TODO: Make the mech2d proportional
     elevatorLigament2d.setLength(Units.metersToInches(elevatorSim.getPositionMeters()));
-
   }
 
   // This method will be called once per scheduler run

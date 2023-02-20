@@ -70,13 +70,13 @@ public class SwerveModule extends SubsystemBase {
   private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
 
   // Logging setup
-  
+
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry swerveModuleTurnCurrentEntry;
   public DoubleLogEntry swerveModuleDriveCurrentEntry;
   public DoubleLogEntry swerveModuleXPositionEntry;
   public DoubleLogEntry swerveModuleYPositionEntry;
-  
+
   public SwerveModule(
       SwerveDriveModulePosition modulePosition,
       TalonFX turnMotor,
@@ -104,10 +104,14 @@ public class SwerveModule extends SubsystemBase {
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
     m_lastAngle = getHeadingDegrees();
 
-    swerveModuleTurnCurrentEntry = new DoubleLogEntry(log, "/swerve/"+m_modulePosition.name()+"/turnCurrent");
-    swerveModuleDriveCurrentEntry = new DoubleLogEntry(log, "/swerve/"+m_modulePosition.name()+"/driveCurrent");
-    swerveModuleXPositionEntry = new DoubleLogEntry(log, "/swerve/"+m_modulePosition.name()+"/xPosition");
-    swerveModuleYPositionEntry = new DoubleLogEntry(log, "/swerve/"+m_modulePosition.name()+"/yPosition");
+    swerveModuleTurnCurrentEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
+    swerveModuleDriveCurrentEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
+    swerveModuleXPositionEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/xPosition");
+    swerveModuleYPositionEntry =
+        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/yPosition");
   }
 
   private void initCanCoder() {
@@ -238,7 +242,7 @@ public class SwerveModule extends SubsystemBase {
     swerveModuleXPositionEntry.append(getModulePose().getX());
     swerveModuleYPositionEntry.append(getModulePose().getY());
   }
-  
+
   @Override
   public void periodic() {
     updateSmartDashboard();
