@@ -170,7 +170,7 @@ public class Wrist extends SubsystemBase {
     // This method will be called once per scheduler run
     switch (desiredRotationState) {
       case JOYSTICK:
-        desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
+      setWristPercentOutput(wristJoystickX);
       case LOW:
         desiredRotationValue = 0.0; // Placeholder values
         break;
@@ -180,7 +180,6 @@ public class Wrist extends SubsystemBase {
       case NONE:
         break;
     }
-    setWristPercentOutput(wristJoystickX);
   }
 
   public Object getWristDesiredRotationState() {
