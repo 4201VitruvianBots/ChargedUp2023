@@ -47,4 +47,17 @@ public class ConstantsGridLock extends ConstantsRushHour {
     public static final double kI_Rotation = 0;
     public static final double kD_Rotation = 0.01;
   }
+
+  public static final class WristDef {
+    public static final int wristMotor = 30;
+    public static final int wristGearRatio = (1 / 50);
+    public static final double encoderUnitsPerRotation = 0;
+    private static final double wristRotationUpperLimit = 0;
+    public static final double wristEncoderUpperLimit =
+        wristRotationUpperLimit * encoderUnitsPerRotation * wristGearRatio;
+    public static final double wristEncoderSlowdown = 0;
+    public static final double maxSpeedLimitsPercent = 0;
+    public static final int wristLowerSwitch = 0;
+    public static final double wristmaxRotationDegrees = 0;
+  }
 }

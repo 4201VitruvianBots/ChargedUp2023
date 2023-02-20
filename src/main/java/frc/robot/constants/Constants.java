@@ -56,19 +56,6 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 8;
   }
 
-  public static final class Wrist {
-    public static final int wristMotor = 30;
-    public static final int wristGearRatio = 0;
-    public static final double encoderUnitsPerRotation = 0;
-    private static final double wristRotationUpperLimit = 0;
-    public static final double wristEncoderUpperLimit =
-        wristRotationUpperLimit * encoderUnitsPerRotation * wristGearRatio;
-    public static final double wristEncoderSlowdown = 0;
-    public static final double maxSpeedLimitsPercent = 0;
-    public static final int wristLowerSwitch = 0;
-    public static final double wristmaxRotationMeters = 0;
-  }
-
   public static final class Vision {
     public enum CAMERA_TYPE {
       OAK,

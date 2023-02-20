@@ -30,10 +30,7 @@ public class RunWristJoystick extends CommandBase {
   public void execute() {
     if (m_JoystickX.getAsDouble() != 0.00) {
       m_wrist.setWristDesiredRotationState(WristRotations.JOYSTICK);
-    } else if (m_wrist.getWristDesiredRotations() == WristRotations.JOYSTICK) {
-      m_wrist.setWristDesiredRotationState(WristRotations.NONE);
     }
-
     Wrist.setWristJoystickX(m_JoystickX);
   }
 
