@@ -10,7 +10,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -141,7 +140,6 @@ public class Elevator extends SubsystemBase {
       motor.configPeakOutputForward(1, Constants.constants.Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-1, Constants.constants.Elevator.kTimeoutMs);
 
-
       motor.configMotionCruiseVelocity(15000, Constants.constants.Elevator.kTimeoutMs);
       motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
 
@@ -151,7 +149,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
-
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
@@ -307,7 +304,7 @@ public class Elevator extends SubsystemBase {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateElevatorHeight();
-    if(elevatorIsClosedLoop) {
+    if (elevatorIsClosedLoop) {
       switch (desiredHeightState) {
         case JOYSTICK:
           desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();

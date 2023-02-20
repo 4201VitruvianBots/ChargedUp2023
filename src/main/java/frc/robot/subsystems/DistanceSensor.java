@@ -5,13 +5,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -32,7 +29,6 @@ public class DistanceSensor extends SubsystemBase {
     }
   }
 
-  
   public String getRawSensorData() {
     return receivedData;
   }
@@ -51,32 +47,86 @@ public class DistanceSensor extends SubsystemBase {
 
     DatagramPacket packet = new DatagramPacket(socketBuffer, socketBuffer.length);
 
-  //   try { 
-  //     InetAddress address = InetAddress.getByName("239, 42, 01, 1");
-  //     DatagramSocket socket = new DatagramSocket();
-  //      // change this js line to java 
-  //     setTimeout(() -> {console.log("this is the first message");}, 1000); TODO: Fix setTimeout because it can't be found
-        
-  //         byte[] buffer = new byte[512];
-  //         DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-  //         socket.receive(response);
+    //   try {
+    //     InetAddress address = InetAddress.getByName("239, 42, 01, 1");
+    //     DatagramSocket socket = new DatagramSocket();
+    //      // change this js line to java
+    //     setTimeout(() -> {console.log("this is the first message");}, 1000); TODO: Fix setTimeout
+    // because it can't be found
 
-  //         String quote = new String(buffer, 0, response.getLength());
+    //         byte[] buffer = new byte[512];
+    //         DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+    //         socket.receive(response);
 
-  //         System.out.println(quote);
-  //         System.out.println();
+    //         String quote = new String(buffer, 0, response.getLength());
 
-  //         Thread.sleep(10000);
+    //         System.out.println(quote);
+    //         System.out.println();
 
-  // } catch (SocketTimeoutException ex) {
-  //   System.out.println("                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           error: " + ex.getMessage());
-  //     ex.printStackTrace();
-  // } catch (IOException ex) {
-  //     System.out.println("Client error: " + ex.getMessage());
-  //     ex.printStackTrace();
-  // } catch (InterruptedException ex) {
-  //     ex.printStackTrace();
-  // }
+    //         Thread.sleep(10000);
+
+    // } catch (SocketTimeoutException ex) {
+    //   System.out.println("
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //                            error: " + ex.getMessage());
+    //     ex.printStackTrace();
+    // } catch (IOException ex) {
+    //     System.out.println("Client error: " + ex.getMessage());
+    //     ex.printStackTrace();
+    // } catch (InterruptedException ex) {
+    //     ex.printStackTrace();
+    // }
 
     InetAddress address = packet.getAddress();
     int port = packet.getPort();
@@ -87,6 +137,5 @@ public class DistanceSensor extends SubsystemBase {
     socket.close();
   }
 
-  private void setTimeout() {
-  }
+  private void setTimeout() {}
 }

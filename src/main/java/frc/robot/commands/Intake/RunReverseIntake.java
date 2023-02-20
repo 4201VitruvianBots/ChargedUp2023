@@ -10,6 +10,7 @@ import frc.robot.subsystems.Intake;
 public class RunReverseIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */

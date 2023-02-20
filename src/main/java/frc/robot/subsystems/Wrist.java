@@ -8,15 +8,14 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
 import frc.robot.constants.Constants;
-import frc.robot.constants.ConstantsRushHour;
+import java.util.function.DoubleSupplier;
 
 public class Wrist extends SubsystemBase {
   private static final double maxRotationValue = Constants.Wrist.wristmaxRotationMeters;
@@ -67,10 +66,9 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
   }
-//  setpoint for the wrist
+  //  setpoint for the wrist
   public void setSetpoint(double setpoint) {
-    this.desiredRotationValue = setpoint; 
-    
+    this.desiredRotationValue = setpoint;
   }
 
   public double getMeasurement() {
@@ -90,7 +88,7 @@ public class Wrist extends SubsystemBase {
         * (360.0 / Constants.Wrist.encoderUnitsPerRotation)
         / Constants.Wrist.wristGearRatio;
   }
-// this is get current angle 
+  // this is get current angle
   public double getAngle() {
     return getPosition() / encoderCountsPerAngle;
   }
@@ -116,18 +114,19 @@ public class Wrist extends SubsystemBase {
   public void setEncoderPosition(int position) {
     wristMotor.setSelectedSensorPosition(position, 0, 0);
   }
-// reset angle of the wrist
-// set sensor to 0
+  // reset angle of the wrist
+  // set sensor to 0
   public void ResetWrist() {
-  setSetpoint(desiredRotationValue);//setWristSensorPosition(0);
+    setSetpoint(desiredRotationValue); // setWristSensorPosition(0);
   }
-// code to limit the minimum/maximum setpoint of the wrist/ might be status frames
+  // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
   public double getWristMotorVoltage() {
     return wristMotor.getMotorOutputVoltage();
   }
 
   // set percent output function
-// period function that edits the elevators height, from there make sure it obeys the limit (27.7 rotation)
+  // period function that edits the elevators height, from there make sure it obeys the limit (27.7
+  // rotation)
   public void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
     wristPosition = getWristPosition();
@@ -156,7 +155,7 @@ public class Wrist extends SubsystemBase {
   private double getWristPosition() {
     return wristMotor.getSelectedSensorPosition();
   }
-//reset wrist angle function based off of a limit switch/hall effect sensor
+  // reset wrist angle function based off of a limit switch/hall effect sensor
   public static void updateWristRotation() {
     if (getWristLowerSwitch()) {
       setWristSensorPosition(0.0);
