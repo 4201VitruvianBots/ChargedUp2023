@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import java.util.function.DoubleSupplier;
 
 public class Wrist extends SubsystemBase {
   private static final double maxRotationValue = Constants.constants.Wrist.wristmaxRotationDegrees;
@@ -79,7 +78,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public void setWristState(boolean state) {
-    boolean isWristMoving = state;
+    isWristMoving = state;
   }
 
   public double getDegrees(int motorIndex) {

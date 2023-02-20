@@ -26,7 +26,6 @@ import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.Intake.RunWristJoystick;
 import frc.robot.commands.auto.*;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
 import frc.robot.commands.led.SetPieceTypeIntent;
@@ -102,7 +101,8 @@ public class RobotContainer {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    //m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
+    // m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator,
+    // xboxController::getLeftY));
     m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightX));
   }

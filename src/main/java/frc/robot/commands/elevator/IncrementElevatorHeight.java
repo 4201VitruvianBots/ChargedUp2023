@@ -39,9 +39,15 @@ public class IncrementElevatorHeight extends CommandBase {
         MathUtil.applyDeadband(Math.abs(m_joystickY.getAsDouble()), 0.05)
             * Math.signum(m_joystickY.getAsDouble());
 
-    if (m_elevator.getElevatorControlLoop()) {
+    if (joystickYDeadbandOutput != 0.0) {
       m_elevator.setElevatorDesiredHeightState(elevatorHeights.JOYSTICK);
     }
+    // This else if statement will automatically set the elevator to the STOWED position once the
+    // joystick is let go
+    // Uncomment if you want to reenable this
+    // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
+    // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
+
     m_elevator.setElevatorJoystickY(joystickYDeadbandOutput);
   }
 

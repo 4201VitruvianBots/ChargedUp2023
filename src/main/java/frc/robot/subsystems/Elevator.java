@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -50,7 +51,6 @@ public class Elevator extends SubsystemBase {
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private double setpointMultiplier = 1;
   private static elevatorHeights desiredHeightState =
       elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
 
@@ -71,7 +71,11 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = false;
+  private boolean elevatorIsClosedLoop = true;
+
+  private int openLoopDeadband = 10;
+  private double maxPercentOutput = 0.25;
+  private double setpointMultiplier = 0.35;
 
   // Simulation setup
 
@@ -145,6 +149,7 @@ public class Elevator extends SubsystemBase {
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
     }
+
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
     elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
@@ -304,27 +309,41 @@ public class Elevator extends SubsystemBase {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateElevatorHeight();
-    if (elevatorIsClosedLoop) {
-      switch (desiredHeightState) {
-        case JOYSTICK:
+    switch (desiredHeightState) {
+      case JOYSTICK:
+        if (elevatorIsClosedLoop) {
           desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
           break;
-        case STOWED:
-          desiredHeightValue = 0.0;
-          break;
-        case LOW:
-          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-          break;
-        case MID:
-          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-          break;
-        case HIGH:
-          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-          break;
-      }
+        } else {
+          setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
+          return;
+        }
+      case STOWED:
+        desiredHeightValue = 0.0;
+        break;
+      case LOW:
+        desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+        break;
+      case MID:
+        desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+        break;
+      case HIGH:
+        desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+        break;
+    }
+    if (elevatorIsClosedLoop) {
       setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
-      setElevatorPercentOutput(elevatorJoystickY);
+      double distanceBetween =
+          MathUtil.applyDeadband(
+              desiredHeightValue - elevatorHeight, maxElevatorHeight / openLoopDeadband);
+      if (distanceBetween == 0) {
+        setElevatorPercentOutput(0.0);
+      } else if (distanceBetween > 0) {
+        setElevatorPercentOutput(maxPercentOutput);
+      } else if (distanceBetween < 0) {
+        setElevatorPercentOutput(-maxPercentOutput);
+      }
     }
   }
 }

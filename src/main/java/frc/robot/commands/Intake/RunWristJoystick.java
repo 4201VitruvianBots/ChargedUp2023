@@ -31,13 +31,13 @@ public class RunWristJoystick extends CommandBase {
   public void execute() {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
     double joystickXDeadbandOutput =
-    MathUtil.applyDeadband(Math.abs(m_JoystickX.getAsDouble()), 0.05)
-        * Math.signum(m_JoystickX.getAsDouble());
-    
+        MathUtil.applyDeadband(Math.abs(m_JoystickX.getAsDouble()), 0.05)
+            * Math.signum(m_JoystickX.getAsDouble());
+
     if (joystickXDeadbandOutput != 0.00) {
       m_wrist.setWristDesiredRotationState(WristRotations.JOYSTICK);
     }
-    
+
     Wrist.setWristJoystickX(joystickXDeadbandOutput);
   }
 
