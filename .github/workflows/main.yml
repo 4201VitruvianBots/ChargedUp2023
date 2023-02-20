@@ -30,15 +30,17 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.BOT_ACCESS_TOKEN }}
-      - name: Setup Git
-        run: |
-          git config user.name "4201-actions-bot"
-          git config user.email "gavinsjunkmail@yahoo.com"
       
       # Declares the repository safe and not under dubious ownership.
       - name: Add repository to git safe directories
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
+      # Logs into our 4201 actions bot
+      - name: Setup Git
+        run: |
+          git config user.name "4201-actions-bot"
+          git config user.email "gavinsjunkmail@yahoo.com"
+          
       # Runs a single command using the runners shell
       - name: Applying spotless formatting
         run: ./gradlew spotlessApply
