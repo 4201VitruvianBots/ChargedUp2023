@@ -70,6 +70,26 @@ public class StateHandler extends SubsystemBase {
   public void advanceState() {
     if (Intake.getIntakeState()) {}
     currentElevatorState = Elevator.getElevatorDesiredHeightState();
+    // Coordinate Wrist Movement with Elevator Heights
+    /*
+        switch (currentElevatorState) {
+          case JOYSTICK:
+            m_wrist.setSetpoint(0.1);
+            break;
+          case STOWED:
+            m_wrist.setSetpoint(0.1);
+            break;
+          case LOW:
+            m_wrist.setSetpoint(0.1);
+            break;
+          case MID:
+            m_wrist.setSetpoint(0.1);
+            break;
+          case HIGH:
+            m_wrist.setSetpoint(0.1);
+            break;
+        }
+    */
   }
 
   @Override

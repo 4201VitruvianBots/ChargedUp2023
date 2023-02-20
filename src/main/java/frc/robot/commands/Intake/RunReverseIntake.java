@@ -10,13 +10,15 @@ import frc.robot.subsystems.Intake;
 public class RunReverseIntake extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+  private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public RunReverseIntake(Intake m_intake2) {
-    m_intake = m_intake2;
+  public RunReverseIntake(Intake intake, double PercentOutput) {
+    m_intake = intake;
+    m_PercentOutput = PercentOutput;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake2);
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
@@ -28,7 +30,7 @@ public class RunReverseIntake extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(-0.25);
+    m_intake.setIntakePercentOutput(m_PercentOutput);
   }
 
   // Called once the command ends or is interrupted.

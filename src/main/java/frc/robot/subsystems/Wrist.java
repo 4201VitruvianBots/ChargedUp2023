@@ -8,16 +8,34 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 import frc.robot.constants.Constants;
+import frc.robot.constants.ConstantsRushHour;
 
 public class Wrist extends SubsystemBase {
+  private static final double maxRotationValue = Constants.Wrist.wristmaxRotationMeters;
+  private static final int encoderCountsPerAngle = 0;
+  private static final boolean wristLowerLimitOverride = false;
+  private static double desiredRotationValue;
+  private static WristRotations desiredRotationState = WristRotations.NONE;
+  private double wristPosition = 0;
+
+  public enum WristRotations {
+    LOW,
+    MEDIUM,
+    JOYSTICK,
+    NONE
+  }
+
+  private static DigitalInput wristLowerSwitch = new DigitalInput(Constants.Wrist.wristLowerSwitch);
   /** Creates a new Wrist. */
-  private TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
+  private static TalonFX wristMotor = new TalonFX(Constants.Wrist.wristMotor);
 
   private boolean isWristtaking;
   private final double kF = 0;
@@ -40,8 +58,8 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-    wristMotor.setStatusFramePeriod(1, 255);
-    wristMotor.setStatusFramePeriod(2, 255);
+    wristMotor.setStatusFramePeriod(1, 0);
+    wristMotor.setStatusFramePeriod(2, 0);
     wristMotor.setNeutralMode(NeutralMode.Brake);
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
@@ -49,8 +67,11 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
   }
-
-  public void setSetpoint(double setpoint) {}
+//  setpoint for the wrist
+  public void setSetpoint(double setpoint) {
+    this.desiredRotationValue = setpoint; 
+    
+  }
 
   public double getMeasurement() {
     return wristMotor.getSelectedSensorPosition();
@@ -64,13 +85,90 @@ public class Wrist extends SubsystemBase {
     boolean isWristtaking = state;
   }
 
+  public double getDegrees(int motorIndex) {
+    return wristMotor.getSelectedSensorVelocity()
+        * (360.0 / Constants.Wrist.encoderUnitsPerRotation)
+        / Constants.Wrist.wristGearRatio;
+  }
+// this is get current angle 
+  public double getAngle() {
+    return getPosition() / encoderCountsPerAngle;
+  }
+
+  private double getPosition() {
+    return wristMotor.getSelectedSensorPosition();
+  }
+
+  public void zeroEncoder() {
+    if (getLimitSwitchState(0)) {
+      wristMotor.setSelectedSensorPosition(kP, 0, 0);
+      isWristtaking = true;
+    } else if (getLimitSwitchState(1)) {
+      wristMotor.setSelectedSensorPosition(kF, 0, 0);
+      isWristtaking = true;
+    } else isWristtaking = false;
+  }
+
+  private boolean getLimitSwitchState(int i) {
+    return false;
+  }
+
+  public void setEncoderPosition(int position) {
+    wristMotor.setSelectedSensorPosition(position, 0, 0);
+  }
+// reset angle of the wrist
+// set sensor to 0
+  public void ResetWrist() {
+  setSetpoint(desiredRotationValue);//setWristSensorPosition(0);
+  }
+// code to limit the minimum/maximum setpoint of the wrist/ might be status frames
   public double getWristMotorVoltage() {
     return wristMotor.getMotorOutputVoltage();
   }
 
   // set percent output function
-  public void setWristPercentOutput(double output) {
-    wristMotor.set(ControlMode.PercentOutput, output);
+// period function that edits the elevators height, from there make sure it obeys the limit (27.7 rotation)
+  public void setWristPercentOutput(double value) {
+    wristMotor.set(ControlMode.PercentOutput, value);
+    wristPosition = getWristPosition();
+    if (value > 0) {
+      if (wristPosition < Constants.Wrist.wristEncoderUpperLimit) {
+        if (Math.abs(wristPosition - Constants.Wrist.wristEncoderUpperLimit)
+            < Constants.Wrist.wristEncoderSlowdown) {
+          wristMotor.set(
+              ControlMode.PercentOutput,
+              Math.min(value, Constants.Wrist.maxSpeedLimitsPercent)
+                  * Math.abs(wristPosition - Constants.Wrist.wristEncoderUpperLimit)
+                  / Constants.Wrist.wristEncoderSlowdown);
+        } else {
+          wristMotor.set(ControlMode.PercentOutput, value);
+        }
+      } else wristMotor.set(ControlMode.PercentOutput, 0);
+    } else {
+      if (!wristLowerLimitOverride) {
+        wristMotor.set(ControlMode.PercentOutput, 0);
+      } else {
+        wristMotor.set(ControlMode.PercentOutput, value);
+      }
+    }
+  }
+
+  private double getWristPosition() {
+    return wristMotor.getSelectedSensorPosition();
+  }
+//reset wrist angle function based off of a limit switch/hall effect sensor
+  public static void updateWristRotation() {
+    if (getWristLowerSwitch()) {
+      setWristSensorPosition(0.0);
+    }
+  }
+
+  public static void setWristSensorPosition(double position) {
+    wristMotor.setSelectedSensorPosition(position);
+  }
+
+  public static boolean getWristLowerSwitch() {
+    return !wristLowerSwitch.get();
   }
   // smartdashboard funciton
   public void updateSmartDashboard() {
@@ -87,5 +185,30 @@ public class Wrist extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    switch (desiredRotationState) {
+      case JOYSTICK:
+        return;
+      case LOW:
+        desiredRotationValue = 0.0; // Placeholder values
+        break;
+      case MEDIUM:
+        desiredRotationValue = maxRotationValue / 2; // Placeholder values
+        break;
+      case NONE:
+        // desiredHeightValue = elevatorHeight;
+        break;
+    }
   }
+
+  public Object getWristDesiredRotationState() {
+    return desiredRotationValue;
+  }
+
+  public static void setWristJoystickX(DoubleSupplier m_JoystickX) {}
+
+  public Object getWristDesiredRotations() {
+    return desiredRotationState;
+  }
+
+  public void setWristDesiredRotationState(WristRotations joystick) {}
 }

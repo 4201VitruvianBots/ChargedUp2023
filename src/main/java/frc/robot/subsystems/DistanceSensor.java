@@ -4,35 +4,35 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class DistanceSensor {
+public class DistanceSensor extends SubsystemBase {
+  private final int socketPort = 25000;
   private final byte[] socketBuffer = new byte[85];
 
   private DatagramSocket socket;
   private String receivedData;
 
-  public DistanceSensor() {
-    this(25000);
-  }
-
   /** Creates a new DistanceSensor. */
-  public DistanceSensor(int socketPort) {
+  public DistanceSensor() {
     try {
       socket = new DatagramSocket(socketPort);
-      socket.setSoTimeout(20); // 20ms
     } catch (SocketException socketFail) {
       socketFail.printStackTrace();
     }
   }
 
+  
   public String getRawSensorData() {
     return receivedData;
   }
@@ -45,23 +45,48 @@ public class DistanceSensor {
     return (int) jsonObject.get(sensorName);
   }
 
+  @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
     DatagramPacket packet = new DatagramPacket(socketBuffer, socketBuffer.length);
 
-    try {
-      socket.receive(packet);
-    } catch (IOException recieveFail) {
-      recieveFail.printStackTrace();
-    }
+  //   try { 
+  //     InetAddress address = InetAddress.getByName("239, 42, 01, 1");
+  //     DatagramSocket socket = new DatagramSocket();
+  //      // change this js line to java 
+  //     setTimeout(() -> {console.log("this is the first message");}, 1000); TODO: Fix setTimeout because it can't be found
+        
+  //         byte[] buffer = new byte[512];
+  //         DatagramPacket response = new DatagramPacket(buffer, buffer.length);
+  //         socket.receive(response);
+
+  //         String quote = new String(buffer, 0, response.getLength());
+
+  //         System.out.println(quote);
+  //         System.out.println();
+
+  //         Thread.sleep(10000);
+
+  // } catch (SocketTimeoutException ex) {
+  //   System.out.println("                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           error: " + ex.getMessage());
+  //     ex.printStackTrace();
+  // } catch (IOException ex) {
+  //     System.out.println("Client error: " + ex.getMessage());
+  //     ex.printStackTrace();
+  // } catch (InterruptedException ex) {
+  //     ex.printStackTrace();
+  // }
 
     InetAddress address = packet.getAddress();
     int port = packet.getPort();
     packet = new DatagramPacket(socketBuffer, socketBuffer.length, address, port);
-    String receivedData = new String(packet.getData(), 0, packet.getLength());
+    receivedData = new String(packet.getData(), 0, packet.getLength());
 
-    //    System.out.println(receivedData);
+    System.out.println(receivedData);
     socket.close();
+  }
+
+  private void setTimeout() {
   }
 }

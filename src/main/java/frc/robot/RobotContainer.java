@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunReverseIntake;
 import frc.robot.commands.auto.*;
+import frc.robot.commands.Intake.RunWrist;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
@@ -132,8 +133,8 @@ public class RobotContainer {
     xboxController.leftBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
     xboxController.rightBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
-    xboxController.leftTrigger().whileTrue(new RunIntake(m_intake));
-    xboxController.rightTrigger().whileTrue(new RunReverseIntake(m_intake));
+    xboxController.leftTrigger().whileTrue(new RunIntake(m_intake, 0.5));
+    xboxController.rightTrigger().whileTrue(new RunReverseIntake(m_intake, 0.5));
 
     // Elevator button bindings
     xboxController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));

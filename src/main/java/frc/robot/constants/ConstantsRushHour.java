@@ -40,7 +40,8 @@ public class ConstantsRushHour {
 
   public final class IntakeDef {}
 
-  public final class WristDef {}
+  public final class WristDef {
+  }
 
   public final class LEDDef {}
 
