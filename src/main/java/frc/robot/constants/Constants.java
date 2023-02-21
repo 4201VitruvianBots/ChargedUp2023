@@ -56,6 +56,19 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 8;
   }
 
+  public static final class ButtonBindings{
+    public static final int xboxA = 0; 
+    public static final int xboxB = 1; 
+    public static final int xboxX = 2; 
+    public static final int xboxY = 3; 
+    public static final int xboxLeftBumper = 4; 
+    public static final int xboxRightBumper = 5; 
+    public static final int xboxMinimize = 6; 
+    public static final int xboxMenu = 7; 
+    public static final int xboxleftJoystickPressed = 8; 
+    public static final int xboxRightJoystickPressed = 9; 
+  }
+
   public static final class Vision {
     public enum CAMERA_TYPE {
       OAK,
