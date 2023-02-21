@@ -12,7 +12,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -65,13 +64,13 @@ public class Elevator extends SubsystemBase {
       0; // the amount of meters the motor has gone up from the initial stowed position
 
   private static final double maxElevatorHeight =
-      Constants.constants.Elevator.elevatorMaxHeightMeters;
+      Constants.getInstance().Elevator.elevatorMaxHeightMeters;
 
   // By default this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = true;
+  private boolean elevatorIsClosedLoop = false;
 
   private int openLoopDeadband = 10;
   private double maxPercentOutput = 0.25;
@@ -81,12 +80,12 @@ public class Elevator extends SubsystemBase {
 
   private static final ElevatorSim elevatorSim =
       new ElevatorSim(
-          Constants.constants.Elevator.elevatorGearbox,
-          Constants.constants.Elevator.elevatorGearing,
-          Constants.constants.Elevator.elevatorMassKg,
-          Constants.constants.Elevator.elevatorDrumRadiusMeters,
-          Constants.constants.Elevator.elevatorMinHeightMeters,
-          Constants.constants.Elevator.elevatorMaxHeightMeters,
+          Constants.getInstance().Elevator.elevatorGearbox,
+          Constants.getInstance().Elevator.elevatorGearing,
+          Constants.getInstance().Elevator.elevatorMassKg,
+          Constants.getInstance().Elevator.elevatorDrumRadiusMeters,
+          Constants.getInstance().Elevator.elevatorMinHeightMeters,
+          Constants.getInstance().Elevator.elevatorMaxHeightMeters,
           true);
 
   // Shuffleboard setup
@@ -133,21 +132,29 @@ public class Elevator extends SubsystemBase {
 
       // Config PID
       motor.selectProfileSlot(
-          Constants.constants.Elevator.kSlotIdx, Constants.constants.Elevator.kPIDLoopIdx);
+          Constants.getInstance().Elevator.kSlotIdx, Constants.getInstance().Elevator.kPIDLoopIdx);
       motor.config_kF(
-          Constants.constants.Elevator.kSlotIdx, kF, Constants.constants.Elevator.kTimeoutMs);
+          Constants.getInstance().Elevator.kSlotIdx,
+          kF,
+          Constants.getInstance().Elevator.kTimeoutMs);
       motor.config_kP(
-          Constants.constants.Elevator.kSlotIdx, kP, Constants.constants.Elevator.kTimeoutMs);
+          Constants.getInstance().Elevator.kSlotIdx,
+          kP,
+          Constants.getInstance().Elevator.kTimeoutMs);
       motor.config_kI(
-          Constants.constants.Elevator.kSlotIdx, kI, Constants.constants.Elevator.kTimeoutMs);
+          Constants.getInstance().Elevator.kSlotIdx,
+          kI,
+          Constants.getInstance().Elevator.kTimeoutMs);
       motor.config_kD(
-          Constants.constants.Elevator.kSlotIdx, kD, Constants.constants.Elevator.kTimeoutMs);
+          Constants.getInstance().Elevator.kSlotIdx,
+          kD,
+          Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configPeakOutputForward(1, Constants.constants.Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-1, Constants.constants.Elevator.kTimeoutMs);
+      motor.configPeakOutputForward(1, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configPeakOutputReverse(-1, Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configMotionCruiseVelocity(15000, Constants.constants.Elevator.kTimeoutMs);
-      motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
+      motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
 
@@ -158,7 +165,6 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
-
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
@@ -177,7 +183,7 @@ public class Elevator extends SubsystemBase {
   public static void setElevatorMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
         TalonFXControlMode.MotionMagic,
-        setpoint / Constants.constants.Elevator.metersToEncoderCounts);
+        setpoint / Constants.getInstance().Elevator.metersToEncoderCounts);
   }
 
   /*
@@ -185,7 +191,7 @@ public class Elevator extends SubsystemBase {
    */
   public double getElevatorHeight() {
     return elevatorMotors[0].getSelectedSensorPosition()
-        * Constants.constants.Elevator.metersToEncoderCounts;
+        * Constants.getInstance().Elevator.metersToEncoderCounts;
   }
 
   public double getElevatorEncoderCounts() {
@@ -293,14 +299,14 @@ public class Elevator extends SubsystemBase {
         .setIntegratedSensorRawPosition(
             (int)
                 (elevatorSim.getPositionMeters()
-                    / Constants.constants.Elevator.metersToEncoderCounts));
+                    / Constants.getInstance().Elevator.metersToEncoderCounts));
 
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
                 (elevatorSim.getVelocityMetersPerSecond()
-                    / Constants.constants.Elevator.metersToEncoderCounts
+                    / Constants.getInstance().Elevator.metersToEncoderCounts
                     * 10));
 
     RoboRioSim.setVInVoltage(
@@ -337,8 +343,10 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
           break;
       }
+      // TODO: Cap the desiredHieghtValue by the min/max elevator height prior to setting it
       setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
+      // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
     }
   }

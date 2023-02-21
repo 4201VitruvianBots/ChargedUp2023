@@ -17,7 +17,7 @@ public class RunIntake extends CommandBase {
   public RunIntake(Intake intake, double PercentOutput) {
     m_intake = intake;
     m_PercentOutput = PercentOutput;
-    
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intake);
   }

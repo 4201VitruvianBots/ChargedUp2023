@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 import frc.robot.simulation.FieldSim;
 
 public class StateHandler extends SubsystemBase {
@@ -74,9 +75,7 @@ public class StateHandler extends SubsystemBase {
     nextIntakeState = state;
   }
 
-  public void advanceStates() {
-
-  }
+  public void advanceStates() {}
 
   @Override
   public void periodic() {
@@ -84,6 +83,24 @@ public class StateHandler extends SubsystemBase {
     isOnTarget = false;
 
     advanceStates();
+
+    // Limit the wrist min/max angle based on where the elevator is.
+    // TODO: Make this a linear interpolation
+    if (m_elevator.getElevatorHeight()
+        > Constants.getInstance().Elevator.elevatorHeightWristLowerLimit) {
+      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftLowerLimitDegrees);
+    } else {
+      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftLowerLimitDegrees);
+    }
+    if (m_elevator.getElevatorHeight()
+        > Constants.getInstance().Elevator.elevatorHeightWristUpperLimit) {
+      m_wrist.updateWristLowerAngleLimit(
+          Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees);
+    } else {
+      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftUpperLimitDegrees);
+    }
+
+    // TODO: Limit max swerve speed by elevator height
 
     switch (currentIntakeState) {
       case CONE:
@@ -116,7 +133,7 @@ public class StateHandler extends SubsystemBase {
       case SCORE_SETPOINT_LOW_INTAKE:
         m_elevator.setElevatorDesiredHeightState(Elevator.elevatorHeights.LOW);
         break;
-        
+
       case INTAKING_GROUND:
         break;
       case INTAKING_STATION:
@@ -133,7 +150,7 @@ public class StateHandler extends SubsystemBase {
       default:
       case STOWED:
         m_elevator.setElevatorDesiredHeightState(Elevator.elevatorHeights.STOWED);
-//        m_Wrist.setWristState(Wrist.WristRotations.);
+        //        m_Wrist.setWristState(Wrist.WristRotations.);
         break;
     }
   }

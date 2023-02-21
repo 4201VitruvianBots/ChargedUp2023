@@ -6,8 +6,14 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.utils.ModuleMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -27,7 +33,7 @@ public final class Constants {
     public static final int xBoxController = 2;
   }
 
-  public static final class CAN { // TODO Not real number change tbt//
+  public static final class CAN {
     public static final int CANdle = 0;
     public static final int pigeon = 9;
 
@@ -56,17 +62,31 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 8;
   }
 
-  public static final class ButtonBindings{
-    public static final int xboxA = 0; 
-    public static final int xboxB = 1; 
-    public static final int xboxX = 2; 
-    public static final int xboxY = 3; 
-    public static final int xboxLeftBumper = 4; 
-    public static final int xboxRightBumper = 5; 
-    public static final int xboxMinimize = 6; 
-    public static final int xboxMenu = 7; 
-    public static final int xboxleftJoystickPressed = 8; 
-    public static final int xboxRightJoystickPressed = 9; 
+  public static final class SwerveDrive {
+    public static final double kTrackWidth = Units.inchesToMeters(24);
+    public static final double kWheelBase = Units.inchesToMeters(24);
+
+    public static final Map<SWERVE_MODULE_POSITION, Translation2d> kModuleTranslations =
+        Map.of(
+            SWERVE_MODULE_POSITION.FRONT_LEFT,
+            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+            SWERVE_MODULE_POSITION.FRONT_RIGHT,
+            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+            SWERVE_MODULE_POSITION.BACK_LEFT,
+            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+            SWERVE_MODULE_POSITION.BACK_RIGHT,
+            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+
+    public static final SwerveDriveKinematics kSwerveKinematics =
+        new SwerveDriveKinematics(
+            ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
+
+    public enum SWERVE_MODULE_POSITION {
+      FRONT_LEFT,
+      FRONT_RIGHT,
+      BACK_LEFT,
+      BACK_RIGHT
+    }
   }
 
   public static final class Vision {
@@ -76,14 +96,14 @@ public final class Constants {
       PHOTONVISION
     }
 
-    public enum CAMERA_POSITION {
+    public enum CAMERA_LOCATION {
       INTAKE,
       OUTTAKE,
       LEFT_LOCALIZER,
       RIGHT_LOCALIZER
     }
 
-    public static Transform3d[] cameraPositions = {
+    public static Transform3d[] LOCALIZER_CAMERA_POSITION = {
       // Robot Center to Left Camera
       new Transform3d(
           new Translation3d(
@@ -118,11 +138,15 @@ public final class Constants {
     }
   }
 
-  public enum SWERVE_MODULE_POSITION {
-    FRONT_LEFT,
-    FRONT_RIGHT,
-    BACK_LEFT,
-    BACK_RIGHT
+  public static final class Wrist {
+    public enum WRIST_POSITIONS {
+      STOWED,
+      INTAKING,
+      LOW,
+      MEDIUM,
+      HIGH,
+      JOYSTICK,
+    }
   }
 
   public static class SetpointSolver {
@@ -138,7 +162,21 @@ public final class Constants {
     HIGH
   }
 
-  public static ConstantsRushHour constants = new ConstantsRushHour();
+  private static ConstantsBase m_constants;
+
+  public static ConstantsBase getInstance() {
+    if (m_constants == null) {
+      NetworkTableInstance inst = NetworkTableInstance.getDefault();
+      String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
+      if (Objects.equals(mac, Constants.alphaRobotMAC)) {
+        m_constants = new ConstantsRushHour();
+      } else {
+        m_constants = new ConstantsGridLock();
+      }
+    }
+    return m_constants;
+  }
+
   public static final String alphaRobotMAC = "00:80:2F:19:30:B7";
   public static final String betaRobotMAC = "00:80:2F:25:BC:FD";
 }

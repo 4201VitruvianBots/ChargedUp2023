@@ -7,7 +7,6 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.Intake.RunWristJoystick;
@@ -33,12 +31,10 @@ import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.USB;
-import frc.robot.constants.ConstantsGridLock;
-import frc.robot.constants.ConstantsRushHour;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
-// import frc.robot.subsystems.DistanceSensor;
+// import frc.robot.utils.DistanceSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
@@ -48,7 +44,6 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -84,13 +79,11 @@ public class RobotContainer {
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
 
   static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
-  static XboxController xBoxController = new XboxController(Constants.USB.xBoxController);
-  public final CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
+  public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftTriggers = new Trigger[2]; //left joystick buttons
-  public Trigger[] rightTriggers = new Trigger[2]; //right joystick buttons
-  public Trigger[] xBoxTriggers = new Trigger[10]; //10 xbox buttons
-  public Trigger[] xBoxPOVTriggers = new Trigger[4]; //4 POV buttons on xbox controller
+  public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
+  public Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
+  public Trigger[] xBoxPOVTriggers = new Trigger[4]; // 4 POV buttons on xbox controller
 
   public Trigger xBoxLeftTrigger, xBoxRightTrigger;
 
@@ -115,9 +108,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureBindings();
-
-    // Choose which constants class to use
-    chooseConstants();
   }
 
   /**
@@ -127,28 +117,21 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureBindings() { // TODO: Replace Joystick Button?
-    for (int i = 0; i < leftTriggers.length; i++)
-      leftTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
-    for (int i = 0; i < rightTriggers.length; i++)
-      rightTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
-    for (int i = 0; i < xBoxTriggers.length; i++)
-      xBoxTriggers[i] = new JoystickButton(xBoxController, (i + 1));
-    for (int i = 0; i < xBoxPOVTriggers.length; i++)
-      xBoxPOVTriggers[i] = new POVButton(xBoxController, (i * 90));
+    for (int i = 0; i < leftJoystickTriggers.length; i++)
+      leftJoystickTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
+    for (int i = 0; i < rightJoystickTriggers.length; i++)
+      rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    xBoxLeftTrigger =
-        new Trigger(
-            () -> xBoxController.getLeftTriggerAxis() > 0.1); // getTrigger());// getRawAxis(2));
-    xBoxRightTrigger = new Trigger(() -> xBoxController.getRightTriggerAxis() > 0.1);
-
-    xBoxLeftTrigger.whileTrue(new RunIntake(m_intake, 0.5));
-    xBoxRightTrigger.whileTrue(new RunIntake(m_intake, -0.5));
+    // TODO: Define this: is this for cube or cone?
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntake(m_intake, 0.5));
+    // TODO: Define this: is this for cube or cone?
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntake(m_intake, -0.5));
 
     // Elevator button bindings
-    xBoxTriggers[Constants.ButtonBindings.xboxA].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
-    xBoxTriggers[Constants.ButtonBindings.xboxB].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
-    xBoxTriggers[Constants.ButtonBindings.xboxX].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
-    xBoxTriggers[Constants.ButtonBindings.xboxY].whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
+    xboxController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
+    xboxController.b().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.MID));
+    xboxController.x().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.STOWED));
+    xboxController.y().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.HIGH));
 
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new SetElevatorControlLoop(m_elevator));
@@ -159,7 +142,7 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_swerveDrive.disabledInit();
+    m_swerveDrive.disabledPeriodic();
   }
 
   public void teleopInit() {
@@ -173,15 +156,15 @@ public class RobotContainer {
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.constants.SwerveDrive.kSwerveKinematics,
+            Constants.SwerveDrive.kSwerveKinematics,
             new PIDConstants(
-                Constants.constants.SwerveDrive.kP_Translation,
-                Constants.constants.SwerveDrive.kI_Translation,
-                Constants.constants.SwerveDrive.kD_Translation),
+                Constants.getInstance().SwerveDrive.kP_Translation,
+                Constants.getInstance().SwerveDrive.kI_Translation,
+                Constants.getInstance().SwerveDrive.kD_Translation),
             new PIDConstants(
-                Constants.constants.SwerveDrive.kP_Rotation,
-                Constants.constants.SwerveDrive.kI_Rotation,
-                Constants.constants.SwerveDrive.kD_Rotation),
+                Constants.getInstance().SwerveDrive.kP_Rotation,
+                Constants.getInstance().SwerveDrive.kI_Rotation,
+                Constants.getInstance().SwerveDrive.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
             false,
@@ -212,17 +195,6 @@ public class RobotContainer {
         new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
-  }
-
-  // Switches between constants class depending on the MAC address of the roboRIO we're running on
-  public void chooseConstants() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
-    if (Objects.equals(mac, Constants.alphaRobotMAC)) {
-      Constants.constants = new ConstantsRushHour();
-    } else if (Objects.equals(mac, Constants.betaRobotMAC)) {
-      Constants.constants = new ConstantsGridLock();
-    }
   }
 
   public Command getAutonomousCommand() {

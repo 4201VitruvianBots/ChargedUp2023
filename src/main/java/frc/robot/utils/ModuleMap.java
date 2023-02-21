@@ -1,11 +1,11 @@
 package frc.robot.utils;
 
-import frc.robot.constants.Constants.SWERVE_MODULE_POSITION;
+import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
 import java.util.*;
 
 /**
- * Contains functions to convert {@link Map}s with {@link SWERVE_MODULE_POSITION} keys to and
- * from arrays so that it's easier to use WPILib swerve functions.
+ * Contains functions to convert {@link Map}s with {@link SWERVE_MODULE_POSITION} keys to and from
+ * arrays so that it's easier to use WPILib swerve functions.
  */
 public class ModuleMap {
 
@@ -19,8 +19,7 @@ public class ModuleMap {
    *     entries. Any entries after will be ignored.
    */
   @SafeVarargs
-  public static <V> Map<SWERVE_MODULE_POSITION, V> of(
-      V... values) {
+  public static <V> Map<SWERVE_MODULE_POSITION, V> of(V... values) {
     Map<SWERVE_MODULE_POSITION, V> map = new HashMap<>();
     for (int i = 0; i < SWERVE_MODULE_POSITION.values().length; i++) {
       map.put(SWERVE_MODULE_POSITION.values()[i], values[i]);

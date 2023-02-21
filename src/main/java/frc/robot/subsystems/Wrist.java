@@ -7,62 +7,43 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Wrist.WRIST_POSITIONS;
 
 public class Wrist extends SubsystemBase {
-  private static final double maxRotationValue = Constants.constants.Wrist.wristmaxRotationDegrees;
-  private static final int encoderCountsPerAngle = 0;
-  private static final boolean wristLowerLimitOverride = false;
-  private static double desiredRotationValue;
-  private static WristRotations desiredRotationState = WristRotations.STOWED;
-  private double wristPosition = 0;
-  private static double wristJoystickX;
-  private boolean wristIsClosedLoop = true; 
-
-  public enum WristRotations {
-    LOW,
-    MEDIUM,
-    JOYSTICK,
-    STOWED, 
-    NONE
-  }
+  private WRIST_POSITIONS desiredRotationState = WRIST_POSITIONS.STOWED;
+  private double desiredAngleSetpoint;
+  private double m_lowerAngleLimit;
+  private double m_upperAngleLimit;
+  private boolean wristIsClosedLoop = false;
+  private boolean wristLowerLimitOverride = false;
+  private double m_joystickInput;
 
   private static DigitalInput wristLowerSwitch =
-      new DigitalInput(Constants.constants.Wrist.wristLowerSwitch);
+      new DigitalInput(Constants.getInstance().Wrist.wristLowerSwitch);
   /** Creates a new Wrist. */
-  private static TalonFX wristMotor = new TalonFX(Constants.constants.Wrist.wristMotor);
-
-  private static final double kDt = 0.02;
-
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(Constants.constants.Wrist.kV, Constants.constants.Wrist.kA);
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private static TalonFX wristMotor = new TalonFX(Constants.getInstance().Wrist.wristMotor);
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   private ArmFeedforward m_feedforward =
       new ArmFeedforward(
-          Constants.constants.Wrist.FFkS,
-          Constants.constants.Wrist.kG,
-          Constants.constants.Wrist.FFkV,
-          Constants.constants.Wrist.kA);
+          Constants.getInstance().Wrist.FFkS,
+          Constants.getInstance().Wrist.kG,
+          Constants.getInstance().Wrist.FFkV,
+          Constants.getInstance().Wrist.kA);
 
-  private boolean isWristMoving;
-  private final double kF = 0;
   private final double kP = 0.2;
   private double setpointMultiplier = 1;
 
@@ -90,152 +71,150 @@ public class Wrist extends SubsystemBase {
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
 
-    wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
-    setEncoderPosition(-(int)(15.0/Constants.constants.Wrist.encoderUnitsPerRotation)); 
+    zeroWristAngle();
 
-    wristTab.addDouble("Angle", this::getAngle);
-    wristTab.addDouble("Raw position", this::getWristPosition);
-    wristTab.addDouble("Setpoint", wristMotor::getSelectedSensorPosition);
-  }
-  //  setpoint for the wrist
-  public void setSetpoint(double setpoint) {
-    wristMotor.set(ControlMode.Position, setpoint);
+    wristTab.addDouble("Angle", this::getWristAngleDegrees);
+    wristTab.addDouble("Raw position", this::getWristSensorPosition);
+    wristTab.addDouble("Setpoint", this::getSetpointDegrees);
   }
 
-  public boolean getWristState() {
-    return isWristMoving;
-  }
-
-  public void setWristState(boolean state) {
-    isWristMoving = state;
-  }
-
-  public double getDegrees(int motorIndex) {
-    return wristMotor.getSelectedSensorVelocity()
-        * (360.0 / Constants.constants.Wrist.encoderUnitsPerRotation)
-        / Constants.constants.Wrist.wristGearRatio;
-  }
-
-  // this is get current angle
-  public double getAngle() {
-    return getWristPosition() * Constants.constants.Wrist.encoderUnitsPerRotation;
-  }
-
-  public void zeroEncoder() {
-    if (getLimitSwitchState(0)) {
-      wristMotor.setSelectedSensorPosition(kP, 0, 0);
-      isWristMoving = true;
-    } else if (getLimitSwitchState(1)) {
-      wristMotor.setSelectedSensorPosition(kF, 0, 0);
-      isWristMoving = true;
-    } else isWristMoving = false;
-  }
-
-  private boolean getLimitSwitchState(int i) {
-    return false;
-  }
-
-  public void setEncoderPosition(int position) {
-    wristMotor.setSelectedSensorPosition(position, 0, 0);
-  }
-  // reset angle of the wrist
-  // set sensor to 0
-  public void ResetWrist() {
-    setSetpoint(desiredRotationValue); // setWristSensorPosition(0);
-  }
-  // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
-  public double getWristMotorVoltage() {
-    return wristMotor.getMotorOutputVoltage();
+  public void setWristInput(double input) {
+    m_joystickInput = input;
   }
 
   // set percent output function
   // period function that edits the elevators height, from there make sure it obeys the limit (27.7
   // rotation)
-  public void setWristPercentOutput(double value) {
+  private void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
   }
 
-  private double getWristPosition() {
+  // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
+  public double getWristMotorVoltage() {
+    return wristMotor.getMotorOutputVoltage();
+  }
+
+  //  setpoint for the wrist
+  public void setSetpointDegrees(double degrees) {
+    wristMotor.set(
+        ControlMode.Position,
+        degrees / Constants.getInstance().Wrist.encoderUnitsPerRotation,
+        DemandType.ArbitraryFeedForward,
+        m_feedforward.calculate(
+            degrees,
+            wristMotor.getActiveTrajectoryVelocity()
+                * Constants.getInstance().Wrist.encoderUnitsPerRotation // TODO: Verify this
+                * 10));
+  }
+
+  public double getSetpointDegrees() {
+    return desiredAngleSetpoint;
+  }
+
+  public void setWristDesiredRotationState(WRIST_POSITIONS wristEnum) {
+    desiredRotationState = wristEnum;
+  }
+
+  // this is get current angle
+  public double getWristAngleDegrees() {
+    return getWristSensorPosition() * Constants.getInstance().Wrist.encoderUnitsPerRotation;
+  }
+
+  public Rotation2d getWristAngleRotation2d() {
+    return Rotation2d.fromDegrees(getWristAngleDegrees());
+  }
+
+  private double getWristSensorPosition() {
     return wristMotor.getSelectedSensorPosition();
   }
+
   // reset wrist angle function based off of a limit switch/hall effect sensor
-  public static void updateWristRotation() {
-    // if (getWristLowerSwitch()) {
-    //   setWristSensorPosition(0.0);
-    // }
+  public void zeroEncoder() {
+    if (getLimitSwitchState(0)) {
+      wristMotor.setSelectedSensorPosition(0, 0, 0);
+    } else if (getLimitSwitchState(1)) {
+      wristMotor.setSelectedSensorPosition(0, 0, 0);
+    }
   }
 
-  public static void setWristSensorPosition(double position) {
-    wristMotor.setSelectedSensorPosition(position);
+  // TODO: Add limit switches
+  private boolean getLimitSwitchState(int i) {
+    return false;
   }
+  //  public static boolean getWristLowerSwitch() {
+  //    return !wristLowerSwitch.get();
+  //  }
 
-  public static boolean getWristLowerSwitch() {
-    return !wristLowerSwitch.get();
+  // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
+  // the ground.
+  public void zeroWristAngle() {
+    setSetpointDegrees(-15.0); // setWristSensorPosition(0);
   }
 
   public void setWristClosedLoop(boolean isClosedLoop) {
     wristIsClosedLoop = isClosedLoop;
   }
 
-  public boolean getElevatorControlLoop() {
+  public boolean getWristClosedLoop() {
     return wristIsClosedLoop;
   }
 
-
-  // smartdashboard function
-  public void updateSmartDashboard() {
-    // ShuffleboardTab.putNumber("Wrist", getWristState());
-    SmartDashboard.putNumber("getWrist", 1);
-    SmartDashboard.putNumber("Wrist Position", getWristPosition());
-    SmartDashboard.putNumber("Elevator desiredrotationvalue", desiredRotationValue);
+  public void updateWristLowerAngleLimit(double angle) {
+    m_lowerAngleLimit = angle;
   }
+
+  public void updateWristUpperAngleLimit(double angle) {
+    m_upperAngleLimit = angle;
+  }
+
+  //
+  private double limitDesiredAngleSetpoint() {
+    return MathUtil.clamp(desiredAngleSetpoint, m_lowerAngleLimit, m_upperAngleLimit);
+  }
+
+  // SmartDashboard function
+  public void updateSmartDashboard() {}
 
   public void updateLog() {
     wristCurrentEntry.append(getWristMotorVoltage());
-    // wristSetpointEntry.append();
-    wristPositionEntry.append(getWristPosition());
+    wristSetpointEntry.append(getSetpointDegrees());
+    wristPositionEntry.append(getWristAngleDegrees());
   }
 
   @Override
   public void periodic() {
+    updateSmartDashboard();
+    updateLog();
     // This method will be called once per scheduler run
-  if (wristIsClosedLoop) {
-    switch (desiredRotationState) {
-      // case JOYSTICK:
-      // desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
-      // case LOW:
-      //   setSetpoint(0.0);
-      //   break;
-      // case MEDIUM:
-      //   setSetpoint(maxRotationValue / 2); // Placeholder values
-      //   break;
-      default:
-      case STOWED: 
-        setSetpoint(50.0 / Constants.constants.Wrist.encoderUnitsPerRotation);
-      // case NONE:
-      //   break;
+    if (wristIsClosedLoop) {
+      switch (desiredRotationState) {
+        case JOYSTICK:
+          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristSensorPosition();
+          break;
+        case INTAKING:
+          desiredAngleSetpoint = -10.0;
+          break;
+        case LOW:
+          // TODO: Find setpoint value
+          desiredAngleSetpoint = 0;
+          break;
+        case MEDIUM:
+          // TODO: Find setpoint value
+          desiredAngleSetpoint = 0;
+          break;
+        case HIGH:
+          // TODO: Find setpoint value
+          desiredAngleSetpoint = 0;
+          break;
+        default:
+        case STOWED:
+          desiredAngleSetpoint = 50.0;
+          break;
+      }
+      setSetpointDegrees(limitDesiredAngleSetpoint());
+    } else {
+      setWristPercentOutput(m_joystickInput * setpointMultiplier);
     }
-  }
-  else {
-    setWristPercentOutput(wristJoystickX * setpointMultiplier);
-  }
-  }
-
-  public Object getWristDesiredRotationState() {
-    return desiredRotationValue;
-  }
-
-  public static void setWristJoystickX(
-      double m_JoystickX) { // change name to call what its used for
-    wristJoystickX = m_JoystickX;
-  }
-
-  public Object getWristDesiredRotations() {
-    return desiredRotationState;
-  }
-
-  public void setWristDesiredRotationState(WristRotations wristEnum) {
-    desiredRotationState = wristEnum;
   }
 }
