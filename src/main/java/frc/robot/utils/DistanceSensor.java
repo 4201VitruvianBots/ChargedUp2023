@@ -2,9 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.utils;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -13,7 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class DistanceSensor extends SubsystemBase {
+public class DistanceSensor {
   private final int socketPort = 25000;
   private final byte[] socketBuffer = new byte[85];
 
@@ -41,7 +40,6 @@ public class DistanceSensor extends SubsystemBase {
     return (int) jsonObject.get(sensorName);
   }
 
-  @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
@@ -66,60 +64,7 @@ public class DistanceSensor extends SubsystemBase {
     //         Thread.sleep(10000);
 
     // } catch (SocketTimeoutException ex) {
-    //   System.out.println("
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //                            error: " + ex.getMessage());
+    //   System.out.println("error: " + ex.getMessage());
     //     ex.printStackTrace();
     // } catch (IOException ex) {
     //     System.out.println("Client error: " + ex.getMessage());

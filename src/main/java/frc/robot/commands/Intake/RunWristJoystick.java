@@ -4,9 +4,10 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.constants.Constants.Wrist.WRIST_POSITIONS;
 import frc.robot.subsystems.Wrist;
-import frc.robot.subsystems.Wrist.WristRotations;
 import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {
@@ -28,13 +29,14 @@ public class RunWristJoystick extends CommandBase {
   // commands to move wrist (Move using joystick values, go to a setpoint)
   @Override
   public void execute() {
-    if (m_JoystickX.getAsDouble() != 0.00) {
-      m_wrist.setWristDesiredRotationState(WristRotations.JOYSTICK);
-    } else if (m_wrist.getWristDesiredRotations() == WristRotations.JOYSTICK) {
-      m_wrist.setWristDesiredRotationState(WristRotations.NONE);
+    // Deadbands joystick X so joystick Xs below 0.05 won't be registered
+    double joystickXDeadbandOutput = MathUtil.applyDeadband((m_JoystickX.getAsDouble()), 0.05);
+
+    if (joystickXDeadbandOutput != 0.00) {
+      m_wrist.setWristDesiredRotationState(WRIST_POSITIONS.JOYSTICK);
     }
 
-    Wrist.setWristJoystickX(m_JoystickX);
+    m_wrist.setWristInput(joystickXDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

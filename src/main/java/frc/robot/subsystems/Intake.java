@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
   private final double kF = 0;
   private final double kP = 0.2;
   private TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
-  private double PercentOutput;
+  private double m_percentOutput;
 
   // Log setup
   public DataLog log = DataLogManager.getLog();
@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
   public Intake() {
     // one or two motors
 
-    // factory default cofigs
+    // factory default configs
     intakeMotor.configFactoryDefault();
     intakeMotor.setInverted(false);
 
@@ -49,40 +49,58 @@ public class Intake extends SubsystemBase {
     intakeMotor.config_kP(0, kP);
   }
 
-  public double getMeasurement() {
-    return intakeMotor.getSelectedSensorPosition();
+  // TODO: Need two measurement values: One that averages the two used to measure the cone and
+  // another to measure the
+  //  distance to the cube
+  public double getIntakeConeMeasurement() {
+    return 0;
+  }
+
+  public double getIntakeCubeMeasurement() {
+    return 0;
   }
 
   // control mode function
-  public static boolean getIntakeState() {
+  public boolean getIntakeState() {
     return isIntaking;
   }
 
-  public double getIntakeMotorVoltage() {
-    return intakeMotor.getMotorOutputVoltage();
+  public double getIntakeMotorCurrent() {
+    return intakeMotor.getStatorCurrent();
   }
 
-  public void setIntakeState(boolean b) {
-    isIntaking = b;
+  public void setIntakeState(boolean state) {
+    isIntaking = state;
   }
+
   // set percent output function
   public void setIntakePercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
-  // shuffleboard or smartdashboard funciton
+  // Shuffleboard or SmartDashboard function
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
-    SmartDashboard.putNumber("getIntake", 1);
-    PercentOutput = SmartDashboard.getNumber("IntakePercentOutput", PercentOutput);
   }
 
   public void updateLog() {
-    intakeCurrentEntry.append(getIntakeMotorVoltage());
+    intakeCurrentEntry.append(getIntakeMotorCurrent());
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     updateLog();
+    // TODO: If the cube or cone distance sensors see a game object, run the intake motor to hold
+    // the game piece in.
+    if (!isIntaking) {
+      if (getIntakeConeMeasurement() > 0) {
+        m_percentOutput = 0;
+      } else if (getIntakeCubeMeasurement() > 0) {
+        m_percentOutput = 0;
+      } else {
+        m_percentOutput = 0;
+      }
+      setIntakePercentOutput(m_percentOutput);
+    }
   }
 }

@@ -7,7 +7,6 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -17,41 +16,34 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntake;
-import frc.robot.commands.Intake.RunReverseIntake;
+import frc.robot.commands.Intake.RunWristJoystick;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
-import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.swerve.SetSwerveDriveBalance;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.USB;
-import frc.robot.constants.ConstantsGridLock;
-import frc.robot.constants.ConstantsRushHour;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
-// import frc.robot.subsystems.DistanceSensor;
+// import frc.robot.utils.DistanceSensor;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.elevatorHeights;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LED;
-import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -84,13 +76,16 @@ public class RobotContainer {
   private final MemoryLog m_memorylog = new MemoryLog();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  public final CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
+  static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
+  public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftJoystickTriggers = new Trigger[2];
-  public Trigger[] rightJoystickTriggers = new Trigger[2];
+  public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
+  public Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
+  public Trigger[] xBoxPOVTriggers = new Trigger[4]; // 4 POV buttons on xbox controller
+
+  public Trigger xBoxLeftTrigger, xBoxRightTrigger;
 
   public void initializeSubsystems() {
     m_swerveDrive.setDefaultCommand(
@@ -103,6 +98,7 @@ public class RobotContainer {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
+    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightX));
   }
 
   public RobotContainer() {
@@ -112,9 +108,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureBindings();
-
-    // Choose which constants class to use
-    chooseConstants();
   }
 
   /**
@@ -129,11 +122,10 @@ public class RobotContainer {
     for (int i = 0; i < rightJoystickTriggers.length; i++)
       rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    xboxController.leftBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-    xboxController.rightBumper().onTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-
-    xboxController.leftTrigger().whileTrue(new RunIntake(m_intake, 0.5));
-    xboxController.rightTrigger().whileTrue(new RunReverseIntake(m_intake, 0.5));
+    // TODO: Define this: is this for cube or cone?
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntake(m_intake, 0.5));
+    // TODO: Define this: is this for cube or cone?
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntake(m_intake, -0.5));
 
     // Elevator button bindings
     xboxController.a().whileTrue(new MoveToElevatorHeight(m_elevator, elevatorHeights.LOW));
@@ -144,17 +136,13 @@ public class RobotContainer {
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new SetElevatorControlLoop(m_elevator));
 
-    leftJoystickTriggers[0].whileTrue(
-        new SetSwerveDriveBalance(m_swerveDrive, null, null, null)
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
   }
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_swerveDrive.disabledInit();
+    m_swerveDrive.disabledPeriodic();
   }
 
   public void teleopInit() {
@@ -168,15 +156,15 @@ public class RobotContainer {
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.constants.SwerveDrive.kSwerveKinematics,
+            Constants.SwerveDrive.kSwerveKinematics,
             new PIDConstants(
-                Constants.constants.SwerveDrive.kP_Translation,
-                Constants.constants.SwerveDrive.kI_Translation,
-                Constants.constants.SwerveDrive.kD_Translation),
+                Constants.getInstance().SwerveDrive.kP_Translation,
+                Constants.getInstance().SwerveDrive.kI_Translation,
+                Constants.getInstance().SwerveDrive.kD_Translation),
             new PIDConstants(
-                Constants.constants.SwerveDrive.kP_Rotation,
-                Constants.constants.SwerveDrive.kI_Rotation,
-                Constants.constants.SwerveDrive.kD_Rotation),
+                Constants.getInstance().SwerveDrive.kP_Rotation,
+                Constants.getInstance().SwerveDrive.kI_Rotation,
+                Constants.getInstance().SwerveDrive.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
             false,
@@ -207,17 +195,6 @@ public class RobotContainer {
         new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
-  }
-
-  // Switches between constants class depending on the MAC address of the roboRIO we're running on
-  public void chooseConstants() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
-    if (Objects.equals(mac, Constants.alphaRobotMAC)) {
-      Constants.constants = new ConstantsRushHour();
-    } else if (Objects.equals(mac, Constants.betaRobotMAC)) {
-      Constants.constants = new ConstantsGridLock();
-    }
   }
 
   public Command getAutonomousCommand() {

@@ -45,7 +45,6 @@ public class GetSubsystemStates extends CommandBase {
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
     intaking = m_intake.getIntakeState();
-    wrist = m_wrist.getWristState();
 
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -57,8 +56,6 @@ public class GetSubsystemStates extends CommandBase {
       m_led.expressState(LED.robotState.CONE);
     } else if (Cube) {
       m_led.expressState(LED.robotState.CUBE);
-    } else if (wrist) {
-      m_led.expressState(LED.robotState.WRIST);
     } else if (enabled) {
       m_led.expressState(LED.robotState.ENABLED);
     }

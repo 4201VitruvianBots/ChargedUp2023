@@ -25,44 +25,44 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SwerveDrive extends SubsystemBase {
 
-  private final HashMap<SwerveDriveModulePosition, SwerveModule> m_swerveModules =
+  private final HashMap<SWERVE_MODULE_POSITION, SwerveModule> m_swerveModules =
       new HashMap<>(
           Map.of(
-              SwerveDriveModulePosition.FRONT_LEFT,
+              SWERVE_MODULE_POSITION.FRONT_LEFT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.FRONT_LEFT,
+                      SWERVE_MODULE_POSITION.FRONT_LEFT,
                       new TalonFX(Constants.CAN.frontLeftTurnMotor),
                       new TalonFX(Constants.CAN.frontLeftDriveMotor),
                       new CANCoder(Constants.CAN.frontLeftCanCoder),
-                      Constants.constants.SwerveDrive.frontLeftCANCoderOffset),
-              SwerveDriveModulePosition.FRONT_RIGHT,
+                      Constants.getInstance().SwerveDrive.frontLeftCANCoderOffset),
+              SWERVE_MODULE_POSITION.FRONT_RIGHT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.FRONT_RIGHT,
+                      SWERVE_MODULE_POSITION.FRONT_RIGHT,
                       new TalonFX(Constants.CAN.frontRightTurnMotor),
                       new TalonFX(Constants.CAN.frontRightDriveMotor),
                       new CANCoder(Constants.CAN.frontRightCanCoder),
-                      Constants.constants.SwerveDrive.frontRightCANCoderOffset),
-              SwerveDriveModulePosition.BACK_LEFT,
+                      Constants.getInstance().SwerveDrive.frontRightCANCoderOffset),
+              SWERVE_MODULE_POSITION.BACK_LEFT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.BACK_LEFT,
+                      SWERVE_MODULE_POSITION.BACK_LEFT,
                       new TalonFX(Constants.CAN.backLeftTurnMotor),
                       new TalonFX(Constants.CAN.backLeftDriveMotor),
                       new CANCoder(Constants.CAN.backLeftCanCoder),
-                      Constants.constants.SwerveDrive.backLeftCANCoderOffset),
-              SwerveDriveModulePosition.BACK_RIGHT,
+                      Constants.getInstance().SwerveDrive.backLeftCANCoderOffset),
+              SWERVE_MODULE_POSITION.BACK_RIGHT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.BACK_RIGHT,
+                      SWERVE_MODULE_POSITION.BACK_RIGHT,
                       new TalonFX(Constants.CAN.backRightTurnMotor),
                       new TalonFX(Constants.CAN.backRightDriveMotor),
                       new CANCoder(Constants.CAN.backRightCanCoder),
-                      Constants.constants.SwerveDrive.backRightCANCoderOffset)));
+                      Constants.getInstance().SwerveDrive.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private Trajectory m_trajectory;
@@ -77,7 +77,7 @@ public class SwerveDrive extends SubsystemBase {
     m_pigeon.setYaw(0);
     m_odometry =
         new SwerveDrivePoseEstimator(
-            Constants.constants.SwerveDrive.kSwerveKinematics,
+            Constants.SwerveDrive.kSwerveKinematics,
             getHeadingRotation2d(),
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
@@ -98,9 +98,9 @@ public class SwerveDrive extends SubsystemBase {
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
-    strafe *= Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
-    rotation *= Constants.constants.SwerveDrive.kMaxRotationRadiansPerSecond;
+    throttle *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
+    strafe *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
+    rotation *= Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond;
 
     ChassisSpeeds chassisSpeeds =
         isFieldRelative
@@ -108,13 +108,12 @@ public class SwerveDrive extends SubsystemBase {
                 throttle, strafe, rotation, getHeadingRotation2d())
             : new ChassisSpeeds(throttle, strafe, rotation);
 
-    Map<SwerveDriveModulePosition, SwerveModuleState> moduleStates =
-        ModuleMap.of(
-            Constants.constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
+    Map<SWERVE_MODULE_POSITION, SwerveModuleState> moduleStates =
+        ModuleMap.of(Constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]),
-        Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond);
+        Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
@@ -122,7 +121,7 @@ public class SwerveDrive extends SubsystemBase {
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond);
+        states, Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(states[module.getModulePosition().ordinal()], isOpenLoop);
@@ -133,8 +132,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
-    var states =
-        Constants.constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = Constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
   }
 
@@ -164,20 +162,20 @@ public class SwerveDrive extends SubsystemBase {
     return m_odometry.getEstimatedPosition();
   }
 
-  public SwerveModule getSwerveModule(SwerveDriveModulePosition modulePosition) {
+  public SwerveModule getSwerveModule(SWERVE_MODULE_POSITION modulePosition) {
     return m_swerveModules.get(modulePosition);
   }
 
-  public Map<SwerveDriveModulePosition, SwerveModuleState> getModuleStates() {
-    Map<SwerveDriveModulePosition, SwerveModuleState> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, SwerveModuleState> getModuleStates() {
+    Map<SWERVE_MODULE_POSITION, SwerveModuleState> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getState());
     return map;
   }
 
-  public Map<SwerveDriveModulePosition, SwerveModulePosition> getModulePositions() {
-    Map<SwerveDriveModulePosition, SwerveModulePosition> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, SwerveModulePosition> getModulePositions() {
+    Map<SWERVE_MODULE_POSITION, SwerveModulePosition> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getPosition());
     return map;
   }
@@ -186,16 +184,15 @@ public class SwerveDrive extends SubsystemBase {
     return ModuleMap.orderedValues(getModulePositions(), new SwerveModulePosition[0]);
   }
 
-  public Map<SwerveDriveModulePosition, Pose2d> getModulePoses() {
-    Map<SwerveDriveModulePosition, Pose2d> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, Pose2d> getModulePoses() {
+    Map<SWERVE_MODULE_POSITION, Pose2d> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getModulePose());
     return map;
   }
 
   public boolean getModuleInitStatus() {
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet()) {
-
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet()) {
       if (!m_swerveModules.get(i).getInitSuccess()) {
         return false;
       }
@@ -243,9 +240,7 @@ public class SwerveDrive extends SubsystemBase {
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Translation2d modulePositionFromChassis =
-          Constants.constants
-              .SwerveDrive
-              .kModuleTranslations
+          Constants.SwerveDrive.kModuleTranslations
               .get(module.getModulePosition())
               .rotateBy(getHeadingRotation2d())
               .plus(getPoseMeters().getTranslation());
@@ -278,19 +273,15 @@ public class SwerveDrive extends SubsystemBase {
     swerveYaw.set(getHeadingDegrees());
   }
 
-  public void disabledInit() {
-    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      module.updateCanCoderHealth();
-    }
-  }
+  public void disabledPeriodic() {}
 
   @Override
   public void periodic() {
-    if (Initialize == false) {
-      if (getModuleInitStatus()) {
-        Initialize = true;
-      }
+    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+      module.updateCanCoderHealth();
     }
+    Initialize = getModuleInitStatus();
+
     updateOdometry();
     updateSmartDashboard();
   }
@@ -298,7 +289,7 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     ChassisSpeeds chassisSpeed =
-        Constants.constants.SwerveDrive.kSwerveKinematics.toChassisSpeeds(
+        Constants.SwerveDrive.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
     m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
