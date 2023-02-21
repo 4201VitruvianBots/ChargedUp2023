@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -50,7 +51,6 @@ public class Elevator extends SubsystemBase {
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private double setpointMultiplier = 1;
   private static elevatorHeights desiredHeightState =
       elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
 
@@ -71,7 +71,11 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = false;
+  private boolean elevatorIsClosedLoop = true;
+
+  private int openLoopDeadband = 10;
+  private double maxPercentOutput = 0.25;
+  private double setpointMultiplier = 0.35;
 
   // Simulation setup
 
@@ -100,6 +104,8 @@ public class Elevator extends SubsystemBase {
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
   public GenericEntry elevatorControlLoopTab =
       elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
+  public GenericEntry elevatorEncoderCountsTab =
+      elevatorTab.add("Elevator Encoder Counts", 0.0).getEntry();
 
   // Mechanism2d visualization setup
 
@@ -144,11 +150,15 @@ public class Elevator extends SubsystemBase {
       motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
+
+      motor.configPeakOutputForward(maxPercentOutput, 0);
     }
+
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
     elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
@@ -176,6 +186,10 @@ public class Elevator extends SubsystemBase {
   public double getElevatorHeight() {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.constants.Elevator.metersToEncoderCounts;
+  }
+
+  public double getElevatorEncoderCounts() {
+    return elevatorMotors[0].getSelectedSensorPosition();
   }
 
   public double getElevatorMotorVoltage() {
@@ -242,6 +256,7 @@ public class Elevator extends SubsystemBase {
     // TODO: Add encoder counts per second or since last scheduler run
 
     elevatorHeightTab.setDouble(getElevatorHeight());
+    elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
     elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
@@ -324,7 +339,7 @@ public class Elevator extends SubsystemBase {
       }
       setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
-      setElevatorPercentOutput(elevatorJoystickY);
+      setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
     }
   }
 }

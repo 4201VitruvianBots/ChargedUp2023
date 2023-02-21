@@ -54,7 +54,7 @@ public class Intake extends SubsystemBase {
   }
 
   // control mode function
-  public static boolean getIntakeState() {
+  public boolean getIntakeState() {
     return isIntaking;
   }
 

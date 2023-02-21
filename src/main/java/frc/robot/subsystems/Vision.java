@@ -238,6 +238,10 @@ public class Vision extends SubsystemBase {
         case LEFT_LOCALIZER:
           localizer = m_leftLocalizer;
           break;
+        case INTAKE:
+          break;
+        case OUTTAKE:
+          break;
       }
       robotPosX = localizer.getEntry("Robot Pose X").getDoubleArray(new double[] {});
       robotPosY = localizer.getEntry("Robot Pose Y").getDoubleArray(new double[] {});
@@ -288,6 +292,10 @@ public class Vision extends SubsystemBase {
           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
           break;
         case RIGHT_LOCALIZER:
+          break;
+        case INTAKE:
+          break;
+        case OUTTAKE:
           break;
       }
     }
