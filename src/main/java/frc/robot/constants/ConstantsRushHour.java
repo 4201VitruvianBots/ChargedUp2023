@@ -40,17 +40,16 @@ public class ConstantsRushHour {
 
   public final class IntakeDef {}
 
-  public final class WristDef {
-    public final int wristMotor = 30;
-    public final int wristGearRatio = (1 / 50);
-    public final double encoderUnitsPerRotation = 7.2 * wristGearRatio;
-    public final double wristRotationUpperLimit = 0;
-    public final double wristEncoderUpperLimit =
-        wristRotationUpperLimit * encoderUnitsPerRotation * wristGearRatio;
-    public final double wristEncoderSlowdown = 0;
-    public final double maxSpeedLimitsPercent = 0;
-    public final int wristLowerSwitch = 0;
-    public final double wristmaxRotationDegrees = 190;
+  public static final class WristDef {
+    public static final int wristMotor = 30;
+    public static final double wristGearRatio = (1.0 / 50.0);
+    public static final double encoderUnitsPerRotation = 360.0 / (2048.0 * (1.0/wristGearRatio)); 
+    public static final double wristEncoderUpperLimit = 90.0 / encoderUnitsPerRotation; 
+    public static final double wristEncoderLowerLimit = -15.0 / encoderUnitsPerRotation; 
+    public static final double wristEncoderSlowdown = 0;
+    public static final double maxSpeedLimitsPercent = 0;
+    public static final int wristLowerSwitch = 0;
+    public static final double wristmaxRotationDegrees = 190;
 
     // Need to find using sysid
     public final double FFkS = 0;

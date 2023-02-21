@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -26,8 +27,8 @@ public class Wrist extends SubsystemBase {
   private static final double maxRotationValue = Constants.constants.Wrist.wristmaxRotationDegrees;
   private static final int encoderCountsPerAngle = 0;
   private static final boolean wristLowerLimitOverride = false;
-  private double desiredRotationValue;
-  private static WristRotations desiredRotationState = WristRotations.NONE;
+  private static double desiredRotationValue;
+  private static WristRotations desiredRotationState = WristRotations.STOWED;
   private double wristPosition = 0;
   private static double wristJoystickX;
   private boolean wristIsClosedLoop = true; 
@@ -36,6 +37,7 @@ public class Wrist extends SubsystemBase {
     LOW,
     MEDIUM,
     JOYSTICK,
+    STOWED, 
     NONE
   }
 
@@ -71,8 +73,6 @@ public class Wrist extends SubsystemBase {
   public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/wrist/wristSetpoint");
   public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/wrist/wristPosition");
   public static ShuffleboardTab wristTab = Shuffleboard.getTab("Wrist");
-  public GenericEntry wristHeightTab = wristTab.add("Wrist Position", 0).getEntry();
-  public GenericEntry wristDesiredTab = wristTab.add("Wrist DesiredRotation", 0).getEntry();
 
   public Wrist() {
     // One motor for the wrist
@@ -92,11 +92,15 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.config_kF(0, kF);
     wristMotor.config_kP(0, kP);
+    setEncoderPosition(-(int)(15.0/Constants.constants.Wrist.encoderUnitsPerRotation)); 
+
+    wristTab.addDouble("Angle", this::getAngle);
+    wristTab.addDouble("Raw position", this::getWristPosition);
+    wristTab.addDouble("Setpoint", wristMotor::getSelectedSensorPosition);
   }
   //  setpoint for the wrist
   public void setSetpoint(double setpoint) {
-    this.desiredRotationValue = setpoint;
-    this.m_goal = new TrapezoidProfile.State(desiredRotationValue, 0);
+    wristMotor.set(ControlMode.Position, setpoint);
   }
 
   public boolean getWristState() {
@@ -112,9 +116,10 @@ public class Wrist extends SubsystemBase {
         * (360.0 / Constants.constants.Wrist.encoderUnitsPerRotation)
         / Constants.constants.Wrist.wristGearRatio;
   }
+
   // this is get current angle
   public double getAngle() {
-    return getWristPosition() / encoderCountsPerAngle;
+    return getWristPosition() * Constants.constants.Wrist.encoderUnitsPerRotation;
   }
 
   public void zeroEncoder() {
@@ -152,13 +157,13 @@ public class Wrist extends SubsystemBase {
   }
 
   private double getWristPosition() {
-    return wristMotor.getSelectedSensorPosition() / Constants.constants.Wrist.wristGearRatio;
+    return wristMotor.getSelectedSensorPosition();
   }
   // reset wrist angle function based off of a limit switch/hall effect sensor
   public static void updateWristRotation() {
-    if (getWristLowerSwitch()) {
-      setWristSensorPosition(0.0);
-    }
+    // if (getWristLowerSwitch()) {
+    //   setWristSensorPosition(0.0);
+    // }
   }
 
   public static void setWristSensorPosition(double position) {
@@ -194,36 +199,22 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    // Create a motion profile with the given maximum velocity and maximum
-    // acceleration constraints for the next setpoint, the desired goal, and the
-    // current setpoint.
-    TrapezoidProfile profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-
-    // Retrieve the profiled setpoint for the next timestep. This setpoint moves
-    // toward the goal while obeying the constraints.
-    m_setpoint = profile.calculate(kDt);
-
-    wristHeightTab.setDouble(getWristPosition());
-    wristDesiredTab.setDouble(desiredRotationValue);
-
-    wristMotor.set(
-        TalonFXControlMode.Position,
-        m_feedforward.calculate(Math.toRadians(getWristPosition()), m_setpoint.velocity));
-
     // This method will be called once per scheduler run
-    if (wristIsClosedLoop) {
+  if (wristIsClosedLoop) {
     switch (desiredRotationState) {
-      case JOYSTICK:
-      desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
-      case LOW:
-        setSetpoint(0.0);
-        break;
-      case MEDIUM:
-        setSetpoint(maxRotationValue / 2); // Placeholder values
-        break;
-      case NONE:
-        break;
+      // case JOYSTICK:
+      // desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
+      // case LOW:
+      //   setSetpoint(0.0);
+      //   break;
+      // case MEDIUM:
+      //   setSetpoint(maxRotationValue / 2); // Placeholder values
+      //   break;
+      default:
+      case STOWED: 
+        setSetpoint(50.0 / Constants.constants.Wrist.encoderUnitsPerRotation);
+      // case NONE:
+      //   break;
     }
   }
   else {
