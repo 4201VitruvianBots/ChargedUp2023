@@ -147,6 +147,8 @@ public class Elevator extends SubsystemBase {
       motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
+
+      motor.configPeakOutputForward(maxPercentOutput);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
