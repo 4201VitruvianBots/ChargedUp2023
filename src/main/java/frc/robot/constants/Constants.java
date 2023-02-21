@@ -118,11 +118,24 @@ public final class Constants {
     }
   }
 
-  public enum SwerveDriveModulePosition {
+  public enum SWERVE_MODULE_POSITION {
     FRONT_LEFT,
     FRONT_RIGHT,
     BACK_LEFT,
     BACK_RIGHT
+  }
+
+  public static class SetpointSolver {
+    public static final double WRIST_HORIZONTAL_LOW_OFFSET = Units.inchesToMeters(6);
+    public static final double WRIST_HORIZONTAL_MID_OFFSET = Units.inchesToMeters(6);
+    public static final double WRIST_HORIZONTAL_HIGH_OFFSET = Units.inchesToMeters(6);
+  }
+
+  public enum SCORING_STATES {
+    LOW_INTAKE,
+    LOW,
+    MID,
+    HIGH
   }
 
   public static ConstantsRushHour constants = new ConstantsRushHour();

@@ -188,7 +188,7 @@ public class FieldSim extends SubsystemBase {
    * 4 - Node is closest to our robot
    */
   public Pose2d getTargetNode(
-      StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
+          StateHandler.INTAKING_STATES intakeState, StateHandler.MAIN_ROBOT_STATES mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
     if (DriverStation.getAlliance() == Alliance.Red) {
@@ -197,17 +197,17 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(blueNodes);
     }
 
-    if (intakeState == StateHandler.intakingStates.CONE) {
+    if (intakeState == StateHandler.INTAKING_STATES.CONE) {
       possibleNodes.retainAll(coneNodes);
-    } else if (intakeState == StateHandler.intakingStates.CUBE) {
+    } else if (intakeState == StateHandler.INTAKING_STATES.CUBE) {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == StateHandler.mainRobotStates.SCORE_LOW) {
+    if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_LOW) {
       possibleNodes.retainAll(lowNodes);
-    } else if (mainState == StateHandler.mainRobotStates.SCORE_MEDIUM) {
+    } else if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (mainState == StateHandler.mainRobotStates.SCORE_HIGH) {
+    } else if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
 

@@ -28,11 +28,11 @@ import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase {
-  SwerveDriveModulePosition m_modulePosition;
+  SWERVE_MODULE_POSITION m_modulePosition;
   int m_moduleNumber;
   TalonFX m_turnMotor;
   TalonFX m_driveMotor;
@@ -78,7 +78,7 @@ public class SwerveModule extends SubsystemBase {
   public DoubleLogEntry swerveModuleYPositionEntry;
 
   public SwerveModule(
-      SwerveDriveModulePosition modulePosition,
+      SWERVE_MODULE_POSITION modulePosition,
       TalonFX turnMotor,
       TalonFX driveMotor,
       CANCoder angleEncoder,
@@ -125,7 +125,7 @@ public class SwerveModule extends SubsystemBase {
     return m_initSuccess;
   }
 
-  public SwerveDriveModulePosition getModulePosition() {
+  public SWERVE_MODULE_POSITION getModulePosition() {
     return m_modulePosition;
   }
 

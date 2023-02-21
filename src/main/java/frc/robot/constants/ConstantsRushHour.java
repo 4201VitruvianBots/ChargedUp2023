@@ -4,11 +4,12 @@
 
 package frc.robot.constants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.constants.Constants.SwerveDriveModulePosition;
+import frc.robot.constants.Constants.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class ConstantsRushHour {
     public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
     public static final double elevatorMinHeightMeters = 0;
     public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
+    public static final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(0);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
@@ -48,15 +50,15 @@ public class ConstantsRushHour {
     public static final double kTrackWidth = Units.inchesToMeters(24);
     public static final double kWheelBase = Units.inchesToMeters(24);
 
-    public static final Map<SwerveDriveModulePosition, Translation2d> kModuleTranslations =
+    public static final Map<SWERVE_MODULE_POSITION, Translation2d> kModuleTranslations =
         Map.of(
-            SwerveDriveModulePosition.FRONT_LEFT,
+            SWERVE_MODULE_POSITION.FRONT_LEFT,
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            SwerveDriveModulePosition.FRONT_RIGHT,
+            SWERVE_MODULE_POSITION.FRONT_RIGHT,
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            SwerveDriveModulePosition.BACK_LEFT,
+            SWERVE_MODULE_POSITION.BACK_LEFT,
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            SwerveDriveModulePosition.BACK_RIGHT,
+            SWERVE_MODULE_POSITION.BACK_RIGHT,
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final double frontLeftCANCoderOffset = 84.98628; // 85.957;
