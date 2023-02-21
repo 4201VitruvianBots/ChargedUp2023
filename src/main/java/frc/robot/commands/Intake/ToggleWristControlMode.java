@@ -4,37 +4,29 @@
 
 package frc.robot.commands.Intake;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.subsystems.Wrist;
-import java.util.function.DoubleSupplier;
 
-public class RunWristJoystick extends CommandBase {
+public class ToggleWristControlMode extends CommandBase {
+  /** Creates a new SetElevatorControlLoop. */
   private Wrist m_wrist;
-  private DoubleSupplier m_JoystickX;
-  /** Creates a new RunWristJoystick. */
-  public RunWristJoystick(Wrist wrist, DoubleSupplier joystickX) {
+
+  public ToggleWristControlMode(Wrist wrist) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_wrist = wrist;
-    m_JoystickX = joystickX;
+
     addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_wrist.setControlMode(!m_wrist.getControlMode());
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
-  // commands to move wrist (Move using joystick values, go to a setpoint)
   @Override
-  public void execute() {
-    // Deadbands joystick X so joystick Xs below 0.05 won't be registered
-    double joystickXDeadbandOutput = MathUtil.applyDeadband((m_JoystickX.getAsDouble()), 0.05);
-
-    m_wrist.setWristState(WRIST_STATE.JOYSTICK);
-    m_wrist.setWristInput(joystickXDeadbandOutput);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
@@ -43,6 +35,6 @@ public class RunWristJoystick extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

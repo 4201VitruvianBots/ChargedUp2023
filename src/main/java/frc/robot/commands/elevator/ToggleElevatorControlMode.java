@@ -2,38 +2,31 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Elevator.elevatorHeights;
 
-public class MoveToElevatorHeight extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. */
+public class ToggleElevatorControlMode extends CommandBase {
+  /** Creates a new SetElevatorControlLoop. */
   private Elevator m_elevator;
 
-  private elevatorHeights heightEnum;
-
-  public MoveToElevatorHeight(Elevator elevator, elevatorHeights heightEnum) {
-
+  public ToggleElevatorControlMode(Elevator elevator) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    this.heightEnum = heightEnum;
+
     addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_elevator.setControlMode(!m_elevator.getControlMode());
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // if (m_elevator.getElevatorDesiredHeightState() != heightEnum) {
-    m_elevator.setElevatorDesiredHeightState(heightEnum);
-    // }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

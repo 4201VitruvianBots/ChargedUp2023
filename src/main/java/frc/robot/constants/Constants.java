@@ -62,6 +62,16 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 8;
   }
 
+  public static final class Elevator {
+    public enum ELEVATOR_STATE {
+      STOWED,
+      LOW,
+      MID,
+      HIGH,
+      JOYSTICK,
+    }
+  }
+
   public static final class SwerveDrive {
     public static final double kTrackWidth = Units.inchesToMeters(24);
     public static final double kWheelBase = Units.inchesToMeters(24);
@@ -139,11 +149,11 @@ public final class Constants {
   }
 
   public static final class Wrist {
-    public enum WRIST_POSITIONS {
+    public enum WRIST_STATE {
       STOWED,
       INTAKING,
       LOW,
-      MEDIUM,
+      MID,
       HIGH,
       JOYSTICK,
     }

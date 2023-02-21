@@ -55,12 +55,16 @@ public class Vision extends SubsystemBase {
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
 
-    PortForwarder.add(5800, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
-    PortForwarder.add(5801, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
-    PortForwarder.add(5802, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5802);
-    PortForwarder.add(5803, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5803);
-    PortForwarder.add(5804, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5804);
-    PortForwarder.add(5805, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5805);
+    PortForwarder.add(5800, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5800);
+    PortForwarder.add(5801, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5801);
+    PortForwarder.add(5802, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5802);
+    PortForwarder.add(5803, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5803);
+    PortForwarder.add(5804, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5804);
+    PortForwarder.add(5805, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5805);
+    PortForwarder.add(5806, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5807, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5801);
+    PortForwarder.add(5808, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5809, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
 
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");

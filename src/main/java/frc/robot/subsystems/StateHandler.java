@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 import frc.robot.simulation.FieldSim;
 
 public class StateHandler extends SubsystemBase {
@@ -131,7 +132,7 @@ public class StateHandler extends SubsystemBase {
       case SCORE_SETPOINT_LOW:
         break;
       case SCORE_SETPOINT_LOW_INTAKE:
-        m_elevator.setElevatorDesiredHeightState(Elevator.elevatorHeights.LOW);
+        m_elevator.setElevatorState(ELEVATOR_STATE.LOW);
         break;
 
       case INTAKING_GROUND:
@@ -149,7 +150,7 @@ public class StateHandler extends SubsystemBase {
         break;
       default:
       case STOWED:
-        m_elevator.setElevatorDesiredHeightState(Elevator.elevatorHeights.STOWED);
+        m_elevator.setElevatorState(ELEVATOR_STATE.STOWED);
         //        m_Wrist.setWristState(Wrist.WristRotations.);
         break;
     }

@@ -5,40 +5,37 @@
 package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
+import frc.robot.constants.Constants.Wrist.WRIST_STATE;
+import frc.robot.subsystems.Wrist;
 
-public class RunReverseIntake extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Intake m_intake;
+public class SetWristState extends CommandBase {
+  private final Wrist m_wrist;
+  private WRIST_STATE m_state;
 
-  private double m_PercentOutput;
-
-  /** Creates a new RunIntake. */
-  public RunReverseIntake(Intake intake, double PercentOutput) {
-    m_intake = intake;
-    m_PercentOutput = PercentOutput;
+  /** Creates a new RunWrist. */
+  public SetWristState(Wrist wrist, WRIST_STATE state) {
+    m_wrist = wrist;
+    m_state = state;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake);
+    addRequirements(wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_intake.setIntakeState(true);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(m_PercentOutput);
+    m_wrist.setWristState(m_state);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakePercentOutput(0);
-    m_intake.setIntakeState(false);
+    // If you are not in joystick mode, automatically move back to the stowed position
+    if (m_wrist.getWristState() != WRIST_STATE.JOYSTICK) m_wrist.setWristState(WRIST_STATE.STOWED);
   }
 
   // Returns true when the command should end.

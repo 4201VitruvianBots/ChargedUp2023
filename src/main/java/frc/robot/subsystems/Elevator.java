@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 
 public class Elevator extends SubsystemBase {
 
@@ -35,23 +36,14 @@ public class Elevator extends SubsystemBase {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
   };
 
-  // Used by RobotContainer to specify which button has been pressed
-  public enum elevatorHeights {
-    STOWED,
-    LOW,
-    MID,
-    HIGH,
-    JOYSTICK,
-  }
-
   // Limit switch at bottom of elevator
   private static DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private static elevatorHeights desiredHeightState =
-      elevatorHeights.STOWED; // Think of this as our "next state" in our state machine.
+  private ELEVATOR_STATE desiredHeightState =
+      ELEVATOR_STATE.STOWED; // Think of this as our "next state" in our state machine.
 
   private static double elevatorJoystickY;
 
@@ -172,7 +164,7 @@ public class Elevator extends SubsystemBase {
   /*
    * Elevator's motor output as a percentage
    */
-  public static double getElevatorPercentOutput() {
+  public double getElevatorPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
@@ -180,7 +172,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-  public static void setElevatorMotionMagicMeters(double setpoint) {
+  public void setElevatorMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
         TalonFXControlMode.MotionMagic,
         setpoint / Constants.getInstance().Elevator.metersToEncoderCounts);
@@ -202,15 +194,15 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
-  public static boolean getElevatorLowerSwitch() {
+  public boolean getElevatorLowerSwitch() {
     return !elevatorLowerSwitch.get();
   }
 
-  public static void setElevatorSensorPosition(double position) {
+  public void setElevatorSensorPosition(double position) {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  public static elevatorHeights getElevatorDesiredHeightState() {
+  public ELEVATOR_STATE getElevatorState() {
     return desiredHeightState;
   }
 
@@ -218,7 +210,7 @@ public class Elevator extends SubsystemBase {
     return !(Math.abs(getElevatorPercentOutput()) < 0.05);
   }
 
-  public void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
+  public void setElevatorState(ELEVATOR_STATE heightEnum) {
     desiredHeightState = heightEnum;
   }
 
@@ -239,11 +231,11 @@ public class Elevator extends SubsystemBase {
    * Closed loop (default): Uses motion magic and a set setpoint to determine motor output
    * Open loop: Changes motor output directly
    */
-  public void setElevatorControlLoop(boolean isClosedLoop) {
+  public void setControlMode(boolean isClosedLoop) {
     elevatorIsClosedLoop = isClosedLoop;
   }
 
-  public boolean getElevatorControlLoop() {
+  public boolean getControlMode() {
     return elevatorIsClosedLoop;
   }
 

@@ -20,10 +20,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Wrist.WRIST_POSITIONS;
+import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
 public class Wrist extends SubsystemBase {
-  private WRIST_POSITIONS desiredRotationState = WRIST_POSITIONS.STOWED;
+  private WRIST_STATE m_desiredState = WRIST_STATE.STOWED;
   private double desiredAngleSetpoint;
   private double m_lowerAngleLimit;
   private double m_upperAngleLimit;
@@ -112,8 +112,12 @@ public class Wrist extends SubsystemBase {
     return desiredAngleSetpoint;
   }
 
-  public void setWristDesiredRotationState(WRIST_POSITIONS wristEnum) {
-    desiredRotationState = wristEnum;
+  public void setWristState(WRIST_STATE state) {
+    m_desiredState = state;
+  }
+
+  public WRIST_STATE getWristState() {
+    return m_desiredState;
   }
 
   // this is get current angle
@@ -152,11 +156,11 @@ public class Wrist extends SubsystemBase {
     setSetpointDegrees(-15.0); // setWristSensorPosition(0);
   }
 
-  public void setWristClosedLoop(boolean isClosedLoop) {
+  public void setControlMode(boolean isClosedLoop) {
     wristIsClosedLoop = isClosedLoop;
   }
 
-  public boolean getWristClosedLoop() {
+  public boolean getControlMode() {
     return wristIsClosedLoop;
   }
 
@@ -188,7 +192,7 @@ public class Wrist extends SubsystemBase {
     updateLog();
     // This method will be called once per scheduler run
     if (wristIsClosedLoop) {
-      switch (desiredRotationState) {
+      switch (m_desiredState) {
         case JOYSTICK:
           desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristSensorPosition();
           break;
@@ -199,7 +203,7 @@ public class Wrist extends SubsystemBase {
           // TODO: Find setpoint value
           desiredAngleSetpoint = 0;
           break;
-        case MEDIUM:
+        case MID:
           // TODO: Find setpoint value
           desiredAngleSetpoint = 0;
           break;
