@@ -40,7 +40,6 @@ public class ConstantsBase {
   public final class IntakeDef {}
 
   public static final class WristDef {
-    public final int wristMotor = 30;
     public final double wristGearRatio = (1.0 / 50.0);
     public final double encoderUnitsPerRotation = 360.0 / (2048.0 * (1.0 / wristGearRatio));
     public final double wristAbsoluteUpperLimitDegrees = 200;

@@ -34,7 +34,7 @@ public class Wrist extends SubsystemBase {
   private static DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.getInstance().Wrist.wristLowerSwitch);
   /** Creates a new Wrist. */
-  private static TalonFX wristMotor = new TalonFX(Constants.getInstance().Wrist.wristMotor);
+  private static TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   private ArmFeedforward m_feedforward =
