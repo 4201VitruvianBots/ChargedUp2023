@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -103,6 +104,8 @@ public class Elevator extends SubsystemBase {
       elevatorTab.add("Elevator Percent Output", "0%").getEntry();
   public GenericEntry elevatorControlLoopTab =
       elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
+  public GenericEntry elevatorEncoderCountsTab =
+      elevatorTab.add("Elevator Encoder Counts", 0.0).getEntry();
 
   // Mechanism2d visualization setup
 
@@ -147,12 +150,15 @@ public class Elevator extends SubsystemBase {
       motor.configMotionAcceleration(6000, Constants.constants.Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
+
+      motor.configPeakOutputForward(maxPercentOutput, 0);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
     elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
@@ -180,6 +186,10 @@ public class Elevator extends SubsystemBase {
   public double getElevatorHeight() {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.constants.Elevator.metersToEncoderCounts;
+  }
+
+  public double getElevatorEncoderCounts() {
+    return elevatorMotors[0].getSelectedSensorPosition();
   }
 
   public double getElevatorMotorVoltage() {
@@ -246,6 +256,7 @@ public class Elevator extends SubsystemBase {
     // TODO: Add encoder counts per second or since last scheduler run
 
     elevatorHeightTab.setDouble(getElevatorHeight());
+    elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
     elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 

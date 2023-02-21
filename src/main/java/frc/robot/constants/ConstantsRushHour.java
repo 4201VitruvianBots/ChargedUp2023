@@ -19,13 +19,13 @@ public class ConstantsRushHour {
     public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
     public static final double elevatorGearing = 10.0;
     public static final double elevatorMassKg = 4.0;
-    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(1.0);
+    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
     public static final double elevatorMinHeightMeters = 0;
     public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static final double kGearRatio = 1.0 / 5.0;
+    public static final double kGearRatio = 5.0;
     public static final double kMaxRPM = 6380.0;
     public static final double kMaxVelocity =
         (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
