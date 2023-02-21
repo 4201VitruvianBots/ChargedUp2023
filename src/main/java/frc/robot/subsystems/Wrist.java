@@ -30,6 +30,7 @@ public class Wrist extends SubsystemBase {
   private static WristRotations desiredRotationState = WristRotations.NONE;
   private double wristPosition = 0;
   private static double wristJoystickX;
+  private boolean wristIsClosedLoop = true; 
 
   public enum WristRotations {
     LOW,
@@ -167,6 +168,16 @@ public class Wrist extends SubsystemBase {
   public static boolean getWristLowerSwitch() {
     return !wristLowerSwitch.get();
   }
+
+  public void setWristClosedLoop(boolean isClosedLoop) {
+    wristIsClosedLoop = isClosedLoop;
+  }
+
+  public boolean getElevatorControlLoop() {
+    return wristIsClosedLoop;
+  }
+
+
   // smartdashboard function
   public void updateSmartDashboard() {
     // ShuffleboardTab.putNumber("Wrist", getWristState());
@@ -201,9 +212,10 @@ public class Wrist extends SubsystemBase {
         m_feedforward.calculate(Math.toRadians(getWristPosition()), m_setpoint.velocity));
 
     // This method will be called once per scheduler run
+    if (wristIsClosedLoop) {
     switch (desiredRotationState) {
       case JOYSTICK:
-        setWristPercentOutput(wristJoystickX);
+      desiredRotationValue = wristJoystickX * setpointMultiplier + getWristPosition();
       case LOW:
         setSetpoint(0.0);
         break;
@@ -213,6 +225,10 @@ public class Wrist extends SubsystemBase {
       case NONE:
         break;
     }
+  }
+  else {
+    setWristPercentOutput(wristJoystickX * setpointMultiplier);
+  }
   }
 
   public Object getWristDesiredRotationState() {

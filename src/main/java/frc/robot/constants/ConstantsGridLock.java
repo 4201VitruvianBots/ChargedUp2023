@@ -27,10 +27,10 @@ public class ConstantsGridLock extends ConstantsRushHour {
             SwerveDriveModulePosition.BACK_RIGHT,
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 105.557;
-    public static final double frontRightCANCoderOffset = 67.412;
-    public static final double backLeftCANCoderOffset = 96.240;
-    public static final double backRightCANCoderOffset = 147.217;
+    public static final double frontLeftCANCoderOffset = 327.129;
+    public static final double frontRightCANCoderOffset = 62.051;
+    public static final double backLeftCANCoderOffset = 11.250;
+    public static final double backRightCANCoderOffset = 213.135;
 
     public static final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(
