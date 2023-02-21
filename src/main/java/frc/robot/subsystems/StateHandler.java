@@ -68,7 +68,7 @@ public class StateHandler extends SubsystemBase {
 
   // Final part of our state machine
   public void advanceState() {
-    if (Intake.getIntakeState()) {}
+    if (m_Intake.getIntakeState()) {}
     currentElevatorState = Elevator.getElevatorDesiredHeightState();
     // Coordinate Wrist Movement with Elevator Heights
     /*

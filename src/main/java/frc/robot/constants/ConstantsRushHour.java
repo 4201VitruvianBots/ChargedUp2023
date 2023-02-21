@@ -14,43 +14,43 @@ import java.util.Map;
 
 public class ConstantsRushHour {
 
-  public static final class ElevatorDef {
+  public final class ElevatorDef {
     // Elevator sim constants
-    public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
-    public static final double elevatorGearing = 10.0;
-    public static final double elevatorMassKg = 4.0;
-    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
-    public static final double elevatorMinHeightMeters = 0;
-    public static final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
+    public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
+    public final double elevatorGearing = 10.0;
+    public final double elevatorMassKg = 4.0;
+    public final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
+    public final double elevatorMinHeightMeters = 0;
+    public final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
 
     // PID
-    public static final double kSensorUnitsPerRotation = 2048.0;
-    public static final double kGearRatio = 5.0;
-    public static final double kMaxRPM = 6380.0;
-    public static final double kMaxVelocity =
+    public final double kSensorUnitsPerRotation = 2048.0;
+    public final double kGearRatio = 5.0;
+    public final double kMaxRPM = 6380.0;
+    public final double kMaxVelocity =
         (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
 
-    public static final int kSlotIdx = 0;
-    public static final int kPIDLoopIdx = 0;
-    public static final int kTimeoutMs = 0;
+    public final int kSlotIdx = 0;
+    public final int kPIDLoopIdx = 0;
+    public final int kTimeoutMs = 0;
 
-    public static final double metersToEncoderCounts =
+    public final double metersToEncoderCounts =
         (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
   }
 
   public final class IntakeDef {}
 
-  public static final class WristDef {
-    public static final int wristMotor = 30;
-    public static final int wristGearRatio = (1 / 50);
-    public static final double encoderUnitsPerRotation = 7.2 * wristGearRatio;
-    public static final double wristRotationUpperLimit = 0;
-    public static final double wristEncoderUpperLimit =
+  public final class WristDef {
+    public final int wristMotor = 30;
+    public final int wristGearRatio = (1 / 50);
+    public final double encoderUnitsPerRotation = 7.2 * wristGearRatio;
+    public final double wristRotationUpperLimit = 0;
+    public final double wristEncoderUpperLimit =
         wristRotationUpperLimit * encoderUnitsPerRotation * wristGearRatio;
-    public static final double wristEncoderSlowdown = 0;
-    public static final double maxSpeedLimitsPercent = 0;
-    public static final int wristLowerSwitch = 0;
-    public static final double wristmaxRotationDegrees = 190;
+    public final double wristEncoderSlowdown = 0;
+    public final double maxSpeedLimitsPercent = 0;
+    public final int wristLowerSwitch = 0;
+    public final double wristmaxRotationDegrees = 190;
 
     // Need to find using sysid
     public final double FFkS = 0;
@@ -66,11 +66,11 @@ public class ConstantsRushHour {
 
   public final class LEDDef {}
 
-  public static final class SwerveDriveDef {
-    public static final double kTrackWidth = Units.inchesToMeters(24);
-    public static final double kWheelBase = Units.inchesToMeters(24);
+  public final class SwerveDriveDef {
+    public final double kTrackWidth = Units.inchesToMeters(24);
+    public final double kWheelBase = Units.inchesToMeters(24);
 
-    public static final Map<SwerveDriveModulePosition, Translation2d> kModuleTranslations =
+    public final Map<SwerveDriveModulePosition, Translation2d> kModuleTranslations =
         Map.of(
             SwerveDriveModulePosition.FRONT_LEFT,
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -81,49 +81,49 @@ public class ConstantsRushHour {
             SwerveDriveModulePosition.BACK_RIGHT,
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double frontLeftCANCoderOffset = 84.98628; // 85.957;
-    public static final double frontRightCANCoderOffset = 219.506836; // 41.748;
-    public static final double backLeftCANCoderOffset = 261.95906; // 261.475;
-    public static final double backRightCANCoderOffset = 148.183594; // 148.008; // 329.150;
+    public final double frontLeftCANCoderOffset = 84.98628; // 85.957;
+    public final double frontRightCANCoderOffset = 219.506836; // 41.748;
+    public final double backLeftCANCoderOffset = 261.95906; // 261.475;
+    public final double backRightCANCoderOffset = 148.183594; // 148.008; // 329.150;
 
-    public static final SwerveDriveKinematics kSwerveKinematics =
+    public final SwerveDriveKinematics kSwerveKinematics =
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
-    public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
-    public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
+    public final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+    public final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
+    public final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_Translation = 0.6;
-    public static final double kI_Translation = 0;
-    public static final double kD_Translation = 0;
-    public static final double kP_Rotation = 4;
-    public static final double kI_Rotation = 0;
-    public static final double kD_Rotation = 0.01;
+    public final double kP_Translation = 0.6;
+    public final double kI_Translation = 0;
+    public final double kD_Translation = 0;
+    public final double kP_Rotation = 4;
+    public final double kI_Rotation = 0;
+    public final double kD_Rotation = 0.01;
   }
 
-  public static final class SwerveModuleDef {
-    public static final double kDriveMotorGearRatio = 6.12;
-    public static final double kTurningMotorGearRatio = 150.0 / 7.0;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
-    public static final int kFalconEncoderCPR = 2048;
-    public static final int kCANCoderCPR = 4096;
+  public final class SwerveModuleDef {
+    public final double kDriveMotorGearRatio = 6.12;
+    public final double kTurningMotorGearRatio = 150.0 / 7.0;
+    public final double kWheelDiameterMeters = Units.inchesToMeters(4);
+    public final int kFalconEncoderCPR = 2048;
+    public final int kCANCoderCPR = 4096;
 
-    public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
-    public static final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
+    public final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
+    public final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
 
-    public static final double kDriveMotorDistancePerPulse =
+    public final double kDriveMotorDistancePerPulse =
         (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
-    public static final double kTurningMotorDistancePerPulse =
+    public final double kTurningMotorDistancePerPulse =
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
-    public static final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+    public final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
-    public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
-    public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
-    public static final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
+    public final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
+    public final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
+    public final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
 
-    public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
-    public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
+    public final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
+    public final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
 
   public final ElevatorDef Elevator;

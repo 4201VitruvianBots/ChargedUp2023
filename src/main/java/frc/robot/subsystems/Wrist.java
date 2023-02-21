@@ -26,7 +26,7 @@ public class Wrist extends SubsystemBase {
   private static final double maxRotationValue = Constants.constants.Wrist.wristmaxRotationDegrees;
   private static final int encoderCountsPerAngle = 0;
   private static final boolean wristLowerLimitOverride = false;
-  private static double desiredRotationValue;
+  private double desiredRotationValue;
   private static WristRotations desiredRotationState = WristRotations.NONE;
   private double wristPosition = 0;
   private static double wristJoystickX;
