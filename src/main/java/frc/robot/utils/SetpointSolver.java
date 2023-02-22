@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.constants.Constants;
 
 public class SetpointSolver {
-  private SetpointSolver m_instance;
+  private static SetpointSolver m_instance;
   private Pose2d m_currentRobotPose;
   private Pose2d m_targetPose;
   private double m_targetTangentalOffset;
@@ -19,7 +19,7 @@ public class SetpointSolver {
 
   private SetpointSolver() {}
 
-  public SetpointSolver getInstance() {
+  public static SetpointSolver getInstance() {
     if (m_instance == null) {
       m_instance = new SetpointSolver();
     }
@@ -27,7 +27,7 @@ public class SetpointSolver {
   }
 
   public void solveSetpoints(
-      Pose2d currentRobotPose, Pose2d targetPose, Constants.SCORING_STATES scoringState) {
+      Pose2d currentRobotPose, Pose2d targetPose, Constants.SCORING_STATE scoringState) {
     solveSetpoints(currentRobotPose, targetPose, scoringState, 0);
   }
 
@@ -40,7 +40,7 @@ public class SetpointSolver {
   public void solveSetpoints(
       Pose2d currentRobotPose,
       Pose2d targetPose,
-      Constants.SCORING_STATES scoringState,
+      Constants.SCORING_STATE scoringState,
       double targetTangentalOffset) {
     m_currentRobotPose = currentRobotPose;
     m_targetPose = targetPose;
@@ -56,22 +56,22 @@ public class SetpointSolver {
         correctedSolution
             .getRotation()
             .plus(
-                scoringState == Constants.SCORING_STATES.LOW_INTAKE
+                scoringState == Constants.SCORING_STATE.SMART_LOW_INTAKE
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 
     switch (scoringState) {
-      case LOW_INTAKE:
+      case SMART_LOW_INTAKE:
         m_wristOffset = 0;
         break;
-      case LOW:
+      case SMART_LOW:
         m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_LOW_OFFSET;
         break;
-      case MID:
+      case SMART_MEDIUM:
         m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_MID_OFFSET;
         break;
       default:
-      case HIGH:
+      case SMART_HIGH:
         m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_HIGH_OFFSET;
         break;
     }

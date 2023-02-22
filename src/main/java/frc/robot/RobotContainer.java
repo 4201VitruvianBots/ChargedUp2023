@@ -220,6 +220,6 @@ public class RobotContainer {
   public void periodic() {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
-    xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget ? 1 : 0);
+    xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
   }
 }

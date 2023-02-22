@@ -5,29 +5,16 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.SCORING_STATE;
 import frc.robot.simulation.FieldSim;
+import frc.robot.utils.SetpointSolver;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
-  public enum MAIN_ROBOT_STATES {
-    DISABLED,
-    AUTO,
-    STOWED,
-    INTAKING_GROUND,
-    INTAKING_STATION,
-    AUTO_BALANCE,
-    SCORE_SETPOINT_LOW_INTAKE,
-    SCORE_SETPOINT_LOW,
-    SCORE_SETPOINT_MEDIUM,
-    SCORE_SETPOINT_HIGH,
-    SCORE_SMART_LOW,
-    SCORE_SMART_MEDIUM,
-    SCORE_SMART_HIGH,
-  }
-
   public enum INTAKING_STATES {
     NONE,
     INTAKING,
@@ -40,13 +27,15 @@ public class StateHandler extends SubsystemBase {
     HIGH
   }
 
-  public MAIN_ROBOT_STATES currentMainState = MAIN_ROBOT_STATES.STOWED;
+  public SCORING_STATE scoringState = SCORING_STATE.STOWED;
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
-  public MAIN_ROBOT_STATES nextMainState = currentMainState;
+  private double m_wristOffset = 0;
+  public SCORING_STATE nextMainState = scoringState;
   public INTAKING_STATES nextIntakeState = currentIntakeState;
   public SUPERSTRUCTURE_STATE superstructureState = SUPERSTRUCTURE_STATE.LOW;
   public Pose2d targetNode;
-  public boolean isOnTarget;
+  private boolean m_smartScoringEnabled;
+  private boolean m_isOnTarget;
 
   private final Intake m_intake;
   private final Wrist m_wrist;
@@ -55,6 +44,7 @@ public class StateHandler extends SubsystemBase {
   private final Elevator m_elevator;
   private final LED m_led;
   private final Vision m_vision;
+  private final SetpointSolver m_setpointSolver;
 
   public StateHandler(
       Intake intake,
@@ -71,21 +61,35 @@ public class StateHandler extends SubsystemBase {
     m_led = led;
     m_vision = vision;
     m_wrist = wrist;
+    m_setpointSolver = SetpointSolver.getInstance();
   }
 
-  // First part of our state machine
-  public void queueMainState(MAIN_ROBOT_STATES state) {
-    nextMainState = state;
+  public void enableSmartScoring(boolean enabled) {
+    m_smartScoringEnabled = enabled;
   }
 
-  public void queueIntakingState(INTAKING_STATES state) {
-    nextIntakeState = state;
+  public boolean isOnTarget() {
+    return m_isOnTarget;
+  }
+
+  // Whopper whopper whopper whopper
+  // junior double triple whopper
+  // flame grilled taste with perfect toppers
+  // i rule this day
+  public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
+    var elevatorPose =
+        m_drive
+            .getPoseMeters()
+            .transformBy(
+                new Transform2d(
+                    m_elevator.getElevatorTranslation(), m_drive.getHeadingRotation2d()));
+
+    return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
   @Override
   public void periodic() {
-    targetNode = m_fieldSim.getTargetNode(currentIntakeState, currentMainState);
-    isOnTarget = false;
+    targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
 
     // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize
     // the elevator limits.
@@ -146,44 +150,29 @@ public class StateHandler extends SubsystemBase {
         break;
     }
 
-    switch (currentMainState) {
-      case SCORE_SMART_HIGH:
-        isOnTarget = m_fieldSim.isRobotOnTarget(targetNode, 0.1);
-        break;
-      case SCORE_SMART_MEDIUM:
-        isOnTarget = m_fieldSim.isRobotOnTarget(targetNode, 0.1);
-        break;
-      case SCORE_SMART_LOW:
-        isOnTarget = m_fieldSim.isRobotOnTarget(targetNode, 0.1);
-        break;
-      case SCORE_SETPOINT_HIGH:
-        break;
-      case SCORE_SETPOINT_MEDIUM:
-        break;
-      case SCORE_SETPOINT_LOW:
-        break;
-      case SCORE_SETPOINT_LOW_INTAKE:
-        m_elevator.setElevatorState(ELEVATOR_STATE.LOW);
-        break;
+    if (m_smartScoringEnabled) {
+      switch (scoringState) {
+        case SMART_HIGH:
+          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_HIGH_OFFSET;
+          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
+          break;
+        case SMART_MEDIUM:
+          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_MID_OFFSET;
+          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
+          break;
+        case SMART_LOW:
+          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_LOW_OFFSET;
+          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
+      }
 
-      case INTAKING_GROUND:
-        break;
-      case INTAKING_STATION:
-        break;
-
-      case AUTO:
-        break;
-
-      case AUTO_BALANCE:
-        break;
-
-      case DISABLED:
-        break;
-      default:
-      case STOWED:
-        m_elevator.setElevatorState(ELEVATOR_STATE.STOWED);
-        //        m_Wrist.setWristState(Wrist.WristRotations.);
-        break;
+      m_setpointSolver.solveSetpoints(
+          m_drive.getPoseMeters(),
+          m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+          scoringState);
+      m_wrist.setWristState(Constants.Wrist.WRIST_STATE.HIGH);
+      m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
+      // TODO: Add this to the SwerveDrive
+      //      m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
   }
 }

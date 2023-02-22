@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.datalog.DataLog;
@@ -258,6 +259,13 @@ public class Elevator extends SubsystemBase {
       setElevatorSensorPosition(0.0);
     }
     elevatorHeight = getHeightMeters();
+  }
+
+  public Translation2d getElevatorTranslation() {
+    return new Translation2d(
+        getHeightMeters()
+            * Math.cos(Constants.getInstance().Elevator.elevatorMountAngle.getRadians()),
+        0);
   }
 
   public void updateShuffleboard() {

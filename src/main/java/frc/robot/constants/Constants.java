@@ -165,11 +165,17 @@ public final class Constants {
     public static final double WRIST_HORIZONTAL_HIGH_OFFSET = Units.inchesToMeters(6);
   }
 
-  public enum SCORING_STATES {
-    LOW_INTAKE,
-    LOW,
-    MID,
-    HIGH
+  public enum SCORING_STATE {
+    STOWED,
+    AUTO_BALANCE,
+    SETPOINT_LOW_INTAKE,
+    SETPOINT_LOW,
+    SETPOINT_MEDIUM,
+    SETPOINT_HIGH,
+    SMART_LOW_INTAKE,
+    SMART_LOW,
+    SMART_MEDIUM,
+    SMART_HIGH,
   }
 
   private static ConstantsBase m_constants;

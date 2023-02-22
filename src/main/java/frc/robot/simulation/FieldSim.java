@@ -6,6 +6,7 @@ package frc.robot.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -171,6 +172,14 @@ public class FieldSim extends SubsystemBase {
         .getObject("rLocalizerPose")
         .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
 
+    elevatorPose =
+        m_swerveDrive
+            .getPoseMeters()
+            .transformBy(
+                new Transform2d(
+                    m_elevator.getElevatorTranslation(), m_swerveDrive.getHeadingRotation2d()));
+    m_field2d.getObject("Elevator Horizontal Pose").setPose(elevatorPose);
+
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
     if (RobotBase.isSimulation()) {
@@ -188,7 +197,7 @@ public class FieldSim extends SubsystemBase {
    * 4 - Node is closest to our robot
    */
   public Pose2d getTargetNode(
-      StateHandler.INTAKING_STATES intakeState, StateHandler.MAIN_ROBOT_STATES mainState) {
+      StateHandler.INTAKING_STATES intakeState, Constants.SCORING_STATE mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
     if (DriverStation.getAlliance() == Alliance.Red) {
@@ -203,47 +212,16 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_LOW) {
+    if (mainState == Constants.SCORING_STATE.SMART_LOW) {
       possibleNodes.retainAll(lowNodes);
-    } else if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_MEDIUM) {
+    } else if (mainState == Constants.SCORING_STATE.SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (mainState == StateHandler.MAIN_ROBOT_STATES.SCORE_SMART_HIGH) {
+    } else if (mainState == Constants.SCORING_STATE.SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
 
     // Only works on WPILIB version 2023.3.2 and above
     return robotPose.nearest(possibleNodes);
-  }
-
-  // Whopper whopper whopper whopper
-  // junior double triple whopper
-  // flame grilled taste with perfect toppers
-  // i rule this day
-  public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
-    // TODO: Fix elevator pose math
-    double elevatorRotation = robotPose.getRotation().getRadians();
-    double elevatorDistance = m_elevator.getHeightMeters();
-
-    double elevatorDeltaX = Math.cos(elevatorRotation) * elevatorDistance;
-    double elevatorDeltaY = Math.sin(elevatorRotation) * elevatorDistance;
-
-    elevatorPose =
-        new Pose2d(
-            robotPose.getX() + elevatorDeltaX,
-            robotPose.getX() + elevatorDeltaY,
-            robotPose.getRotation());
-
-    m_field2d.getObject("Elevator Pose").setPose(elevatorPose);
-
-    double deltaX = Math.abs(targetPose.getX() - elevatorPose.getX());
-    double deltaY = Math.abs(targetPose.getY() - elevatorPose.getY());
-
-    double distance =
-        Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)); // Standard distance formula
-
-    return distance < margin
-        ? true
-        : false; // Returns true if the robot is on target, returns false if not on target
   }
 
   @Override
