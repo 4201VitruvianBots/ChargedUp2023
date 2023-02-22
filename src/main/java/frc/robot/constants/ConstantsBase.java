@@ -40,8 +40,11 @@ public class ConstantsBase {
   public final class IntakeDef {}
 
   public static final class WristDef {
-    public final double wristGearRatio = (1.0 / 50.0);
-    public final double encoderUnitsPerRotation = 360.0 / (2048.0 * (1.0 / wristGearRatio));
+    public final double wristGearRatio = 50.0 / 1.0;
+    public final double encoderUnitsPerRotation = 360.0 / (2048.0 * wristGearRatio);
+    public final DCMotor gearBox = DCMotor.getFalcon500(1);
+    public final double wristMass = Units.lbsToKilograms(15);
+    public final double wristLength = Units.inchesToMeters(22);
     public final double wristAbsoluteUpperLimitDegrees = 200;
     // TODO: Determine the soft limits
     public final double wristSoftUpperLimitDegrees = 80.0;

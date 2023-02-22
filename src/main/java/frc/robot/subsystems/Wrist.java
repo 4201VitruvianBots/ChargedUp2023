@@ -9,16 +9,21 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
@@ -26,11 +31,12 @@ import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 public class Wrist extends SubsystemBase {
   private WRIST_STATE m_desiredState = WRIST_STATE.JOYSTICK;
   private double desiredAngleSetpoint;
-  private double m_lowerAngleLimitDegrees;
-  private double m_upperAngleLimitDegrees;
-  private boolean wristIsClosedLoop = true;
+  private double m_lowerAngleLimitDegrees = Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
+  private double m_upperAngleLimitDegrees = Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
+  private boolean wristIsClosedLoop = false;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
+  private double m_wristPercentOutput;
 
   private static DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.getInstance().Wrist.wristLowerSwitch);
@@ -45,8 +51,20 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.FFkV,
           Constants.getInstance().Wrist.kA);
 
-  private double setpointMultiplier = 1;
+  private double setpointMultiplier = 20.0;
 
+  private final SingleJointedArmSim m_armSim =
+      new SingleJointedArmSim(
+          Constants.getInstance().Wrist.gearBox,
+          Constants.getInstance().Wrist.wristGearRatio,
+          SingleJointedArmSim.estimateMOI(
+              Constants.getInstance().Wrist.wristLength, Constants.getInstance().Wrist.wristMass),
+          Constants.getInstance().Wrist.wristLength,
+          Units.degreesToRadians(Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees),
+          Units.degreesToRadians(Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees),
+          true);
+//          VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
+//          );
   // Logging setup
 
   public DataLog log = DataLogManager.getLog();
@@ -74,7 +92,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kP(0, Constants.getInstance().Wrist.kP);
     wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
     Timer.delay(1);
-    zeroWristAngle();
+    resetWristAngle(-15);
 
     wristMotor.configPeakOutputForward(0.25);
     wristMotor.configPeakOutputReverse(0.25);
@@ -82,6 +100,9 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Angle", this::getWristAngleDegrees);
     wristTab.addDouble("Raw position", this::getWristSensorPosition);
     wristTab.addDouble("Setpoint", this::getSetpointDegrees);
+    wristTab.addDouble("Feedforward", ()->calculateFeedforward(getSetpointDegrees()));
+    wristTab.addString("State", () -> getWristState().toString());
+    wristTab.add(this);
   }
 
   public void setWristInput(double input) {
@@ -102,16 +123,28 @@ public class Wrist extends SubsystemBase {
 
   //  setpoint for the wrist
   public void setSetpointDegrees(double degrees) {
+    System.out.println("Commanded Setpoint: " + degrees);
+    System.out.println("Min Limit: " + m_lowerAngleLimitDegrees);
+    System.out.println("Max Limit: " + m_upperAngleLimitDegrees);
+    System.out.println("Clamped Setpoint: " + limitDesiredAngleSetpoint());
     wristMotor.set(
         ControlMode.Position,
         degrees / Constants.getInstance().Wrist.encoderUnitsPerRotation,
         DemandType.ArbitraryFeedForward,
-        m_feedforward.calculate(
-            degrees,
-            wristMotor.getActiveTrajectoryVelocity()
-                * Constants.getInstance().Wrist.encoderUnitsPerRotation // TODO: Verify this
-                * 10));
+//            0
+            calculateFeedforward(degrees)
+        );
+    m_wristPercentOutput = wristMotor.getMotorOutputPercent();
   }
+
+  private double calculateFeedforward(double degreesSetpoint) {
+    return m_feedforward.calculate(
+            degreesSetpoint,
+            wristMotor.getActiveTrajectoryVelocity()
+                    * Constants.getInstance().Wrist.encoderUnitsPerRotation // TODO: Verify this
+                    * 10);
+  }
+
 
   public double getSetpointDegrees() {
     return desiredAngleSetpoint;
@@ -157,8 +190,10 @@ public class Wrist extends SubsystemBase {
 
   // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
   // the ground.
-  public void zeroWristAngle() {
-    wristMotor.setSelectedSensorPosition((-15.0 / Constants.getInstance().Wrist.encoderUnitsPerRotation)); // setWristSensorPosition(0);
+  public void resetWristAngle(double angle) {
+    wristMotor.setSelectedSensorPosition(
+        angle
+            / Constants.getInstance().Wrist.encoderUnitsPerRotation); // setWristSensorPosition(0);
   }
 
   public void setControlMode(boolean isClosedLoop) {
@@ -183,8 +218,7 @@ public class Wrist extends SubsystemBase {
   }
 
   // SmartDashboard function
-  public void updateSmartDashboard() {
-  }
+  public void updateSmartDashboard() {}
 
   public void updateLog() {
     wristCurrentEntry.append(getWristMotorVoltage());
@@ -200,7 +234,7 @@ public class Wrist extends SubsystemBase {
     if (wristIsClosedLoop) {
       switch (m_desiredState) {
         case JOYSTICK:
-          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristSensorPosition();
+          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
           break;
         case INTAKING:
           desiredAngleSetpoint = -10.0;
@@ -226,5 +260,31 @@ public class Wrist extends SubsystemBase {
     } else {
       setWristPercentOutput(m_joystickInput * setpointMultiplier);
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    m_armSim.setInput(m_wristPercentOutput * RobotController.getBatteryVoltage());
+
+    m_armSim.update(0.020);
+
+    Unmanaged.feedEnable(20);
+
+    System.out.println("Arm Sim Input: " + m_wristPercentOutput);
+    System.out.println("Arm Sim Degrees: " + Units.radiansToDegrees(m_armSim.getAngleRads()) + "\tVelocity: " + Units.radiansToDegrees(m_armSim.getVelocityRadPerSec()));
+
+    wristMotor
+        .getSimCollection()
+        .setIntegratedSensorRawPosition(
+            (int)
+                (Units.radiansToDegrees(m_armSim.getAngleRads())
+                    / Constants.getInstance().Wrist.encoderUnitsPerRotation));
+    wristMotor
+        .getSimCollection()
+        .setIntegratedSensorVelocity(
+            (int)
+                (Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
+                    / Constants.getInstance().Wrist.encoderUnitsPerRotation
+                    * 10.0));
   }
 }
