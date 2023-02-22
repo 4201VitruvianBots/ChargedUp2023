@@ -191,10 +191,24 @@ public class FieldSim extends SubsystemBase {
       StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
-    if (DriverStation.getAlliance() == Alliance.Red) {
-      possibleNodes.retainAll(redNodes);
-    } else if (DriverStation.getAlliance() == Alliance.Blue) {
-      possibleNodes.retainAll(blueNodes);
+    // If we are closer to the opposite alliance, prioritize scoring in their coopertition grid
+    ArrayList<Pose2d> nearestNodes = new ArrayList<>();
+    nearestNodes.add(robotPose.nearest(redNodes));
+    nearestNodes.add(robotPose.nearest(blueNodes));
+    Pose2d closestAllianceNode = robotPose.nearest(nearestNodes);
+
+    if (redNodes.contains(closestAllianceNode) && DriverStation.getAlliance() == Alliance.Blue) {
+      possibleNodes.retainAll(coopertitionNodes);
+    }
+    else if (blueNodes.contains(closestAllianceNode) && DriverStation.getAlliance() == Alliance.Red) {
+      possibleNodes.retainAll(coopertitionNodes);
+    }
+    else {
+      if (DriverStation.getAlliance() == Alliance.Red) {
+        possibleNodes.retainAll(redNodes);
+      } else if (DriverStation.getAlliance() == Alliance.Blue) {
+        possibleNodes.retainAll(blueNodes);
+      }  
     }
 
     if (intakeState == StateHandler.intakingStates.CONE) {
