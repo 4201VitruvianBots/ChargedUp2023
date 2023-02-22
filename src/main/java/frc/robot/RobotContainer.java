@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -125,10 +126,26 @@ public class RobotContainer {
     // TODO: add a driver button that hard limits the max swerve speed while held for fine control
 
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-    // xboxController.leftTrigger(0.1).onTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+    xboxController
+        .leftTrigger(0.1)
+        .onTrue(
+            new ConditionalCommand(
+                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
+                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                () ->
+                    m_stateHandler.getSuperStructureState()
+                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
 
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
-    // xboxController.rightTrigger(0.1).onTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+    xboxController
+        .rightTrigger(0.1)
+        .onTrue(
+            new ConditionalCommand(
+                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
+                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                () ->
+                    m_stateHandler.getSuperStructureState()
+                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
 
     // Elevator button bindings
     xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
