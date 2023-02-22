@@ -16,6 +16,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,11 +24,11 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
 public class Wrist extends SubsystemBase {
-  private WRIST_STATE m_desiredState = WRIST_STATE.STOWED;
+  private WRIST_STATE m_desiredState = WRIST_STATE.JOYSTICK;
   private double desiredAngleSetpoint;
   private double m_lowerAngleLimitDegrees;
   private double m_upperAngleLimitDegrees;
-  private boolean wristIsClosedLoop = false;
+  private boolean wristIsClosedLoop = true;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
 
@@ -72,7 +73,11 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.config_kP(0, Constants.getInstance().Wrist.kP);
     wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
+    Timer.delay(1);
     zeroWristAngle();
+
+    wristMotor.configPeakOutputForward(0.25);
+    wristMotor.configPeakOutputReverse(0.25);
 
     wristTab.addDouble("Angle", this::getWristAngleDegrees);
     wristTab.addDouble("Raw position", this::getWristSensorPosition);
@@ -135,11 +140,11 @@ public class Wrist extends SubsystemBase {
 
   // reset wrist angle function based off of a limit switch/hall effect sensor
   public void zeroEncoder() {
-    if (getLimitSwitchState(0)) {
-      wristMotor.setSelectedSensorPosition(0, 0, 0);
-    } else if (getLimitSwitchState(1)) {
-      wristMotor.setSelectedSensorPosition(0, 0, 0);
-    }
+    // if (getLimitSwitchState(0)) {
+    //   wristMotor.setSelectedSensorPosition(0, 0, 0);
+    // } else if (getLimitSwitchState(1)) {
+    //   wristMotor.setSelectedSensorPosition(0, 0, 0);
+    // }
   }
 
   // TODO: Add limit switches
@@ -153,7 +158,7 @@ public class Wrist extends SubsystemBase {
   // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
   // the ground.
   public void zeroWristAngle() {
-    setSetpointDegrees(-15.0); // setWristSensorPosition(0);
+    wristMotor.setSelectedSensorPosition((-15.0 / Constants.getInstance().Wrist.encoderUnitsPerRotation)); // setWristSensorPosition(0);
   }
 
   public void setControlMode(boolean isClosedLoop) {
@@ -178,7 +183,8 @@ public class Wrist extends SubsystemBase {
   }
 
   // SmartDashboard function
-  public void updateSmartDashboard() {}
+  public void updateSmartDashboard() {
+  }
 
   public void updateLog() {
     wristCurrentEntry.append(getWristMotorVoltage());
