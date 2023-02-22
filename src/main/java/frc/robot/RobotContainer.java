@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.RunIntakeCone;
 import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.Intake.RunWristJoystick;
-import frc.robot.commands.Intake.SetWristState;
 import frc.robot.commands.Intake.ToggleWristControlMode;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
@@ -35,7 +34,6 @@ import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 import frc.robot.constants.Constants.USB;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
@@ -132,13 +130,13 @@ public class RobotContainer {
 
     // Elevator button bindings
     xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    //xboxController.a().whileTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
+    // xboxController.a().whileTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
     xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
-    //xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
+    // xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
     xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
-   // xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
+    // xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
     xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    //xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    // xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
 
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new ToggleElevatorControlMode(m_elevator));
