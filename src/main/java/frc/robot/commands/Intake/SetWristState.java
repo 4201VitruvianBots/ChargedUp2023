@@ -34,8 +34,6 @@ public class SetWristState extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // If you are not in joystick mode, automatically move back to the stowed position
-    if (m_wrist.getWristState() != WRIST_STATE.JOYSTICK) m_wrist.setWristState(WRIST_STATE.STOWED);
   }
 
   // Returns true when the command should end.

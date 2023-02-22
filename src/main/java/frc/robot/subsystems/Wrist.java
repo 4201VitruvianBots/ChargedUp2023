@@ -23,7 +23,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
 public class Wrist extends SubsystemBase {
-  private WRIST_STATE m_desiredState = WRIST_STATE.STOWED;
+  private WRIST_STATE m_desiredState = WRIST_STATE.JOYSTICK;
   private double desiredAngleSetpoint;
   private double m_lowerAngleLimitDegrees;
   private double m_upperAngleLimitDegrees;
@@ -74,9 +74,8 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
     zeroWristAngle();
 
-    wristTab.addDouble("Angle", this::getWristAngleDegrees);
-    wristTab.addDouble("Raw position", this::getWristSensorPosition);
-    wristTab.addDouble("Setpoint", this::getSetpointDegrees);
+    wristMotor.configPeakOutputForward(0.25);
+    wristMotor.configPeakOutputReverse(0.25);
   }
 
   public void setWristInput(double input) {
@@ -178,7 +177,11 @@ public class Wrist extends SubsystemBase {
   }
 
   // SmartDashboard function
-  public void updateSmartDashboard() {}
+  public void updateSmartDashboard() {
+    wristTab.addDouble("Angle", this::getWristAngleDegrees);
+    wristTab.addDouble("Raw position", this::getWristSensorPosition);
+    wristTab.addDouble("Setpoint", this::getSetpointDegrees);
+  }
 
   public void updateLog() {
     wristCurrentEntry.append(getWristMotorVoltage());
