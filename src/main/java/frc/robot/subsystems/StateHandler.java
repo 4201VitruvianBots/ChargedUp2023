@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -113,47 +112,47 @@ public class StateHandler extends SubsystemBase {
     // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize
     // the elevator limits.
     // If the elevator is HIGH, prioritize the wrist limits
-//    switch (m_superstructureState) {
-//      case HIGH:
-//        // TODO: Make this a linear interpolation
-//        // TODO: Determine Limit
-//        if (m_wrist.getWristAngleDegrees() > 0) {
-//          m_elevator.setLowerLimit(Units.inchesToMeters(12));
-//        } else {
-//          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-//        }
-//
-//        // TODO: Make this a linear interpolation
-//        // TODO: Determine Limit
-//        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
-//          m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
-//        }
-//        break;
-//      default:
-//      case LOW:
-//        // TODO: Make this a linear interpolation
-//        // TODO: Determine Limit
-//        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
-//          m_wrist.setUpperAngleLimit(80);
-//        } else {
-//          m_wrist.setUpperAngleLimit(80);
-//        }
-//
-//        // TODO: Make this a linear interpolation
-//        // TODO: Determine Limit
-//        if (m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
-//          m_wrist.setLowerAngleLimit(15);
-//        } else {
-//          m_wrist.setLowerAngleLimit(-10);
-//        }
-//
-//        // TODO: Make this a linear interpolation
-//        // TODO: Determine Limit
-//        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
-//          m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
-//        }
-//        break;
-//    }
+    //    switch (m_superstructureState) {
+    //      case HIGH:
+    //        // TODO: Make this a linear interpolation
+    //        // TODO: Determine Limit
+    //        if (m_wrist.getWristAngleDegrees() > 0) {
+    //          m_elevator.setLowerLimit(Units.inchesToMeters(12));
+    //        } else {
+    //          m_elevator.setLowerLimit(Units.inchesToMeters(0));
+    //        }
+    //
+    //        // TODO: Make this a linear interpolation
+    //        // TODO: Determine Limit
+    //        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+    //          m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
+    //        }
+    //        break;
+    //      default:
+    //      case LOW:
+    //        // TODO: Make this a linear interpolation
+    //        // TODO: Determine Limit
+    //        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+    //          m_wrist.setUpperAngleLimit(80);
+    //        } else {
+    //          m_wrist.setUpperAngleLimit(80);
+    //        }
+    //
+    //        // TODO: Make this a linear interpolation
+    //        // TODO: Determine Limit
+    //        if (m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
+    //          m_wrist.setLowerAngleLimit(15);
+    //        } else {
+    //          m_wrist.setLowerAngleLimit(-10);
+    //        }
+    //
+    //        // TODO: Make this a linear interpolation
+    //        // TODO: Determine Limit
+    //        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+    //          m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
+    //        }
+    //        break;
+    //    }
 
     // TODO: Limit max swerve speed by elevator height
 
