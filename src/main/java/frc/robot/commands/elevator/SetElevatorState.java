@@ -35,11 +35,7 @@ public class SetElevatorState extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // If you are not in joystick mode, automatically move back to the stowed position
-    if (m_elevator.getElevatorState() != ELEVATOR_STATE.JOYSTICK)
-      m_elevator.setElevatorState(ELEVATOR_STATE.STOWED);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
