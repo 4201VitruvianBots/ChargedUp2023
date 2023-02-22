@@ -64,9 +64,9 @@ public class ConstantsBase {
     // Is kv different from below kv?
 
     // Found using reca.lc/arm
-//    public final double kG = 1.65;
-//    public final double kV = 0.9;
-//    public final double kA = 0.08;
+    //    public final double kG = 1.65;
+    //    public final double kV = 0.9;
+    //    public final double kA = 0.08;
   }
 
   public final class LEDDef {}

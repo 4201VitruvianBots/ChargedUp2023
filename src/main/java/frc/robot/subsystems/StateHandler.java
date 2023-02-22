@@ -87,14 +87,14 @@ public class StateHandler extends SubsystemBase {
     targetNode = m_fieldSim.getTargetNode(currentIntakeState, currentMainState);
     isOnTarget = false;
 
-
-    // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize the elevator limits.
+    // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize
+    // the elevator limits.
     // If the elevator is HIGH, prioritize the wrist limits
     switch (superstructureState) {
       case HIGH:
         // TODO: Make this a linear interpolation
         // TODO: Determine Limit
-        if(m_wrist.getWristAngleDegrees() > 0) {
+        if (m_wrist.getWristAngleDegrees() > 0) {
           m_elevator.setLowerLimit(Units.inchesToMeters(12));
         } else {
           m_elevator.setLowerLimit(Units.inchesToMeters(0));
@@ -102,7 +102,7 @@ public class StateHandler extends SubsystemBase {
 
         // TODO: Make this a linear interpolation
         // TODO: Determine Limit
-        if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
           superstructureState = SUPERSTRUCTURE_STATE.LOW;
         }
         break;
@@ -110,7 +110,7 @@ public class StateHandler extends SubsystemBase {
       case LOW:
         // TODO: Make this a linear interpolation
         // TODO: Determine Limit
-        if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
           m_wrist.setUpperAngleLimit(80);
         } else {
           m_wrist.setUpperAngleLimit(80);
@@ -118,7 +118,7 @@ public class StateHandler extends SubsystemBase {
 
         // TODO: Make this a linear interpolation
         // TODO: Determine Limit
-        if(m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
+        if (m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
           m_wrist.setLowerAngleLimit(15);
         } else {
           m_wrist.setLowerAngleLimit(-10);
@@ -126,7 +126,7 @@ public class StateHandler extends SubsystemBase {
 
         // TODO: Make this a linear interpolation
         // TODO: Determine Limit
-        if(m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
           superstructureState = SUPERSTRUCTURE_STATE.HIGH;
         }
         break;
