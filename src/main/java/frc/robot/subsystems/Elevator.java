@@ -44,6 +44,8 @@ public class Elevator extends SubsystemBase {
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private ELEVATOR_STATE desiredHeightState =
       ELEVATOR_STATE.STOWED; // Think of this as our "next state" in our state machine.
+  private double m_lowerLimitMeters = 0;
+  private double m_upperLimitMeters = 0;
 
   private static double elevatorJoystickY;
 
@@ -181,7 +183,7 @@ public class Elevator extends SubsystemBase {
   /*
    * Elevator's height position
    */
-  public double getElevatorHeight() {
+  public double getHeightMeters() {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.getInstance().Elevator.metersToEncoderCounts;
   }
@@ -212,6 +214,14 @@ public class Elevator extends SubsystemBase {
 
   public void setElevatorState(ELEVATOR_STATE heightEnum) {
     desiredHeightState = heightEnum;
+  }
+
+  public void setLowerLimit(double meters) {
+    m_lowerLimitMeters = meters;
+  }
+
+  public void setUpperLimit(double meters) {
+    m_upperLimitMeters = meters;
   }
 
   public void setElevatorJoystickY(double m_joystickY) {
@@ -247,13 +257,13 @@ public class Elevator extends SubsystemBase {
     if (getElevatorLowerSwitch()) {
       setElevatorSensorPosition(0.0);
     }
-    elevatorHeight = getElevatorHeight();
+    elevatorHeight = getHeightMeters();
   }
 
   public void updateShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
 
-    elevatorHeightTab.setDouble(getElevatorHeight());
+    elevatorHeightTab.setDouble(getHeightMeters());
     elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
     elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
@@ -320,7 +330,7 @@ public class Elevator extends SubsystemBase {
     if (elevatorIsClosedLoop) {
       switch (desiredHeightState) {
         case JOYSTICK:
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getElevatorHeight();
+          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
           break;
         case STOWED:
           desiredHeightValue = 0.0;

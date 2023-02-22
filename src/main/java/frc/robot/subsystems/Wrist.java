@@ -25,8 +25,8 @@ import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 public class Wrist extends SubsystemBase {
   private WRIST_STATE m_desiredState = WRIST_STATE.STOWED;
   private double desiredAngleSetpoint;
-  private double m_lowerAngleLimit;
-  private double m_upperAngleLimit;
+  private double m_lowerAngleLimitDegrees;
+  private double m_upperAngleLimitDegrees;
   private boolean wristIsClosedLoop = false;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
@@ -44,7 +44,6 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.FFkV,
           Constants.getInstance().Wrist.kA);
 
-  private final double kP = 0.2;
   private double setpointMultiplier = 1;
 
   // Logging setup
@@ -71,7 +70,8 @@ public class Wrist extends SubsystemBase {
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
 
-    wristMotor.config_kP(0, kP);
+    wristMotor.config_kP(0, Constants.getInstance().Wrist.kP);
+    wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
     zeroWristAngle();
 
     wristTab.addDouble("Angle", this::getWristAngleDegrees);
@@ -84,7 +84,7 @@ public class Wrist extends SubsystemBase {
   }
 
   // set percent output function
-  // period function that edits the elevators height, from there make sure it obeys the limit (27.7
+  // period function that edits the elevator's height, from there make sure it obeys the limit (27.7
   // rotation)
   private void setWristPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
@@ -164,17 +164,17 @@ public class Wrist extends SubsystemBase {
     return wristIsClosedLoop;
   }
 
-  public void updateWristLowerAngleLimit(double angle) {
-    m_lowerAngleLimit = angle;
+  public void setLowerAngleLimit(double angleDegrees) {
+    m_lowerAngleLimitDegrees = angleDegrees;
   }
 
-  public void updateWristUpperAngleLimit(double angle) {
-    m_upperAngleLimit = angle;
+  public void setUpperAngleLimit(double angleDegrees) {
+    m_upperAngleLimitDegrees = angleDegrees;
   }
 
   //
   private double limitDesiredAngleSetpoint() {
-    return MathUtil.clamp(desiredAngleSetpoint, m_lowerAngleLimit, m_upperAngleLimit);
+    return MathUtil.clamp(desiredAngleSetpoint, m_lowerAngleLimitDegrees, m_upperAngleLimitDegrees);
   }
 
   // SmartDashboard function

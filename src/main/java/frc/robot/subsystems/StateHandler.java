@@ -5,8 +5,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 import frc.robot.simulation.FieldSim;
 
@@ -35,10 +35,16 @@ public class StateHandler extends SubsystemBase {
     CUBE
   }
 
+  public enum SUPERSTRUCTURE_STATE {
+    LOW,
+    HIGH
+  }
+
   public MAIN_ROBOT_STATES currentMainState = MAIN_ROBOT_STATES.STOWED;
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   public MAIN_ROBOT_STATES nextMainState = currentMainState;
   public INTAKING_STATES nextIntakeState = currentIntakeState;
+  public SUPERSTRUCTURE_STATE superstructureState = SUPERSTRUCTURE_STATE.LOW;
   public Pose2d targetNode;
   public boolean isOnTarget;
 
@@ -76,29 +82,54 @@ public class StateHandler extends SubsystemBase {
     nextIntakeState = state;
   }
 
-  public void advanceStates() {}
-
   @Override
   public void periodic() {
     targetNode = m_fieldSim.getTargetNode(currentIntakeState, currentMainState);
     isOnTarget = false;
 
-    advanceStates();
 
-    // Limit the wrist min/max angle based on where the elevator is.
-    // TODO: Make this a linear interpolation
-    if (m_elevator.getElevatorHeight()
-        > Constants.getInstance().Elevator.elevatorHeightWristLowerLimit) {
-      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftLowerLimitDegrees);
-    } else {
-      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftLowerLimitDegrees);
-    }
-    if (m_elevator.getElevatorHeight()
-        > Constants.getInstance().Elevator.elevatorHeightWristUpperLimit) {
-      m_wrist.updateWristLowerAngleLimit(
-          Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees);
-    } else {
-      m_wrist.updateWristLowerAngleLimit(Constants.getInstance().Wrist.wristSoftUpperLimitDegrees);
+    // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize the elevator limits.
+    // If the elevator is HIGH, prioritize the wrist limits
+    switch (superstructureState) {
+      case HIGH:
+        // TODO: Make this a linear interpolation
+        // TODO: Determine Limit
+        if(m_wrist.getWristAngleDegrees() > 0) {
+          m_elevator.setLowerLimit(Units.inchesToMeters(12));
+        } else {
+          m_elevator.setLowerLimit(Units.inchesToMeters(0));
+        }
+
+        // TODO: Make this a linear interpolation
+        // TODO: Determine Limit
+        if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+          superstructureState = SUPERSTRUCTURE_STATE.LOW;
+        }
+        break;
+      default:
+      case LOW:
+        // TODO: Make this a linear interpolation
+        // TODO: Determine Limit
+        if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+          m_wrist.setUpperAngleLimit(80);
+        } else {
+          m_wrist.setUpperAngleLimit(80);
+        }
+
+        // TODO: Make this a linear interpolation
+        // TODO: Determine Limit
+        if(m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
+          m_wrist.setLowerAngleLimit(15);
+        } else {
+          m_wrist.setLowerAngleLimit(-10);
+        }
+
+        // TODO: Make this a linear interpolation
+        // TODO: Determine Limit
+        if(m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+          superstructureState = SUPERSTRUCTURE_STATE.HIGH;
+        }
+        break;
     }
 
     // TODO: Limit max swerve speed by elevator height

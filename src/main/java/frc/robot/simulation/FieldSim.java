@@ -222,7 +222,7 @@ public class FieldSim extends SubsystemBase {
   public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
     // TODO: Fix elevator pose math
     double elevatorRotation = robotPose.getRotation().getRadians();
-    double elevatorDistance = m_elevator.getElevatorHeight();
+    double elevatorDistance = m_elevator.getHeightMeters();
 
     double elevatorDeltaX = Math.cos(elevatorRotation) * elevatorDistance;
     double elevatorDeltaY = Math.sin(elevatorRotation) * elevatorDistance;
