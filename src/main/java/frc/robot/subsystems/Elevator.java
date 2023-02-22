@@ -349,7 +349,7 @@ public class Elevator extends SubsystemBase {
       setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
+      setElevatorPercentOutput(elevatorJoystickY);
     }
   }
 }
