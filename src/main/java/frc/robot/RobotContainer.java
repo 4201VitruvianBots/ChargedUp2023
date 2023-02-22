@@ -124,12 +124,11 @@ public class RobotContainer {
 
     // TODO: add a driver button that hard limits the max swerve speed while held for fine control
 
-    // TODO: Define this: is this for cube or cone?
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-    xboxController.leftTrigger(0.1).whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
-    // TODO: Define this: is this for cube or cone?
+    // xboxController.leftTrigger(0.1).onTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
-    xboxController.rightTrigger(0.1).whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+    // xboxController.rightTrigger(0.1).onTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
 
     // Elevator button bindings
     xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
