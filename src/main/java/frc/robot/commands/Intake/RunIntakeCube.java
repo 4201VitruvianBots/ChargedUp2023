@@ -7,14 +7,14 @@ package frc.robot.commands.Intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
 
-public class RunIntake extends CommandBase {
+public class RunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public RunIntake(Intake intake, double PercentOutput) {
+  public RunIntakeCube(Intake intake, double PercentOutput) {
     m_intake = intake;
     m_PercentOutput = PercentOutput;
 

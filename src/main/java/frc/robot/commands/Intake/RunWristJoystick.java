@@ -12,12 +12,12 @@ import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {
   private Wrist m_wrist;
-  private DoubleSupplier m_JoystickX;
+  private DoubleSupplier m_joystickY;
   /** Creates a new RunWristJoystick. */
-  public RunWristJoystick(Wrist wrist, DoubleSupplier joystickX) {
+  public RunWristJoystick(Wrist wrist, DoubleSupplier joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_wrist = wrist;
-    m_JoystickX = joystickX;
+    m_joystickY = joystickY;
     addRequirements(m_wrist);
   }
 
@@ -30,10 +30,10 @@ public class RunWristJoystick extends CommandBase {
   @Override
   public void execute() {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
-    double joystickXDeadbandOutput = MathUtil.applyDeadband((m_JoystickX.getAsDouble()), 0.05);
+    double joystickXDeadbandOutput = MathUtil.applyDeadband((m_joystickY.getAsDouble()), 0.05);
 
     m_wrist.setWristState(WRIST_STATE.JOYSTICK);
-    m_wrist.setWristInput(joystickXDeadbandOutput);
+    m_wrist.setWristInput(-joystickXDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

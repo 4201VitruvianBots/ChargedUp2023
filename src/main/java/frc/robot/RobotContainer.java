@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.Intake.RunIntakeCone;
+import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.Intake.RunWristJoystick;
 import frc.robot.commands.Intake.SetWristState;
 import frc.robot.commands.Intake.ToggleWristControlMode;
@@ -99,14 +100,14 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> leftJoystick.getRawAxis(1),
-            () -> leftJoystick.getRawAxis(0),
-            () -> rightJoystick.getRawAxis(0)));
+            () -> -leftJoystick.getRawAxis(1),
+            () -> -leftJoystick.getRawAxis(0),
+            () -> -rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
-    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightX));
+    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
   }
 
   /**
@@ -124,10 +125,10 @@ public class RobotContainer {
     // TODO: add a driver button that hard limits the max swerve speed while held for fine control
 
     // TODO: Define this: is this for cube or cone?
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntake(m_intake, 0.5));
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
     xboxController.leftTrigger(0.1).whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
     // TODO: Define this: is this for cube or cone?
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntake(m_intake, -0.5));
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
     xboxController.rightTrigger(0.1).whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
 
     // Elevator button bindings

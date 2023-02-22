@@ -46,7 +46,7 @@ public class IncrementElevatorHeight extends CommandBase {
     // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
     // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
 
-    m_elevator.setElevatorJoystickY(joystickYDeadbandOutput);
+    m_elevator.setElevatorJoystickY(-joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

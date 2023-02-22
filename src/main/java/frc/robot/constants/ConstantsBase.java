@@ -67,10 +67,10 @@ public class ConstantsBase {
   public final class LEDDef {}
 
   public final class SwerveDriveDef {
-    public final double frontLeftCANCoderOffset = 84.98628; // 85.957;
-    public final double frontRightCANCoderOffset = 219.506836; // 41.748;
-    public final double backLeftCANCoderOffset = 261.95906; // 261.475;
-    public final double backRightCANCoderOffset = 148.183594; // 148.008; // 329.150;
+    public final double frontLeftCANCoderOffset = 345.059; // 85.957;
+    public final double frontRightCANCoderOffset = 56.909; // 41.748;
+    public final double backLeftCANCoderOffset = 11.25; // 261.475;
+    public final double backRightCANCoderOffset = 212.6515; // 148.008; // 329.150;
 
     public final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
