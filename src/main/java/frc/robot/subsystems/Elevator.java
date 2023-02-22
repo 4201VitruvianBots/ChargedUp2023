@@ -45,8 +45,8 @@ public class Elevator extends SubsystemBase {
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private ELEVATOR_STATE desiredHeightState =
       ELEVATOR_STATE.STOWED; // Think of this as our "next state" in our state machine.
-  private double m_lowerLimitMeters = 0;
-  private double m_upperLimitMeters = 0;
+  private double m_lowerLimitMeters = Constants.getInstance().Elevator.elevatorMinHeightMeters;
+  private double m_upperLimitMeters = Constants.getInstance().Elevator.elevatorMaxHeightMeters;
 
   private static double elevatorJoystickY;
 

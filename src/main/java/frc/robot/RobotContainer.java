@@ -132,13 +132,13 @@ public class RobotContainer {
 
     // Elevator button bindings
     xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    xboxController.a().whileTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
+    //xboxController.a().whileTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
     xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
-    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
+    //xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
     xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
-    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
+   // xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
     xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    //xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
 
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new ToggleElevatorControlMode(m_elevator));
