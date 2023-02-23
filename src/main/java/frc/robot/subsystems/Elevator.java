@@ -67,9 +67,8 @@ public class Elevator extends SubsystemBase {
   // of the motors.
   private boolean elevatorIsClosedLoop = false;
 
-  private int openLoopDeadband = 10;
   private double maxPercentOutput = 0.25;
-  private double setpointMultiplier = 0.35;
+  private double setpointMultiplier = 0.10;
 
   // Simulation setup
 

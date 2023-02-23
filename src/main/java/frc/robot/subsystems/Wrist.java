@@ -11,15 +11,17 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -34,7 +36,7 @@ public class Wrist extends SubsystemBase {
       Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
   private double m_upperAngleLimitDegrees =
       Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
-  private boolean wristIsClosedLoop = false;
+  private boolean wristIsClosedLoop = true;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
   private double m_wristPercentOutput;
@@ -44,15 +46,20 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private static TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
+  private final TrapezoidProfile.Constraints m_constraints =
+          new TrapezoidProfile.Constraints(Units.degreesToRadians(360), Units.degreesToRadians(600));
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
-  private ArmFeedforward m_feedforward =
+  public ArmFeedforward m_feedforward =
       new ArmFeedforward(
           Constants.getInstance().Wrist.FFkS,
           Constants.getInstance().Wrist.kG,
           Constants.getInstance().Wrist.FFkV,
-          Constants.getInstance().Wrist.kA);
+          Constants.getInstance().Wrist.kA
+      );
 
-  private double setpointMultiplier = 20.0;
+  private double setpointMultiplier = 60.0;
 
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
@@ -63,9 +70,9 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.wristLength,
           Units.degreesToRadians(Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees),
           Units.degreesToRadians(Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees),
-          true);
-  //          VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
-  //          );
+              true,
+              VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
+            );
   // Logging setup
 
   public DataLog log = DataLogManager.getLog();
@@ -73,6 +80,9 @@ public class Wrist extends SubsystemBase {
   public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/wrist/wristSetpoint");
   public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/wrist/wristPosition");
   public static ShuffleboardTab wristTab = Shuffleboard.getTab("Wrist");
+
+  private DoubleSubscriber kSSub, kVSub, kGSub, kASub, kPSub, kDSub, setpointSub;
+  private DoublePublisher kSetpointPub;
 
   public Wrist() {
     // One motor for the wrist
@@ -93,17 +103,36 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kP(0, Constants.getInstance().Wrist.kP);
     wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
     Timer.delay(1);
-    resetWristAngle(-15);
+    resetWristAngle(0);
 
-    wristMotor.configPeakOutputForward(0.25);
-    wristMotor.configPeakOutputReverse(0.25);
+    wristMotor.configAllowableClosedloopError(0, 1 / Constants.getInstance().Wrist.encoderUnitsPerRotation);
 
     wristTab.addDouble("Angle", this::getWristAngleDegrees);
     wristTab.addDouble("Raw position", this::getWristSensorPosition);
     wristTab.addDouble("Setpoint", this::getSetpointDegrees);
-    wristTab.addDouble("Feedforward", () -> calculateFeedforward(getSetpointDegrees()));
     wristTab.addString("State", () -> getWristState().toString());
+    wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
     wristTab.add(this);
+
+    try {
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kA").publish().set(Constants.getInstance().Wrist.kA);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kS").publish().set(Constants.getInstance().Wrist.FFkS);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kV").publish().set(Constants.getInstance().Wrist.FFkV);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kG").publish().set(Constants.getInstance().Wrist.kG);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kP").publish().set(Constants.getInstance().Wrist.kP);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kD").publish().set(Constants.getInstance().Wrist.kD);
+      NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("setpoint").publish().set(0);
+      kSetpointPub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("calculated setpoint").publish();
+    } catch (Exception e) {
+
+    }
+    kASub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kA").subscribe(Constants.getInstance().Wrist.kA);
+    kSSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kS").subscribe(Constants.getInstance().Wrist.FFkS);
+    kVSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kV").subscribe(Constants.getInstance().Wrist.FFkV);
+    kGSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kG").subscribe(Constants.getInstance().Wrist.kG);
+    kPSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kP").subscribe(Constants.getInstance().Wrist.kP);
+    kDSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("kD").subscribe(Constants.getInstance().Wrist.kD);
+    setpointSub = NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("setpoint").subscribe(0);
   }
 
   public void setWristInput(double input) {
@@ -123,26 +152,23 @@ public class Wrist extends SubsystemBase {
   }
 
   //  setpoint for the wrist
-  public void setSetpointDegrees(double degrees) {
-    System.out.println("Commanded Setpoint: " + degrees);
-    System.out.println("Min Limit: " + m_lowerAngleLimitDegrees);
-    System.out.println("Max Limit: " + m_upperAngleLimitDegrees);
-    System.out.println("Clamped Setpoint: " + limitDesiredAngleSetpoint());
+  public void setSetpointDegrees(TrapezoidProfile.State state) {
     wristMotor.set(
         ControlMode.Position,
-        degrees / Constants.getInstance().Wrist.encoderUnitsPerRotation,
+        Units.radiansToDegrees(state.position) / Constants.getInstance().Wrist.encoderUnitsPerRotation,
         DemandType.ArbitraryFeedForward,
-        //            0
-        calculateFeedforward(degrees));
+//                    0
+        calculateFeedforward(state)
+        );
     m_wristPercentOutput = wristMotor.getMotorOutputPercent();
   }
 
-  private double calculateFeedforward(double degreesSetpoint) {
-    return m_feedforward.calculate(
-        degreesSetpoint,
-        wristMotor.getActiveTrajectoryVelocity()
-            * Constants.getInstance().Wrist.encoderUnitsPerRotation // TODO: Verify this
-            * 10);
+  private double calculateFeedforward(TrapezoidProfile.State state) {
+    return (m_feedforward.calculate(state.position, state.velocity) / 12.0);
+  }
+
+  public void resetState() {
+    m_setpoint = new TrapezoidProfile.State(Units.degreesToRadians(getWristAngleDegrees()), Units.degreesToRadians(getWristAngleDegreesPerSecond()));
   }
 
   public double getSetpointDegrees() {
@@ -160,6 +186,10 @@ public class Wrist extends SubsystemBase {
   // this is get current angle
   public double getWristAngleDegrees() {
     return getWristSensorPosition() * Constants.getInstance().Wrist.encoderUnitsPerRotation;
+  }
+  // this is get current angle
+  public double getWristAngleDegreesPerSecond() {
+    return wristMotor.getSelectedSensorVelocity() * Constants.getInstance().Wrist.encoderUnitsPerRotation * 10;
   }
 
   public Rotation2d getWristAngleRotation2d() {
@@ -213,7 +243,7 @@ public class Wrist extends SubsystemBase {
 
   //
   private double limitDesiredAngleSetpoint() {
-    return MathUtil.clamp(desiredAngleSetpoint, m_lowerAngleLimitDegrees, m_upperAngleLimitDegrees);
+    return MathUtil.clamp(m_setpoint.position, m_lowerAngleLimitDegrees, m_upperAngleLimitDegrees);
   }
 
   // SmartDashboard function
@@ -223,10 +253,22 @@ public class Wrist extends SubsystemBase {
     wristCurrentEntry.append(getWristMotorVoltage());
     wristSetpointEntry.append(getSetpointDegrees());
     wristPositionEntry.append(getWristAngleDegrees());
+
   }
 
   @Override
   public void periodic() {
+    var kS = kSSub.get(0);
+    var kG = kSSub.get(0);
+    var kV = kSSub.get(0);
+    var kA = kSSub.get(0);
+    var kP = kPSub.get(0);
+    var kD = kDSub.get(0);
+
+    m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+    wristMotor.config_kP(0, kP);
+    wristMotor.config_kD(0, kD);
+
     updateSmartDashboard();
     updateLog();
     // This method will be called once per scheduler run
@@ -240,7 +282,7 @@ public class Wrist extends SubsystemBase {
           break;
         case LOW:
           // TODO: Find setpoint value
-          desiredAngleSetpoint = 0;
+          desiredAngleSetpoint = 35;
           break;
         case MID:
           // TODO: Find setpoint value
@@ -255,7 +297,15 @@ public class Wrist extends SubsystemBase {
           desiredAngleSetpoint = 50.0;
           break;
       }
-      setSetpointDegrees(limitDesiredAngleSetpoint());
+      if(DriverStation.isEnabled()) {
+//        desiredAngleSetpoint = setpointSub.get(0);
+        m_goal = new TrapezoidProfile.State(Units.degreesToRadians(desiredAngleSetpoint), 0);
+        var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+        m_setpoint = profile.calculate(0.02);
+//      var commandedSetpoint = limitDesiredAngleSetpoint();
+        kSetpointPub.set(Units.radiansToDegrees(m_setpoint.position));
+        setSetpointDegrees(m_setpoint);
+      }
     } else {
       setWristPercentOutput(m_joystickInput * setpointMultiplier);
     }
