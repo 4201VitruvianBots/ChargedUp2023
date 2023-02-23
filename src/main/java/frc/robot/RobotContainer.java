@@ -143,7 +143,7 @@ public class RobotContainer {
 
     // Elevator button bindings
     // xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    xboxController.a().whileTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
+    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
     // xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
     xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
     // xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));

@@ -45,7 +45,7 @@ public class ConstantsBase {
     public final DCMotor gearBox = DCMotor.getFalcon500(1);
     public final double wristMass = Units.lbsToKilograms(15);
     public final double wristLength = Units.inchesToMeters(22);
-    public final double wristAbsoluteUpperLimitDegrees = 200;
+    public final double wristAbsoluteUpperLimitDegrees = 50;
     // TODO: Determine the soft limits
     public final double wristSoftUpperLimitDegrees = 80.0;
     public final double wristSoftLowerLimitDegrees = 30.0;

@@ -34,7 +34,7 @@ public class Wrist extends SubsystemBase {
       Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
   private double m_upperAngleLimitDegrees =
       Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
-  private boolean wristIsClosedLoop = false;
+  private boolean wristIsClosedLoop = true;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
   private double m_wristPercentOutput;
@@ -240,7 +240,7 @@ public class Wrist extends SubsystemBase {
           break;
         case LOW:
           // TODO: Find setpoint value
-          desiredAngleSetpoint = 0;
+          desiredAngleSetpoint = 35;
           break;
         case MID:
           // TODO: Find setpoint value
