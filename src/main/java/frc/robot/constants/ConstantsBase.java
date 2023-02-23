@@ -40,36 +40,26 @@ public class ConstantsBase {
   public final class IntakeDef {}
 
   public static final class WristDef {
-    public final double wristGearRatio = 50.0 / 1.0;
+    public final double wristGearRatio = 1024.0 / 27.0;
     public final double encoderUnitsPerRotation = 360.0 / (2048.0 * wristGearRatio);
     public final DCMotor gearBox = DCMotor.getFalcon500(1);
     public final double wristMass = Units.lbsToKilograms(15);
     public final double wristLength = Units.inchesToMeters(22);
-    public final double wristAbsoluteUpperLimitDegrees = 50;
+    public final double wristAbsoluteUpperLimitDegrees = 200.0;
     // TODO: Determine the soft limits
-    public final double wristSoftUpperLimitDegrees = 80.0;
-    public final double wristSoftLowerLimitDegrees = 30.0;
+    public final double wristSoftUpperLimitDegrees = 130.0;
+    public final double wristSoftLowerLimitDegrees = 0.0;
     public final double wristAbsoluteLowerLimitDegrees = -15.0;
-    public final double wristEncoderSlowdown = 0;
-    public final double maxSpeedLimitsPercent = 0;
     public final int wristLowerSwitch = 0;
-    public final double wristmaxRotationDegrees = 190;
 
-    // Need to find using sysid
-    public final double FFkS = 0.63393;
-    public final double FFkV = 0.0026167;
-    public final double kG = 0.2479;
-    public final double kA = 0.0030682;
+    // Values were experimentally determined
+    public final double FFkS = 0.1;
+    public final double FFkV = 1.95;
+    public final double kG = 1.75;
+    public final double kA = 0.16;
 
-    public final double kP = 3.1898E-06;
-    public final double kD = 2.0916E-07;
-
-    // Is kv different from below kv?
-
-    // Found using reca.lc/arm
-    //    public final double kG = 1.65;
-    //    public final double kV = 0.9;
-    //    public final double kA = 0.08;
+    public final double kP = 0.04;
+    public final double kD = 0.0;
   }
 
   public final class LEDDef {}
