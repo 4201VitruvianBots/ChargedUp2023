@@ -27,6 +27,14 @@ public class MemoryLog {
   private final long startTime = System.nanoTime();
 
   public MemoryLog() {
+    // Creates the file if it does not already exist
+    try {
+      File newFile = new File(logPath);
+      newFile.createNewFile();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    
     try {
       final FileWriter clearFile = new FileWriter(logPath, false);
       clearFile.close();

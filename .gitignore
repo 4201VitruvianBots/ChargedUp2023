@@ -173,4 +173,7 @@ simgui.json
 
 *.checksum
 
-.github/artifacts/
+# Github action artifacts
+.github/artifacts/memorylog.txt
+
+memorylog.txt
