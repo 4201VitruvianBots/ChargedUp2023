@@ -34,7 +34,7 @@ public class MemoryLog {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
     try {
       final FileWriter clearFile = new FileWriter(logPath, false);
       clearFile.close();
