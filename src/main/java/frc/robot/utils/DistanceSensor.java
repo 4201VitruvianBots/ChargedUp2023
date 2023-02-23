@@ -4,13 +4,19 @@
 
 package frc.robot.utils;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensor {
   private final int socketPort = 25000;
@@ -22,8 +28,9 @@ public class DistanceSensor {
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
     try {
-      socket = new DatagramSocket(socketPort);
-    } catch (SocketException socketFail) {
+      InetAddress address = InetAddress.getByName("10.42.1.2"); //239.42.01.1
+      socket = new DatagramSocket(socketPort, address);
+    } catch (SocketException | UnknownHostException socketFail) {
       socketFail.printStackTrace();
     }
   }
@@ -41,46 +48,23 @@ public class DistanceSensor {
   }
 
   public void periodic() {
+    System.out.println("Periodic is running"); 
     // This method will be called once per scheduler run
+    try {
 
-    DatagramPacket packet = new DatagramPacket(socketBuffer, socketBuffer.length);
+      byte[] buffer = new byte[512];
+      DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+      socket.receive(packet);
 
-    //   try {
-    //     InetAddress address = InetAddress.getByName("239, 42, 01, 1");
-    //     DatagramSocket socket = new DatagramSocket();
-    //      // change this js line to java
-    //     setTimeout(() -> {console.log("this is the first message");}, 1000); TODO: Fix setTimeout
-    // because it can't be found
-
-    //         byte[] buffer = new byte[512];
-    //         DatagramPacket response = new DatagramPacket(buffer, buffer.length);
-    //         socket.receive(response);
-
-    //         String quote = new String(buffer, 0, response.getLength());
-
-    //         System.out.println(quote);
-    //         System.out.println();
-
-    //         Thread.sleep(10000);
-
-    // } catch (SocketTimeoutException ex) {
-    //   System.out.println("error: " + ex.getMessage());
-    //     ex.printStackTrace();
-    // } catch (IOException ex) {
-    //     System.out.println("Client error: " + ex.getMessage());
-    //     ex.printStackTrace();
-    // } catch (InterruptedException ex) {
-    //     ex.printStackTrace();
-    // }
-
-    InetAddress address = packet.getAddress();
-    int port = packet.getPort();
-    packet = new DatagramPacket(socketBuffer, socketBuffer.length, address, port);
-    receivedData = new String(packet.getData(), 0, packet.getLength());
-
-    System.out.println(receivedData);
-    socket.close();
+      receivedData = new String(packet.getData(), 0, packet.getLength());
+      // System.out.println(receivedData);
+      SmartDashboard.putString("Distance", receivedData); 
+    } catch (SocketTimeoutException ex) {
+      System.out.println("error: " + ex.getMessage());
+      ex.printStackTrace();
+    } catch (IOException ex) {
+      System.out.println("Client error: " + ex.getMessage());
+      ex.printStackTrace();
+    }
+    }
   }
-
-  private void setTimeout() {}
-}

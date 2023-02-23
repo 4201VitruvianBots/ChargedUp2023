@@ -42,6 +42,7 @@ import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
+import frc.robot.utils.DistanceSensor;
 import java.util.HashMap;
 
 /**
@@ -65,6 +66,7 @@ public class RobotContainer {
   private final LED m_led = new LED(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -231,5 +233,6 @@ public class RobotContainer {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
+    m_distanceSensor.periodic();
   }
 }
