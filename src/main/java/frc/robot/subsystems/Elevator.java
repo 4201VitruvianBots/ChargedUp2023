@@ -46,15 +46,15 @@ public class Elevator extends SubsystemBase {
   private double maxVel = Units.inchesToMeters(40);
   private double maxAccel = Units.inchesToMeters(40);
   private TrapezoidProfile.Constraints m_constraints =
-          new TrapezoidProfile.Constraints(maxVel, maxAccel);
+      new TrapezoidProfile.Constraints(maxVel, maxAccel);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
-  private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(
+  private SimpleMotorFeedforward m_feedForward =
+      new SimpleMotorFeedforward(
           Constants.getInstance().Elevator.kS,
           Constants.getInstance().Elevator.kV,
-          Constants.getInstance().Elevator.kA
-  );
+          Constants.getInstance().Elevator.kA);
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
@@ -69,7 +69,7 @@ public class Elevator extends SubsystemBase {
   private final double kP = 0.55;
   private final double kI = 0;
   private final double kD = 0;
-//  private final double kF = 0.01;
+  //  private final double kF = 0.01;
   private final double kF = 0;
 
   private static double elevatorHeight =
@@ -183,7 +183,8 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
 
-    var elevatorNtTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+    var elevatorNtTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
     try {
       elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
       elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
@@ -219,10 +220,10 @@ public class Elevator extends SubsystemBase {
 
   public void setTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
-            TalonFXControlMode.Position,
-            state.position / Constants.getInstance().Elevator.metersToEncoderCounts,
-            DemandType.ArbitraryFeedForward,
-            (m_feedForward.calculate(state.velocity) / 12.0));
+        TalonFXControlMode.Position,
+        state.position / Constants.getInstance().Elevator.metersToEncoderCounts,
+        DemandType.ArbitraryFeedForward,
+        (m_feedForward.calculate(state.velocity) / 12.0));
   }
 
   public void resetState() {
@@ -236,9 +237,11 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getSelectedSensorPosition()
         * Constants.getInstance().Elevator.metersToEncoderCounts;
   }
+
   public double getVelocityMps() {
     return elevatorMotors[0].getSelectedSensorVelocity()
-            * Constants.getInstance().Elevator.metersToEncoderCounts * 10;
+        * Constants.getInstance().Elevator.metersToEncoderCounts
+        * 10;
   }
 
   public double getElevatorEncoderCounts() {
@@ -422,7 +425,7 @@ public class Elevator extends SubsystemBase {
         kSetpointTargetPub.set(Units.radiansToDegrees(m_setpoint.position));
         setTrapezoidState(m_setpoint);
       }
-//      setElevatorMotionMagicMeters(desiredHeightValue);
+      //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       setElevatorPercentOutput(elevatorJoystickY);

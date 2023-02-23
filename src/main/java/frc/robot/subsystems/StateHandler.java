@@ -101,17 +101,17 @@ public class StateHandler extends SubsystemBase {
         // TODO: Determine Limit
         if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
           m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
-        } else if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+        } else if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
           m_superstructureState = SUPERSTRUCTURE_STATE.STOWED;
         }
       case STOWED:
-        if(m_queuedSuperStructureState == SUPERSTRUCTURE_STATE.INTAKING)
+        if (m_queuedSuperStructureState == SUPERSTRUCTURE_STATE.INTAKING)
           m_superstructureState = SUPERSTRUCTURE_STATE.INTAKING;
-        else if(m_queuedSuperStructureState.ordinal() >= SUPERSTRUCTURE_STATE.LOW.ordinal()) {
+        else if (m_queuedSuperStructureState.ordinal() >= SUPERSTRUCTURE_STATE.LOW.ordinal()) {
           m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
         }
       case INTAKING:
-        if(m_queuedSuperStructureState != SUPERSTRUCTURE_STATE.INTAKING) {
+        if (m_queuedSuperStructureState != SUPERSTRUCTURE_STATE.INTAKING) {
           m_superstructureState = SUPERSTRUCTURE_STATE.STOWED;
         }
         break;
@@ -154,7 +154,7 @@ public class StateHandler extends SubsystemBase {
     // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize
     // the elevator limits.
     // If the elevator is HIGH, prioritize the wrist limits
-    if(m_enforceStates) {
+    if (m_enforceStates) {
       advanceState();
       switch (m_superstructureState) {
         case EXTENDED:
@@ -171,8 +171,8 @@ public class StateHandler extends SubsystemBase {
           }
           break;
         case LOW:
-//          m_wrist.setLowerAngleLimit(15);
-//          m_wrist.setLowerAngleLimit(-10);
+          //          m_wrist.setLowerAngleLimit(15);
+          //          m_wrist.setLowerAngleLimit(-10);
           // TODO: Make this a linear interpolation
           // TODO: Determine Limit
           if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
