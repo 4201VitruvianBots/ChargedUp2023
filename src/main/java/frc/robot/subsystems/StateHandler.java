@@ -26,15 +26,20 @@ public class StateHandler extends SubsystemBase {
   }
 
   public enum SUPERSTRUCTURE_STATE {
+    STOWED,
+    INTAKING,
     LOW,
-    HIGH
+    HIGH,
+    EXTENDED
   }
 
   public SCORING_STATE scoringState = SCORING_STATE.STOWED;
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
-  public SUPERSTRUCTURE_STATE m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
+  public SUPERSTRUCTURE_STATE m_superstructureState = SUPERSTRUCTURE_STATE.STOWED;
+  public SUPERSTRUCTURE_STATE m_queuedSuperStructureState = m_superstructureState;
   public Pose2d targetNode;
+  private boolean m_enforceStates;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
 
@@ -78,6 +83,41 @@ public class StateHandler extends SubsystemBase {
     return m_isOnTarget;
   }
 
+  public void advanceState() {
+    switch (m_superstructureState) {
+      case EXTENDED:
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
+        }
+        break;
+      case HIGH:
+        // TODO: Determine Limit
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
+        } else if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.EXTENDED;
+        }
+      case LOW:
+        // TODO: Determine Limit
+        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
+        } else if(m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.STOWED;
+        }
+      case STOWED:
+        if(m_queuedSuperStructureState == SUPERSTRUCTURE_STATE.INTAKING)
+          m_superstructureState = SUPERSTRUCTURE_STATE.INTAKING;
+        else if(m_queuedSuperStructureState.ordinal() >= SUPERSTRUCTURE_STATE.LOW.ordinal()) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
+        }
+      case INTAKING:
+        if(m_queuedSuperStructureState != SUPERSTRUCTURE_STATE.INTAKING) {
+          m_superstructureState = SUPERSTRUCTURE_STATE.STOWED;
+        }
+        break;
+    }
+  }
+
   // Whopper whopper whopper whopper
   // junior double triple whopper
   // flame grilled taste with perfect toppers
@@ -114,46 +154,43 @@ public class StateHandler extends SubsystemBase {
     // Superstructure states for elevator/wrist limit control. If the elevator is LOW, prioritize
     // the elevator limits.
     // If the elevator is HIGH, prioritize the wrist limits
-    switch (m_superstructureState) {
-      case HIGH:
-        // TODO: Make this a linear interpolation
-        // TODO: Determine Limit
-        if (m_wrist.getWristAngleDegrees() > 0) {
-          m_elevator.setLowerLimit(Units.inchesToMeters(12));
-        } else {
-          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-        }
+    if(m_enforceStates) {
+      advanceState();
+      switch (m_superstructureState) {
+        case EXTENDED:
+          // Set mechanism soft limits
 
-        // TODO: Make this a linear interpolation
-        // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
-          m_superstructureState = SUPERSTRUCTURE_STATE.LOW;
-        }
-        break;
-      default:
-      case LOW:
-        // TODO: Make this a linear interpolation
-        // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
-          m_wrist.setUpperAngleLimit(80);
-        } else {
-          m_wrist.setUpperAngleLimit(80);
-        }
-
-        // TODO: Make this a linear interpolation
-        // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() > Units.inchesToMeters(6)) {
-          m_wrist.setLowerAngleLimit(15);
-        } else {
-          m_wrist.setLowerAngleLimit(-10);
-        }
-
-        // TODO: Make this a linear interpolation
-        // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
-          m_superstructureState = SUPERSTRUCTURE_STATE.HIGH;
-        }
-        break;
+          break;
+        case HIGH:
+          // TODO: Make this a linear interpolation
+          // TODO: Determine Limit
+          if (m_wrist.getWristAngleDegrees() > 0) {
+            m_elevator.setLowerLimit(Units.inchesToMeters(12));
+          } else {
+            m_elevator.setLowerLimit(Units.inchesToMeters(0));
+          }
+          break;
+        case LOW:
+//          m_wrist.setLowerAngleLimit(15);
+//          m_wrist.setLowerAngleLimit(-10);
+          // TODO: Make this a linear interpolation
+          // TODO: Determine Limit
+          if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+            m_wrist.setUpperAngleLimit(80);
+          } else {
+            m_wrist.setUpperAngleLimit(80);
+          }
+          break;
+        case INTAKING:
+          m_elevator.setElevatorState(Constants.Elevator.ELEVATOR_STATE.STOWED);
+          m_wrist.setWristState(WRIST_STATE.INTAKING);
+          break;
+        default:
+        case STOWED:
+          m_elevator.setElevatorState(Constants.Elevator.ELEVATOR_STATE.STOWED);
+          m_wrist.setWristState(WRIST_STATE.STOWED);
+          break;
+      }
     }
 
     // TODO: Limit max swerve speed by elevator height

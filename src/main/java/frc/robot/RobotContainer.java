@@ -167,6 +167,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.resetState();
     m_wrist.resetState();
   }
 

@@ -35,6 +35,11 @@ public class ConstantsBase {
 
     public final double metersToEncoderCounts =
         (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
+
+    public final double kS = 0;
+    public final double kV = 0;
+    public final double kA = 0;
+
   }
 
   public final class IntakeDef {}

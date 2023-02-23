@@ -69,6 +69,7 @@ public final class Constants {
       MID,
       HIGH,
       JOYSTICK,
+      TUNING
     }
   }
 
