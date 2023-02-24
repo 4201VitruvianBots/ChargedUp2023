@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.constants.Constants.Elevator.SETPOINT_STATE;
 
 public class Elevator extends SubsystemBase {
 
@@ -58,8 +58,8 @@ public class Elevator extends SubsystemBase {
 
   private static double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private ELEVATOR_STATE desiredHeightState =
-      ELEVATOR_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
+  private SETPOINT_STATE desiredHeightState =
+      SETPOINT_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
 
   private double m_lowerLimitMeters = Constants.getInstance().Elevator.elevatorMinHeightMeters;
   private double m_upperLimitMeters = Constants.getInstance().Elevator.elevatorMaxHeightMeters;
@@ -260,7 +260,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  public ELEVATOR_STATE getElevatorState() {
+  public SETPOINT_STATE getElevatorState() {
     return desiredHeightState;
   }
 
@@ -268,7 +268,7 @@ public class Elevator extends SubsystemBase {
     return !(Math.abs(getElevatorPercentOutput()) < 0.05);
   }
 
-  public void setElevatorState(ELEVATOR_STATE heightEnum) {
+  public void setElevatorState(SETPOINT_STATE heightEnum) {
     desiredHeightState = heightEnum;
   }
 
@@ -391,7 +391,7 @@ public class Elevator extends SubsystemBase {
     updateShuffleboard();
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
-      desiredHeightState = ELEVATOR_STATE.TUNING;
+      desiredHeightState = SETPOINT_STATE.TUNING;
       switch (desiredHeightState) {
         case TUNING:
           elevatorMotors[0].config_kP(0, kPSub.get());

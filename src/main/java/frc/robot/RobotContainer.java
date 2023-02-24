@@ -30,9 +30,8 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.constants.Constants.Elevator.SETPOINT_STATE;
 import frc.robot.constants.Constants.USB;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.Controls;
@@ -125,32 +124,36 @@ public class RobotContainer {
         .leftTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                new SetDesiredWristSetpoint(
+                    m_wrist, Constants.Wrist.SETPOINT_STATE.INTAKING.getValue()),
+                new SetDesiredWristSetpoint(
+                    m_wrist, Constants.Wrist.SETPOINT_STATE.HIGH.getValue()),
                 () ->
                     m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
+                        == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE));
 
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
     xboxController
         .rightTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                new SetDesiredWristSetpoint(
+                    m_wrist, Constants.Wrist.SETPOINT_STATE.INTAKING.getValue()),
+                new SetDesiredWristSetpoint(
+                    m_wrist, Constants.Wrist.SETPOINT_STATE.HIGH.getValue()),
                 () ->
                     m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
+                        == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE));
 
     // Elevator button bindings
-    xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    //    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
-    xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
+    xboxController.a().whileTrue(new SetElevatorState(m_elevator, SETPOINT_STATE.LOW));
+    //    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW_ZONE));
+    xboxController.b().whileTrue(new SetElevatorState(m_elevator, SETPOINT_STATE.MID));
     //    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
-    xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
+    xboxController.x().whileTrue(new SetElevatorState(m_elevator, SETPOINT_STATE.STOWED));
     //    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
-    xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    //    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    xboxController.y().whileTrue(new SetElevatorState(m_elevator, SETPOINT_STATE.HIGH));
+    //    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH_ZONE));
 
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new ToggleElevatorControlMode(m_elevator));

@@ -63,7 +63,7 @@ public final class Constants {
   }
 
   public static final class Elevator {
-    public enum ELEVATOR_STATE {
+    public enum SETPOINT_STATE {
       STOWED,
       LOW,
       MID,
@@ -150,13 +150,22 @@ public final class Constants {
   }
 
   public static final class Wrist {
-    public enum WRIST_STATE {
-      STOWED,
-      INTAKING,
-      LOW,
-      MID,
-      HIGH,
-      JOYSTICK,
+    public enum SETPOINT_STATE {
+      STOWED(90.0),
+      INTAKING(-15.0),
+      LOW(0.0),
+      MID(0.0),
+      HIGH(180.0);
+
+      private final double value;
+
+      SETPOINT_STATE(final double value) {
+        this.value = value;
+      }
+
+      public double getValue() {
+        return value;
+      }
     }
   }
 

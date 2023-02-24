@@ -27,11 +27,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
 public class Wrist extends SubsystemBase {
-  private WRIST_STATE m_desiredState = WRIST_STATE.JOYSTICK;
-  private double desiredAngleSetpoint;
+  private double m_desiredAngleDegrees;
+  private double m_commandedAngleDegrees;
   private double m_lowerAngleLimitDegrees =
       Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
   private double m_upperAngleLimitDegrees =
@@ -75,9 +74,14 @@ public class Wrist extends SubsystemBase {
   // Logging setup
 
   public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/wristCurrent");
-  public DoubleLogEntry wristSetpointEntry = new DoubleLogEntry(log, "/wrist/wristSetpoint");
-  public DoubleLogEntry wristPositionEntry = new DoubleLogEntry(log, "/wrist/wristPosition");
+  public DoubleLogEntry wristVoltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
+  public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/current");
+  public DoubleLogEntry wristDesiredPositionEntry =
+      new DoubleLogEntry(log, "/wrist/desiredPositionDegrees");
+  public DoubleLogEntry wristCommandedPositionEntry =
+      new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
+  public DoubleLogEntry wristPositionDegreesEntry =
+      new DoubleLogEntry(log, "/wrist/positionDegrees");
   public static ShuffleboardTab wristTab = Shuffleboard.getTab("Wrist");
 
   private DoubleSubscriber kSSub, kVSub, kGSub, kASub, kPSub, kDSub, setpointSub;
@@ -107,10 +111,9 @@ public class Wrist extends SubsystemBase {
     wristMotor.configAllowableClosedloopError(
         0, 1 / Constants.getInstance().Wrist.encoderUnitsPerRotation);
 
-    wristTab.addDouble("Angle", this::getWristAngleDegrees);
+    wristTab.addDouble("Angle", this::getAngleDegrees);
     wristTab.addDouble("Raw position", this::getWristSensorPosition);
-    wristTab.addDouble("Setpoint", this::getSetpointDegrees);
-    wristTab.addString("State", () -> getWristState().toString());
+    wristTab.addDouble("Setpoint", this::getDesiredAngle);
     wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
     wristTab.add(this);
 
@@ -208,6 +211,10 @@ public class Wrist extends SubsystemBase {
     return wristMotor.getMotorOutputVoltage();
   }
 
+  public double getWristMotorCurrent() {
+    return wristMotor.getSupplyCurrent();
+  }
+
   //  setpoint for the wrist
   public void setSetpointDegrees(TrapezoidProfile.State state) {
     wristMotor.set(
@@ -227,24 +234,28 @@ public class Wrist extends SubsystemBase {
   public void resetState() {
     m_setpoint =
         new TrapezoidProfile.State(
-            Units.degreesToRadians(getWristAngleDegrees()),
+            Units.degreesToRadians(getAngleDegrees()),
             Units.degreesToRadians(getWristAngleDegreesPerSecond()));
   }
 
-  public double getSetpointDegrees() {
-    return desiredAngleSetpoint;
+  public void setDesiredAngle(double desiredAngleDegrees) {
+    m_desiredAngleDegrees = desiredAngleDegrees;
   }
 
-  public void setWristState(WRIST_STATE state) {
-    m_desiredState = state;
+  public double getDesiredAngle() {
+    return m_desiredAngleDegrees;
   }
 
-  public WRIST_STATE getWristState() {
-    return m_desiredState;
+  public void setCommandedAngle(double commandedAngle) {
+    m_commandedAngleDegrees = commandedAngle;
+  }
+
+  public double getCommandedAngle() {
+    return m_commandedAngleDegrees;
   }
 
   // this is get current angle
-  public double getWristAngleDegrees() {
+  public double getAngleDegrees() {
     return getWristSensorPosition() * Constants.getInstance().Wrist.encoderUnitsPerRotation;
   }
   // this is get current angle
@@ -255,7 +266,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public Rotation2d getWristAngleRotation2d() {
-    return Rotation2d.fromDegrees(getWristAngleDegrees());
+    return Rotation2d.fromDegrees(getAngleDegrees());
   }
 
   private double getWristSensorPosition() {
@@ -312,9 +323,11 @@ public class Wrist extends SubsystemBase {
   public void updateSmartDashboard() {}
 
   public void updateLog() {
-    wristCurrentEntry.append(getWristMotorVoltage());
-    wristSetpointEntry.append(getSetpointDegrees());
-    wristPositionEntry.append(getWristAngleDegrees());
+    wristVoltageEntry.append(getWristMotorVoltage());
+    wristCurrentEntry.append(getWristMotorCurrent());
+    wristDesiredPositionEntry.append(getDesiredAngle());
+    wristCommandedPositionEntry.append(getCommandedAngle());
+    wristPositionDegreesEntry.append(getAngleDegrees());
   }
 
   @Override
@@ -334,33 +347,33 @@ public class Wrist extends SubsystemBase {
     updateLog();
     // This method will be called once per scheduler run
     if (wristIsClosedLoop) {
-      switch (m_desiredState) {
-        case JOYSTICK:
-          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
-          break;
-        case INTAKING:
-          desiredAngleSetpoint = -10.0;
-          break;
-        case LOW:
-          // TODO: Find setpoint value
-          desiredAngleSetpoint = 35;
-          break;
-        case MID:
-          // TODO: Find setpoint value
-          desiredAngleSetpoint = 0;
-          break;
-        case HIGH:
-          // TODO: Find setpoint value
-          desiredAngleSetpoint = 0;
-          break;
-        default:
-        case STOWED:
-          desiredAngleSetpoint = 50.0;
-          break;
-      }
+      //      switch (m_desiredAngleDegrees) {
+      //        case JOYSTICK:
+      //          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getAngleDegrees();
+      //          break;
+      //        case INTAKING:
+      //          desiredAngleSetpoint = -10.0;
+      //          break;
+      //        case LOW:
+      //          // TODO: Find setpoint value
+      //          desiredAngleSetpoint = 35;
+      //          break;
+      //        case MID:
+      //          // TODO: Find setpoint value
+      //          desiredAngleSetpoint = 0;
+      //          break;
+      //        case HIGH:
+      //          // TODO: Find setpoint value
+      //          desiredAngleSetpoint = 0;
+      //          break;
+      //        default:
+      //        case STOWED:
+      //          desiredAngleSetpoint = 50.0;
+      //          break;
+      //      }
       if (DriverStation.isEnabled()) {
         //        desiredAngleSetpoint = setpointSub.get(0);
-        m_goal = new TrapezoidProfile.State(Units.degreesToRadians(desiredAngleSetpoint), 0);
+        m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_commandedAngleDegrees), 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();

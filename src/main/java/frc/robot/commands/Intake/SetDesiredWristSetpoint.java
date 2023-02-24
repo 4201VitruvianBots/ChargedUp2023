@@ -5,17 +5,16 @@
 package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.subsystems.Wrist;
 
-public class SetWristState extends CommandBase {
+public class SetDesiredWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
-  private WRIST_STATE m_state;
+  private double m_desiredSetpoint;
 
   /** Creates a new RunWrist. */
-  public SetWristState(Wrist wrist, WRIST_STATE state) {
+  public SetDesiredWristSetpoint(Wrist wrist, double desiredSetpoint) {
     m_wrist = wrist;
-    m_state = state;
+    m_desiredSetpoint = desiredSetpoint;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
@@ -28,7 +27,7 @@ public class SetWristState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristState(m_state);
+    m_wrist.setDesiredAngle(m_desiredSetpoint);
   }
 
   // Called once the command ends or is interrupted.
