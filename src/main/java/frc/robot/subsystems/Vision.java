@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
@@ -23,7 +24,7 @@ public class Vision extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
   private final Controls m_controls;
 
-  private final NetworkTable intake;
+  private final NetworkTable m_intake;
   private final NetworkTable outtake;
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
@@ -33,6 +34,18 @@ public class Vision extends SubsystemBase {
 
   private DoubleLogEntry limelightTargetValid;
   private DoubleLogEntry leftLocalizerTargetValid;
+
+  private Timer searchTimer = new Timer();
+  private Double searchWindow = 0.2;
+
+  private enum targetType {
+    INTAKING,
+    CONE,
+    CUBE,
+    NONE
+  }
+
+  private targetType targetFound = targetType.NONE;
 
   Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -50,7 +63,7 @@ public class Vision extends SubsystemBase {
     m_swerveDrive = swerveDrive;
     m_controls = controls;
 
-    intake = NetworkTableInstance.getDefault().getTable("limelight");
+    m_intake = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
@@ -80,6 +93,8 @@ public class Vision extends SubsystemBase {
             .getTable("rLocalizer")
             .getDoubleArrayTopic("camToRobotT3D")
             .publish();
+    
+    resetSearch();
   }
 
   /**
@@ -91,10 +106,13 @@ public class Vision extends SubsystemBase {
     return getValidTargetType(location) > 0;
   }
 
+  /*
+   * Whether the limelight has any valid targets (0 or 1)
+   */
   public double getValidTargetType(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
-        return intake.getEntry("tv").getDouble(0);
+        return m_intake.getEntry("tv").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
@@ -117,10 +135,13 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  /*
+   * Horizontal Offset From Crosshair To Target
+   */
   public double getTargetXAngle(CAMERA_LOCATION location, int index) {
     switch (location) {
       case INTAKE:
-        return -intake.getEntry("tx").getDouble(0);
+        return -m_intake.getEntry("tx").getDouble(0);
       case OUTTAKE:
         return -outtake.getEntry("tx").getDouble(0);
       default:
@@ -128,10 +149,13 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  /*
+   * Vertical Offset From Crosshair To Target
+   */
   public double getTargetYAngle(CAMERA_LOCATION location, int index) {
     switch (location) {
       case INTAKE:
-        return intake.getEntry("ty").getDouble(0);
+        return m_intake.getEntry("ty").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("ty").getDouble(0);
       default:
@@ -139,12 +163,29 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  /*
+   * The pipeline’s latency contribution (ms). Add to “cl” to get total latency.
+   */
   public double getCameraLatency(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
-        return intake.getEntry("tl").getDouble(0);
+        return m_intake.getEntry("tl").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("tl").getDouble(0);
+      default:
+        return 0;
+    }
+  }
+
+  /*
+   * Target Area (0% of image to 100% of image)
+   */
+  public double getTargetArea(CAMERA_LOCATION location) {
+    switch (location) {
+      case INTAKE:
+        return m_intake.getEntry("ta").getDouble(0);
+      case OUTTAKE:
+        return outtake.getEntry("ta").getDouble(0);
       default:
         return 0;
     }
@@ -161,6 +202,53 @@ public class Vision extends SubsystemBase {
         return m_rightLocalizer.getEntry("json").getDouble(0);
       default:
         return 0;
+    }
+  }
+
+  /*
+   * Pipeline 1 = cube
+   * Pipeline 2 = cone
+   */
+  public void setPipeline(CAMERA_LOCATION location, double pipeline) {
+    switch (location) {
+      case INTAKE:
+        m_intake.getEntry("pipeline").setDouble(pipeline);
+        break;
+    }
+  }
+  
+  public void resetSearch() {
+    targetFound = targetType.NONE;
+    searchTimer.reset();
+    searchTimer.start();
+  }
+
+  /*
+   * Look for a pipeline until a clear target is found
+   */
+  public void searchLimelightPipeline(CAMERA_LOCATION location) {
+    int pipeline = (int)(Math.floor(searchTimer.get() / searchWindow) % 2) + 1; 
+    
+    //threshold to find game object
+    if(targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
+      setPipeline(location, pipeline);
+      if(getTargetArea(location) > 20.0 && pipeline == 1) {
+        targetFound = targetType.CUBE;
+      } else if (getTargetArea(location) > 10.0 && pipeline == 2) {
+        targetFound = targetType.CONE;
+      }
+    }
+
+    //threshold to lose game object once it's found
+    if(targetFound == targetType.CUBE){
+      if(getTargetArea(location) < 15.0) {
+        targetFound = targetType.NONE;
+      }
+    }
+    if(targetFound == targetType.CONE) {
+      if(getTargetArea(location) < 5.0) {
+        targetFound = targetType.NONE;
+      }
     }
   }
 
@@ -342,6 +430,7 @@ public class Vision extends SubsystemBase {
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_LOCATION.LEFT_LOCALIZER);
     //    updateVisionPose(CAMERA_LOCATION.REAR_LOCALIZER);
+    searchLimelightPipeline(CAMERA_LOCATION.INTAKE);
     logData();
   }
 
