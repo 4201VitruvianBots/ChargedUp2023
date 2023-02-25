@@ -85,7 +85,7 @@ public class Elevator extends SubsystemBase {
   private boolean elevatorIsClosedLoop = false;
 
   private double maxPercentOutput = 0.25;
-  private double setpointMultiplier = 0.10;
+  private double setpointMultiplier = 1;
 
   // Simulation setup
 
@@ -428,7 +428,7 @@ public class Elevator extends SubsystemBase {
       //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY);
+      setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
     }
   }
 }

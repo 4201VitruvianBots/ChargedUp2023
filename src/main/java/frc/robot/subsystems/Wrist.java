@@ -36,7 +36,7 @@ public class Wrist extends SubsystemBase {
       Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
   private double m_upperAngleLimitDegrees =
       Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
-  private boolean wristIsClosedLoop = true;
+  private boolean wristIsClosedLoop = false;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
   private double m_wristPercentOutput;
@@ -58,7 +58,7 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.FFkV,
           Constants.getInstance().Wrist.kA);
 
-  private double setpointMultiplier = 60.0;
+  private double setpointMultiplier = .4;
 
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
@@ -112,6 +112,7 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Setpoint", this::getSetpointDegrees);
     wristTab.addString("State", () -> getWristState().toString());
     wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
+    wristTab.addBoolean("WristisClosedLoop", this::getControlMode);
     wristTab.add(this);
 
     try {
