@@ -126,7 +126,8 @@ public class StateHandler extends SubsystemBase {
 
     switch (m_currentZone) {
       case EXTENDED_ZONE:
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(20)) {
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(20) &&
+            m_wrist.getAngleDegrees()) {
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
         }
         break;
