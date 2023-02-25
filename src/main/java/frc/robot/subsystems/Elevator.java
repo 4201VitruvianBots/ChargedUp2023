@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.kV,
           Constants.getInstance().Elevator.kA);
 
-  private static double
+  private double
       desiredHeightValue; // The height in encoder units our robot is trying to reach
   private ELEVATOR_STATE desiredHeightState =
       ELEVATOR_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = false;
+  private boolean elevatorIsClosedLoop = true;
 
   private double maxPercentOutput = 0.25;
   private double setpointMultiplier = 1;
@@ -310,9 +310,9 @@ public class Elevator extends SubsystemBase {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    if (getElevatorLowerSwitch()) {
-      setElevatorSensorPosition(0.0);
-    }
+    // if (getElevatorLowerSwitch()) {
+    //   setElevatorSensorPosition(0.0);
+    // }
     elevatorHeight = getHeightMeters();
   }
 
@@ -328,7 +328,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorHeightTab.setDouble(getHeightMeters());
     elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
-    elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
+    elevatorTargetHeightTab.setDouble(desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
     elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
@@ -392,30 +392,30 @@ public class Elevator extends SubsystemBase {
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
       desiredHeightState = ELEVATOR_STATE.TUNING;
-      switch (desiredHeightState) {
-        case TUNING:
+      // switch (desiredHeightState) {
+      //   case TUNING:
           elevatorMotors[0].config_kP(0, kPSub.get());
           elevatorMotors[0].config_kI(0, kISub.get());
           elevatorMotors[0].config_kD(0, kDSub.get());
           desiredHeightValue = kSetpointSub.get();
-          break;
-        case JOYSTICK:
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
-          break;
-        case HIGH:
-          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-          break;
-        case MID:
-          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-          break;
-        case LOW:
-          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-          break;
-        default:
-        case STOWED:
-          desiredHeightValue = 0.0;
-          break;
-      }
+      //     break;
+      //   case JOYSTICK:
+      //     desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+      //     break;
+      //   case HIGH:
+      //     desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+      //     break;
+      //   case MID:
+      //     desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+      //     break;
+      //   case LOW:
+      //     desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+      //     break;
+      //   default:
+      //   case STOWED:
+      //     desiredHeightValue = 0.0;
+      //     break;
+      // }
       // TODO: Cap the desiredHieghtValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(desiredHeightValue, 0);
