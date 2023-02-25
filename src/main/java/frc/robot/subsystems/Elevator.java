@@ -69,7 +69,6 @@ public class Elevator extends SubsystemBase {
   private final double kP = 0.55;
   private final double kI = 0;
   private final double kD = 0;
-  //  private final double kF = 0.01;
   private final double kF = 0;
 
   private static double elevatorHeight =
@@ -185,15 +184,12 @@ public class Elevator extends SubsystemBase {
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-    try {
-      elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-      elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-      elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
-      elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-      kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint").publish();
-    } catch (Exception e) {
+    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
 
-    }
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
@@ -391,41 +387,39 @@ public class Elevator extends SubsystemBase {
     updateShuffleboard();
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
-      desiredHeightState = ELEVATOR_STATE.TUNING;
-      // switch (desiredHeightState) {
-      //   case TUNING:
+      switch (desiredHeightState) {
+        case TUNING:
           elevatorMotors[0].config_kP(0, kPSub.get());
           elevatorMotors[0].config_kI(0, kISub.get());
           elevatorMotors[0].config_kD(0, kDSub.get());
           desiredHeightValue = kSetpointSub.get();
-      //     break;
-      //   case JOYSTICK:
-      //     desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
-      //     break;
-      //   case HIGH:
-      //     desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-      //     break;
-      //   case MID:
-      //     desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-      //     break;
-      //   case LOW:
-      //     desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-      //     break;
-      //   default:
-      //   case STOWED:
-      //     desiredHeightValue = 0.0;
-      //     break;
-      // }
-      // TODO: Cap the desiredHieghtValue by the min/max elevator height prior to setting it
+          break;
+        case JOYSTICK:
+          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+          break;
+        case HIGH:
+          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+          break;
+        case MID:
+          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+          break;
+        case LOW:
+          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+          break;
+        default:
+        case STOWED:
+          desiredHeightValue = 0.0;
+          break;
+      }
+      // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(desiredHeightValue, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
-        kSetpointTargetPub.set(Units.radiansToDegrees(m_setpoint.position));
+        kSetpointTargetPub.set(m_setpoint.position);
         setTrapezoidState(m_setpoint);
       }
-      //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
