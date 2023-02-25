@@ -61,7 +61,7 @@ public class Elevator extends SubsystemBase {
   private double
       m_commandedPositionMeters; // The height in encoder units our robot is trying to reach
   private ELEVATOR.SETPOINT desiredHeightState =
-      ELEVATOR.SETPOINT.JOYSTICK; // Think of this as our "next state" in our state machine.
+      ELEVATOR.SETPOINT.STOWED; // Think of this as our "next state" in our state machine.
 
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();

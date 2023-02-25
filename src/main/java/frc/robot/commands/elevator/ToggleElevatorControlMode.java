@@ -23,7 +23,7 @@ public class ToggleElevatorControlMode extends CommandBase {
   @Override
   public void initialize() {
     m_elevator.setControlMode(!m_elevator.getControlMode());
-    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
+//    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

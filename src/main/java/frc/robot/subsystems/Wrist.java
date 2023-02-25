@@ -54,7 +54,7 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.kA);
 
   private final double maxPercentOutput = 1.0;
-  private final double setpointMultiplier = Units.degreesToRadians(20.0);
+  private final double setpointMultiplier = Units.degreesToRadians(30.0);
   private final double percentOutputMultiplier = 0.4;
 
   private final SingleJointedArmSim m_armSim =
@@ -98,8 +98,6 @@ public class Wrist extends SubsystemBase {
     wristMotor.configFactoryDefault();
     wristMotor.setNeutralMode(NeutralMode.Brake);
     wristMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
-    Timer.delay(1);
-    resetWristAngle(0.0);
 
     //    wristMotor.setStatusFramePeriod(1, 0);
     //    wristMotor.setStatusFramePeriod(2, 0);
@@ -113,10 +111,12 @@ public class Wrist extends SubsystemBase {
     wristMotor.configPeakOutputReverse(
         -maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
 
-    wristMotor.setInverted(TalonFXInvertType.CounterClockwise);
+    wristMotor.setInverted(TalonFXInvertType.Clockwise);
 
     wristMotor.configAllowableClosedloopError(
         0, 1 / Constants.getInstance().Wrist.encoderUnitsToDegrees);
+    Timer.delay(1);
+    resetWristAngle(-10.0);
 
     wristTab.addDouble("Angle", this::getPositionDegrees);
     wristTab.addDouble("Raw position", this::getSensorPosition);

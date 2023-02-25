@@ -52,7 +52,7 @@ public class ConstantsBase {
     public final double kG = 1.75;
     public final double kA = 0.16;
 
-    public final double kP = 0.04;
+    public final double kP = 0.1;
     public final double kD = 0.0;
   }
 
