@@ -59,7 +59,7 @@ public class RobotContainer {
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Controls m_controls = new Controls();
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final Wrist m_wrist = new Wrist();

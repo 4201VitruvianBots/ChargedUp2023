@@ -23,8 +23,9 @@ public class Vision extends SubsystemBase {
 
   private final SwerveDrive m_swerveDrive;
   private final Controls m_controls;
+  private final Intake m_intakeSub;
 
-  private final NetworkTable m_intake;
+  private final NetworkTable m_intakeNet;
   private final NetworkTable outtake;
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
@@ -59,11 +60,12 @@ public class Vision extends SubsystemBase {
   double[] tagPosX = new double[10];
   double[] tagPosY = new double[10];
 
-  public Vision(SwerveDrive swerveDrive, DataLog logger, Controls controls) {
+  public Vision(SwerveDrive swerveDrive, DataLog logger, Controls controls, Intake intake) {
     m_swerveDrive = swerveDrive;
     m_controls = controls;
+    m_intakeSub = intake;
 
-    m_intake = NetworkTableInstance.getDefault().getTable("limelight");
+    m_intakeNet = NetworkTableInstance.getDefault().getTable("limelight");
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
@@ -93,7 +95,7 @@ public class Vision extends SubsystemBase {
             .getTable("rLocalizer")
             .getDoubleArrayTopic("camToRobotT3D")
             .publish();
-    
+
     resetSearch();
   }
 
@@ -112,7 +114,7 @@ public class Vision extends SubsystemBase {
   public double getValidTargetType(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
-        return m_intake.getEntry("tv").getDouble(0);
+        return m_intakeNet.getEntry("tv").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
@@ -141,7 +143,7 @@ public class Vision extends SubsystemBase {
   public double getTargetXAngle(CAMERA_LOCATION location, int index) {
     switch (location) {
       case INTAKE:
-        return -m_intake.getEntry("tx").getDouble(0);
+        return -m_intakeNet.getEntry("tx").getDouble(0);
       case OUTTAKE:
         return -outtake.getEntry("tx").getDouble(0);
       default:
@@ -155,7 +157,7 @@ public class Vision extends SubsystemBase {
   public double getTargetYAngle(CAMERA_LOCATION location, int index) {
     switch (location) {
       case INTAKE:
-        return m_intake.getEntry("ty").getDouble(0);
+        return m_intakeNet.getEntry("ty").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("ty").getDouble(0);
       default:
@@ -169,7 +171,7 @@ public class Vision extends SubsystemBase {
   public double getCameraLatency(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
-        return m_intake.getEntry("tl").getDouble(0);
+        return m_intakeNet.getEntry("tl").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("tl").getDouble(0);
       default:
@@ -183,7 +185,7 @@ public class Vision extends SubsystemBase {
   public double getTargetArea(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
-        return m_intake.getEntry("ta").getDouble(0);
+        return m_intakeNet.getEntry("ta").getDouble(0);
       case OUTTAKE:
         return outtake.getEntry("ta").getDouble(0);
       default:
@@ -212,11 +214,11 @@ public class Vision extends SubsystemBase {
   public void setPipeline(CAMERA_LOCATION location, double pipeline) {
     switch (location) {
       case INTAKE:
-        m_intake.getEntry("pipeline").setDouble(pipeline);
+        m_intakeNet.getEntry("pipeline").setDouble(pipeline);
         break;
     }
   }
-  
+
   public void resetSearch() {
     targetFound = targetType.NONE;
     searchTimer.reset();
@@ -224,30 +226,33 @@ public class Vision extends SubsystemBase {
   }
 
   /*
-   * Look for a pipeline until a clear target is found
+   * Look for a pipeline until a clear target is found when intaking
+   *
    */
   public void searchLimelightPipeline(CAMERA_LOCATION location) {
-    int pipeline = (int)(Math.floor(searchTimer.get() / searchWindow) % 2) + 1; 
-    
-    //threshold to find game object
-    if(targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
-      setPipeline(location, pipeline);
-      if(getTargetArea(location) > 20.0 && pipeline == 1) {
-        targetFound = targetType.CUBE;
-      } else if (getTargetArea(location) > 10.0 && pipeline == 2) {
-        targetFound = targetType.CONE;
-      }
-    }
+    if (m_intakeSub.getIntakeState()) {
+      int pipeline = (int) (Math.floor(searchTimer.get() / searchWindow) % 2) + 1;
 
-    //threshold to lose game object once it's found
-    if(targetFound == targetType.CUBE){
-      if(getTargetArea(location) < 15.0) {
-        targetFound = targetType.NONE;
+      // threshold to find game object
+      if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
+        setPipeline(location, pipeline);
+        if (getTargetArea(location) > 20.0 && pipeline == 1) {
+          targetFound = targetType.CUBE;
+        } else if (getTargetArea(location) > 10.0 && pipeline == 2) {
+          targetFound = targetType.CONE;
+        }
       }
-    }
-    if(targetFound == targetType.CONE) {
-      if(getTargetArea(location) < 5.0) {
-        targetFound = targetType.NONE;
+
+      // threshold to lose game object once it's found
+      if (targetFound == targetType.CUBE) {
+        if (getTargetArea(location) < 15.0) {
+          targetFound = targetType.NONE;
+        }
+      }
+      if (targetFound == targetType.CONE) {
+        if (getTargetArea(location) < 5.0) {
+          targetFound = targetType.NONE;
+        }
       }
     }
   }
