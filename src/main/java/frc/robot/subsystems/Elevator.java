@@ -17,7 +17,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -162,7 +161,8 @@ public class Elevator extends SubsystemBase {
           kD,
           Constants.getInstance().Elevator.kTimeoutMs);
 
-      // motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configPeakOutputForward(maxPercentOutput,
+      // Constants.getInstance().Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-0.5, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
@@ -392,12 +392,12 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = kSetpointSub.get();
           break;
         case JOYSTICK:
-        // desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+          // desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
           break;
         case HIGH:
           desiredHeightValue = 1.02; // Placeholder values
           break;
-        case MID: 
+        case MID:
           desiredHeightValue = .66; // Placeholder values
           break;
         case LOW:
