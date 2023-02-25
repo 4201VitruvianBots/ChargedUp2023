@@ -62,14 +62,48 @@ public final class Constants {
     public static final int elevatorLowerSwitch = 8;
   }
 
-  public static final class Elevator {
-    public enum SETPOINT_STATE {
-      STOWED,
-      LOW,
-      MID,
-      HIGH,
-      JOYSTICK,
-      TUNING
+  public static final class ELEVATOR {
+    public enum SETPOINT {
+      STOWED(Units.inchesToMeters(0.0)),
+      LOW(Units.inchesToMeters(12.0)),
+      MID(Units.inchesToMeters(24.0)),
+      HIGH(Units.inchesToMeters(36.0)),
+      JOYSTICK(Units.inchesToMeters(0.0));
+
+      private final double value;
+
+      SETPOINT(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
+    public enum THRESHOLD {
+      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
+      ABSOLUTE_MAX(Units.inchesToMeters(43.0)),
+      LOW_MIN(Units.inchesToMeters(0.0)),
+      LOW_MAX(Units.inchesToMeters(12.0)),
+      HIGH_MIN(Units.inchesToMeters(12.0)),
+      HIGH_MAX(Units.inchesToMeters(12.0)),
+      EXTENDED_MIN(Units.inchesToMeters(12.0)),
+      EXTENDED_MAX(Units.inchesToMeters(43.0)),
+      LOW_TO_HIGH(Units.inchesToMeters(14.0)),
+      HIGH_TO_LOW(Units.inchesToMeters(10.0)),
+      HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
+      EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
+
+      private final double value;
+
+      THRESHOLD(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
     }
   }
 
@@ -100,7 +134,7 @@ public final class Constants {
     }
   }
 
-  public static final class Vision {
+  public static final class VISION {
     public enum CAMERA_TYPE {
       OAK,
       LIMELIGHT,
@@ -149,30 +183,62 @@ public final class Constants {
     }
   }
 
-  public static final class Wrist {
-    public enum SETPOINT_STATE {
+  public static final class WRIST {
+    public enum SETPOINT {
       STOWED(90.0),
-      INTAKING(-15.0),
-      LOW(0.0),
-      MID(0.0),
+      INTAKING_GROUND(-10.0),
+      INTAKING_STATION(180.0),
+      LOW(180.0),
+      MID(180.0),
       HIGH(180.0);
 
       private final double value;
 
-      SETPOINT_STATE(final double value) {
+      SETPOINT(final double value) {
         this.value = value;
       }
 
-      public double getValue() {
+      public double get() {
+        return value;
+      }
+    }
+
+    public enum THRESHOLD {
+      ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(225.0)),
+      LOW_TO_HIGH(Units.inchesToMeters(14.0)),
+      HIGH_TO_LOW(Units.inchesToMeters(10.0)),
+      HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
+      EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
+
+      private final double value;
+
+      THRESHOLD(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
         return value;
       }
     }
   }
 
-  public static class SetpointSolver {
-    public static final double WRIST_HORIZONTAL_LOW_OFFSET = Units.inchesToMeters(6);
-    public static final double WRIST_HORIZONTAL_MID_OFFSET = Units.inchesToMeters(6);
-    public static final double WRIST_HORIZONTAL_HIGH_OFFSET = Units.inchesToMeters(6);
+  public static class STATEHANDLER {
+    public enum WRIST_SETPOINT_OFFSET {
+      LOW(Units.inchesToMeters(6)),
+      MID(Units.inchesToMeters(6)),
+      HIGH(Units.inchesToMeters(6));
+
+      private final double value;
+
+      WRIST_SETPOINT_OFFSET(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
   }
 
   public enum SCORING_STATE {

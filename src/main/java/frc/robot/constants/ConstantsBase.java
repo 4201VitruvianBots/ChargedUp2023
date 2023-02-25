@@ -16,11 +16,6 @@ public class ConstantsBase {
     public final double elevatorGearing = 10.0;
     public final double elevatorMassKg = 4.0;
     public final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
-    public final double elevatorMinHeightMeters = 0;
-    public final double elevatorMaxHeightMeters = Units.inchesToMeters(43.0);
-    // TODO: Find these two values
-    public final double elevatorHeightWristUpperLimit = Units.inchesToMeters(12.0);
-    public final double elevatorHeightWristLowerLimit = Units.inchesToMeters(12.0);
     public final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(0);
 
     // PID

@@ -2,22 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Intake;
+// Called when the joystick moves up/down, also acts as manual override
+package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.constants.Constants.ELEVATOR;
+import frc.robot.subsystems.Elevator;
 
-public class SetDesiredWristSetpoint extends CommandBase {
-  private final Wrist m_wrist;
-  private double m_desiredSetpoint;
+public class SetElevatorSetpointState extends CommandBase {
+  /** Creates a new IncrementElevatorHeight. */
+  private final Elevator m_elevator;
 
-  /** Creates a new RunWrist. */
-  public SetDesiredWristSetpoint(Wrist wrist, double desiredSetpoint) {
-    m_wrist = wrist;
-    m_desiredSetpoint = desiredSetpoint;
+  private final ELEVATOR.SETPOINT m_setpoint;
+
+  public SetElevatorSetpointState(Elevator elevator, ELEVATOR.SETPOINT state) {
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(wrist);
+    m_elevator = elevator;
+    m_setpoint = state;
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -27,7 +30,7 @@ public class SetDesiredWristSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setDesiredAngle(m_desiredSetpoint);
+    m_elevator.setSetpointState(m_setpoint);
   }
 
   // Called once the command ends or is interrupted.

@@ -15,7 +15,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
+import frc.robot.constants.Constants.VISION.CAMERA_LOCATION;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase {
@@ -55,16 +55,16 @@ public class Vision extends SubsystemBase {
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
 
-    PortForwarder.add(5800, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5800);
-    PortForwarder.add(5801, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5801);
-    PortForwarder.add(5802, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5802);
-    PortForwarder.add(5803, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5803);
-    PortForwarder.add(5804, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5804);
-    PortForwarder.add(5805, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5805);
-    PortForwarder.add(5806, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5800);
-    PortForwarder.add(5807, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5801);
-    PortForwarder.add(5808, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
-    PortForwarder.add(5809, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
+    PortForwarder.add(5800, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5800);
+    PortForwarder.add(5801, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5801);
+    PortForwarder.add(5802, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5802);
+    PortForwarder.add(5803, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5803);
+    PortForwarder.add(5804, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5804);
+    PortForwarder.add(5805, Constants.VISION.SERVER_IPS.INTAKE.toString(), 5805);
+    PortForwarder.add(5806, Constants.VISION.SERVER_IPS.LEFT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5807, Constants.VISION.SERVER_IPS.LEFT_LOCALIZER.toString(), 5801);
+    PortForwarder.add(5808, Constants.VISION.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5809, Constants.VISION.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
 
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
@@ -322,18 +322,18 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     m_leftLocalizerPositionPub.set(
         new double[] {
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
           0,
           0,
           0
         });
     m_rightLocalizerPositionPub.set(
         new double[] {
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
           0,
           0,
           0

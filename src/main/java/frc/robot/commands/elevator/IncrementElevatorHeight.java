@@ -6,7 +6,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Elevator.SETPOINT_STATE;
+import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
@@ -38,7 +38,7 @@ public class IncrementElevatorHeight extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_elevator.setElevatorState(SETPOINT_STATE.JOYSTICK);
+      m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go

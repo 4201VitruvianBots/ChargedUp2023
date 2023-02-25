@@ -26,15 +26,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.constants.Constants;
 
 public class Wrist extends SubsystemBase {
   private double m_desiredAngleDegrees;
   private double m_commandedAngleDegrees;
-  private double m_lowerAngleLimitDegrees =
-      Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
-  private double m_upperAngleLimitDegrees =
-      Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
+  private double m_lowerLimitDegrees = Constants.getInstance().Wrist.wristAbsoluteLowerLimitDegrees;
+  private double m_upperLimitDegrees = Constants.getInstance().Wrist.wristAbsoluteUpperLimitDegrees;
   private boolean wristIsClosedLoop = true;
   private boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
@@ -246,10 +245,6 @@ public class Wrist extends SubsystemBase {
     return m_desiredAngleDegrees;
   }
 
-  public void setCommandedAngle(double commandedAngle) {
-    m_commandedAngleDegrees = commandedAngle;
-  }
-
   public double getCommandedAngle() {
     return m_commandedAngleDegrees;
   }
@@ -306,17 +301,26 @@ public class Wrist extends SubsystemBase {
     return wristIsClosedLoop;
   }
 
-  public void setLowerAngleLimit(double angleDegrees) {
-    m_lowerAngleLimitDegrees = angleDegrees;
+  public void setLowerLimit(double angleDegrees) {
+    m_lowerLimitDegrees = angleDegrees;
   }
 
-  public void setUpperAngleLimit(double angleDegrees) {
-    m_upperAngleLimitDegrees = angleDegrees;
+  public double getLowerLimit() {
+    return m_lowerLimitDegrees;
+  }
+
+  public void setUpperLimit(double angleDegrees) {
+    m_upperLimitDegrees = angleDegrees;
+  }
+
+  public double getUpperLimit() {
+    return m_upperLimitDegrees;
   }
 
   //
-  private double limitDesiredAngleSetpoint() {
-    return MathUtil.clamp(m_setpoint.position, m_lowerAngleLimitDegrees, m_upperAngleLimitDegrees);
+  private TrapezoidProfile.State limitDesiredAngleSetpoint(TrapezoidProfile.State state) {
+    return new TrapezoidProfile.State(
+        MathUtil.clamp(state.position, Units.degreesToRadians(m_lowerLimitDegrees), Units.degreesToRadians(m_upperLimitDegrees)), state.velocity);
   }
 
   // SmartDashboard function
@@ -347,6 +351,7 @@ public class Wrist extends SubsystemBase {
     updateLog();
     // This method will be called once per scheduler run
     if (wristIsClosedLoop) {
+      m_desiredAngleDegrees = m_joystickInput * setpointMultiplier + getAngleDegrees();
       //      switch (m_desiredAngleDegrees) {
       //        case JOYSTICK:
       //          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getAngleDegrees();
@@ -373,12 +378,13 @@ public class Wrist extends SubsystemBase {
       //      }
       if (DriverStation.isEnabled()) {
         //        desiredAngleSetpoint = setpointSub.get(0);
-        m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_commandedAngleDegrees), 0);
+        m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredAngleDegrees), 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
-        //      var commandedSetpoint = limitDesiredAngleSetpoint();
-        kSetpointPub.set(Units.radiansToDegrees(m_setpoint.position));
-        setSetpointDegrees(m_setpoint);
+        var commandedSetpoint = limitDesiredAngleSetpoint(m_setpoint);
+        m_commandedAngleDegrees = m_setpoint.position;
+        kSetpointPub.set(Units.radiansToDegrees(m_commandedAngleDegrees));
+        setSetpointDegrees(commandedSetpoint);
       }
     } else {
       setWristPercentOutput(m_joystickInput * setpointMultiplier);
@@ -393,19 +399,13 @@ public class Wrist extends SubsystemBase {
 
     Unmanaged.feedEnable(20);
 
-    System.out.println("Arm Sim Input: " + m_wristPercentOutput);
-    System.out.println(
-        "Arm Sim Degrees: "
-            + Units.radiansToDegrees(m_armSim.getAngleRads())
-            + "\tVelocity: "
-            + Units.radiansToDegrees(m_armSim.getVelocityRadPerSec()));
-
     wristMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
                 (Units.radiansToDegrees(m_armSim.getAngleRads())
                     / Constants.getInstance().Wrist.encoderUnitsPerRotation));
+
     wristMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(

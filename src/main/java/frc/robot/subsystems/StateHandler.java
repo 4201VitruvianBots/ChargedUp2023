@@ -7,11 +7,15 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.constants.Constants.SCORING_STATE;
+import frc.robot.constants.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.utils.SetpointSolver;
 
@@ -26,7 +30,8 @@ public class StateHandler extends SubsystemBase {
 
   public enum SUPERSTRUCTURE_STATE {
     STOWED,
-    INTAKING,
+    INTAKE_LOW,
+    INTAKE_EXTENDED,
     LOW_ZONE,
     HIGH_ZONE,
     EXTENDED_ZONE,
@@ -40,7 +45,7 @@ public class StateHandler extends SubsystemBase {
   public SUPERSTRUCTURE_STATE m_desiredZone = m_currentZone;
   public SUPERSTRUCTURE_STATE m_nextZone = m_currentZone;
   public Pose2d targetNode;
-  private boolean m_zoneEnforcement;
+  private boolean m_zoneEnforcement = true;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
 
@@ -52,6 +57,14 @@ public class StateHandler extends SubsystemBase {
   private final LED m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
+
+  private StringPublisher m_statePub;
+  private DoublePublisher m_elevatorHeightPub,
+      m_elevatorLowerLimPub,
+      m_elevatorUpperLimPub,
+      m_wristAnglePub,
+      m_wristLowerLimPub,
+      m_wristUpperLimPub;
 
   public StateHandler(
       Intake intake,
@@ -84,19 +97,40 @@ public class StateHandler extends SubsystemBase {
     return m_isOnTarget;
   }
 
-  public void zoneAdvancement() {
-    switch (m_desiredZone) {
+  public SUPERSTRUCTURE_STATE determineDesiredSuperStructureState(
+      double elevatorDesiredSetpoint, double wristDesiredSetpoint) {
+    if (elevatorDesiredSetpoint <= 6) {
+      if (-15 < wristDesiredSetpoint && wristDesiredSetpoint <= 30)
+        return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+      else if (30 < wristDesiredSetpoint && wristDesiredSetpoint <= 60)
+        return SUPERSTRUCTURE_STATE.STOWED;
+      else if (60 < wristDesiredSetpoint && wristDesiredSetpoint <= 80)
+        return SUPERSTRUCTURE_STATE.LOW_ZONE;
+    } else if (6 < elevatorDesiredSetpoint && elevatorDesiredSetpoint <= 12) {
+      return SUPERSTRUCTURE_STATE.HIGH_ZONE;
+    } else if (24 < elevatorDesiredSetpoint) {
+      if (30 < elevatorDesiredSetpoint
+          && elevatorDesiredSetpoint <= 36
+          && 160 < wristDesiredSetpoint
+          && wristDesiredSetpoint <= 200) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
+      else return SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
     }
+    return SUPERSTRUCTURE_STATE.DANGER_ZONE;
+  }
+
+  public void zoneAdvancement() {
+    m_desiredZone = determineDesiredSuperStructureState(0, m_wrist.getDesiredAngle());
     // Advance a state if you pass the zone threshold and are within the next zone's mechanism
     // limits
+    if (m_desiredZone != m_currentZone) {}
+
     switch (m_currentZone) {
       case EXTENDED_ZONE:
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+        if (m_elevator.getHeightMeters() < Units.inchesToMeters(20)) {
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
         }
         break;
       case HIGH_ZONE:
-        // TODO: Determine Limit
         if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
           m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
         } else if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
@@ -104,33 +138,30 @@ public class StateHandler extends SubsystemBase {
         }
         break;
       case LOW_ZONE:
-        // TODO: Determine Limit
         if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
         }
         break;
       case STOWED:
-        // TODO: Determine Limit
         if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
         }
-        m_elevator.setElevatorState(Constants.Elevator.SETPOINT_STATE.STOWED);
-        m_wrist.setDesiredAngle(Constants.Wrist.SETPOINT_STATE.STOWED.getValue());
+        m_elevator.setSetpointState(ELEVATOR.SETPOINT.STOWED);
+        m_wrist.setDesiredAngle(WRIST.SETPOINT.STOWED.get());
         break;
-      case INTAKING:
-        m_wrist.setDesiredAngle(Constants.Wrist.SETPOINT_STATE.INTAKING.getValue());
+      case INTAKE_LOW:
+        m_elevator.setSetpointState(ELEVATOR.SETPOINT.STOWED);
+        m_wrist.setDesiredAngle(WRIST.SETPOINT.INTAKING_GROUND.get());
         // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.LOW_TO_HIGH.get()) {
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
         }
+        break;
+      case INTAKE_EXTENDED:
+        m_elevator.setSetpointState(ELEVATOR.SETPOINT.HIGH);
+        m_wrist.setDesiredAngle(WRIST.SETPOINT.HIGH.get());
         break;
     }
-
-    //    switch ()
-  }
-
-  public boolean checkNextZoneThresholds(double elevatorHeight, SUPERSTRUCTURE_STATE desiredState) {
-    return false;
   }
 
   // Whopper whopper whopper whopper
@@ -149,8 +180,15 @@ public class StateHandler extends SubsystemBase {
   }
 
   private void initSmartDashboard() {
-    var stateHandlerTab = Shuffleboard.getTab("StateHandler");
-
+    var stateHandlerTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
+    m_statePub = stateHandlerTab.getStringTopic("state").publish();
+    m_elevatorHeightPub = stateHandlerTab.getDoubleTopic("elevatorHeightInches").publish();
+    m_elevatorLowerLimPub = stateHandlerTab.getDoubleTopic("elevatorMinLimit").publish();
+    m_elevatorUpperLimPub = stateHandlerTab.getDoubleTopic("elevatorMaxLimit").publish();
+    m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
+    m_wristLowerLimPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
+    m_wristUpperLimPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
     //    stateHandlerTab.addDouble("Angle", this::getWristAngleDegrees);
     //    stateHandlerTab.addDouble("Raw position", this::getWristSensorPosition);
     //    stateHandlerTab.addDouble("Setpoint", this::getSetpointDegrees);
@@ -159,6 +197,13 @@ public class StateHandler extends SubsystemBase {
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getSuperStructureState().toString());
     //    SmartDashboard.putString("Superstructure State", getSuperStructureState().toString());
+    m_statePub.set(getSuperStructureState().toString());
+    m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
+    m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimit()));
+    m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimit()));
+    m_wristAnglePub.set(m_wrist.getAngleDegrees());
+    m_wristUpperLimPub.set(m_wrist.getUpperLimit());
+    m_wristLowerLimPub.set(m_wrist.getLowerLimit());
   }
 
   @Override
@@ -174,29 +219,33 @@ public class StateHandler extends SubsystemBase {
       zoneAdvancement();
       switch (m_currentZone) {
         case EXTENDED_ZONE:
-          // Set mechanism soft limits
-
+          m_elevator.setUpperLimit(Units.inchesToMeters(43));
+          m_elevator.setLowerLimit(Units.inchesToMeters(20));
+          m_wrist.setUpperLimit(225);
+          m_wrist.setLowerLimit(0);
           break;
         case HIGH_ZONE:
-          m_elevator.setUpperLimit(Units.inchesToMeters(12));
+          m_elevator.setUpperLimit(Units.inchesToMeters(24));
           m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperAngleLimit(80);
-          m_wrist.setLowerAngleLimit(0);
+          m_wrist.setUpperLimit(80);
+          m_wrist.setLowerLimit(0);
           break;
         case LOW_ZONE:
-          m_wrist.setUpperAngleLimit(80);
-          m_wrist.setLowerAngleLimit(-15);
+          m_elevator.setUpperLimit(Units.inchesToMeters(12));
+          m_elevator.setLowerLimit(Units.inchesToMeters(0));
+          m_wrist.setUpperLimit(80);
+          m_wrist.setLowerLimit(-15);
         case STOWED:
           m_elevator.setUpperLimit(Units.inchesToMeters(12));
           m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperAngleLimit(80);
-          m_wrist.setLowerAngleLimit(-15);
+          m_wrist.setUpperLimit(80);
+          m_wrist.setLowerLimit(-15);
           break;
-        case INTAKING:
+        case INTAKE_LOW:
           m_elevator.setUpperLimit(Units.inchesToMeters(12));
           m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperAngleLimit(80);
-          m_wrist.setLowerAngleLimit(-15);
+          m_wrist.setUpperLimit(80);
+          m_wrist.setLowerLimit(-15);
           break;
       }
     }
@@ -219,15 +268,15 @@ public class StateHandler extends SubsystemBase {
     if (m_smartScoringEnabled) {
       switch (scoringState) {
         case SMART_HIGH:
-          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_HIGH_OFFSET;
+          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.HIGH.get();
           m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
           break;
         case SMART_MEDIUM:
-          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_MID_OFFSET;
+          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.MID.get();
           m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
           break;
         case SMART_LOW:
-          m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_LOW_OFFSET;
+          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.LOW.get();
           m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
       }
 
@@ -235,7 +284,7 @@ public class StateHandler extends SubsystemBase {
           m_drive.getPoseMeters(),
           m_fieldSim.getTargetNode(currentIntakeState, scoringState),
           scoringState);
-      m_wrist.setDesiredAngle(Constants.Wrist.SETPOINT_STATE.HIGH.getValue());
+      m_wrist.setDesiredAngle(WRIST.SETPOINT.HIGH.get());
       m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());

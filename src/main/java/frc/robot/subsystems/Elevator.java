@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -30,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Elevator.SETPOINT_STATE;
+import frc.robot.constants.Constants.ELEVATOR;
 
 public class Elevator extends SubsystemBase {
 
@@ -57,12 +58,12 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.kA);
 
   private static double
-      desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private SETPOINT_STATE desiredHeightState =
-      SETPOINT_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
+      m_desiredSetpointMeters; // The height in encoder units our robot is trying to reach
+  private ELEVATOR.SETPOINT desiredHeightState =
+      ELEVATOR.SETPOINT.JOYSTICK; // Think of this as our "next state" in our state machine.
 
-  private double m_lowerLimitMeters = Constants.getInstance().Elevator.elevatorMinHeightMeters;
-  private double m_upperLimitMeters = Constants.getInstance().Elevator.elevatorMaxHeightMeters;
+  private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   private static double elevatorJoystickY;
 
@@ -75,17 +76,16 @@ public class Elevator extends SubsystemBase {
   private static double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
 
-  private static final double maxElevatorHeight =
-      Constants.getInstance().Elevator.elevatorMaxHeightMeters;
+  private static final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   // By default this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = false;
+  private boolean elevatorIsClosedLoop = true;
 
-  private double maxPercentOutput = 0.25;
-  private double setpointMultiplier = 0.10;
+  private double maxPercentOutput = 1.0;
+  private double setpointMultiplier = 0.50;
 
   // Simulation setup
 
@@ -95,8 +95,8 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.elevatorGearing,
           Constants.getInstance().Elevator.elevatorMassKg,
           Constants.getInstance().Elevator.elevatorDrumRadiusMeters,
-          Constants.getInstance().Elevator.elevatorMinHeightMeters,
-          Constants.getInstance().Elevator.elevatorMaxHeightMeters,
+          ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+          ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get(),
           true);
 
   // Shuffleboard setup
@@ -105,7 +105,7 @@ public class Elevator extends SubsystemBase {
 
   public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
   public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height", desiredHeightValue).getEntry();
+      elevatorTab.add("Elevator Target Height", m_desiredSetpointMeters).getEntry();
   public GenericEntry elevatorTargetPosTab =
       elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
   public GenericEntry elevatorRawPerOutTab =
@@ -164,15 +164,13 @@ public class Elevator extends SubsystemBase {
           kD,
           Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configPeakOutputForward(1, Constants.getInstance().Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-1, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configPeakOutputReverse(-maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
-      motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
+      //      motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
+      //      motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
-
-      motor.configPeakOutputForward(maxPercentOutput, 0);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -218,6 +216,11 @@ public class Elevator extends SubsystemBase {
         setpoint / Constants.getInstance().Elevator.metersToEncoderCounts);
   }
 
+  private TrapezoidProfile.State limitDesiredAngleSetpoint(TrapezoidProfile.State state) {
+    return new TrapezoidProfile.State(
+            MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
+  }
+
   public void setTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
@@ -260,7 +263,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setSelectedSensorPosition(position);
   }
 
-  public SETPOINT_STATE getElevatorState() {
+  public ELEVATOR.SETPOINT getElevatorState() {
     return desiredHeightState;
   }
 
@@ -268,16 +271,28 @@ public class Elevator extends SubsystemBase {
     return !(Math.abs(getElevatorPercentOutput()) < 0.05);
   }
 
-  public void setElevatorState(SETPOINT_STATE heightEnum) {
+  public void setSetpointState(ELEVATOR.SETPOINT heightEnum) {
     desiredHeightState = heightEnum;
+  }
+
+  public void setDesiredSetpoint(double meters) {
+    m_desiredSetpointMeters = meters;
   }
 
   public void setLowerLimit(double meters) {
     m_lowerLimitMeters = meters;
   }
 
+  public double getLowerLimit() {
+    return m_lowerLimitMeters;
+  }
+
   public void setUpperLimit(double meters) {
     m_upperLimitMeters = meters;
+  }
+
+  public double getUpperLimit() {
+    return m_upperLimitMeters;
   }
 
   public void setElevatorJoystickY(double m_joystickY) {
@@ -328,7 +343,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorHeightTab.setDouble(getHeightMeters());
     elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
-    elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
+    elevatorTargetHeightTab.setDouble(Elevator.m_desiredSetpointMeters);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
     elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
@@ -348,7 +363,7 @@ public class Elevator extends SubsystemBase {
 
   public void updateLog() {
     elevatorCurrentEntry.append(getElevatorMotorVoltage());
-    elevatorSetpointEntry.append(desiredHeightValue);
+    elevatorSetpointEntry.append(m_desiredSetpointMeters);
     elevatorPositionEntry.append(elevatorHeight);
   }
 
@@ -391,39 +406,41 @@ public class Elevator extends SubsystemBase {
     updateShuffleboard();
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
-      desiredHeightState = SETPOINT_STATE.TUNING;
-      switch (desiredHeightState) {
-        case TUNING:
-          elevatorMotors[0].config_kP(0, kPSub.get());
-          elevatorMotors[0].config_kI(0, kISub.get());
-          elevatorMotors[0].config_kD(0, kDSub.get());
-          desiredHeightValue = kSetpointSub.get();
-          break;
-        case JOYSTICK:
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
-          break;
-        case HIGH:
-          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
-          break;
-        case MID:
-          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
-          break;
-        case LOW:
-          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
-          break;
-        default:
-        case STOWED:
-          desiredHeightValue = 0.0;
-          break;
-      }
-      // TODO: Cap the desiredHieghtValue by the min/max elevator height prior to setting it
+      m_desiredSetpointMeters = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+      //      desiredHeightState = ELEVATOR.SETPOINT.TUNING;
+      //      switch (desiredHeightState) {
+      //        case TUNING:
+      //          elevatorMotors[0].config_kP(0, kPSub.get());
+      //          elevatorMotors[0].config_kI(0, kISub.get());
+      //          elevatorMotors[0].config_kD(0, kDSub.get());
+      //          m_desiredSetpointMeters = kSetpointSub.get();
+      //          break;
+      //        case JOYSTICK:
+
+      //          break;
+      //        case HIGH:
+      //          m_desiredSetpointMeters = maxElevatorHeight * 0.75; // Placeholder values
+      //          break;
+      //        case MID:
+      //          m_desiredSetpointMeters = maxElevatorHeight * 0.5; // Placeholder values
+      //          break;
+      //        case LOW:
+      //          m_desiredSetpointMeters = maxElevatorHeight * 0.25; // Placeholder values
+      //          break;
+      //        default:
+      //        case STOWED:
+      //          m_desiredSetpointMeters = 0.0;
+      //          break;
+      //      }
+      // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
-        m_goal = new TrapezoidProfile.State(desiredHeightValue, 0);
+        m_goal = new TrapezoidProfile.State(m_desiredSetpointMeters, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
-        kSetpointTargetPub.set(Units.radiansToDegrees(m_setpoint.position));
-        setTrapezoidState(m_setpoint);
+        var m_commandedSetpoint = limitDesiredAngleSetpoint(m_setpoint);
+        kSetpointTargetPub.set(Units.metersToInches(m_commandedSetpoint.position));
+        setTrapezoidState(m_commandedSetpoint);
       }
       //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
