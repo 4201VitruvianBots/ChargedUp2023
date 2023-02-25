@@ -6,6 +6,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 
 public class SetElevatorDesiredSetpoint extends CommandBase {
@@ -29,7 +30,8 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setDesiredSetpoint(m_setpoint);
+    m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
+    m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
   // Called once the command ends or is interrupted.

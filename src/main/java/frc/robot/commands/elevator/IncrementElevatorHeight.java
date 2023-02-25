@@ -35,10 +35,14 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
+    var test = m_joystickY.getAsDouble();
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
+      m_elevator.setControlState(
+          m_elevator.getControlMode()
+              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
+              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go

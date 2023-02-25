@@ -36,13 +36,12 @@ import frc.robot.constants.Constants.ELEVATOR;
 public class Elevator extends SubsystemBase {
 
   // Initializing both motors
-  public static final TalonFX[] elevatorMotors = {
+  public final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
   };
 
   // Limit switch at bottom of elevator
-  private static DigitalInput elevatorLowerSwitch =
-      new DigitalInput(Constants.DIO.elevatorLowerSwitch);
+  private DigitalInput elevatorLowerSwitch = new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
   private double maxVel = Units.inchesToMeters(40);
   private double maxAccel = Units.inchesToMeters(40);
@@ -57,15 +56,17 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.kV,
           Constants.getInstance().Elevator.kA);
 
-  private static double
-      m_desiredSetpointMeters; // The height in encoder units our robot is trying to reach
+  private double
+      m_desiredPositionMeters; // The height in encoder units our robot is trying to reach
+  private double
+      m_commandedPositionMeters; // The height in encoder units our robot is trying to reach
   private ELEVATOR.SETPOINT desiredHeightState =
       ELEVATOR.SETPOINT.JOYSTICK; // Think of this as our "next state" in our state machine.
 
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
-  private static double elevatorJoystickY;
+  private double elevatorJoystickY;
 
   private final double kP = 0.55;
   private final double kI = 0;
@@ -73,23 +74,25 @@ public class Elevator extends SubsystemBase {
   //  private final double kF = 0.01;
   private final double kF = 0;
 
-  private static double elevatorHeight =
+  private double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
 
-  private static final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
+  private final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   // By default this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
   private boolean elevatorIsClosedLoop = true;
+  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
   private double maxPercentOutput = 1.0;
   private double setpointMultiplier = 0.50;
+  private double percentOutputMultiplier = 0.50;
 
   // Simulation setup
 
-  private static final ElevatorSim elevatorSim =
+  private final ElevatorSim elevatorSim =
       new ElevatorSim(
           Constants.getInstance().Elevator.elevatorGearbox,
           Constants.getInstance().Elevator.elevatorGearing,
@@ -101,11 +104,11 @@ public class Elevator extends SubsystemBase {
 
   // Shuffleboard setup
 
-  public static ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
+  public ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
 
   public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
   public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height", m_desiredSetpointMeters).getEntry();
+      elevatorTab.add("Elevator Target Height", m_desiredPositionMeters).getEntry();
   public GenericEntry elevatorTargetPosTab =
       elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
   public GenericEntry elevatorRawPerOutTab =
@@ -166,11 +169,6 @@ public class Elevator extends SubsystemBase {
 
       motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
-
-      //      motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
-      //      motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
-
-      motor.setSelectedSensorPosition(0.0); // Zero both motors
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -213,18 +211,18 @@ public class Elevator extends SubsystemBase {
   public void setElevatorMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
         TalonFXControlMode.MotionMagic,
-        setpoint / Constants.getInstance().Elevator.metersToEncoderCounts);
+        setpoint / Constants.getInstance().Elevator.encoderCountsToMeters);
   }
 
-  private TrapezoidProfile.State limitDesiredAngleSetpoint(TrapezoidProfile.State state) {
+  private TrapezoidProfile.State limitDesiredSetpointMeters(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
-            MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
+        MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
   }
 
   public void setTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
-        state.position / Constants.getInstance().Elevator.metersToEncoderCounts,
+        state.position / Constants.getInstance().Elevator.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
         (m_feedForward.calculate(state.velocity) / 12.0));
   }
@@ -238,12 +236,12 @@ public class Elevator extends SubsystemBase {
    */
   public double getHeightMeters() {
     return elevatorMotors[0].getSelectedSensorPosition()
-        * Constants.getInstance().Elevator.metersToEncoderCounts;
+        * Constants.getInstance().Elevator.encoderCountsToMeters;
   }
 
   public double getVelocityMps() {
     return elevatorMotors[0].getSelectedSensorVelocity()
-        * Constants.getInstance().Elevator.metersToEncoderCounts
+        * Constants.getInstance().Elevator.encoderCountsToMeters
         * 10;
   }
 
@@ -259,8 +257,8 @@ public class Elevator extends SubsystemBase {
     return !elevatorLowerSwitch.get();
   }
 
-  public void setElevatorSensorPosition(double position) {
-    elevatorMotors[0].setSelectedSensorPosition(position);
+  public void setElevatorSensorPosition(double meters) {
+    elevatorMotors[0].setSelectedSensorPosition(meters);
   }
 
   public ELEVATOR.SETPOINT getElevatorState() {
@@ -275,23 +273,31 @@ public class Elevator extends SubsystemBase {
     desiredHeightState = heightEnum;
   }
 
-  public void setDesiredSetpoint(double meters) {
-    m_desiredSetpointMeters = meters;
+  public void setDesiredPositionMeters(double meters) {
+    m_desiredPositionMeters = meters;
   }
 
-  public void setLowerLimit(double meters) {
+  public double getDesiredPositionMeters() {
+    return m_desiredPositionMeters;
+  }
+
+  public double getCommandedPositionMeters() {
+    return m_commandedPositionMeters;
+  }
+
+  public void setLowerLimitMeters(double meters) {
     m_lowerLimitMeters = meters;
   }
 
-  public double getLowerLimit() {
+  public double getLowerLimitMeters() {
     return m_lowerLimitMeters;
   }
 
-  public void setUpperLimit(double meters) {
+  public void setUpperLimitMeters(double meters) {
     m_upperLimitMeters = meters;
   }
 
-  public double getUpperLimit() {
+  public double getUpperLimitMeters() {
     return m_upperLimitMeters;
   }
 
@@ -320,6 +326,14 @@ public class Elevator extends SubsystemBase {
     return elevatorIsClosedLoop;
   }
 
+  public void setControlState(ELEVATOR.STATE state) {
+    m_controlState = state;
+  }
+
+  public ELEVATOR.STATE getControlState() {
+    return m_controlState;
+  }
+
   // Update elevator height using encoders and bottom limit switch
   public void updateElevatorHeight() {
     /* Uses limit switch to act as a baseline
@@ -343,7 +357,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorHeightTab.setDouble(getHeightMeters());
     elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
-    elevatorTargetHeightTab.setDouble(Elevator.m_desiredSetpointMeters);
+    elevatorTargetHeightTab.setDouble(m_desiredPositionMeters);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
     elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
@@ -363,7 +377,7 @@ public class Elevator extends SubsystemBase {
 
   public void updateLog() {
     elevatorCurrentEntry.append(getElevatorMotorVoltage());
-    elevatorSetpointEntry.append(m_desiredSetpointMeters);
+    elevatorSetpointEntry.append(m_desiredPositionMeters);
     elevatorPositionEntry.append(elevatorHeight);
   }
 
@@ -379,14 +393,14 @@ public class Elevator extends SubsystemBase {
         .setIntegratedSensorRawPosition(
             (int)
                 (elevatorSim.getPositionMeters()
-                    / Constants.getInstance().Elevator.metersToEncoderCounts));
+                    / Constants.getInstance().Elevator.encoderCountsToMeters));
 
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
                 (elevatorSim.getVelocityMetersPerSecond()
-                    / Constants.getInstance().Elevator.metersToEncoderCounts
+                    / Constants.getInstance().Elevator.encoderCountsToMeters
                     * 10));
 
     RoboRioSim.setVInVoltage(
@@ -406,46 +420,33 @@ public class Elevator extends SubsystemBase {
     updateShuffleboard();
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
-      m_desiredSetpointMeters = elevatorJoystickY * setpointMultiplier + getHeightMeters();
-      //      desiredHeightState = ELEVATOR.SETPOINT.TUNING;
-      //      switch (desiredHeightState) {
-      //        case TUNING:
-      //          elevatorMotors[0].config_kP(0, kPSub.get());
-      //          elevatorMotors[0].config_kI(0, kISub.get());
-      //          elevatorMotors[0].config_kD(0, kDSub.get());
-      //          m_desiredSetpointMeters = kSetpointSub.get();
-      //          break;
-      //        case JOYSTICK:
-
-      //          break;
-      //        case HIGH:
-      //          m_desiredSetpointMeters = maxElevatorHeight * 0.75; // Placeholder values
-      //          break;
-      //        case MID:
-      //          m_desiredSetpointMeters = maxElevatorHeight * 0.5; // Placeholder values
-      //          break;
-      //        case LOW:
-      //          m_desiredSetpointMeters = maxElevatorHeight * 0.25; // Placeholder values
-      //          break;
-      //        default:
-      //        case STOWED:
-      //          m_desiredSetpointMeters = 0.0;
-      //          break;
-      //      }
+      switch (m_controlState) {
+        case CLOSED_LOOP_MANUAL:
+          m_desiredPositionMeters =
+              MathUtil.clamp(
+                  elevatorJoystickY * setpointMultiplier + getHeightMeters(),
+                  ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+                  ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
+          break;
+        default:
+        case SETPOINT:
+          break;
+      }
       // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
-        m_goal = new TrapezoidProfile.State(m_desiredSetpointMeters, 0);
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
-        var m_commandedSetpoint = limitDesiredAngleSetpoint(m_setpoint);
-        kSetpointTargetPub.set(Units.metersToInches(m_commandedSetpoint.position));
-        setTrapezoidState(m_commandedSetpoint);
+        var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
+        m_commandedPositionMeters = commandedSetpoint.position;
+        kSetpointTargetPub.set(Units.metersToInches(commandedSetpoint.position));
+        setTrapezoidState(commandedSetpoint);
       }
       //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY);
+      setElevatorPercentOutput(elevatorJoystickY * percentOutputMultiplier);
     }
   }
 }

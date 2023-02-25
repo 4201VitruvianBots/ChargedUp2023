@@ -28,7 +28,7 @@ public class ConstantsBase {
     public final int kPIDLoopIdx = 0;
     public final int kTimeoutMs = 0;
 
-    public final double metersToEncoderCounts =
+    public final double encoderCountsToMeters =
         (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
 
     public final double kS = 0;
@@ -40,15 +40,10 @@ public class ConstantsBase {
 
   public static final class WristDef {
     public final double wristGearRatio = 1024.0 / 27.0;
-    public final double encoderUnitsPerRotation = 360.0 / (2048.0 * wristGearRatio);
+    public final double encoderUnitsToDegrees = 360.0 / (2048.0 * wristGearRatio);
     public final DCMotor gearBox = DCMotor.getFalcon500(1);
     public final double wristMass = Units.lbsToKilograms(15);
     public final double wristLength = Units.inchesToMeters(22);
-    public final double wristAbsoluteUpperLimitDegrees = 200.0;
-    // TODO: Determine the soft limits
-    public final double wristSoftUpperLimitDegrees = 130.0;
-    public final double wristSoftLowerLimitDegrees = 0.0;
-    public final double wristAbsoluteLowerLimitDegrees = -15.0;
     public final int wristLowerSwitch = 0;
 
     // Values were experimentally determined

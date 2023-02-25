@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
@@ -31,11 +32,19 @@ public class StateHandler extends SubsystemBase {
   public enum SUPERSTRUCTURE_STATE {
     STOWED,
     INTAKE_LOW,
-    INTAKE_EXTENDED,
     LOW_ZONE,
     HIGH_ZONE,
     EXTENDED_ZONE,
+    INTAKE_EXTENDED,
     DANGER_ZONE
+  }
+
+  public enum ZONE_TRANSITIONS {
+    NONE,
+    LOW_TO_HIGH,
+    HIGH_TO_LOW,
+    HIGH_TO_EXTENDED,
+    EXTENDED_TO_HIGH
   }
 
   public SCORING_STATE scoringState = SCORING_STATE.STOWED;
@@ -43,9 +52,9 @@ public class StateHandler extends SubsystemBase {
   private double m_wristOffset = 0;
   public SUPERSTRUCTURE_STATE m_currentZone = SUPERSTRUCTURE_STATE.STOWED;
   public SUPERSTRUCTURE_STATE m_desiredZone = m_currentZone;
-  public SUPERSTRUCTURE_STATE m_nextZone = m_currentZone;
+  public ZONE_TRANSITIONS m_nextZone = ZONE_TRANSITIONS.NONE;
   public Pose2d targetNode;
-  private boolean m_zoneEnforcement = true;
+  private boolean m_zoneEnforcement = false;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
 
@@ -97,70 +106,148 @@ public class StateHandler extends SubsystemBase {
     return m_isOnTarget;
   }
 
-  public SUPERSTRUCTURE_STATE determineDesiredSuperStructureState(
-      double elevatorDesiredSetpoint, double wristDesiredSetpoint) {
-    if (elevatorDesiredSetpoint <= 6) {
-      if (-15 < wristDesiredSetpoint && wristDesiredSetpoint <= 30)
-        return SUPERSTRUCTURE_STATE.INTAKE_LOW;
-      else if (30 < wristDesiredSetpoint && wristDesiredSetpoint <= 60)
-        return SUPERSTRUCTURE_STATE.STOWED;
-      else if (60 < wristDesiredSetpoint && wristDesiredSetpoint <= 80)
+  public SUPERSTRUCTURE_STATE determineSuperStructureState(
+      double elevatorPositionMeters, double wristPositionRadians) {
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.STOWED.get()) < Units.inchesToMeters(2)
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.STOWED.get()) < Units.degreesToRadians(5))
+      return SUPERSTRUCTURE_STATE.STOWED;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_LOW.get())
+            < Units.inchesToMeters(2)
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW.get())
+            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
+            < Units.inchesToMeters(2)
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
+            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
+
+    if (elevatorPositionMeters <= ELEVATOR.THRESHOLD.LOW_MAX.get()) {
+      if (WRIST.THRESHOLD.LOW_MIN.get() < wristPositionRadians
+          && wristPositionRadians <= WRIST.THRESHOLD.LOW_MAX.get())
         return SUPERSTRUCTURE_STATE.LOW_ZONE;
-    } else if (6 < elevatorDesiredSetpoint && elevatorDesiredSetpoint <= 12) {
-      return SUPERSTRUCTURE_STATE.HIGH_ZONE;
-    } else if (24 < elevatorDesiredSetpoint) {
-      if (30 < elevatorDesiredSetpoint
-          && elevatorDesiredSetpoint <= 36
-          && 160 < wristDesiredSetpoint
-          && wristDesiredSetpoint <= 200) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
-      else return SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
+    }
+    if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < elevatorPositionMeters
+        && elevatorPositionMeters <= ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
+      if (WRIST.THRESHOLD.HIGH_MIN.get() < wristPositionRadians
+          && wristPositionRadians <= WRIST.THRESHOLD.HIGH_MAX.get())
+        return SUPERSTRUCTURE_STATE.HIGH_ZONE;
+    }
+    if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < elevatorPositionMeters
+        && elevatorPositionMeters <= ELEVATOR.THRESHOLD.EXTENDED_MAX.get()) {
+      if (WRIST.THRESHOLD.EXTENDED_MIN.get() < wristPositionRadians
+          && wristPositionRadians <= WRIST.THRESHOLD.EXTENDED_MAX.get())
+        return SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
     }
     return SUPERSTRUCTURE_STATE.DANGER_ZONE;
   }
 
   public void zoneAdvancement() {
-    m_desiredZone = determineDesiredSuperStructureState(0, m_wrist.getDesiredAngle());
-    // Advance a state if you pass the zone threshold and are within the next zone's mechanism
-    // limits
-    if (m_desiredZone != m_currentZone) {}
+    // Determine current zone based on elevator/wrist position
+    m_currentZone =
+        determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+    DriverStation.reportError(
+        "StateHandler - Superstructure is in an undefined state. ElevatorHeightMeters: "
+            + m_elevator.getHeightMeters()
+            + "\tWristAngleDegrees: "
+            + Units.radiansToDegrees(m_wrist.getPositionRadians()),
+        false);
 
+    // Determine desired zone based on elevator/wrist setpoints
+    m_desiredZone =
+        determineSuperStructureState(
+            m_elevator.getDesiredPositionMeters(), m_wrist.getDesiredPositionRadians());
+
+    if (m_desiredZone == SUPERSTRUCTURE_STATE.DANGER_ZONE)
+      DriverStation.reportWarning(
+          "StateHandler - Desired State is not defined. ElevatorDesiredPositionMeters: "
+              + m_elevator.getDesiredPositionMeters()
+              + "\tWristDesiredPositionDegrees: "
+              + Units.radiansToDegrees(m_wrist.getDesiredPositionRadians()),
+          false);
+
+    // If your current zone is not equal to your desired zone, assume you are transitioning between
+    // zones
+    if (m_desiredZone != m_currentZone) {
+      if (m_currentZone == SUPERSTRUCTURE_STATE.EXTENDED_ZONE) {
+        if (m_desiredZone.ordinal() < m_currentZone.ordinal())
+          m_nextZone = ZONE_TRANSITIONS.EXTENDED_TO_HIGH;
+      } else if (m_currentZone == SUPERSTRUCTURE_STATE.HIGH_ZONE) {
+        if (m_desiredZone.ordinal() > m_currentZone.ordinal())
+          m_nextZone = ZONE_TRANSITIONS.HIGH_TO_EXTENDED;
+        else if (m_desiredZone.ordinal() < m_currentZone.ordinal())
+          m_nextZone = ZONE_TRANSITIONS.LOW_TO_HIGH;
+      } else if (m_currentZone == SUPERSTRUCTURE_STATE.LOW_ZONE) {
+        if (m_desiredZone.ordinal() > m_currentZone.ordinal())
+          m_nextZone = ZONE_TRANSITIONS.LOW_TO_HIGH;
+      }
+    } else m_nextZone = ZONE_TRANSITIONS.NONE;
+
+    // Use zone transition info to set mechanism limits
+    switch (m_nextZone) {
+      case LOW_TO_HIGH:
+      case HIGH_TO_LOW:
+        m_elevator.setLowerLimitMeters(
+            Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
+        m_elevator.setUpperLimitMeters(
+            Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
+        m_wrist.setLowerLimit(
+            Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
+        m_wrist.setUpperLimit(
+            Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+        break;
+      case HIGH_TO_EXTENDED:
+      case EXTENDED_TO_HIGH:
+        m_elevator.setLowerLimitMeters(
+            Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
+        m_elevator.setUpperLimitMeters(
+            Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
+        m_wrist.setLowerLimit(
+            Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
+        m_wrist.setUpperLimit(
+            Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+        break;
+      default:
+      case NONE:
+        switch (m_currentZone) {
+          case LOW_ZONE:
+          case INTAKE_LOW:
+          case STOWED:
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.LOW_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.LOW_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.LOW_MAX.get());
+            break;
+          case HIGH_ZONE:
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.HIGH_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.HIGH_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+            break;
+          case EXTENDED_ZONE:
+          case INTAKE_EXTENDED:
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.EXTENDED_MAX.get());
+            break;
+        }
+        break;
+    }
+
+    // Check current mechanism positions before advancing zones
     switch (m_currentZone) {
       case EXTENDED_ZONE:
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(20) &&
-            m_wrist.getAngleDegrees()) {
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_MAX.get())
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-        }
         break;
       case HIGH_ZONE:
-        if (m_elevator.getHeightMeters() < Units.inchesToMeters(12)) {
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.LOW_MAX.get())
           m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
-        } else if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.EXTENDED_MIN.get())
           m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
-        }
         break;
       case LOW_ZONE:
-        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
+        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.HIGH_MIN.get())
           m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-        }
-        break;
-      case STOWED:
-        if (m_elevator.getHeightMeters() > Units.inchesToMeters(24)) {
-          m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-        }
-        m_elevator.setSetpointState(ELEVATOR.SETPOINT.STOWED);
-        m_wrist.setDesiredAngle(WRIST.SETPOINT.STOWED.get());
-        break;
-      case INTAKE_LOW:
-        m_elevator.setSetpointState(ELEVATOR.SETPOINT.STOWED);
-        m_wrist.setDesiredAngle(WRIST.SETPOINT.INTAKING_GROUND.get());
-        // TODO: Determine Limit
-        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.LOW_TO_HIGH.get()) {
-          m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-        }
-        break;
-      case INTAKE_EXTENDED:
-        m_elevator.setSetpointState(ELEVATOR.SETPOINT.HIGH);
-        m_wrist.setDesiredAngle(WRIST.SETPOINT.HIGH.get());
         break;
     }
   }
@@ -200,11 +287,11 @@ public class StateHandler extends SubsystemBase {
     //    SmartDashboard.putString("Superstructure State", getSuperStructureState().toString());
     m_statePub.set(getSuperStructureState().toString());
     m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
-    m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimit()));
-    m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimit()));
-    m_wristAnglePub.set(m_wrist.getAngleDegrees());
-    m_wristUpperLimPub.set(m_wrist.getUpperLimit());
-    m_wristLowerLimPub.set(m_wrist.getLowerLimit());
+    m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimitMeters()));
+    m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimitMeters()));
+    m_wristAnglePub.set(m_wrist.getPositionDegrees());
+    m_wristUpperLimPub.set(Units.radiansToDegrees(m_wrist.getUpperLimit()));
+    m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
   @Override
@@ -212,43 +299,10 @@ public class StateHandler extends SubsystemBase {
     updateSmartDashboard();
     targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
 
-    // Superstructure states for elevator/wrist limit control. If the elevator is LOW_ZONE,
-    // prioritize
-    // the elevator limits.
-    // If the elevator is HIGH_ZONE, prioritize the wrist limits
+    // Limit wrist/elevator setpoints to safe thresholds based on where you are and where you want
+    // to go
     if (m_zoneEnforcement) {
       zoneAdvancement();
-      switch (m_currentZone) {
-        case EXTENDED_ZONE:
-          m_elevator.setUpperLimit(Units.inchesToMeters(43));
-          m_elevator.setLowerLimit(Units.inchesToMeters(20));
-          m_wrist.setUpperLimit(225);
-          m_wrist.setLowerLimit(0);
-          break;
-        case HIGH_ZONE:
-          m_elevator.setUpperLimit(Units.inchesToMeters(24));
-          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperLimit(80);
-          m_wrist.setLowerLimit(0);
-          break;
-        case LOW_ZONE:
-          m_elevator.setUpperLimit(Units.inchesToMeters(12));
-          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperLimit(80);
-          m_wrist.setLowerLimit(-15);
-        case STOWED:
-          m_elevator.setUpperLimit(Units.inchesToMeters(12));
-          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperLimit(80);
-          m_wrist.setLowerLimit(-15);
-          break;
-        case INTAKE_LOW:
-          m_elevator.setUpperLimit(Units.inchesToMeters(12));
-          m_elevator.setLowerLimit(Units.inchesToMeters(0));
-          m_wrist.setUpperLimit(80);
-          m_wrist.setLowerLimit(-15);
-          break;
-      }
     }
 
     // TODO: Limit max swerve speed by elevator height
@@ -285,7 +339,7 @@ public class StateHandler extends SubsystemBase {
           m_drive.getPoseMeters(),
           m_fieldSim.getTargetNode(currentIntakeState, scoringState),
           scoringState);
-      m_wrist.setDesiredAngle(WRIST.SETPOINT.HIGH.get());
+      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.HIGH.get());
       m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());

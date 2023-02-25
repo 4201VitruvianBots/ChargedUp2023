@@ -63,12 +63,19 @@ public final class Constants {
   }
 
   public static final class ELEVATOR {
+    public enum STATE {
+      OPEN_LOOP_MANUAL,
+      CLOSED_LOOP_MANUAL,
+      SETPOINT
+    }
+
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
-      LOW(Units.inchesToMeters(12.0)),
-      MID(Units.inchesToMeters(24.0)),
-      HIGH(Units.inchesToMeters(36.0)),
-      JOYSTICK(Units.inchesToMeters(0.0));
+      INTAKING_LOW(STOWED.get()),
+      LOW(Units.inchesToMeters(20.0)),
+      MID(Units.inchesToMeters(26.0)),
+      HIGH(Units.inchesToMeters(32.0)),
+      INTAKING_EXTENDED(HIGH.get());
 
       private final double value;
 
@@ -82,14 +89,15 @@ public final class Constants {
     }
 
     public enum THRESHOLD {
+      // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(43.0)),
-      LOW_MIN(Units.inchesToMeters(0.0)),
-      LOW_MAX(Units.inchesToMeters(12.0)),
-      HIGH_MIN(Units.inchesToMeters(12.0)),
-      HIGH_MAX(Units.inchesToMeters(12.0)),
+      LOW_MIN(ABSOLUTE_MIN.get()),
+      LOW_MAX(Units.inchesToMeters(16.0)),
+      HIGH_MIN(Units.inchesToMeters(8.0)),
+      HIGH_MAX(Units.inchesToMeters(24.0)),
       EXTENDED_MIN(Units.inchesToMeters(12.0)),
-      EXTENDED_MAX(Units.inchesToMeters(43.0)),
+      EXTENDED_MAX(ABSOLUTE_MAX.get()),
       LOW_TO_HIGH(Units.inchesToMeters(14.0)),
       HIGH_TO_LOW(Units.inchesToMeters(10.0)),
       HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
@@ -184,13 +192,20 @@ public final class Constants {
   }
 
   public static final class WRIST {
+    public enum STATE {
+      OPEN_LOOP_MANUAL,
+      CLOSED_LOOP_MANUAL,
+      SETPOINT
+    }
+
     public enum SETPOINT {
-      STOWED(90.0),
-      INTAKING_GROUND(-10.0),
-      INTAKING_STATION(180.0),
-      LOW(180.0),
-      MID(180.0),
-      HIGH(180.0);
+      // Units are in Radians
+      STOWED(Units.degreesToRadians(90.0)),
+      INTAKING_LOW(Units.degreesToRadians(-10.0)),
+      LOW(Units.degreesToRadians(180.0)),
+      MID(Units.degreesToRadians(180.0)),
+      HIGH(Units.degreesToRadians(180.0)),
+      INTAKING_EXTENDED(HIGH.get());
 
       private final double value;
 
@@ -204,12 +219,15 @@ public final class Constants {
     }
 
     public enum THRESHOLD {
+      // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(225.0)),
-      LOW_TO_HIGH(Units.inchesToMeters(14.0)),
-      HIGH_TO_LOW(Units.inchesToMeters(10.0)),
-      HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
-      EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
+      LOW_MIN(ABSOLUTE_MIN.get()),
+      LOW_MAX(Units.degreesToRadians(130.0)),
+      HIGH_MIN(Units.degreesToRadians(0.0)),
+      HIGH_MAX(LOW_MAX.get()),
+      EXTENDED_MIN(HIGH_MIN.get()),
+      EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 

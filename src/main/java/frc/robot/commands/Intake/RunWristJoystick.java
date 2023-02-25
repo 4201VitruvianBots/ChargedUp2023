@@ -6,6 +6,7 @@ package frc.robot.commands.Intake;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.constants.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
@@ -31,8 +32,13 @@ public class RunWristJoystick extends CommandBase {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
     double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
 
-    //    m_wrist.setWristState(WRIST_STATE.JOYSTICK);
-    m_wrist.setWristInput(-joystickXDeadbandOutput);
+    if (Math.abs(joystickXDeadbandOutput) != 0) {
+      m_wrist.setControlState(
+          m_wrist.getClosedLoopState()
+              ? WRIST.STATE.CLOSED_LOOP_MANUAL
+              : WRIST.STATE.OPEN_LOOP_MANUAL);
+    }
+    m_wrist.setUserInput(-joystickXDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

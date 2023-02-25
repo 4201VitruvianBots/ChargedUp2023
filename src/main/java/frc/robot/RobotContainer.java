@@ -118,22 +118,22 @@ public class RobotContainer {
         .leftTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_GROUND.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
                 new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE));
+                    m_stateHandler.getSuperStructureState().ordinal()
+                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
     xboxController
         .rightTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_GROUND.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
                 new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE));
+                    m_stateHandler.getSuperStructureState().ordinal()
+                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     // Elevator button bindings
     xboxController
@@ -152,6 +152,13 @@ public class RobotContainer {
         .y()
         .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.HIGH.get()));
     xboxController.y().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()));
+
+    xboxController
+        .povDown()
+        .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+    xboxController
+        .povDown()
+        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
