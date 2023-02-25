@@ -29,6 +29,7 @@ import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.MoveToElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorControlLoop;
 import frc.robot.commands.led.SetPieceTypeIntent;
+import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -143,6 +144,10 @@ public class RobotContainer {
 
     // Will switch between closed and open loop on button press
     xboxController.start().onTrue(new SetElevatorControlLoop(m_elevator));
+
+    // Will switch our target node on the field sim to the adjacent node on D-pad press
+    xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
+    xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     leftJoystickTriggers[0].whileTrue(
         new SetSwerveDriveBalance(m_swerveDrive, null, null, null)

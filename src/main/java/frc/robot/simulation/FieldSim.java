@@ -187,7 +187,7 @@ public class FieldSim extends SubsystemBase {
    * 3 - Node is on the same level as our elevator
    * 4 - Node is closest to our robot
    */
-  public Pose2d getTargetNode(
+  public ArrayList<Pose2d> getPossibleNodes(
       StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
@@ -225,8 +225,15 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(highNodes);
     }
 
-    // Only works on WPILIB version 2023.3.2 and above
-    return robotPose.nearest(possibleNodes);
+    return possibleNodes;
+  }
+
+  public Pose2d getTargetNode(
+    StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
+      ArrayList<Pose2d> possibleNodes = getPossibleNodes(intakeState, mainState);
+
+      // Only works on WPILIB version 2023.3.2 and above
+      return robotPose.nearest(possibleNodes);
   }
 
   // Whopper whopper whopper whopper
@@ -258,6 +265,43 @@ public class FieldSim extends SubsystemBase {
     return distance < margin
         ? true
         : false; // Returns true if the robot is on target, returns false if not on target
+  }
+
+  // True for left, false for right
+  public Pose2d getAdjacentNode(Pose2d node, boolean left, ArrayList<Pose2d> possibleNodes, boolean sameTypeOnly) {
+    int nodeIndex = gridNodes.indexOf(node);
+    Pose2d adjacentNode;
+
+    // TODO: Make code more efficient/compact
+    while (true) {
+      if (DriverStation.getAlliance() == Alliance.Blue) {
+        if (left)
+          adjacentNode = gridNodes.get(nodeIndex-6);
+        else
+          adjacentNode = gridNodes.get(nodeIndex+6);
+      }
+      else if (DriverStation.getAlliance() == Alliance.Red) {
+        if (left)
+          adjacentNode = gridNodes.get(nodeIndex+6);
+        else
+          adjacentNode = gridNodes.get(nodeIndex-6);
+      }
+      else {
+        adjacentNode = node;
+      }
+      
+      if (sameTypeOnly) {
+        if (possibleNodes.contains(adjacentNode))
+          break;
+        else
+          nodeIndex = gridNodes.indexOf(adjacentNode);
+      }
+      else {
+        break;
+      }
+    }
+
+    return adjacentNode;
   }
 
   @Override

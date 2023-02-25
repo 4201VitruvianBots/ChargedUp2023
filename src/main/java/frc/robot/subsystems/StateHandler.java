@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.simulation.FieldSim;
@@ -90,6 +92,11 @@ public class StateHandler extends SubsystemBase {
             break;
         }
     */
+  }
+
+  public void switchTargetNode(boolean left, boolean sameTypeOnly){
+    ArrayList<Pose2d> possibleNodes = m_FieldSim.getPossibleNodes(currentScoringState, currentMainState);
+    targetNode = m_FieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
   }
 
   @Override
