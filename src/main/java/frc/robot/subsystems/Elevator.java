@@ -56,8 +56,7 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.kV,
           Constants.getInstance().Elevator.kA);
 
-  private static double
-      desiredHeightValue; // The height in encoder units our robot is trying to reach
+  private double desiredHeightValue; // The height in encoder units our robot is trying to reach
   private ELEVATOR_STATE desiredHeightState =
       ELEVATOR_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
 
@@ -69,7 +68,6 @@ public class Elevator extends SubsystemBase {
   private final double kP = 0.55;
   private final double kI = 0;
   private final double kD = 0;
-  //  private final double kF = 0.01;
   private final double kF = 0;
 
   private static double elevatorHeight =
@@ -82,7 +80,7 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = false;
+  private boolean elevatorIsClosedLoop = true;
 
   private double maxPercentOutput = 0.25;
   private double setpointMultiplier = 1;
@@ -185,15 +183,12 @@ public class Elevator extends SubsystemBase {
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-    try {
-      elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-      elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-      elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
-      elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-      kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint").publish();
-    } catch (Exception e) {
+    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
 
-    }
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
@@ -310,9 +305,9 @@ public class Elevator extends SubsystemBase {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    if (getElevatorLowerSwitch()) {
-      setElevatorSensorPosition(0.0);
-    }
+    // if (getElevatorLowerSwitch()) {
+    //   setElevatorSensorPosition(0.0);
+    // }
     elevatorHeight = getHeightMeters();
   }
 
@@ -328,7 +323,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorHeightTab.setDouble(getHeightMeters());
     elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
-    elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
+    elevatorTargetHeightTab.setDouble(desiredHeightValue);
     elevatorTargetPosTab.setString(desiredHeightState.name());
 
     elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
@@ -391,7 +386,6 @@ public class Elevator extends SubsystemBase {
     updateShuffleboard();
     updateElevatorHeight();
     if (elevatorIsClosedLoop) {
-      desiredHeightState = ELEVATOR_STATE.TUNING;
       switch (desiredHeightState) {
         case TUNING:
           elevatorMotors[0].config_kP(0, kPSub.get());
@@ -416,16 +410,15 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = 0.0;
           break;
       }
-      // TODO: Cap the desiredHieghtValue by the min/max elevator height prior to setting it
+      // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(desiredHeightValue, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
-        kSetpointTargetPub.set(Units.radiansToDegrees(m_setpoint.position));
+        kSetpointTargetPub.set(m_setpoint.position);
         setTrapezoidState(m_setpoint);
       }
-      //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
