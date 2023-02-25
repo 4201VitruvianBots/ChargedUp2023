@@ -112,7 +112,7 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Setpoint", this::getSetpointDegrees);
     wristTab.addString("State", () -> getWristState().toString());
     wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
-    wristTab.addBoolean("WristisClosedLoop", this::getControlMode); 
+    wristTab.addBoolean("WristisClosedLoop", this::getControlMode);
     wristTab.add(this);
 
     try {
