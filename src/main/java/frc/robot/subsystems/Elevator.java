@@ -56,8 +56,7 @@ public class Elevator extends SubsystemBase {
           Constants.getInstance().Elevator.kV,
           Constants.getInstance().Elevator.kA);
 
-  private double
-      desiredHeightValue; // The height in encoder units our robot is trying to reach
+  private double desiredHeightValue; // The height in encoder units our robot is trying to reach
   private ELEVATOR_STATE desiredHeightState =
       ELEVATOR_STATE.JOYSTICK; // Think of this as our "next state" in our state machine.
 
