@@ -348,7 +348,7 @@ public class Wrist extends SubsystemBase {
           break;
         case MID:
           // TODO: Find setpoint value
-          desiredAngleSetpoint = 0;
+          desiredAngleSetpoint = 155;
           break;
         case HIGH:
           // TODO: Find setpoint value

@@ -40,8 +40,8 @@ public class Elevator extends SubsystemBase {
   };
 
   // Limit switch at bottom of elevator
-  private static DigitalInput elevatorLowerSwitch =
-      new DigitalInput(Constants.DIO.elevatorLowerSwitch);
+  // private static DigitalInput elevatorLowerSwitch =
+  //     new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
   private double maxVel = Units.inchesToMeters(40);
   private double maxAccel = Units.inchesToMeters(40);
@@ -82,8 +82,8 @@ public class Elevator extends SubsystemBase {
   // of the motors.
   private boolean elevatorIsClosedLoop = true;
 
-  private double maxPercentOutput = 0.25;
-  private double setpointMultiplier = 1;
+  private double maxPercentOutput = 0.75;
+  private double setpointMultiplier = .35;
 
   // Simulation setup
 
@@ -162,15 +162,13 @@ public class Elevator extends SubsystemBase {
           kD,
           Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configPeakOutputForward(1, Constants.getInstance().Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-1, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.5, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
       motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
-
-      motor.configPeakOutputForward(maxPercentOutput, 0);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -247,9 +245,9 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
-  public boolean getElevatorLowerSwitch() {
-    return !elevatorLowerSwitch.get();
-  }
+  // public boolean getElevatorLowerSwitch() {
+  //   // return !elevatorLowerSwitch.get();
+  // }
 
   public void setElevatorSensorPosition(double position) {
     elevatorMotors[0].setSelectedSensorPosition(position);
@@ -394,16 +392,16 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = kSetpointSub.get();
           break;
         case JOYSTICK:
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+        // desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
           break;
         case HIGH:
-          desiredHeightValue = maxElevatorHeight * 0.75; // Placeholder values
+          desiredHeightValue = 1.02; // Placeholder values
           break;
-        case MID:
-          desiredHeightValue = maxElevatorHeight * 0.5; // Placeholder values
+        case MID: 
+          desiredHeightValue = .66; // Placeholder values
           break;
         case LOW:
-          desiredHeightValue = maxElevatorHeight * 0.25; // Placeholder values
+          desiredHeightValue = 0.07; // Placeholder values
           break;
         default:
         case STOWED:
@@ -421,7 +419,7 @@ public class Elevator extends SubsystemBase {
       }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY * setpointMultiplier);
+      setElevatorPercentOutput(elevatorJoystickY * maxPercentOutput);
     }
   }
 }
