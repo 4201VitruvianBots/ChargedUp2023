@@ -4,13 +4,18 @@
 
 package frc.robot.utils;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensor {
   private final int socketPort = 25000;
@@ -24,6 +29,7 @@ public class DistanceSensor {
     try {
       InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
       socket = new DatagramSocket(socketPort, address);
+      socket.setSoTimeout(1000);
     } catch (SocketException | UnknownHostException socketFail) {
       socketFail.printStackTrace();
     }
@@ -41,24 +47,24 @@ public class DistanceSensor {
     return (int) jsonObject.get(sensorName);
   }
 
-  public void periodic() {
-    //   System.out.println("Periodic is running");
-    //   // This method will be called once per scheduler run
-    //   try {
+  public void pollDistanceSensors() {
+      // This method will be called once per scheduler run
+      try {
 
-    //     byte[] buffer = new byte[512];
-    //     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-    //     socket.receive(packet);
+        byte[] buffer = new byte[512];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        socket.receive(packet);
 
-    //     receivedData = new String(packet.getData(), 0, packet.getLength());
-    //     // System.out.println(receivedData);
-    //     SmartDashboard.putString("Distance", receivedData);
-    //   } catch (SocketTimeoutException ex) {
-    //     System.out.println("error: " + ex.getMessage());
-    //     ex.printStackTrace();
-    //   } catch (IOException ex) {
-    //     System.out.println("Client error: " + ex.getMessage());
-    //     ex.printStackTrace();
-    //   }
+        receivedData = new String(packet.getData(), 0, packet.getLength());
+        // System.out.println(receivedData);
+        SmartDashboard.putString("Is running", "Is running");
+        SmartDashboard.putString("Distance", receivedData);
+      } catch (SocketTimeoutException ex) {
+        System.out.println("error: " + ex.getMessage());
+        ex.printStackTrace();
+      } catch (IOException ex) {
+        System.out.println("Client error: " + ex.getMessage());
+        ex.printStackTrace();
+      }
   }
 }
