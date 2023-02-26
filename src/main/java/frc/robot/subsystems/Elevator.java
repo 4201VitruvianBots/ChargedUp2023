@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -71,7 +70,6 @@ public class Elevator extends SubsystemBase {
   private final double kP = 0.55;
   private final double kI = 0;
   private final double kD = 0;
-  //  private final double kF = 0.01;
   private final double kF = 0;
 
   private double elevatorHeight =
@@ -181,15 +179,12 @@ public class Elevator extends SubsystemBase {
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-    try {
-      elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-      elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-      elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
-      elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-      kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint").publish();
-    } catch (Exception e) {
+    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
 
-    }
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
@@ -253,9 +248,9 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
-  public boolean getElevatorLowerSwitch() {
-    return !elevatorLowerSwitch.get();
-  }
+  // public boolean getElevatorLowerSwitch() {
+  //   // return !elevatorLowerSwitch.get();
+  // }
 
   public void setElevatorSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters);
@@ -339,9 +334,9 @@ public class Elevator extends SubsystemBase {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    if (getElevatorLowerSwitch()) {
-      setElevatorSensorPosition(0.0);
-    }
+    // if (getElevatorLowerSwitch()) {
+    //   setElevatorSensorPosition(0.0);
+    // }
     elevatorHeight = getHeightMeters();
   }
 
@@ -443,7 +438,6 @@ public class Elevator extends SubsystemBase {
         kSetpointTargetPub.set(Units.metersToInches(commandedSetpoint.position));
         setTrapezoidState(commandedSetpoint);
       }
-      //      setElevatorMotionMagicMeters(desiredHeightValue);
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       setElevatorPercentOutput(elevatorJoystickY * percentOutputMultiplier);

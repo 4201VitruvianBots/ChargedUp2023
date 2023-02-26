@@ -122,6 +122,8 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Raw Position", this::getSensorPosition);
     wristTab.addDouble("Setpoint Degrees", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
     wristTab.addDouble("Velocity DPS", this::getVelocityDegreesPerSecond);
+    wristTab.addString("State", () -> getWristState().toString());
+    wristTab.addBoolean("WristisClosedLoop", this::getControlMode);
     wristTab.add(this);
 
     try {
