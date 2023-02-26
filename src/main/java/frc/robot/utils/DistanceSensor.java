@@ -4,6 +4,7 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,12 +12,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensor {
   private final int socketPort = 25000;
@@ -28,7 +26,7 @@ public class DistanceSensor {
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
     try {
-      InetAddress address = InetAddress.getByName("10.42.1.2"); //239.42.01.1
+      InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
       socket = new DatagramSocket(socketPort, address);
     } catch (SocketException | UnknownHostException socketFail) {
       socketFail.printStackTrace();
@@ -48,7 +46,7 @@ public class DistanceSensor {
   }
 
   public void periodic() {
-    System.out.println("Periodic is running"); 
+    System.out.println("Periodic is running");
     // This method will be called once per scheduler run
     try {
 
@@ -58,7 +56,7 @@ public class DistanceSensor {
 
       receivedData = new String(packet.getData(), 0, packet.getLength());
       // System.out.println(receivedData);
-      SmartDashboard.putString("Distance", receivedData); 
+      SmartDashboard.putString("Distance", receivedData);
     } catch (SocketTimeoutException ex) {
       System.out.println("error: " + ex.getMessage());
       ex.printStackTrace();
@@ -66,5 +64,5 @@ public class DistanceSensor {
       System.out.println("Client error: " + ex.getMessage());
       ex.printStackTrace();
     }
-    }
   }
+}
