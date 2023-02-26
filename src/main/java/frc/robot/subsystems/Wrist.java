@@ -25,7 +25,9 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.Intake.SetWristState;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
@@ -114,6 +116,8 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
     wristTab.addString("WristisClosedLoop", this::getControlModeAsString);
     wristTab.add(this);
+
+    SmartDashboard.putData("Wrist to Stowed", new SetWristState(this, WRIST_STATE.STOWED));
 
     try {
       NetworkTableInstance.getDefault()
