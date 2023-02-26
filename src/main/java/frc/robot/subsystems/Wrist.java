@@ -340,7 +340,7 @@ public class Wrist extends SubsystemBase {
     if (wristIsClosedLoop) {
       switch (m_desiredState) {
         case JOYSTICK:
-          //desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
+          // desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
           break;
         case INTAKING:
           desiredAngleSetpoint = -10.0;
