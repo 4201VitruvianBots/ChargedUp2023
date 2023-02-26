@@ -149,11 +149,23 @@ public final class Constants {
       PHOTONVISION
     }
 
-    public enum CAMERA_LOCATION {
-      INTAKE,
-      OUTTAKE,
-      LEFT_LOCALIZER,
-      RIGHT_LOCALIZER
+    public enum CAMERA_SERVERS {
+      INTAKE("10.42.1.10"),
+      OUTTAKE("10.42.1.10"),
+      LEFT_LOCALIZER("10.42.1.11"),
+      RIGHT_LOCALIZER("10.42.1.12"),
+      FUSED_LOCALIZER("10.42.1.11");
+
+      private final String ip;
+
+      CAMERA_SERVERS(final String ip) {
+        this.ip = ip;
+      }
+
+      @Override
+      public String toString() {
+        return ip;
+      }
     }
 
     public static Transform3d[] LOCALIZER_CAMERA_POSITION = {
@@ -172,23 +184,6 @@ public final class Constants {
               Units.inchesToMeters(20)),
           new Rotation3d()),
     };
-
-    public enum SERVER_IPS {
-      INTAKE("10.42.1.10"),
-      LEFT_LOCALIZER("10.42.1.11"),
-      RIGHT_LOCALIZER("10.42.1.12");
-
-      private final String ip;
-
-      SERVER_IPS(final String ip) {
-        this.ip = ip;
-      }
-
-      @Override
-      public String toString() {
-        return ip;
-      }
-    }
   }
 
   public static final class WRIST {
