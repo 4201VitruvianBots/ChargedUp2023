@@ -384,12 +384,12 @@ public class Wrist extends SubsystemBase {
 
     Unmanaged.feedEnable(20);
 
-    // System.out.println("Arm Sim Input: " + m_wristPercentOutput);
-    // System.out.println(
-    //     "Arm Sim Degrees: "
-    //         + Units.radiansToDegrees(m_armSim.getAngleRads())
-    //         + "\tVelocity: "
-    //         + Units.radiansToDegrees(m_armSim.getVelocityRadPerSec()));
+    System.out.println("Arm Sim Input: " + m_wristPercentOutput);
+    System.out.println(
+        "Arm Sim Degrees: "
+            + Units.radiansToDegrees(m_armSim.getAngleRads())
+            + "\tVelocity: "
+            + Units.radiansToDegrees(m_armSim.getVelocityRadPerSec()));
 
     wristMotor
         .getSimCollection()
