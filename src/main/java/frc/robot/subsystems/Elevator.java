@@ -419,7 +419,7 @@ public class Elevator extends SubsystemBase {
       }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY * maxPercentOutput);
+      setElevatorPercentOutput(elevatorJoystickY);
     }
   }
 }

@@ -112,7 +112,7 @@ public class Wrist extends SubsystemBase {
     wristTab.addDouble("Setpoint", this::getSetpointDegrees);
     wristTab.addString("State", () -> getWristState().toString());
     wristTab.addDouble("Wrist Velocity", this::getWristAngleDegreesPerSecond);
-    wristTab.addBoolean("WristisClosedLoop", this::getControlMode);
+    wristTab.addString("WristisClosedLoop", this::getControlModeAsString);
     wristTab.add(this);
 
     try {
@@ -309,6 +309,9 @@ public class Wrist extends SubsystemBase {
     return MathUtil.clamp(m_setpoint.position, m_lowerAngleLimitDegrees, m_upperAngleLimitDegrees);
   }
 
+  public String getControlModeAsString() {
+    return wristIsClosedLoop ? "Closed" : "Open";
+  }
   // SmartDashboard function
   public void updateSmartDashboard() {}
 
@@ -337,7 +340,7 @@ public class Wrist extends SubsystemBase {
     if (wristIsClosedLoop) {
       switch (m_desiredState) {
         case JOYSTICK:
-          desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
+          //desiredAngleSetpoint = m_joystickInput * setpointMultiplier + getWristAngleDegrees();
           break;
         case INTAKING:
           desiredAngleSetpoint = -10.0;

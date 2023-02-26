@@ -144,17 +144,19 @@ public class RobotContainer {
 
     // Elevator button bindings
     xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    //    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
+    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
     xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
-    //    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
+    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
     xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
-    //    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
+    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
     xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    //    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+
+    xboxController.rightBumper().whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
 
     // Will switch between closed and open loop on button press
-    xboxController.start().onTrue(new ToggleElevatorControlMode(m_elevator));
-    xboxController.back().onTrue(new ToggleWristControlMode(m_wrist));
+    xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
+    xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
