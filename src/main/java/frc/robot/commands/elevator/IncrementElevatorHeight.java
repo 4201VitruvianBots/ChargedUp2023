@@ -6,7 +6,6 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
@@ -44,8 +43,7 @@ public class IncrementElevatorHeight extends CommandBase {
           m_elevator.getControlMode()
               ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
               : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-    } else
-      m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
+    } else m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
     // Uncomment if you want to reenable this

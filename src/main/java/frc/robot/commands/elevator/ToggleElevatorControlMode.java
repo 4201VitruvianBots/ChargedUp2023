@@ -5,7 +5,6 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 
 public class ToggleElevatorControlMode extends CommandBase {
@@ -23,7 +22,7 @@ public class ToggleElevatorControlMode extends CommandBase {
   @Override
   public void initialize() {
     m_elevator.setControlMode(!m_elevator.getControlMode());
-//    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
+    //    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

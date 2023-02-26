@@ -120,10 +120,11 @@ public class Wrist extends SubsystemBase {
 
     wristTab.addDouble("Angle Degrees", this::getPositionDegrees);
     wristTab.addDouble("Raw Position", this::getSensorPosition);
-    wristTab.addDouble("Setpoint Degrees", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
+    wristTab.addDouble(
+        "Setpoint Degrees", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
     wristTab.addDouble("Velocity DPS", this::getVelocityDegreesPerSecond);
-    wristTab.addString("State", () -> getWristState().toString());
-    wristTab.addBoolean("WristisClosedLoop", this::getControlMode);
+    wristTab.addString("State", () -> getControlState().toString());
+    wristTab.addBoolean("isClosedLoop", this::getControlMode);
     wristTab.add(this);
 
     try {
@@ -204,7 +205,7 @@ public class Wrist extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("setpoint").subscribe(0);
 
     if (RobotBase.isSimulation()) {
-//            wristMotor.setSensorPhase(true);
+      //            wristMotor.setSensorPhase(true);
     }
   }
 
@@ -413,7 +414,8 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInputVoltage(MathUtil.clamp(m_wristPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_armSim.setInputVoltage(
+        MathUtil.clamp(m_wristPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
     m_armSim.update(0.020);
 
     Unmanaged.feedEnable(20);
