@@ -16,7 +16,7 @@ public class ConstantsBase {
     public final double elevatorGearing = 10.0;
     public final double elevatorMassKg = 4.0;
     public final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
-    public final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(0);
+    public final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(40);
 
     // PID
     public final double kSensorUnitsPerRotation = 2048.0;
