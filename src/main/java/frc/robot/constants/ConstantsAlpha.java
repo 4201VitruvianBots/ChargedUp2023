@@ -6,7 +6,7 @@ package frc.robot.constants;
 
 import edu.wpi.first.math.util.Units;
 
-public class ConstantsGridLock extends ConstantsRushHour {
+public class ConstantsAlpha extends ConstantsBeta {
   public static final class SwerveDriveDef {
     public static final double frontLeftCANCoderOffset = 327.129;
     public static final double frontRightCANCoderOffset = 62.051;

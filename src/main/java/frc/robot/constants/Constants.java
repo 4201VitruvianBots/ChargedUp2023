@@ -186,9 +186,9 @@ public final class Constants {
       NetworkTableInstance inst = NetworkTableInstance.getDefault();
       String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
       if (Objects.equals(mac, Constants.alphaRobotMAC)) {
-        m_constants = new ConstantsRushHour();
+        m_constants = new ConstantsAlpha();
       } else {
-        m_constants = new ConstantsGridLock();
+        m_constants = new ConstantsBeta();
       }
     }
     return m_constants;
