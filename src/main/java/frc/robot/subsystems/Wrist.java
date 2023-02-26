@@ -54,7 +54,7 @@ public class Wrist extends SubsystemBase {
           Constants.getInstance().Wrist.kA);
 
   private final double maxPercentOutput = 1.0;
-  private final double setpointMultiplier = Units.degreesToRadians(30.0);
+  private final double setpointMultiplier = Units.degreesToRadians(60.0);
   private final double percentOutputMultiplier = 0.4;
 
   private final SingleJointedArmSim m_armSim =
@@ -118,10 +118,10 @@ public class Wrist extends SubsystemBase {
     Timer.delay(1);
     resetWristAngle(-10.0);
 
-    wristTab.addDouble("Angle", this::getPositionDegrees);
-    wristTab.addDouble("Raw position", this::getSensorPosition);
-    wristTab.addDouble("Setpoint", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
-    wristTab.addDouble("Wrist Velocity", this::getVelocityDegreesPerSecond);
+    wristTab.addDouble("Angle Degrees", this::getPositionDegrees);
+    wristTab.addDouble("Raw Position", this::getSensorPosition);
+    wristTab.addDouble("Setpoint Degrees", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
+    wristTab.addDouble("Velocity DPS", this::getVelocityDegreesPerSecond);
     wristTab.add(this);
 
     try {
@@ -202,7 +202,7 @@ public class Wrist extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("setpoint").subscribe(0);
 
     if (RobotBase.isSimulation()) {
-      //      wristMotor.setSensorPhase(true);
+//            wristMotor.setSensorPhase(true);
     }
   }
 
@@ -247,7 +247,7 @@ public class Wrist extends SubsystemBase {
         DemandType.ArbitraryFeedForward,
         //                    0
         calculateFeedforward(state));
-    m_wristPercentOutput = wristMotor.getMotorOutputPercent();
+    m_wristPercentOutput = wristMotor.getMotorOutputPercent() + calculateFeedforward(state);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -411,23 +411,23 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInput(m_wristPercentOutput * RobotController.getBatteryVoltage());
-
+    m_armSim.setInputVoltage(MathUtil.clamp(m_wristPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
     m_armSim.update(0.020);
 
     Unmanaged.feedEnable(20);
 
+    // Using negative sensor units to match physical behavior
     wristMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int)
+            -(int)
                 (Units.radiansToDegrees(m_armSim.getAngleRads())
                     / Constants.getInstance().Wrist.encoderUnitsToDegrees));
 
     wristMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
-            (int)
+            -(int)
                 (Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.getInstance().Wrist.encoderUnitsToDegrees
                     * 10.0));

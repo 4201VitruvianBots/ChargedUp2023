@@ -72,10 +72,10 @@ public final class Constants {
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
-      LOW(Units.inchesToMeters(20.0)),
-      MID(Units.inchesToMeters(26.0)),
-      HIGH(Units.inchesToMeters(32.0)),
-      INTAKING_EXTENDED(HIGH.get());
+      SCORE_LOW(Units.inchesToMeters(20.0)),
+      SCORE_MID(Units.inchesToMeters(26.0)),
+      SCORE_HIGH(Units.inchesToMeters(32.0)),
+      INTAKING_EXTENDED(SCORE_HIGH.get());
 
       private final double value;
 
@@ -202,10 +202,10 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW(Units.degreesToRadians(-10.0)),
-      LOW(Units.degreesToRadians(180.0)),
-      MID(Units.degreesToRadians(180.0)),
-      HIGH(Units.degreesToRadians(180.0)),
-      INTAKING_EXTENDED(HIGH.get());
+      SCORE_LOW(Units.degreesToRadians(180.0)),
+      SCORE_MID(Units.degreesToRadians(180.0)),
+      SCORE_HIGH(Units.degreesToRadians(180.0)),
+      INTAKING_EXTENDED(SCORE_HIGH.get());
 
       private final double value;
 

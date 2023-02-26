@@ -119,9 +119,9 @@ public class RobotContainer {
         .onTrue(
             new ConditionalCommand(
                 new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState().ordinal()
+                    m_stateHandler.getCurrentZone().ordinal()
                         <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
@@ -130,28 +130,28 @@ public class RobotContainer {
         .onTrue(
             new ConditionalCommand(
                 new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState().ordinal()
+                    m_stateHandler.getCurrentZone().ordinal()
                         <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     // Elevator button bindings
     xboxController
         .a()
-        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.LOW.get()));
-    xboxController.a().onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.LOW.get()));
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW.get()));
+    xboxController.a().onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW.get()));
     xboxController
         .b()
-        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.MID.get()));
-    xboxController.b().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.MID.get()));
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID.get()));
+    xboxController.b().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID.get()));
     xboxController
         .x()
         .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
-    xboxController.x().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.MID.get()));
+    xboxController.x().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID.get()));
     xboxController
         .y()
-        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.HIGH.get()));
-    xboxController.y().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.HIGH.get()));
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH.get()));
+    xboxController.y().whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()));
 
     xboxController
         .povDown()

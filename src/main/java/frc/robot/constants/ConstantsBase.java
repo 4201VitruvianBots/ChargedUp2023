@@ -42,7 +42,7 @@ public class ConstantsBase {
     public final double wristGearRatio = 1024.0 / 27.0;
     public final double encoderUnitsToDegrees = 360.0 / (2048.0 * wristGearRatio);
     public final DCMotor gearBox = DCMotor.getFalcon500(1);
-    public final double wristMass = Units.lbsToKilograms(15);
+    public final double wristMass = Units.lbsToKilograms(20);
     public final double wristLength = Units.inchesToMeters(22);
     public final int wristLowerSwitch = 0;
 
