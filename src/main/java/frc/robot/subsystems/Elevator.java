@@ -117,7 +117,13 @@ public class Elevator extends SubsystemBase {
   public GenericEntry elevatorEncoderCountsTab =
       elevatorTab.add("Elevator Height Encoder Counts", 0.0).getEntry();
 
-  private DoubleSubscriber kPSub, kISub, kDSub, kSetpointSub, kMaxVelSub, kMaxAccelSub, kSetpointCalcTimeSub;
+  private DoubleSubscriber kPSub,
+      kISub,
+      kDSub,
+      kSetpointSub,
+      kMaxVelSub,
+      kMaxAccelSub,
+      kSetpointCalcTimeSub;
   private DoublePublisher kSetpointTargetPub;
 
   // Mechanism2d visualization setup
@@ -167,8 +173,8 @@ public class Elevator extends SubsystemBase {
       motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
       motor.configPeakOutputReverse(-maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
 
-      //motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
-      //motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
 
       motor.setSelectedSensorPosition(0.0); // Zero both motors
     }
@@ -197,7 +203,8 @@ public class Elevator extends SubsystemBase {
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
     kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
     kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
-    kSetpointCalcTimeSub = elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
+    kSetpointCalcTimeSub =
+        elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
   }
   /*
    * Elevator's motor output as a percentage

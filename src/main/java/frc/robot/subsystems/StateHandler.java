@@ -14,7 +14,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.SCORING_STATE;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.simulation.FieldSim;
-//import frc.robot.utils.SetpointSolver;
+// import frc.robot.utils.SetpointSolver;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
@@ -50,7 +50,7 @@ public class StateHandler extends SubsystemBase {
   private final Elevator m_elevator;
   private final LED m_led;
   private final Vision m_vision;
-  //private final SetpointSolver m_setpointSolver;
+  // private final SetpointSolver m_setpointSolver;
 
   public StateHandler(
       Intake intake,
@@ -67,7 +67,7 @@ public class StateHandler extends SubsystemBase {
     m_led = led;
     m_vision = vision;
     m_wrist = wrist;
-    //m_setpointSolver = SetpointSolver.getInstance();
+    // m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
   }
 
@@ -223,12 +223,12 @@ public class StateHandler extends SubsystemBase {
           m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
       }
 
-      //m_setpointSolver.solveSetpoints(
-          //m_drive.getPoseMeters(),
-          //m_fieldSim.getTargetNode(currentIntakeState, scoringState),
-          //scoringState);
+      // m_setpointSolver.solveSetpoints(
+      // m_drive.getPoseMeters(),
+      // m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+      // scoringState);
       m_wrist.setWristState(WRIST_STATE.HIGH);
-      //m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
+      // m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
