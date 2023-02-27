@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,7 +55,8 @@ public class SwerveModule extends SubsystemBase {
           // Sim Values
           LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
           Constants.getInstance().SwerveModule.kTurnGearbox,
-          Constants.getInstance().SwerveModule.kTurningMotorGearRatio);
+          Constants.getInstance().SwerveModule.kTurningMotorGearRatio,
+          VecBuilder.fill(0));
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
