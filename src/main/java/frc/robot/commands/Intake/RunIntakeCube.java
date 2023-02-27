@@ -5,17 +5,24 @@
 package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
 public class RunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+  private final Vision m_vision;
+  private final SwerveDrive m_swerve;
 
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public RunIntakeCube(Intake intake, double PercentOutput) {
+  public RunIntakeCube(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
+    m_vision = vision;
+    m_swerve = swerve;
     m_PercentOutput = PercentOutput;
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,6 +39,10 @@ public class RunIntakeCube extends CommandBase {
   @Override
   public void execute() {
     m_intake.setIntakePercentOutput(m_PercentOutput);
+    if (m_vision.searchLimelightTarget(CAMERA_LOCATION.INTAKE)) {
+      m_swerve.enableHeadingTarget(true);
+      m_swerve.setRobotHeading(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE));
+    }
   }
 
   // Called once the command ends or is interrupted.

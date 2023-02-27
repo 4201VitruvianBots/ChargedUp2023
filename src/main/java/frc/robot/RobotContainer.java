@@ -173,6 +173,7 @@ public class RobotContainer {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.resetState();
     m_wrist.resetState();
+    m_swerveDrive.resetState();
   }
 
   private void initAutoBuilder() {

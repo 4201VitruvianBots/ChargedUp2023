@@ -4,7 +4,10 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
@@ -18,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -72,7 +76,15 @@ public class SwerveDrive extends SubsystemBase {
   private double m_simYaw;
   private DoublePublisher swervePitch, swerveRoll, swerveYaw;
 
+  public boolean useHeadingTarget = false;
+
+  private final TrapezoidProfile.Constraints m_constraints =
+  new TrapezoidProfile.Constraints(Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond, Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+
   public SwerveDrive() {
+
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
@@ -102,6 +114,10 @@ public class SwerveDrive extends SubsystemBase {
     strafe *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
     rotation *= Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond;
 
+    if(useHeadingTarget) {
+      rotation = m_setpoint.velocity;
+    }
+
     ChassisSpeeds chassisSpeeds =
         isFieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -117,6 +133,29 @@ public class SwerveDrive extends SubsystemBase {
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
+  }
+
+  /*
+   * Uses trapezoidal profile to set robot heading to a clear target
+   */
+  public void setRobotHeading(double desiredAngleSetpoint) {
+    m_goal = new TrapezoidProfile.State(Units.degreesToRadians(desiredAngleSetpoint), 0);
+    var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+    m_setpoint = profile.calculate(0.02);
+  }
+
+  /*
+   * ability to let head of swerve drive face the target
+   */
+  public void enableHeadingTarget(boolean enable) {
+    useHeadingTarget = enable;
+  }
+
+  public void resetState() {
+    m_setpoint =
+        new TrapezoidProfile.State(
+            Units.degreesToRadians(getHeadingDegrees()),
+            Units.degreesToRadians(0));
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {

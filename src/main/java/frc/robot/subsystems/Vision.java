@@ -6,8 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -18,6 +22,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
 import java.util.stream.DoubleStream;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 public class Vision extends SubsystemBase {
 
@@ -38,6 +46,10 @@ public class Vision extends SubsystemBase {
 
   private Timer searchTimer = new Timer();
   private Double searchWindow = 0.2;
+
+  private double desiredAngleSetpoint;
+
+  private DoublePublisher kSetpointPub;
 
   private enum targetType {
     INTAKING,
@@ -140,7 +152,7 @@ public class Vision extends SubsystemBase {
   /*
    * Horizontal Offset From Crosshair To Target
    */
-  public double getTargetXAngle(CAMERA_LOCATION location, int index) {
+  public double getTargetXAngle(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
         return -m_intakeNet.getEntry("tx").getDouble(0);
@@ -154,7 +166,7 @@ public class Vision extends SubsystemBase {
   /*
    * Vertical Offset From Crosshair To Target
    */
-  public double getTargetYAngle(CAMERA_LOCATION location, int index) {
+  public double getTargetYAngle(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ty").getDouble(0);
@@ -219,6 +231,18 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  public double getPipeline(CAMERA_LOCATION location) {
+    switch (location) {
+      case INTAKE:
+        return m_intakeNet.getEntry("pipeline").getDouble(0);
+      default:
+        return 0;
+    }
+  }
+
+  /*
+   * resets timer for pipeline finder
+   */
   public void resetSearch() {
     targetFound = targetType.NONE;
     searchTimer.reset();
@@ -226,8 +250,19 @@ public class Vision extends SubsystemBase {
   }
 
   /*
+   * Look for any target
+   */
+  public boolean searchLimelightTarget(CAMERA_LOCATION location) {
+    if (getPipeline(location) == 1.0) { //CUBE
+     return getValidTargetType(location) == 1.0 && getTargetArea(location) > 20.0; //target read and threshold
+    } else if (getPipeline(location) == 2.0) { //CONE
+      return getValidTargetType(location) == 1.0 && getTargetArea(location) > 10.0; //target read and threshold
+    } 
+    return false;
+  }
+
+  /*
    * Look for a pipeline until a clear target is found when intaking
-   *
    */
   public void searchLimelightPipeline(CAMERA_LOCATION location) {
     if (m_intakeSub.getIntakeState()) {
