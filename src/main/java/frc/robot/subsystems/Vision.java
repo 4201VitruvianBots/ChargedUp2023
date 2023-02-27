@@ -209,7 +209,10 @@ public class Vision extends SubsystemBase {
         botPose = m_fLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
         break;
     }
-    if (botPose.length > 0) return botPose;
+    if (botPose.length > 0)
+      return botPose;
+    else
+      return defaultDoubleArray;
   }
 
   /**
@@ -315,7 +318,6 @@ public class Vision extends SubsystemBase {
           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
           break;
         case INTAKE:
-          break;
         case OUTTAKE:
           break;
       }

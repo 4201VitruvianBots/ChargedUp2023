@@ -214,7 +214,7 @@ public class RobotContainer {
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
     // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
+    m_autoChooser.setDefaultOption(
         "BlueTopConeCubeBalance",
         new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
