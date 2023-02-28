@@ -35,7 +35,7 @@ public class GetSubsystemStates extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_led.expressState(LED.robotState.ENABLED);
+    m_led.expressState(LED.robotState.DISABLED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

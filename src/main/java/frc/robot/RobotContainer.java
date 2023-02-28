@@ -26,6 +26,7 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorState;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
+import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -106,6 +107,7 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_wrist));
   }
 
   /**

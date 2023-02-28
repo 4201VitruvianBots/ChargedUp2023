@@ -166,7 +166,7 @@ public class Vision extends SubsystemBase {
   }
 
   /*
-   * The pipeline’s latency contribution (ms). Add to “cl” to get total latency.
+   * The pipeline’s latency contribution (ms). Add to "cl" to get total latency.
    */
   public double getCameraLatency(CAMERA_LOCATION location) {
     switch (location) {
