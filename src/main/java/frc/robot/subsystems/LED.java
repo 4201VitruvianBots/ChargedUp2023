@@ -11,7 +11,6 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
@@ -44,7 +43,8 @@ public class LED extends SubsystemBase {
     m_candle.configAllSettings(configAll, 100);
 
     m_controls = controls;
-    var nt_instance = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
+    var nt_instance =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
   }
 
@@ -144,7 +144,7 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(m_candle.getCurrent() < 0.01) {
+    if (m_candle.getCurrent() < 0.01) {
       currentRobotState = robotState.DISABLED;
       red = 255;
       green = 0;
@@ -154,12 +154,12 @@ public class LED extends SubsystemBase {
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
-//      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount);
-       m_candle.setLEDs(red, green, blue, 0, 0, 35); // setting all LEDs to color
+      //      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount);
+      m_candle.setLEDs(red, green, blue, 0, 0, 35); // setting all LEDs to color
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
-//    SmartDashboard.putString("LED Mode", currentRobotState.toString());
+    //    SmartDashboard.putString("LED Mode", currentRobotState.toString());
     ledStatePub.set(currentRobotState.toString());
     // the code below was printing out just LED Mode over and over again in the Led tab for some
     // reason but the code above does show the current state
