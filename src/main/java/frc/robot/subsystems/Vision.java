@@ -6,9 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -22,10 +19,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
 import java.util.stream.DoubleStream;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 
 public class Vision extends SubsystemBase {
 
@@ -253,11 +246,13 @@ public class Vision extends SubsystemBase {
    * Look for any target
    */
   public boolean searchLimelightTarget(CAMERA_LOCATION location) {
-    if (getPipeline(location) == 1.0) { //CUBE
-     return getValidTargetType(location) == 1.0 && getTargetArea(location) > 20.0; //target read and threshold
-    } else if (getPipeline(location) == 2.0) { //CONE
-      return getValidTargetType(location) == 1.0 && getTargetArea(location) > 10.0; //target read and threshold
-    } 
+    if (getPipeline(location) == 1.0) { // CUBE
+      return getValidTargetType(location) == 1.0
+          && getTargetArea(location) > 3.0; // target read and threshold
+    } else if (getPipeline(location) == 2.0) { // CONE
+      return getValidTargetType(location) == 1.0
+          && getTargetArea(location) > 3.0; // target read and threshold
+    }
     return false;
   }
 
@@ -271,21 +266,21 @@ public class Vision extends SubsystemBase {
       // threshold to find game object
       if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
         setPipeline(location, pipeline);
-        if (getTargetArea(location) > 20.0 && pipeline == 1) {
+        if (getTargetArea(location) > 3.0 && pipeline == 1) {
           targetFound = targetType.CUBE;
-        } else if (getTargetArea(location) > 10.0 && pipeline == 2) {
+        } else if (getTargetArea(location) > 3.0 && pipeline == 2) {
           targetFound = targetType.CONE;
         }
       }
 
       // threshold to lose game object once it's found
       if (targetFound == targetType.CUBE) {
-        if (getTargetArea(location) < 15.0) {
+        if (getTargetArea(location) < 2.0) {
           targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
-        if (getTargetArea(location) < 5.0) {
+        if (getTargetArea(location) < 2.0) {
           targetFound = targetType.NONE;
         }
       }

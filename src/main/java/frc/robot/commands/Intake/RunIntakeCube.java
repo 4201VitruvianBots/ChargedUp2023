@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
 import frc.robot.subsystems.Intake;
@@ -13,6 +14,7 @@ import frc.robot.subsystems.Vision;
 public class RunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+
   private final Vision m_vision;
   private final SwerveDrive m_swerve;
 
@@ -41,7 +43,7 @@ public class RunIntakeCube extends CommandBase {
     m_intake.setIntakePercentOutput(m_PercentOutput);
     if (m_vision.searchLimelightTarget(CAMERA_LOCATION.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeading(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE));
+      m_swerve.setRobotHeading(m_swerve.getHeadingRotation2d().minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE))).getRadians());
     }
   }
 
@@ -50,6 +52,7 @@ public class RunIntakeCube extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakePercentOutput(0);
     m_intake.setIntakeState(false);
+    m_swerve.enableHeadingTarget(false);
   }
 
   // Returns true when the command should end.

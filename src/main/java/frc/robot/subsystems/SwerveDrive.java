@@ -4,10 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
@@ -24,6 +21,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -77,9 +75,12 @@ public class SwerveDrive extends SubsystemBase {
   private DoublePublisher swervePitch, swerveRoll, swerveYaw;
 
   public boolean useHeadingTarget = false;
+  private double m_desiredRobotHeading;
 
   private final TrapezoidProfile.Constraints m_constraints =
-  new TrapezoidProfile.Constraints(Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond, Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
+      new TrapezoidProfile.Constraints(
+          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond,
+          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -114,8 +115,10 @@ public class SwerveDrive extends SubsystemBase {
     strafe *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
     rotation *= Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond;
 
-    if(useHeadingTarget) {
+    if (useHeadingTarget) {
       rotation = m_setpoint.velocity;
+      SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
+      SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
     }
 
     ChassisSpeeds chassisSpeeds =
@@ -138,8 +141,13 @@ public class SwerveDrive extends SubsystemBase {
   /*
    * Uses trapezoidal profile to set robot heading to a clear target
    */
+  
   public void setRobotHeading(double desiredAngleSetpoint) {
-    m_goal = new TrapezoidProfile.State(Units.degreesToRadians(desiredAngleSetpoint), 0);
+    m_desiredRobotHeading = desiredAngleSetpoint;
+  }
+
+  public void calculateRotationSpeed() {
+    m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
     var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
     m_setpoint = profile.calculate(0.02);
   }
@@ -154,8 +162,7 @@ public class SwerveDrive extends SubsystemBase {
   public void resetState() {
     m_setpoint =
         new TrapezoidProfile.State(
-            Units.degreesToRadians(getHeadingDegrees()),
-            Units.degreesToRadians(0));
+            Units.degreesToRadians(getHeadingDegrees()), Units.degreesToRadians(0));
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -316,6 +323,10 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isEnabled() && useHeadingTarget) {
+      calculateRotationSpeed();
+    }
+
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       module.updateCanCoderHealth();
     }
