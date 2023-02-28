@@ -209,10 +209,8 @@ public class Vision extends SubsystemBase {
         botPose = m_fLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
         break;
     }
-    if (botPose.length > 0)
-      return botPose;
-    else
-      return defaultDoubleArray;
+    if (botPose.length > 0) return botPose;
+    else return defaultDoubleArray;
   }
 
   /**

@@ -13,7 +13,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -229,8 +228,10 @@ public class SwerveDrive extends SubsystemBase {
     m_odometry.update(getHeadingRotation2d(), getSwerveDriveModulePositionsArray());
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      Transform2d moduleTransform = new Transform2d(Constants.SwerveDrive.kModuleTranslations
-              .get(module.getModulePosition()), module.getHeadingRotation2d());
+      Transform2d moduleTransform =
+          new Transform2d(
+              Constants.SwerveDrive.kModuleTranslations.get(module.getModulePosition()),
+              module.getHeadingRotation2d());
       module.setModulePose(getPoseMeters().transformBy(moduleTransform));
     }
   }

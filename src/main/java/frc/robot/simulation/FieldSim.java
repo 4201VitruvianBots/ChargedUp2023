@@ -23,10 +23,8 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
@@ -146,8 +144,11 @@ public class FieldSim extends SubsystemBase {
   public void setTrajectory(List<Trajectory> trajectories) {
     List<Pose2d> trajectoryPoses = new ArrayList<>();
 
-    for(var trajectory:trajectories) {
-      trajectoryPoses.addAll(trajectory.getStates().stream().map(state -> state.poseMeters).collect(Collectors.toList()));
+    for (var trajectory : trajectories) {
+      trajectoryPoses.addAll(
+          trajectory.getStates().stream()
+              .map(state -> state.poseMeters)
+              .collect(Collectors.toList()));
     }
 
     m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
@@ -184,8 +185,8 @@ public class FieldSim extends SubsystemBase {
         .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.RIGHT_LOCALIZER));
 
     m_field2d
-            .getObject("fLocalizerPose")
-            .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.FUSED_LOCALIZER));
+        .getObject("fLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.FUSED_LOCALIZER));
 
     elevatorPose =
         m_swerveDrive

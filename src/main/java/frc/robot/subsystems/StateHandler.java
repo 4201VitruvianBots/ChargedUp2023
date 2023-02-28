@@ -176,7 +176,8 @@ public class StateHandler extends SubsystemBase {
       }
     } else m_nextZone = ZONE_TRANSITIONS.NONE;
 
-    // Use zone transition info to set mechanism limits. Only threshold limit when within transition zones
+    // Use zone transition info to set mechanism limits. Only threshold limit when within transition
+    // zones
     switch (m_nextZone) {
       case LOW_TO_HIGH:
         if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.LOW_TO_HIGH.get())

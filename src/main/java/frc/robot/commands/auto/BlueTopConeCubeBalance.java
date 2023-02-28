@@ -11,8 +11,6 @@ import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class BlueTopConeCubeBalance extends SequentialCommandGroup {
@@ -27,7 +25,8 @@ public class BlueTopConeCubeBalance extends SequentialCommandGroup {
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
         new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
-        new PlotAutoTrajectory(fieldSim, trajectory.stream().map(t -> (Trajectory) t).collect(Collectors.toList())),
+        new PlotAutoTrajectory(
+            fieldSim, trajectory.stream().map(t -> (Trajectory) t).collect(Collectors.toList())),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

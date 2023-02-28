@@ -4,13 +4,10 @@
 
 package frc.robot.commands.auto;
 
-import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PlotAutoTrajectory extends CommandBase {
   FieldSim m_fieldSim;
@@ -36,10 +33,8 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(useList)
-      m_fieldSim.setTrajectory(m_trajectories);
-    else
-      m_fieldSim.setTrajectory(m_trajectory);
+    if (useList) m_fieldSim.setTrajectory(m_trajectories);
+    else m_fieldSim.setTrajectory(m_trajectory);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
