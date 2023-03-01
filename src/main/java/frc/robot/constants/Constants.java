@@ -192,7 +192,7 @@ public final class Constants {
         var ip = InetAddress.getLocalHost();
         var networkInterfaces = NetworkInterface.getByInetAddress(ip).getHardwareAddress();
         String[] hex = new String[networkInterfaces.length];
-        for(int i=0; i <networkInterfaces.length; i++) {
+        for (int i = 0; i < networkInterfaces.length; i++) {
           hex[i] = String.format("%02X", networkInterfaces[i]);
         }
         mac = String.join(":", hex);
