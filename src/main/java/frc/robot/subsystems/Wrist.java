@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.Intake.SetWristState;
+import frc.robot.commands.wrist.SetWristState;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 
