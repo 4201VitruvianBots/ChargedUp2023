@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -174,7 +173,7 @@ public class Elevator extends SubsystemBase {
 
       // motor.configPeakOutputForward(maxPercentOutput,
       // Constants.getInstance().Elevator.kTimeoutMs);
-      //motor.configPeakOutputReverse(-0.5, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configPeakOutputReverse(-0.5, Constants.getInstance().Elevator.kTimeoutMs);
 
       // motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
       // motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
@@ -315,9 +314,10 @@ public class Elevator extends SubsystemBase {
     return elevatorIsClosedLoop;
   }
 
-  // Returns true if 
+  // Returns true if
   public boolean getSetpointReached() {
-    double distanceBetween = MathUtil.applyDeadband(desiredHeightValue - getHeightMeters(), Units.inchesToMeters(2.5));
+    double distanceBetween =
+        MathUtil.applyDeadband(desiredHeightValue - getHeightMeters(), Units.inchesToMeters(2.5));
     return distanceBetween == 0;
   }
 
@@ -413,7 +413,7 @@ public class Elevator extends SubsystemBase {
           break;
         case JOYSTICK:
           setElevatorPercentOutput(elevatorJoystickY * maxPercentOutput);
-          //desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+          // desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
           break;
         case HIGH:
           desiredHeightValue = 1.02; // Placeholder values

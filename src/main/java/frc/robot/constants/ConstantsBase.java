@@ -5,7 +5,6 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
