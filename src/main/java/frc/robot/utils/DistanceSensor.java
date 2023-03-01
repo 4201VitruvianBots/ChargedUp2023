@@ -14,24 +14,26 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensor {
   private final int socketPort = 25000;
-  private final byte[] socketBuffer = new byte[85];
 
   private DatagramSocket socket;
   private String receivedData;
 
   private final String mainPath = new File("").getAbsolutePath();
   private final String testPath = mainPath + "/resources/sensorReading.json";
+
+  private Random rand = new Random();
 
   // Shuffleboard setup
 
@@ -105,25 +107,35 @@ public class DistanceSensor {
     }
   }
 
+  public void simulationPeriodic() {
+    receivedData =
+    "{\"sensor1.mm\":"
+    + Integer.toString(rand.nextInt(8190))
+    + ",\"sensor2.mm\":"
+    + Integer.toString(rand.nextInt(8190))
+    + ",\"test\":"
+    + Integer.toString(rand.nextInt(100))
+    + "}";
+    System.out.println(receivedData);
+  }
+
   public void pollDistanceSensors() {
       // This method will be called once per scheduler run
       testParserTab.setInteger(testParser());
       try {
-
-        byte[] buffer = new byte[512];
-        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-        socket.receive(packet);
-
-        receivedData = new String(packet.getData(), 0, packet.getLength());
-
+        if (RobotBase.isSimulation()) {
+          simulationPeriodic();
+        }
+        else {
+          byte[] buffer = new byte[512];
+          DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+          socket.receive(packet);
+  
+          receivedData = new String(packet.getData(), 0, packet.getLength());
+        }
         rawStringTab.setString(receivedData);
         sensorValue1Tab.setInteger(getSensorValue(1));
         sensorValue2Tab.setInteger(getSensorValue(2));
-        //SmartDashboard.putString("Is running", "Is running");
-        //SmartDashboard.putString("Distance", receivedData);
-        //SmartDashboard.putNumber("Parsed Sensor 1", getSensorValue(1));
-        //SmartDashboard.putNumber("Parsed Sensor 2", getSensorValue(2));
-        //System.out.println(getSensorValue(1));
       } catch (SocketTimeoutException ex) {
         System.out.println("error: " + ex.getMessage());
         ex.printStackTrace();
