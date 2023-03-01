@@ -11,18 +11,16 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class BlueTopTwoConeBalance extends SequentialCommandGroup {
-  public BlueTopTwoConeBalance(
-      SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
+public class BlueTopTwoCone extends SequentialCommandGroup {
+  public BlueTopTwoCone(SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueTopTwoConeBalance",
-            new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
+            "BlueTopTwoCone", new PathConstraints(Units.feetToMeters(8), Units.feetToMeters(40)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
-        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
+        // new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

@@ -95,9 +95,9 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
-            () -> -rightJoystick.getRawAxis(0)));
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
+            () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
@@ -198,7 +198,9 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(5));
+    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("RunIntake", new AutoRunReverseIntake(m_intake));
+    m_eventMap.put("RunReverseIntake", new AutoRunReverseIntake(m_intake));
 
     m_autoBuilder =
         new SwerveAutoBuilder(
@@ -215,7 +217,7 @@ public class RobotContainer {
                 Constants.getInstance().SwerveDrive.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+            true,
             m_swerveDrive);
   }
 
@@ -225,24 +227,28 @@ public class RobotContainer {
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
-    m_autoChooser.setDefaultOption(
-        "BlueTopConeCubeBalance",
-        new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-        "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueTopTwoCone", new BlueTopTwoCone(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueMiddleTwoConeBalance",
-        new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "BlueTopConeCubeBalance",
+    //     new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive,
+    // m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // // m_autoChooser.addOption(
+    // //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption(
+    //     "BlueMiddleTwoConeBalance",
+    //     new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 

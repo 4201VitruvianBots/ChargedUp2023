@@ -481,6 +481,7 @@ public class Vision extends SubsystemBase {
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateVisionPose(CAMERA_SERVERS.FUSED_LOCALIZER);
+    searchLimelightPipeline(CAMERA_LOCATION.INTAKE);
     logData();
   }
 
