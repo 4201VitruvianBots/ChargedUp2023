@@ -10,7 +10,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.utils.ModuleMap;
 import java.util.Map;
 import java.util.Objects;
@@ -196,4 +200,26 @@ public final class Constants {
 
   public static final String alphaRobotMAC = "00:80:2F:19:30:B7";
   public static final String betaRobotMAC = "00:80:2F:25:BC:FD";
+
+  public static ShuffleboardTab otherTab = Shuffleboard.getTab("Other");
+  public static GenericEntry robotMacTab = otherTab.add("MAC Address", "None").getEntry();
+  public static GenericEntry detectedRobotTab = otherTab.add("Detected Robot", "None").getEntry();
+
+  public static void periodic() {
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
+
+    detectedRobotTab.setString(mac);
+    
+    if (RobotBase.isSimulation()) {
+      detectedRobotTab.setString("Simulation");
+    } else if (Objects.equals(mac, Constants.alphaRobotMAC)) {
+      detectedRobotTab.setString("Alpha");
+    } else if (Objects.equals(mac, Constants.betaRobotMAC)) {
+      detectedRobotTab.setString("Beta");
+    } else {
+      detectedRobotTab.setString("None");
+    }
+  }
+
 }
