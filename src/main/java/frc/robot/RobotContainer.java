@@ -127,7 +127,9 @@ public class RobotContainer {
 
     // TODO: add a driver button that hard limits the max swerve speed while held for fine control
 
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+    xboxController
+        .leftTrigger(0.1)
+        .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     xboxController
         .leftTrigger(0.1)
         .onTrue(
@@ -138,7 +140,9 @@ public class RobotContainer {
                     m_stateHandler.getSuperStructureState()
                         == StateHandler.SUPERSTRUCTURE_STATE.LOW));
 
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+    xboxController
+        .rightTrigger(0.1)
+        .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     xboxController
         .rightTrigger(0.1)
         .onTrue(
@@ -178,6 +182,7 @@ public class RobotContainer {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.resetState();
     m_wrist.resetState();
+    m_swerveDrive.resetState();
   }
 
   private void initAutoBuilder() {

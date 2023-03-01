@@ -82,7 +82,7 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = true;
+  private boolean elevatorIsClosedLoop = false;
 
   private double maxPercentOutput = 0.75;
   private double setpointMultiplier = 0.35;

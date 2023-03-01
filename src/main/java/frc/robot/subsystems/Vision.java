@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -38,6 +39,10 @@ public class Vision extends SubsystemBase {
 
   private Timer searchTimer = new Timer();
   private Double searchWindow = 0.2;
+
+  private double desiredAngleSetpoint;
+
+  private DoublePublisher kSetpointPub;
 
   private enum targetType {
     INTAKING,
@@ -140,7 +145,7 @@ public class Vision extends SubsystemBase {
   /*
    * Horizontal Offset From Crosshair To Target
    */
-  public double getTargetXAngle(CAMERA_LOCATION location, int index) {
+  public double getTargetXAngle(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
         return -m_intakeNet.getEntry("tx").getDouble(0);
@@ -154,7 +159,7 @@ public class Vision extends SubsystemBase {
   /*
    * Vertical Offset From Crosshair To Target
    */
-  public double getTargetYAngle(CAMERA_LOCATION location, int index) {
+  public double getTargetYAngle(CAMERA_LOCATION location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ty").getDouble(0);
@@ -219,6 +224,18 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  public double getPipeline(CAMERA_LOCATION location) {
+    switch (location) {
+      case INTAKE:
+        return m_intakeNet.getEntry("pipeline").getDouble(0);
+      default:
+        return 0;
+    }
+  }
+
+  /*
+   * resets timer for pipeline finder
+   */
   public void resetSearch() {
     targetFound = targetType.NONE;
     searchTimer.reset();
@@ -226,8 +243,21 @@ public class Vision extends SubsystemBase {
   }
 
   /*
+   * Look for any target
+   */
+  public boolean searchLimelightTarget(CAMERA_LOCATION location) {
+    if (getPipeline(location) == 1.0) { // CUBE
+      return getValidTargetType(location) == 1.0
+          && getTargetArea(location) > 3.0; // target read and threshold
+    } else if (getPipeline(location) == 2.0) { // CONE
+      return getValidTargetType(location) == 1.0
+          && getTargetArea(location) > 3.0; // target read and threshold
+    }
+    return false;
+  }
+
+  /*
    * Look for a pipeline until a clear target is found when intaking
-   *
    */
   public void searchLimelightPipeline(CAMERA_LOCATION location) {
     if (m_intakeSub.getIntakeState()) {
@@ -236,21 +266,21 @@ public class Vision extends SubsystemBase {
       // threshold to find game object
       if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
         setPipeline(location, pipeline);
-        if (getTargetArea(location) > 20.0 && pipeline == 1) {
+        if (getTargetArea(location) > 3.0 && pipeline == 1) {
           targetFound = targetType.CUBE;
-        } else if (getTargetArea(location) > 10.0 && pipeline == 2) {
+        } else if (getTargetArea(location) > 3.0 && pipeline == 2) {
           targetFound = targetType.CONE;
         }
       }
 
       // threshold to lose game object once it's found
       if (targetFound == targetType.CUBE) {
-        if (getTargetArea(location) < 15.0) {
+        if (getTargetArea(location) < 2.0) {
           targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
-        if (getTargetArea(location) < 5.0) {
+        if (getTargetArea(location) < 2.0) {
           targetFound = targetType.NONE;
         }
       }
