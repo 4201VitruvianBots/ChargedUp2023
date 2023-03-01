@@ -9,7 +9,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class ConstantsBase {
-
+  public String robotName;
   public final class ElevatorDef {
     // Elevator sim constants
     public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
@@ -124,5 +124,6 @@ public class ConstantsBase {
     LED = new LEDDef();
     SwerveDrive = new SwerveDriveDef();
     SwerveModule = new SwerveModuleDef();
+    robotName = "";
   }
 }

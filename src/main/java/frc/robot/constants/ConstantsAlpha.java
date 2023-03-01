@@ -7,11 +7,12 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public class ConstantsAlpha extends ConstantsBeta {
+  
   public static final class SwerveDriveDef {
-    public static final double frontLeftCANCoderOffset = 327.129;
-    public static final double frontRightCANCoderOffset = 62.051;
-    public static final double backLeftCANCoderOffset = 11.250;
-    public static final double backRightCANCoderOffset = 213.135;
+    public static final double frontLeftCANCoderOffset = -197.402;
+    public static final double frontRightCANCoderOffset = -36.211;
+    public static final double backLeftCANCoderOffset = -82.002;
+    public static final double backRightCANCoderOffset = -311.084;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
@@ -27,7 +28,7 @@ public class ConstantsAlpha extends ConstantsBeta {
 
   public static final class WristDef {
     public static final int wristMotor = 30;
-    public static final int wristGearRatio = (1 / 50);
+    public static final double wristGearRatio = (1.0 / 50.0);
     public static final double encoderUnitsPerRotation = 0;
     private static final double wristRotationUpperLimit = 0;
     public static final double wristEncoderUpperLimit =
@@ -36,5 +37,10 @@ public class ConstantsAlpha extends ConstantsBeta {
     public static final double maxSpeedLimitsPercent = 0;
     public static final int wristLowerSwitch = 0;
     public static final double wristmaxRotationDegrees = 0;
+  }
+
+  public ConstantsAlpha() {
+    super();
+    robotName = "Alpha";
   }
 }

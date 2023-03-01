@@ -5,8 +5,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.Constants;
 
 public class Controls extends SubsystemBase {
+  StringPublisher robotNamePub;
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
@@ -47,6 +49,7 @@ public class Controls extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
     allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
+    robotNamePub = controlsTab.getStringTopic("Robot Name").publish();
   }
 
   /** Sends values to SmartDashboard */
@@ -54,6 +57,7 @@ public class Controls extends SubsystemBase {
     // SmartDashboard.putBoolean("Alliance", getAllianceColorBoolean());
     allianceString.set(getAllianceColor().toString());
     allianceBoolean.set(getAllianceColorBoolean());
+    robotNamePub.set(Constants.getInstance().robotName);
     //    System.out.println("Alliance Color: " + getAllianceColor().toString());
     // TODO: fix
   }
