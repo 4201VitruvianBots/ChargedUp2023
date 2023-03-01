@@ -7,7 +7,7 @@ package frc.robot.constants;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 
 public class ConstantsBeta extends ConstantsBase {
-    public static final class ElevatorDef {
-        public static final TalonFXInvertType firstMotorInvert = TalonFXInvertType.Clockwise;
-    }
+  public static final class ElevatorDef {
+    public static final TalonFXInvertType firstMotorInvert = TalonFXInvertType.Clockwise;
+  }
 }

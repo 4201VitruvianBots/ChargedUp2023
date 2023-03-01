@@ -5,7 +5,6 @@
 package frc.robot.constants;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-
 import edu.wpi.first.math.util.Units;
 
 public class ConstantsAlpha extends ConstantsBeta {
@@ -13,7 +12,7 @@ public class ConstantsAlpha extends ConstantsBeta {
   public static final class ElevatorDef {
     public static final TalonFXInvertType firstMotorInvert = TalonFXInvertType.CounterClockwise;
   }
-  
+
   public static final class SwerveDriveDef {
     public static final double frontLeftCANCoderOffset = 327.129;
     public static final double frontRightCANCoderOffset = 62.051;
