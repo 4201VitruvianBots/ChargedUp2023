@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -85,9 +84,12 @@ public class SwerveDrive extends SubsystemBase {
           Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private final ProfiledPIDController m_rotationController = new ProfiledPIDController(Constants.getInstance().SwerveDrive.kP_Rotation, 
-                                                                                       Constants.getInstance().SwerveDrive.kI_Rotation, 
-                                                                                       Constants.getInstance().SwerveDrive.kD_Rotation, m_constraints);
+  private final ProfiledPIDController m_rotationController =
+      new ProfiledPIDController(
+          Constants.getInstance().SwerveDrive.kP_Rotation,
+          Constants.getInstance().SwerveDrive.kI_Rotation,
+          Constants.getInstance().SwerveDrive.kD_Rotation,
+          m_constraints);
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
@@ -128,9 +130,10 @@ public class SwerveDrive extends SubsystemBase {
       rotation = m_rotationOutput;
       // SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
       // SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
-      chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
+      chassisSpeeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
     } else {
-      chassisSpeeds = 
+      chassisSpeeds =
           isFieldRelative
               ? ChassisSpeeds.fromFieldRelativeSpeeds(
                   throttle, strafe, rotation, getHeadingRotation2d())
@@ -151,7 +154,7 @@ public class SwerveDrive extends SubsystemBase {
   /*
    * Uses trapezoidal profile to set robot heading to a clear target
    */
-  
+
   public void setRobotHeading(double desiredAngleSetpoint) {
     m_desiredRobotHeading = desiredAngleSetpoint;
   }
@@ -162,8 +165,7 @@ public class SwerveDrive extends SubsystemBase {
     // m_setpoint = profile.calculate(0.02);
 
     m_rotationOutput =
-    m_rotationController.calculate(
-        getHeadingRotation2d().getRadians(), m_desiredRobotHeading);
+        m_rotationController.calculate(getHeadingRotation2d().getRadians(), m_desiredRobotHeading);
   }
 
   /*

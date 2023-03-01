@@ -26,9 +26,13 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorState;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
+import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.wrist.RunWristJoystick;
+import frc.robot.commands.wrist.SetWristState;
+import frc.robot.commands.wrist.ToggleWristControlMode;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 import frc.robot.constants.Constants.USB;
@@ -106,6 +110,7 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
   }
 
   /**
@@ -237,6 +242,13 @@ public class RobotContainer {
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
     m_memorylog.simulationPeriodic();
+  }
+
+  public void disabledPeriodic() {
+    // TODO: Add logic
+    // Check all mechanisms
+    //    if(m_wrist && m_elevator && m_vision)
+    //      m_controls.setInitState(true);
   }
 
   public void periodic() {

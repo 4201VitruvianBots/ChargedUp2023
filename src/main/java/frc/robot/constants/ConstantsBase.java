@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 
 public class ConstantsBase {
   public String robotName;
+
   public final class ElevatorDef {
     // Elevator sim constants
     public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
@@ -50,9 +51,6 @@ public class ConstantsBase {
     public final double wristMass = Units.lbsToKilograms(15);
     public final double wristLength = Units.inchesToMeters(22);
     public final double wristAbsoluteUpperLimitDegrees = 200.0;
-    // TODO: Determine the soft limits
-    public final double wristSoftUpperLimitDegrees = 130.0;
-    public final double wristSoftLowerLimitDegrees = 0.0;
     public final double wristAbsoluteLowerLimitDegrees = -15.0;
     public final int wristLowerSwitch = 0;
 

@@ -43,7 +43,11 @@ public class RunIntakeCone extends CommandBase {
     m_intake.setIntakePercentOutput(-m_PercentOutput);
     if (m_vision.searchLimelightTarget(CAMERA_LOCATION.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeading(m_swerve.getHeadingRotation2d().minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE))).getRadians());
+      m_swerve.setRobotHeading(
+          m_swerve
+              .getHeadingRotation2d()
+              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE)))
+              .getRadians());
     }
   }
 

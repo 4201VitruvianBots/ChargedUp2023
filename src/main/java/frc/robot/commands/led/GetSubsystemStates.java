@@ -13,6 +13,7 @@ public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LED m_led;
 
+  private final Controls m_controls;
   private final Wrist m_wrist;
   private final Intake m_intake;
   private boolean Cone;
@@ -24,8 +25,9 @@ public class GetSubsystemStates extends CommandBase {
   private boolean wrist;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LED led, Intake intake, Wrist wrist) {
+  public GetSubsystemStates(LED led, Controls controls, Intake intake, Wrist wrist) {
     m_led = led;
+    m_controls = controls;
     m_intake = intake;
     m_wrist = wrist;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,7 +37,7 @@ public class GetSubsystemStates extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_led.expressState(LED.robotState.ENABLED);
+    m_led.expressState(LED.robotState.DISABLED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,7 +51,8 @@ public class GetSubsystemStates extends CommandBase {
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {
-      m_led.expressState(LED.robotState.DISABLED);
+      if (m_controls.getInitState()) m_led.expressState(LED.robotState.INITIALIZED);
+      else m_led.expressState(LED.robotState.DISABLED);
     } else if (elavating) {
       m_led.expressState(LED.robotState.ELEVATING);
     } else if (Cone) {

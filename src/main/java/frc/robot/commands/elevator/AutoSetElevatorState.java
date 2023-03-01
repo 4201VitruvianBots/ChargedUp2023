@@ -2,22 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Intake;
+// Called when the joystick moves up/down, also acts as manual override
+package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.subsystems.Elevator;
 
-public class RunWrist extends CommandBase {
-  private final Wrist m_wrist;
-  private double m_percentOutput;
+public class AutoSetElevatorState extends CommandBase {
+  /** Creates a new IncrementElevatorHeight. */
+  private final Elevator m_elevator;
 
-  /** Creates a new RunWrist. */
-  public RunWrist(Wrist wrist, double PercentOutput) {
-    m_wrist = wrist;
-    m_percentOutput = PercentOutput;
+  private final ELEVATOR_STATE m_elevatorState;
+
+  public AutoSetElevatorState(Elevator elevator, ELEVATOR_STATE state) {
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(wrist);
+    m_elevator = elevator;
+    m_elevatorState = state;
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -27,18 +30,20 @@ public class RunWrist extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristInput(m_percentOutput);
+    m_elevator.setElevatorState(m_elevatorState);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_wrist.setWristInput(0);
+    if (m_elevator.getElevatorState() == m_elevatorState) {
+      interrupted = true;
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }
