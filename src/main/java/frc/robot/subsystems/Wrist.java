@@ -20,8 +20,8 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.WRIST;
+import frc.robot.Constants;
+import frc.robot.Constants.WRIST;
 
 public class Wrist extends SubsystemBase {
   private double m_desiredSetpointRadians;

@@ -26,8 +26,8 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.ELEVATOR;
+import frc.robot.Constants;
+import frc.robot.Constants.ELEVATOR;
 
 public class Elevator extends SubsystemBase {
 
@@ -159,7 +159,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    elevatorMotors[0].setInverted(TalonFXInvertType.Clockwise);
+    elevatorMotors[0].setInverted(Constants.getInstance().Elevator.mainMotorInversionType);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
     initShuffleboard();
@@ -323,7 +323,7 @@ public class Elevator extends SubsystemBase {
   }
 
   private void initShuffleboard() {
-    if(RobotBase.isSimulation()) {
+    if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Command", this);
       SmartDashboard.putData("Elevator", mech2d);
     }

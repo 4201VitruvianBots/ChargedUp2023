@@ -4,8 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET;
+import frc.robot.Constants;
+import frc.robot.Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;

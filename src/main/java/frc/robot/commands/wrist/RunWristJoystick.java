@@ -6,7 +6,7 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.WRIST;
+import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 

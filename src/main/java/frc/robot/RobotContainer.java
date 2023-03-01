@@ -21,6 +21,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.USB;
+import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
@@ -35,10 +38,6 @@ import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.ELEVATOR;
-import frc.robot.constants.Constants.USB;
-import frc.robot.constants.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
@@ -211,7 +210,7 @@ public class RobotContainer {
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.SWERVEDRIVE.kSwerveKinematics,
             new PIDConstants(
                 Constants.getInstance().SwerveDrive.kP_Translation,
                 Constants.getInstance().SwerveDrive.kI_Translation,

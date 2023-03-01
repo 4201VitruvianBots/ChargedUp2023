@@ -2,13 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.constants;
+package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +27,6 @@ import java.util.Map;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
   // Add any constants that do not change between robots here, as well as all enums
 
   public static class USB {
@@ -120,7 +118,7 @@ public final class Constants {
     }
   }
 
-  public static final class SwerveDrive {
+  public static final class SWERVEDRIVE {
     public static final double kTrackWidth = Units.inchesToMeters(24);
     public static final double kWheelBase = Units.inchesToMeters(24);
 
@@ -273,7 +271,199 @@ public final class Constants {
     SMART_HIGH,
   }
 
+  public static class ConstantsBase {
+    public String robotName;
+
+    public static class ElevatorDefB {
+      // Elevator sim constants
+      public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
+      public final double elevatorGearing = 10.0;
+      public final double elevatorMassKg = 4.0;
+      public final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
+      public final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(40);
+
+      // PID
+      public final double kSensorUnitsPerRotation = 2048.0;
+      public final double kGearRatio = 5.0;
+      public final double kMaxRPM = 6380.0;
+      public final double kMaxVelocity = (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
+
+      public final int kSlotIdx = 0;
+      public final int kPIDLoopIdx = 0;
+      public final int kTimeoutMs = 0;
+
+      public final double encoderCountsToMeters =
+          (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
+
+      public final double kS = 0.15;
+      public final double kV = 12.57;
+      public final double kA = 0.04;
+
+      public final TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
+    }
+
+    public static class IntakeDef {}
+
+    public static class WristDefB {
+      public final double wristGearRatio = 1024.0 / 27.0;
+      public final double encoderUnitsToDegrees = 360.0 / (2048.0 * wristGearRatio);
+      public final DCMotor gearBox = DCMotor.getFalcon500(1);
+      public final double wristMass = Units.lbsToKilograms(20);
+      public final double wristLength = Units.inchesToMeters(22);
+      public final int wristLowerSwitch = 0;
+
+      // Values were experimentally determined
+      public final double kMaxVel = Units.degreesToRadians(360);
+      public final double kMaxAccel = Units.degreesToRadians(360);
+      public final double FFkS = 0.1;
+      public final double FFkV = 1.95;
+      public final double kG = 1.75;
+      public final double kA = 0.16;
+
+      public final double kP = 0.1;
+      public final double kI = 0.0;
+      public final double kD = 0.0;
+    }
+
+    public static class LEDDef {}
+
+    public static class SwerveDriveDefB {
+      public final double frontLeftCANCoderOffset = 16.26; // 85.957;
+      public final double frontRightCANCoderOffset = 215.596; // 41.748;
+      public final double backLeftCANCoderOffset = 262.705; // 261.475;
+      public final double backRightCANCoderOffset = 151.348; // 148.008; // 329.150;
+
+      public final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+      public final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
+      public final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
+
+      public final double kP_Translation = 0.6;
+      public final double kI_Translation = 0;
+      public final double kD_Translation = 0;
+      public final double kP_Rotation = 4;
+      public final double kI_Rotation = 0;
+      public final double kD_Rotation = 0.01;
+    }
+
+    public static class SwerveModuleDef {
+      public final double kDriveMotorGearRatio = 6.12;
+      public final double kTurningMotorGearRatio = 150.0 / 7.0;
+      public final double kWheelDiameterMeters = Units.inchesToMeters(4);
+      public final int kFalconEncoderCPR = 2048;
+      public final int kCANCoderCPR = 4096;
+
+      public final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
+      public final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
+
+      public final double kDriveMotorDistancePerPulse =
+          (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
+      public final double kTurningMotorDistancePerPulse =
+          360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
+      public final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+
+      public final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
+      public final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
+      public final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
+
+      public final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
+      public final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
+    }
+
+    public ElevatorDefB Elevator;
+    public IntakeDef Intake;
+    public WristDefB Wrist;
+    public LEDDef LED;
+    public SwerveDriveDefB SwerveDrive;
+    public SwerveModuleDef SwerveModule;
+
+    public ConstantsBase() {
+      Elevator = new ElevatorDefB();
+      Intake = new IntakeDef();
+      Wrist = new WristDefB();
+      LED = new LEDDef();
+      SwerveDrive = new SwerveDriveDefB();
+      SwerveModule = new SwerveModuleDef();
+      robotName = "";
+    }
+  }
+
   private static ConstantsBase m_constants;
+
+  public static class ConstantsBeta extends ConstantsBase {
+    public ConstantsBeta() {
+      super();
+      robotName = "Beta";
+    }
+  }
+
+  public static class ConstantsAlpha extends ConstantsBeta {
+    public static class ElevatorDefA extends ElevatorDefB {
+      // Elevator sim constants
+      public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
+      public final double elevatorGearing = 10.0;
+      public final double elevatorMassKg = 4.0;
+      public final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
+      public final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(40);
+
+      // PID
+      public final double kSensorUnitsPerRotation = 2048.0;
+      public final double kGearRatio = 5.0;
+      public final double kMaxRPM = 6380.0;
+      public final double kMaxVelocity = (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
+
+      public final int kSlotIdx = 0;
+      public final int kPIDLoopIdx = 0;
+      public final int kTimeoutMs = 0;
+
+      public final double encoderCountsToMeters =
+          (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
+
+      public final double kS = 0.15;
+      public final double kV = 12.57;
+      public final double kA = 0.04;
+
+      public final TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
+    }
+
+    public static final class SwerveDriveDefA extends SwerveDriveDefB {
+      public static final double frontLeftCANCoderOffset = -197.402;
+      public static final double frontRightCANCoderOffset = -36.211;
+      public static final double backLeftCANCoderOffset = -82.002;
+      public static final double backRightCANCoderOffset = -311.084;
+
+      public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+      public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
+      public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
+
+      public static final double kP_Translation = 0.6;
+      public static final double kI_Translation = 0;
+      public static final double kD_Translation = 0;
+      public static final double kP_Rotation = 4;
+      public static final double kI_Rotation = 0;
+      public static final double kD_Rotation = 0.01;
+    }
+
+    public static final class WristDefA extends WristDefB {
+      public static final int wristMotor = 30;
+      public static final double wristGearRatio = (1.0 / 50.0);
+      public static final double encoderUnitsPerRotation = 0;
+      private static final double wristRotationUpperLimit = 0;
+      public static final double wristEncoderUpperLimit =
+          wristRotationUpperLimit * encoderUnitsPerRotation * wristGearRatio;
+      public static final double wristEncoderSlowdown = 0;
+      public static final double maxSpeedLimitsPercent = 0;
+      public static final int wristLowerSwitch = 0;
+      public static final double wristmaxRotationDegrees = 0;
+    }
+
+    public ConstantsAlpha() {
+      super();
+      Elevator = new ElevatorDefA();
+      SwerveDrive = new SwerveDriveDefA();
+      Wrist = new WristDefA();
+      robotName = "Alpha";
+    }
+  }
 
   public static ConstantsBase getInstance() {
     if (m_constants == null) {

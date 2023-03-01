@@ -16,8 +16,8 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.VISION.CAMERA_SERVER;
+import frc.robot.Constants;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase {

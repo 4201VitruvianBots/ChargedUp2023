@@ -30,10 +30,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
+import frc.robot.Constants;
+import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase {
@@ -127,10 +126,11 @@ public class SwerveModule extends SubsystemBase {
     // Check if the offset was applied properly. Delay to give it some time to set
     Timer.delay(0.1);
     // TODO: This doesn't cover all edge cases
-    if(RobotBase.isReal()) {
-      m_initSuccess = Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()) < 1.0;
-    } else
-      m_initSuccess = true;
+    if (RobotBase.isReal()) {
+      m_initSuccess =
+          Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition())
+              < 1.0;
+    } else m_initSuccess = true;
   }
 
   public boolean getInitSuccess() {
@@ -231,7 +231,10 @@ public class SwerveModule extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
     moduleEncoderHeadingPub =
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Heading").publish();
-      moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset").publish().set(m_angleOffset);
+    moduleTab
+        .getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset")
+        .publish()
+        .set(m_angleOffset);
     moduleEncoderHealthPub =
         moduleTab.getBooleanTopic("Module (" + m_moduleNumber + ") Encoder Health").publish();
     moduleMotorHeadingPub =
@@ -239,7 +242,8 @@ public class SwerveModule extends SubsystemBase {
   }
 
   private void updateSmartDashboard() {
-//    SmartDashboard.putNumber("Module " + m_moduleNumber + " error", Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
+    //    SmartDashboard.putNumber("Module " + m_moduleNumber + " error",
+    // Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
 
     moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
     moduleMotorHeadingPub.set(getHeadingDegrees());

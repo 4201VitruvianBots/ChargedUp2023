@@ -6,7 +6,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 

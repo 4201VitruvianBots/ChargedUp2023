@@ -12,10 +12,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.ELEVATOR;
-import frc.robot.constants.Constants.SCORING_STATE;
-import frc.robot.constants.Constants.WRIST;
+import frc.robot.Constants;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.SCORING_STATE;
+import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.utils.SetpointSolver;
 
