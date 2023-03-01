@@ -34,8 +34,8 @@ public class AutoSetWristState extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if(m_wrist.getWristState() == m_wristState){
-      interrupted = true; 
+    if (m_wrist.getWristState() == m_wristState) {
+      interrupted = true;
     }
   }
 
