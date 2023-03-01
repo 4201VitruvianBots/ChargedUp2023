@@ -4,6 +4,8 @@
 
 package frc.robot.constants;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -39,6 +41,8 @@ public class ConstantsBase {
     public final double kS = 0.15;
     public final double kV = 12.57;
     public final double kA = 0.04;
+
+    public final TalonFXInvertType firstMotorInvert = TalonFXInvertType.CounterClockwise;
   }
 
   public final class IntakeDef {}
@@ -109,6 +113,8 @@ public class ConstantsBase {
     public final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
     public final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
+
+  public static final TalonFXInvertType firstMotorInvert = null;
 
   public final ElevatorDef Elevator;
   public final IntakeDef Intake;

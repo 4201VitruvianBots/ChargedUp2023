@@ -39,6 +39,8 @@ public class IncrementElevatorHeight extends CommandBase {
 
     if (joystickYDeadbandOutput != 0.0) {
       m_elevator.setElevatorState(ELEVATOR_STATE.JOYSTICK);
+    } else if (m_elevator.getElevatorState() == ELEVATOR_STATE.JOYSTICK) {
+      m_elevator.resetState();
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go

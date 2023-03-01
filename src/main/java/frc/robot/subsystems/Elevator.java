@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -170,8 +172,9 @@ public class Elevator extends SubsystemBase {
           kD,
           Constants.getInstance().Elevator.kTimeoutMs);
 
-      motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+      // motor.configPeakOutputForward(maxPercentOutput,
+      // Constants.getInstance().Elevator.kTimeoutMs);
+      //motor.configPeakOutputReverse(-0.5, Constants.getInstance().Elevator.kTimeoutMs);
 
       // motor.configMotionCruiseVelocity(15000, Constants.getInstance().Elevator.kTimeoutMs);
       // motor.configMotionAcceleration(6000, Constants.getInstance().Elevator.kTimeoutMs);
@@ -181,7 +184,7 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
+    elevatorMotors[0].setInverted(Constants.getInstance().Elevator.firstMotorInvert);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
     SmartDashboard.putData("Elevator Command", this);
@@ -312,6 +315,12 @@ public class Elevator extends SubsystemBase {
     return elevatorIsClosedLoop;
   }
 
+  // Returns true if 
+  public boolean getSetpointReached() {
+    double distanceBetween = MathUtil.applyDeadband(desiredHeightValue - getHeightMeters(), Units.inchesToMeters(2.5));
+    return distanceBetween == 0;
+  }
+
   // Update elevator height using encoders and bottom limit switch
   public void updateElevatorHeight() {
     /* Uses limit switch to act as a baseline
@@ -403,7 +412,8 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = kSetpointSub.get();
           break;
         case JOYSTICK:
-          desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
+          setElevatorPercentOutput(elevatorJoystickY * maxPercentOutput);
+          //desiredHeightValue = elevatorJoystickY * setpointMultiplier + getHeightMeters();
           break;
         case HIGH:
           desiredHeightValue = 1.02; // Placeholder values
@@ -418,7 +428,8 @@ public class Elevator extends SubsystemBase {
           desiredHeightValue = 0.0;
           break;
       }
-      if (DriverStation.isEnabled()) {
+      // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
+      if (DriverStation.isEnabled() && desiredHeightState != ELEVATOR_STATE.JOYSTICK) {
         m_goal = new TrapezoidProfile.State(desiredHeightValue, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(kSetpointCalcTime);
