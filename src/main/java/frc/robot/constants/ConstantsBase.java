@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 
 public class ConstantsBase {
   public String robotName;
+
   public final class ElevatorDef {
     // Elevator sim constants
     public final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);

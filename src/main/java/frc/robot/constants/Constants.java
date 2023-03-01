@@ -12,13 +12,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.ModuleMap;
-
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -202,7 +200,7 @@ public final class Constants {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-     
+
       if (mac.equals(alphaRobotMAC)) {
         m_constants = new ConstantsAlpha();
       } else {
