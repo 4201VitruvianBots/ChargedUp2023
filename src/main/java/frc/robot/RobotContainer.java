@@ -107,7 +107,7 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_wrist));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
   }
 
   /**
@@ -234,6 +234,12 @@ public class RobotContainer {
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
     m_memorylog.simulationPeriodic();
+  }
+
+  public void disabledPeriodic() {
+    // Check all mechanisms
+    //    if(m_wrist && m_elevator && m_vision)
+    //      m_controls.setInitState(true);
   }
 
   public void periodic() {

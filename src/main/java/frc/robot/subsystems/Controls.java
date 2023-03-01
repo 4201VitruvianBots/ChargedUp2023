@@ -10,8 +10,11 @@ public class Controls extends SubsystemBase {
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
+  private boolean isInit;
+
   public Controls() {
     initSmartDashboard();
+    isInit = false;
   }
 
   /**
@@ -34,6 +37,14 @@ public class Controls extends SubsystemBase {
 
   public void setPDHChannel(boolean on) {
     // pdh.setSwitchableChannel(on);
+  }
+
+  public boolean getInitState() {
+    return isInit;
+  }
+
+  public void setInitState(boolean init) {
+    isInit = init;
   }
 
   /** Initializes values on SmartDashboard */

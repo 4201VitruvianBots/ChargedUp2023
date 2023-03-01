@@ -11,22 +11,21 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
 // creates LED subsystem
 public class LED extends SubsystemBase {
   private PieceType pieceIntent = PieceType.NONE;
-  private final CANdle m_candle =
-      new CANdle(Constants.CAN.CANdle); // LED In constants implecation later (the errors fine)
+  private final CANdle m_candle = new CANdle(Constants.CAN.CANdle); // LED In constants)
   int red = 0;
-  int green = 0; // setting all LED colors to none: there is no color when robot actiates
+  int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
   private robotState currentRobotState = robotState.DISABLED;
   private Animation m_toAnimate = null;
 
-  private final Controls m_controls; // fiugure out during robtoics class
+  private final Controls m_controls; // figure out during robotics class
 
   private final int LEDcount = 144; // TODO: Change LEDCount
 
@@ -39,12 +38,13 @@ public class LED extends SubsystemBase {
     configAll.disableWhenLOS = false; // disables LEDs when robot is off(?)
     configAll.stripType = LEDStripType.GRB;
     configAll.brightnessScalar =
-        1; // 1 is highest we can go we dont want to blind everyone at the event
+        1; // 1 is highest we can go we don't want to blind everyone at the event
     configAll.vBatOutputMode = VBatOutputMode.Modulated; // Modulate
     m_candle.configAllSettings(configAll, 100);
 
     m_controls = controls;
-    var nt_instance = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
+    var nt_instance =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
   }
 
@@ -108,32 +108,38 @@ public class LED extends SubsystemBase {
     }
   }
   /**
-   * @param state the dominant robot state that LEDs will epxress
+   * @param state the dominant robot state that LEDs will express
    */
   // will set LEDs a coordinated color for an action !TBD!
   public void expressState(robotState state) {
     if (state != currentRobotState) {
       switch (state) {
-        case INTAKING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+        case DISABLED: // Solid red
+          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
+          break;
+        case READY:
+          setPattern(0, 255, 0, 0, 0, AnimationTypes.Twinkle);
           break;
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
+        case INTAKING:
+          setPattern(0, 0, 0, 0, 0, AnimationTypes.Strobe);
+          break;
+        case CONE: // Solid yellow
+          setPattern(255, 255, 0, 0, 0, AnimationTypes.Solid);
+          break;
+        case CUBE: // Solid purple
+          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
+          break;
         case ELEVATING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(0, 0, 0, 0, 0, AnimationTypes.ColorFlow);
           break;
         case WRIST: // Solid blue
           setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
           break;
-        case CONE: // Solid yellow
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case CUBE: // Soild purple
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Solid);
-          break;
-        case DISABLED: // Solid red
-          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
+        case CHARGING_STATION:
+          setPattern(125, 125, 125, 125, 0, AnimationTypes.Rainbow);
           break;
         default:
           break;
@@ -144,7 +150,7 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(m_candle.getCurrent() < 0.01) {
+    if (DriverStation.isDisabled() && m_candle.getCurrent() < 0.01) {
       currentRobotState = robotState.DISABLED;
       red = 255;
       green = 0;
@@ -154,12 +160,12 @@ public class LED extends SubsystemBase {
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
-//      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount);
-       m_candle.setLEDs(red, green, blue, 0, 0, 35); // setting all LEDs to color
+      //      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount);
+      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
-//    SmartDashboard.putString("LED Mode", currentRobotState.toString());
+    //    SmartDashboard.putString("LED Mode", currentRobotState.toString());
     ledStatePub.set(currentRobotState.toString());
     // the code below was printing out just LED Mode over and over again in the Led tab for some
     // reason but the code above does show the current state
@@ -192,13 +198,15 @@ public class LED extends SubsystemBase {
 
   /** Different robot states */
   public enum robotState {
+    DISABLED,
+    READY,
+    ENABLED,
     INTAKING,
     ELEVATING,
     WRIST,
     CONE,
     CUBE,
-    DISABLED,
-    ENABLED,
+    CHARGING_STATION
   }
 
   public enum PieceType {
