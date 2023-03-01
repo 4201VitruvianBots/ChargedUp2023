@@ -118,7 +118,7 @@ public class Vision extends SubsystemBase {
   /*
    * Whether the limelight has any valid targets (0 or 1)
    */
-  public double getValidTargetType(CAMERA_LOCATION location) {
+  public double getValidTargetType(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tv").getDouble(0);
@@ -149,7 +149,7 @@ public class Vision extends SubsystemBase {
   /*
    * Horizontal Offset From Crosshair To Target
    */
-  public double getTargetXAngle(CAMERA_LOCATION location) {
+  public double getTargetXAngle(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return -m_intakeNet.getEntry("tx").getDouble(0);
@@ -163,7 +163,7 @@ public class Vision extends SubsystemBase {
   /*
    * Vertical Offset From Crosshair To Target
    */
-  public double getTargetYAngle(CAMERA_LOCATION location) {
+  public double getTargetYAngle(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ty").getDouble(0);
@@ -177,7 +177,7 @@ public class Vision extends SubsystemBase {
   /*
    * The pipeline’s latency contribution (ms). Add to "cl" to get total latency.
    */
-  public double getCameraLatency(CAMERA_LOCATION location) {
+  public double getCameraLatency(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tl").getDouble(0);
@@ -191,7 +191,7 @@ public class Vision extends SubsystemBase {
   /*
    * Target Area (0% of image to 100% of image)
    */
-  public double getTargetArea(CAMERA_LOCATION location) {
+  public double getTargetArea(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ta").getDouble(0);
@@ -220,7 +220,7 @@ public class Vision extends SubsystemBase {
    * Pipeline 1 = cube
    * Pipeline 2 = cone
    */
-  public void setPipeline(CAMERA_LOCATION location, double pipeline) {
+  public void setPipeline(CAMERA_SERVERS location, double pipeline) {
     switch (location) {
       case INTAKE:
         m_intakeNet.getEntry("pipeline").setDouble(pipeline);
@@ -228,7 +228,7 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public double getPipeline(CAMERA_LOCATION location) {
+  public double getPipeline(CAMERA_SERVERS location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("pipeline").getDouble(0);
@@ -249,7 +249,7 @@ public class Vision extends SubsystemBase {
   /*
    * Look for any target
    */
-  public boolean searchLimelightTarget(CAMERA_LOCATION location) {
+  public boolean searchLimelightTarget(CAMERA_SERVERS location) {
     if (getPipeline(location) == 1.0) { // CUBE
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read and threshold
@@ -263,7 +263,7 @@ public class Vision extends SubsystemBase {
   /*
    * Look for a pipeline until a clear target is found when intaking
    */
-  public void searchLimelightPipeline(CAMERA_LOCATION location) {
+  public void searchLimelightPipeline(CAMERA_SERVERS location) {
     if (m_intakeSub.getIntakeState()) {
       int pipeline = (int) (Math.floor(searchTimer.get() / searchWindow) % 2) + 1;
 

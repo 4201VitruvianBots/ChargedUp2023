@@ -5,17 +5,16 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.subsystems.Wrist;
 
 public class AutoSetWristState extends CommandBase {
   private final Wrist m_wrist;
-  private WRIST_STATE m_wristState;
+  private double m_setpoint;
 
   /** Creates a new RunWrist. */
-  public AutoSetWristState(Wrist wrist, WRIST_STATE state) {
+  public AutoSetWristState(Wrist wrist, double setpoint) {
     m_wrist = wrist;
-    m_wristState = state;
+    m_setpoint = setpoint;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
@@ -28,15 +27,15 @@ public class AutoSetWristState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristState(m_wristState);
+    m_wrist.setDesiredPositionRadians(m_setpoint);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (m_wrist.getWristState() == m_wristState) {
-      interrupted = true;
-    }
+    // if (m_wrist.getControlState() == m_wristState) {
+    //   interrupted = true;
+    // }
   }
 
   // Returns true when the command should end.

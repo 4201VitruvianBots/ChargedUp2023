@@ -94,7 +94,7 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
-      ABSOLUTE_MAX(Units.inchesToMeters(43.0)),
+      ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(16.0)),
       HIGH_MIN(Units.inchesToMeters(8.0)),

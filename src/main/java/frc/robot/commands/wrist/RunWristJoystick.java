@@ -30,7 +30,7 @@ public class RunWristJoystick extends CommandBase {
   @Override
   public void execute() {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
-    double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
+    double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (Math.abs(joystickXDeadbandOutput) != 0) {
       m_wrist.setControlState(

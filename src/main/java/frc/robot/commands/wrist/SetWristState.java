@@ -5,15 +5,15 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
+import frc.robot.constants.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 
 public class SetWristState extends CommandBase {
   private final Wrist m_wrist;
-  private WRIST_STATE m_state;
+  private WRIST.STATE m_state;
 
   /** Creates a new RunWrist. */
-  public SetWristState(Wrist wrist, WRIST_STATE state) {
+  public SetWristState(Wrist wrist, WRIST.STATE state) {
     m_wrist = wrist;
     m_state = state;
 
@@ -28,7 +28,7 @@ public class SetWristState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setWristState(m_state);
+    m_wrist.setControlState(m_state);
   }
 
   // Called once the command ends or is interrupted.

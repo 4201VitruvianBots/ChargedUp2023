@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.wrist.SetWristState;
+import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.WRIST;
 
@@ -113,7 +113,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.configPeakOutputReverse(
         -maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
 
-    wristMotor.setInverted(TalonFXInvertType.Clockwise);
+    wristMotor.setInverted(TalonFXInvertType.CounterClockwise);
 
     wristMotor.configAllowableClosedloopError(
         0, 1 / Constants.getInstance().Wrist.encoderUnitsToDegrees);
@@ -129,7 +129,8 @@ public class Wrist extends SubsystemBase {
     wristTab.addBoolean("isClosedLoop", this::getControlMode);
     wristTab.add(this);
 
-    SmartDashboard.putData("Wrist to Stowed", new SetWristState(this, WRIST_STATE.STOWED));
+    SmartDashboard.putData(
+        "Wrist to Stowed", new SetWristDesiredSetpoint(this, WRIST.SETPOINT.STOWED.get()));
 
     try {
       NetworkTableInstance.getDefault()
@@ -363,7 +364,7 @@ public class Wrist extends SubsystemBase {
   }
 
   public String getControlModeAsString() {
-    return wristIsClosedLoop ? "Closed" : "Open";
+    return isClosedLoop ? "Closed" : "Open";
   }
   // SmartDashboard function
   public void updateSmartDashboard() {}

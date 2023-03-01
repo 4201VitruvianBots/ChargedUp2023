@@ -31,7 +31,7 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.wrist.RunWristJoystick;
-import frc.robot.commands.wrist.SetWristState;
+import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ELEVATOR;
@@ -40,6 +40,7 @@ import frc.robot.constants.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.utils.DistanceSensor;
 import java.util.HashMap;
 
 /**

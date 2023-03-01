@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.elevator.SetElevatorState;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ELEVATOR;
 
@@ -110,7 +109,7 @@ public class Elevator extends SubsystemBase {
 
   public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height Meters", 0.0).getEntry();
   public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height Meters", desiredHeightValue).getEntry();
+      elevatorTab.add("Elevator Target Height Meters", m_desiredPositionMeters).getEntry();
   public GenericEntry elevatorTargetPosTab =
       elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
   public GenericEntry elevatorRawPerOutTab =
@@ -181,12 +180,11 @@ public class Elevator extends SubsystemBase {
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    elevatorMotors[0].setInverted(TalonFXInvertType.CounterClockwise);
+    elevatorMotors[0].setInverted(TalonFXInvertType.Clockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
-    SmartDashboard.putData("Elevator to Stowed", new SetElevatorState(this, ELEVATOR_STATE.STOWED));
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
