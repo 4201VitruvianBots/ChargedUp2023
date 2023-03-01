@@ -12,8 +12,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.utils.ModuleMap;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -272,16 +275,29 @@ public final class Constants {
   public static ConstantsBase getInstance() {
     if (m_constants == null) {
       NetworkTableInstance inst = NetworkTableInstance.getDefault();
-      String mac = inst.getTable("RIO-Info").getEntry("MAC").getString("N/A");
-      if (Objects.equals(mac, Constants.alphaRobotMAC)) {
-        m_constants = new ConstantsRushHour();
+      String mac = "";
+      try {
+        var ip = InetAddress.getLocalHost();
+        var networkInterfaces = NetworkInterface.getByInetAddress(ip).getHardwareAddress();
+        String[] hex = new String[networkInterfaces.length];
+        for (int i = 0; i < networkInterfaces.length; i++) {
+          hex[i] = String.format("%02X", networkInterfaces[i]);
+        }
+        mac = String.join(":", hex);
+      } catch (SocketException | UnknownHostException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
+      if (mac.equals(alphaRobotMAC)) {
+        m_constants = new ConstantsAlpha();
       } else {
-        m_constants = new ConstantsGridLock();
+        m_constants = new ConstantsBeta();
       }
     }
     return m_constants;
   }
 
-  public static final String alphaRobotMAC = "00:80:2F:19:30:B7";
-  public static final String betaRobotMAC = "00:80:2F:25:BC:FD";
+  public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
+  public static final String betaRobotMAC = "00:80:2F:19:30:B7";
 }

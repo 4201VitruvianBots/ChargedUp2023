@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.elevator.SetElevatorState;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ELEVATOR;
 
@@ -73,7 +74,9 @@ public class Elevator extends SubsystemBase {
   private final double kD = 0;
   private final double kF = 0;
 
-  private double elevatorHeight =
+  private double kSetpointCalcTime = 0.02;
+
+  private static double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
 
   private final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
@@ -105,9 +108,9 @@ public class Elevator extends SubsystemBase {
 
   public ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
 
-  public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
+  public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height Meters", 0.0).getEntry();
   public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height", m_desiredPositionMeters).getEntry();
+      elevatorTab.add("Elevator Target Height Meters", desiredHeightValue).getEntry();
   public GenericEntry elevatorTargetPosTab =
       elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
   public GenericEntry elevatorRawPerOutTab =
@@ -117,9 +120,15 @@ public class Elevator extends SubsystemBase {
   public GenericEntry elevatorControlLoopTab =
       elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
   public GenericEntry elevatorEncoderCountsTab =
-      elevatorTab.add("Elevator Encoder Counts", 0.0).getEntry();
+      elevatorTab.add("Elevator Height Encoder Counts", 0.0).getEntry();
 
-  private DoubleSubscriber kPSub, kISub, kDSub, kSetpointSub, kMaxVelSub, kMaxAccelSub;
+  private DoubleSubscriber kPSub,
+      kISub,
+      kDSub,
+      kSetpointSub,
+      kMaxVelSub,
+      kMaxAccelSub,
+      kSetpointCalcTimeSub;
   private DoublePublisher kSetpointTargetPub;
 
   // Mechanism2d visualization setup
@@ -177,6 +186,7 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putData("Elevator Command", this);
     SmartDashboard.putData("Elevator", mech2d);
+    SmartDashboard.putData("Elevator to Stowed", new SetElevatorState(this, ELEVATOR_STATE.STOWED));
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
@@ -184,6 +194,7 @@ public class Elevator extends SubsystemBase {
     elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
     elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
     elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    elevatorNtTab.getDoubleTopic("setpoint calculation time").publish().set(kSetpointCalcTime);
     kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
@@ -192,6 +203,8 @@ public class Elevator extends SubsystemBase {
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
     kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
     kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
+    kSetpointCalcTimeSub =
+        elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
   }
   /*
    * Elevator's motor output as a percentage
@@ -201,6 +214,8 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setElevatorPercentOutput(double output) {
+    // if (getElevatorLowerSwitch())
+    //   MathUtil.clamp(output, 0, 1);
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
@@ -364,11 +379,7 @@ public class Elevator extends SubsystemBase {
      */
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
 
-    if (elevatorIsClosedLoop) {
-      elevatorControlLoopTab.setString("Closed");
-    } else {
-      elevatorControlLoopTab.setString("Open");
-    }
+    elevatorControlLoopTab.setString(elevatorIsClosedLoop ? "Closed" : "Open");
   }
 
   public void updateLog() {
@@ -428,7 +439,6 @@ public class Elevator extends SubsystemBase {
         case SETPOINT:
           break;
       }
-      // TODO: Cap the desiredHeightValue by the min/max elevator height prior to setting it
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
         var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);

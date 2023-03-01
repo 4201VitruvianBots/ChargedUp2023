@@ -4,4 +4,9 @@
 
 package frc.robot.constants;
 
-public class ConstantsRushHour extends ConstantsBase {}
+public class ConstantsBeta extends ConstantsBase {
+  public ConstantsBeta() {
+    super();
+    robotName = "Beta";
+  }
+}

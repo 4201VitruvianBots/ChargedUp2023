@@ -26,9 +26,13 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
+import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.wrist.RunWristJoystick;
+import frc.robot.commands.wrist.SetWristState;
+import frc.robot.commands.wrist.ToggleWristControlMode;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ELEVATOR;
 import frc.robot.constants.Constants.USB;
@@ -52,13 +56,14 @@ public class RobotContainer {
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Controls m_controls = new Controls();
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls);
+  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
   private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -97,6 +102,8 @@ public class RobotContainer {
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_fieldSim.initSim();
+    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
   }
 
   /**
@@ -113,7 +120,9 @@ public class RobotContainer {
 
     // TODO: add a driver button that hard limits the max swerve speed while held for fine control
 
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+    xboxController
+        .leftTrigger(0.1)
+        .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     xboxController
         .leftTrigger(0.1)
         .onTrue(
@@ -124,7 +133,9 @@ public class RobotContainer {
                     m_stateHandler.getCurrentZone().ordinal()
                         <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+    xboxController
+        .rightTrigger(0.1)
+        .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     xboxController
         .rightTrigger(0.1)
         .onTrue(
@@ -183,6 +194,7 @@ public class RobotContainer {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.resetState();
     m_wrist.resetState();
+    m_swerveDrive.resetState();
   }
 
   private void initAutoBuilder() {
@@ -244,9 +256,17 @@ public class RobotContainer {
     m_memorylog.simulationPeriodic();
   }
 
+  public void disabledPeriodic() {
+    // TODO: Add logic
+    // Check all mechanisms
+    //    if(m_wrist && m_elevator && m_vision)
+    //      m_controls.setInitState(true);
+  }
+
   public void periodic() {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
+    m_distanceSensor.periodic();
   }
 }

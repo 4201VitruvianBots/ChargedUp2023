@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,8 +19,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -72,7 +75,27 @@ public class SwerveDrive extends SubsystemBase {
   private double m_simYaw;
   private DoublePublisher swervePitch, swerveRoll, swerveYaw;
 
+  public boolean useHeadingTarget = false;
+  private double m_desiredRobotHeading;
+
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(
+          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond,
+          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private final ProfiledPIDController m_rotationController =
+      new ProfiledPIDController(
+          Constants.getInstance().SwerveDrive.kP_Rotation,
+          Constants.getInstance().SwerveDrive.kI_Rotation,
+          Constants.getInstance().SwerveDrive.kD_Rotation,
+          m_constraints);
+  private double m_rotationOutput;
+
+  ChassisSpeeds chassisSpeeds;
+
   public SwerveDrive() {
+
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
@@ -102,11 +125,20 @@ public class SwerveDrive extends SubsystemBase {
     strafe *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
     rotation *= Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond;
 
-    ChassisSpeeds chassisSpeeds =
-        isFieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                throttle, strafe, rotation, getHeadingRotation2d())
-            : new ChassisSpeeds(throttle, strafe, rotation);
+    if (useHeadingTarget) {
+      // rotation = m_setpoint.velocity;
+      rotation = m_rotationOutput;
+      // SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
+      // SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
+      chassisSpeeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
+    } else {
+      chassisSpeeds =
+          isFieldRelative
+              ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                  throttle, strafe, rotation, getHeadingRotation2d())
+              : new ChassisSpeeds(throttle, strafe, rotation);
+    }
 
     Map<SWERVE_MODULE_POSITION, SwerveModuleState> moduleStates =
         ModuleMap.of(Constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
@@ -117,6 +149,36 @@ public class SwerveDrive extends SubsystemBase {
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
+  }
+
+  /*
+   * Uses trapezoidal profile to set robot heading to a clear target
+   */
+
+  public void setRobotHeading(double desiredAngleSetpoint) {
+    m_desiredRobotHeading = desiredAngleSetpoint;
+  }
+
+  public void calculateRotationSpeed() {
+    // m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
+    // var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+    // m_setpoint = profile.calculate(0.02);
+
+    m_rotationOutput =
+        m_rotationController.calculate(getHeadingRotation2d().getRadians(), m_desiredRobotHeading);
+  }
+
+  /*
+   * ability to let head of swerve drive face the target
+   */
+  public void enableHeadingTarget(boolean enable) {
+    useHeadingTarget = enable;
+  }
+
+  public void resetState() {
+    m_setpoint =
+        new TrapezoidProfile.State(
+            Units.degreesToRadians(getHeadingDegrees()), Units.degreesToRadians(0));
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -262,6 +324,10 @@ public class SwerveDrive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isEnabled() && useHeadingTarget) {
+      calculateRotationSpeed();
+    }
+
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       module.updateCanCoderHealth();
     }

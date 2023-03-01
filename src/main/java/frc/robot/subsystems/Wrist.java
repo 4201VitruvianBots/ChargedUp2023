@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.wrist.SetWristState;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.WRIST;
 
@@ -126,6 +128,8 @@ public class Wrist extends SubsystemBase {
     wristTab.addString("State", () -> getControlState().toString());
     wristTab.addBoolean("isClosedLoop", this::getControlMode);
     wristTab.add(this);
+
+    SmartDashboard.putData("Wrist to Stowed", new SetWristState(this, WRIST_STATE.STOWED));
 
     try {
       NetworkTableInstance.getDefault()
@@ -358,6 +362,9 @@ public class Wrist extends SubsystemBase {
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
   }
 
+  public String getControlModeAsString() {
+    return wristIsClosedLoop ? "Closed" : "Open";
+  }
   // SmartDashboard function
   public void updateSmartDashboard() {}
 
