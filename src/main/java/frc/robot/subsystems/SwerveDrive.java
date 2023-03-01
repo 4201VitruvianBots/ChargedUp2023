@@ -69,13 +69,12 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private Trajectory m_trajectory;
-  private boolean Initialize = false;
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
-  public boolean useHeadingTarget = false;
+  private boolean useHeadingTarget = false;
   private double m_desiredRobotHeading;
 
   private final TrapezoidProfile.Constraints m_constraints =

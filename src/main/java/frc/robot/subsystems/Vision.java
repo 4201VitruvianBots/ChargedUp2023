@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -40,10 +39,6 @@ public class Vision extends SubsystemBase {
 
   private Timer searchTimer = new Timer();
   private Double searchWindow = 0.2;
-
-  private double desiredAngleSetpoint;
-
-  private DoublePublisher kSetpointPub;
 
   private enum targetType {
     INTAKING,

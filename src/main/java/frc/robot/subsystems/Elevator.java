@@ -37,18 +37,8 @@ public class Elevator extends SubsystemBase {
   };
 
   // Limit switch at bottom of elevator
-  private DigitalInput elevatorLowerSwitch = new DigitalInput(Constants.DIO.elevatorLowerSwitch);
-
-  private double maxVel = Units.inchesToMeters(40);
-  private double maxAccel = Units.inchesToMeters(40);
-  private TrapezoidProfile.Constraints m_trapezoidialConstraints =
-      new TrapezoidProfile.Constraints(maxVel, maxAccel);
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-
-  private SimpleMotorFeedforward m_feedForward =
-      new SimpleMotorFeedforward(
-          Constants.ELEVATOR.kS, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
+  private final DigitalInput elevatorLowerSwitch =
+      new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
   private double
       m_desiredPositionMeters; // The height in encoder units our robot is trying to reach
@@ -65,9 +55,18 @@ public class Elevator extends SubsystemBase {
   private final double kP = 0.55;
   private final double kI = 0;
   private final double kD = 0;
-  private final double kF = 0;
 
-  private final double kSetpointCalcTime = 0.02;
+  private double maxVel = ELEVATOR.kMaxVel;
+  private double maxAccel = ELEVATOR.kMaxAccel;
+  private double kS = ELEVATOR.kS;
+  private double kV = ELEVATOR.kV;
+  private double kA = ELEVATOR.kA;
+  private TrapezoidProfile.Constraints m_trapezoidialConstraints =
+      new TrapezoidProfile.Constraints(maxVel, maxAccel);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+
+  private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
 
   private static double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
@@ -81,18 +80,18 @@ public class Elevator extends SubsystemBase {
   private boolean elevatorIsClosedLoop = true;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
-  private double maxPercentOutput = 1.0;
-  private double setpointMultiplier = 0.50;
-  private double percentOutputMultiplier = 0.50;
+  private final double maxPercentOutput = 1.0;
+  private final double setpointMultiplier = 0.50;
+  private final double percentOutputMultiplier = 0.50;
 
   // Simulation setup
 
   private final ElevatorSim elevatorSim =
       new ElevatorSim(
-          Constants.ELEVATOR.elevatorGearbox,
-          Constants.ELEVATOR.elevatorGearing,
-          Constants.ELEVATOR.elevatorMassKg,
-          Constants.ELEVATOR.elevatorDrumRadiusMeters,
+          Constants.ELEVATOR.gearbox,
+          Constants.ELEVATOR.gearRatio,
+          Constants.ELEVATOR.massKg,
+          Constants.ELEVATOR.drumRadiusMeters,
           ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
           ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get(),
           true);
@@ -105,6 +104,9 @@ public class Elevator extends SubsystemBase {
       kSetpointSub,
       kMaxVelSub,
       kMaxAccelSub,
+      kSSub,
+      kVSub,
+      kASub,
       kSetpointCalcTimeSub;
   private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub;
   private StringPublisher kDesiredStatePub, kPercentOutputPub, kClosedLoopModePub;
@@ -133,7 +135,6 @@ public class Elevator extends SubsystemBase {
 
       // Config PID
       motor.selectProfileSlot(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kPIDLoopIdx);
-      motor.config_kF(Constants.ELEVATOR.kSlotIdx, kF, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kP(Constants.ELEVATOR.kSlotIdx, kP, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
@@ -300,7 +301,7 @@ public class Elevator extends SubsystemBase {
 
   public Translation2d getElevatorField2dTranslation() {
     return new Translation2d(
-        getHeightMeters() * Math.cos(Constants.ELEVATOR.elevatorMountAngle.getRadians()), 0);
+        getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()), 0);
   }
 
   private void initShuffleboard() {
@@ -321,17 +322,26 @@ public class Elevator extends SubsystemBase {
     elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
     elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
-    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-    elevatorNtTab.getDoubleTopic("setpoint calculation time").publish().set(kSetpointCalcTime);
 
-    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
-    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
+    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(maxVel);
+    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(maxAccel);
+    elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
+    elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
+    elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
+
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
     kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
+
+    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
+    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
+    kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
+    kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
+    kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
+
     kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
-    kSetpointCalcTimeSub =
-        elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
   }
 
   public void updateShuffleboard() {
@@ -344,12 +354,17 @@ public class Elevator extends SubsystemBase {
 
     // Elevator PID Tuning Values
     if (DriverStation.isTest()) {
-      var maxVel = kMaxVelSub.get(0);
-      var maxAccel = kMaxVelSub.get(0);
       m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
       elevatorMotors[0].config_kP(0, kPSub.get(0));
       elevatorMotors[0].config_kI(0, kISub.get(0));
       elevatorMotors[0].config_kD(0, kDSub.get(0));
+
+      maxVel = kMaxVelSub.get(0);
+      maxAccel = kMaxVelSub.get(0);
+      kS = kSSub.get(0);
+      kV = kSSub.get(0);
+      kA = kSSub.get(0);
+      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
 
       var testSetpoint = kSetpointSub.get(0);
       if (m_desiredPositionMeters != testSetpoint) {

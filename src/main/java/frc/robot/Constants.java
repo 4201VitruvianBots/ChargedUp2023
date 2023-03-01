@@ -63,28 +63,28 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerSwitch = 8;
+    public static final int wristLowerSwitch = 0;
   }
 
   public static final class ELEVATOR {
     // Elevator sim constants
-    public static final DCMotor elevatorGearbox = DCMotor.getFalcon500(2);
-    public static final double elevatorGearing = 10.0;
-    public static final double elevatorMassKg = 4.0;
-    public static final double elevatorDrumRadiusMeters = Units.inchesToMeters(0.5625);
-    public static final Rotation2d elevatorMountAngle = Rotation2d.fromDegrees(40);
+    public static final DCMotor gearbox = DCMotor.getFalcon500(2);
+    public static final double gearRatio = 10.0;
+    public static final double massKg = 4.0;
+    public static final double drumRadiusMeters = Units.inchesToMeters(0.5625);
+    public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static final double kGearRatio = 5.0;
-    public final double kMaxRPM = 6380.0;
-    public final double kMaxVelocity = (kMaxRPM / 600) * (kSensorUnitsPerRotation / kGearRatio);
+    public static double kMaxVel = Units.inchesToMeters(40);
+    public static double kMaxAccel = Units.inchesToMeters(40);
 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
 
     public static final double encoderCountsToMeters =
-        (elevatorDrumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * kGearRatio);
+        (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
 
     public static final double kS = 0.15;
     public static final double kV = 12.57;
@@ -206,7 +206,7 @@ public final class Constants {
         (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
     public static final double kTurningMotorDistancePerPulse =
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
-    public final double kTurningEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+    public final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
     public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
     public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
@@ -261,12 +261,14 @@ public final class Constants {
   }
 
   public static final class WRIST {
-    public static final double wristGearRatio = 1024.0 / 27.0;
-    public static final double encoderUnitsToDegrees = 360.0 / (2048.0 * wristGearRatio);
+    public static final double gearRatio = 1024.0 / 27.0;
+    public static final double encoderUnitsToDegrees = 360.0 / (2048.0 * gearRatio);
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
-    public static final double wristMass = Units.lbsToKilograms(20);
-    public static final double wristLength = Units.inchesToMeters(22);
-    public static final int wristLowerSwitch = 0;
+    public static final double mass = Units.lbsToKilograms(20);
+    public static final double length = Units.inchesToMeters(22);
+    public static int kTimeoutMs = 0;
+
+    public static TalonFXInvertType motorInversionType = TalonFXInvertType.CounterClockwise;
 
     // Values were experimentally determined
     public static final double kMaxVel = Units.degreesToRadians(360);
@@ -374,6 +376,7 @@ public final class Constants {
     SWERVEDRIVE.backRightCANCoderOffset = -311.084;
 
     ELEVATOR.mainMotorInversionType = TalonFXInvertType.CounterClockwise;
+    WRIST.motorInversionType = TalonFXInvertType.Clockwise;
   }
 
   private static void initSim() {

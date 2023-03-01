@@ -79,7 +79,7 @@ public class SetpointSolver {
 
     elevatorHorizontalSetpointMeters = correctedSolution.getTranslation().getNorm() - m_wristOffset;
     elevatorSetpointMeters =
-        Math.cos(Constants.ELEVATOR.elevatorMountAngle.getRadians())
+        Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
             * elevatorHorizontalSetpointMeters;
   }
 

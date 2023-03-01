@@ -30,11 +30,11 @@ public class Wrist extends SubsystemBase {
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
   private boolean isClosedLoop = true;
   private WRIST.STATE m_controlState = WRIST.STATE.SETPOINT;
-  private final boolean wristLowerLimitOverride = false;
   private double m_joystickInput;
   private double m_wristPercentOutput;
 
-  private static final DigitalInput wristLowerSwitch = new DigitalInput(WRIST.wristLowerSwitch);
+  private static final DigitalInput wristLowerSwitch =
+      new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
@@ -54,9 +54,9 @@ public class Wrist extends SubsystemBase {
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
           Constants.WRIST.gearBox,
-          Constants.WRIST.wristGearRatio,
-          SingleJointedArmSim.estimateMOI(Constants.WRIST.wristLength, Constants.WRIST.wristMass),
-          Constants.WRIST.wristLength,
+          Constants.WRIST.gearRatio,
+          SingleJointedArmSim.estimateMOI(Constants.WRIST.length, Constants.WRIST.mass),
+          Constants.WRIST.length,
           WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
           WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
           false
@@ -74,17 +74,17 @@ public class Wrist extends SubsystemBase {
   public DoubleLogEntry wristPositionDegreesEntry =
       new DoubleLogEntry(log, "/wrist/positionDegrees");
 
-  private DoubleSubscriber kMaxVelSub;
-  private DoubleSubscriber kMaxAccelSub;
-  private DoubleSubscriber kSSub;
-  private DoubleSubscriber kVSub;
-  private DoubleSubscriber kGSub;
-  private DoubleSubscriber kASub;
-  private DoubleSubscriber kPSub;
-  private DoubleSubscriber kISub;
-  private DoubleSubscriber kDSub;
-  private DoubleSubscriber kSetpointSub;
-  private DoublePublisher kSetpointTargetPub;
+  private DoubleSubscriber kPSub,
+      kISub,
+      kDSub,
+      kMaxVelSub,
+      kMaxAccelSub,
+      kSSub,
+      kGSub,
+      kVSub,
+      kASub,
+      kSetpointSub;
+  private DoublePublisher kCommandedAngleDegreesPub;
 
   public Wrist() {
     // One motor for the wrist
@@ -99,14 +99,14 @@ public class Wrist extends SubsystemBase {
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
 
-    wristMotor.config_kP(0, Constants.WRIST.kP);
-    wristMotor.config_kD(0, Constants.WRIST.kD);
-    wristMotor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(-maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
+    wristMotor.config_kP(0, WRIST.kP);
+    wristMotor.config_kD(0, WRIST.kD);
+    wristMotor.configPeakOutputForward(maxPercentOutput, WRIST.kTimeoutMs);
+    wristMotor.configPeakOutputReverse(-maxPercentOutput, WRIST.kTimeoutMs);
 
-    wristMotor.setInverted(TalonFXInvertType.CounterClockwise);
+    wristMotor.setInverted(WRIST.motorInversionType);
 
-    wristMotor.configAllowableClosedloopError(0, 1 / Constants.WRIST.encoderUnitsToDegrees);
+    wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
     Timer.delay(1);
     resetWristAngle(-10.0);
 
@@ -275,9 +275,9 @@ public class Wrist extends SubsystemBase {
     wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
     wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
     wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-    wristTab.getDoubleTopic("setpoint").publish().set(0);
+    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
-    kSetpointTargetPub = wristTab.getDoubleTopic("calculated setpoint").publish();
+    kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
 
     kMaxVelSub = wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.WRIST.kMaxVel);
     kMaxAccelSub = wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.WRIST.kMaxAccel);
@@ -288,7 +288,7 @@ public class Wrist extends SubsystemBase {
     kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
     kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
     kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-    kSetpointSub = wristTab.getDoubleTopic("setpoint").subscribe(0);
+    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   // SmartDashboard function
@@ -349,7 +349,7 @@ public class Wrist extends SubsystemBase {
         m_setpoint = profile.calculate(0.02);
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;
-        kSetpointTargetPub.set(Units.radiansToDegrees(commandedSetpoint.position));
+        kCommandedAngleDegreesPub.set(Units.radiansToDegrees(commandedSetpoint.position));
         setSetpointDegrees(commandedSetpoint);
       }
     } else {

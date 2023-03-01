@@ -27,8 +27,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -36,15 +34,15 @@ import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase {
-  SWERVE_MODULE_POSITION m_modulePosition;
-  int m_moduleNumber;
-  TalonFX m_turnMotor;
-  TalonFX m_driveMotor;
-  CANCoder m_angleEncoder;
-  double m_angleOffset;
-  double m_lastAngle;
-  Pose2d m_pose;
-  boolean m_initSuccess = false;
+  private final SWERVE_MODULE_POSITION m_modulePosition;
+  private final int m_moduleNumber;
+  private final TalonFX m_turnMotor;
+  private final TalonFX m_driveMotor;
+  private final CANCoder m_angleEncoder;
+  private final double m_angleOffset;
+  private double m_lastAngle;
+  private Pose2d m_pose;
+  private boolean m_initSuccess = false;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -71,8 +69,6 @@ public class SwerveModule extends SubsystemBase {
   private double m_turnPercentOutput;
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
-
-  private ShuffleboardTab m_ShuffleboardTab = Shuffleboard.getTab("Swerve");
 
   // Logging setup
 
