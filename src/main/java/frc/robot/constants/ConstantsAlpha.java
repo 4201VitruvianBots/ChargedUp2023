@@ -7,7 +7,7 @@ package frc.robot.constants;
 import edu.wpi.first.math.util.Units;
 
 public class ConstantsAlpha extends ConstantsBeta {
-  
+
   public static final class SwerveDriveDef {
     public static final double frontLeftCANCoderOffset = -197.402;
     public static final double frontRightCANCoderOffset = -36.211;
