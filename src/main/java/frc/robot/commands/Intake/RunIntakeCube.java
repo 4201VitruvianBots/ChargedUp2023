@@ -6,7 +6,7 @@ package frc.robot.commands.Intake;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
@@ -41,12 +41,12 @@ public class RunIntakeCube extends CommandBase {
   @Override
   public void execute() {
     m_intake.setIntakePercentOutput(m_PercentOutput);
-    if (m_vision.searchLimelightTarget(CAMERA_LOCATION.INTAKE)) {
+    if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
       m_swerve.setRobotHeading(
           m_swerve
               .getHeadingRotation2d()
-              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE)))
+              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
               .getRadians());
     }
   }

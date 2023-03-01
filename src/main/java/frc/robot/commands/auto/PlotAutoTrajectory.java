@@ -7,14 +7,25 @@ package frc.robot.commands.auto;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
+import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
   FieldSim m_fieldSim;
+  List<Trajectory> m_trajectories;
   Trajectory m_trajectory;
+  boolean useList = false;
+
+  public PlotAutoTrajectory(FieldSim fieldSim, List<Trajectory> trajectories) {
+    m_fieldSim = fieldSim;
+    m_trajectories = trajectories;
+    useList = true;
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
   /** Creates a new PlotAutoTrajectory. */
   public PlotAutoTrajectory(FieldSim fieldSim, Trajectory trajectory) {
     m_fieldSim = fieldSim;
     m_trajectory = trajectory;
+    useList = false;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -22,7 +33,8 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_fieldSim.setTrajectory(m_trajectory);
+    if (useList) m_fieldSim.setTrajectory(m_trajectories);
+    else m_fieldSim.setTrajectory(m_trajectory);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

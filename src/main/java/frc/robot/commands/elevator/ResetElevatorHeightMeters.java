@@ -6,21 +6,25 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
 import frc.robot.subsystems.Elevator;
 
-public class AutoSetElevatorState extends CommandBase {
+public class ResetElevatorHeightMeters extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
-  private final ELEVATOR_STATE m_elevatorState;
+  private final double m_meters;
 
-  public AutoSetElevatorState(Elevator elevator, ELEVATOR_STATE state) {
+  public ResetElevatorHeightMeters(Elevator elevator, double meters) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    m_elevatorState = state;
+    m_meters = meters;
     addRequirements(m_elevator);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called when the command is initially scheduled.
@@ -30,16 +34,12 @@ public class AutoSetElevatorState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setElevatorState(m_elevatorState);
+    m_elevator.setElevatorSensorPosition(m_meters);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    if (m_elevator.getElevatorState() == m_elevatorState) {
-      interrupted = true;
-    }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

@@ -4,7 +4,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.constants.Constants;
+import frc.robot.Constants;
+import frc.robot.Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;
@@ -56,23 +57,23 @@ public class SetpointSolver {
         correctedSolution
             .getRotation()
             .plus(
-                scoringState == Constants.SCORING_STATE.SMART_LOW_INTAKE
+                scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 
     switch (scoringState) {
-      case SMART_LOW_INTAKE:
+      case SMART_LOW_REVERSE:
         m_wristOffset = 0;
         break;
       case SMART_LOW:
-        m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_LOW_OFFSET;
+        m_wristOffset = WRIST_SETPOINT_OFFSET.LOW.get();
         break;
       case SMART_MEDIUM:
-        m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_MID_OFFSET;
+        m_wristOffset = WRIST_SETPOINT_OFFSET.MID.get();
         break;
       default:
       case SMART_HIGH:
-        m_wristOffset = Constants.SetpointSolver.WRIST_HORIZONTAL_HIGH_OFFSET;
+        m_wristOffset = WRIST_SETPOINT_OFFSET.HIGH.get();
         break;
     }
 

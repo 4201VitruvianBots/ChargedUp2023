@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
+import frc.robot.Constants;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
@@ -23,6 +23,8 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
@@ -139,6 +141,19 @@ public class FieldSim extends SubsystemBase {
     return m_field2d;
   }
 
+  public void setTrajectory(List<Trajectory> trajectories) {
+    List<Pose2d> trajectoryPoses = new ArrayList<>();
+
+    for (var trajectory : trajectories) {
+      trajectoryPoses.addAll(
+          trajectory.getStates().stream()
+              .map(state -> state.poseMeters)
+              .collect(Collectors.toList()));
+    }
+
+    m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
+  }
+
   public void setTrajectory(Trajectory trajectory) {
     m_field2d.getObject("trajectory").setTrajectory(trajectory);
   }
@@ -152,32 +167,34 @@ public class FieldSim extends SubsystemBase {
     m_field2d.setRobotPose(robotPose);
     m_field2d
         .getObject("lLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_LOCATION.LEFT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_LOCATION.LEFT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.LEFT_LOCALIZER));
-    //    m_field2d
-    //        .getObject("Limelight Pose")
-    //        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_LOCATION.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+
+    m_field2d
+        .getObject("fLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
 
     elevatorPose =
         m_swerveDrive
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getElevatorTranslation(), m_swerveDrive.getHeadingRotation2d()));
+                    m_elevator.getElevatorField2dTranslation(),
+                    m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Elevator Horizontal Pose").setPose(elevatorPose);
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);

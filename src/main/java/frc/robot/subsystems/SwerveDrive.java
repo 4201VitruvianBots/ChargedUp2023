@@ -13,7 +13,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -27,8 +27,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
+import frc.robot.Constants;
+import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
-  private DoublePublisher swervePitch, swerveRoll, swerveYaw;
+  private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   public boolean useHeadingTarget = false;
   private double m_desiredRobotHeading;
@@ -100,7 +100,7 @@ public class SwerveDrive extends SubsystemBase {
     m_pigeon.setYaw(0);
     m_odometry =
         new SwerveDrivePoseEstimator(
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.SWERVEDRIVE.kSwerveKinematics,
             getHeadingRotation2d(),
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
@@ -141,7 +141,7 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     Map<SWERVE_MODULE_POSITION, SwerveModuleState> moduleStates =
-        ModuleMap.of(Constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
+        ModuleMap.of(Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]),
@@ -194,7 +194,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
-    var states = Constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
   }
 
@@ -289,50 +289,38 @@ public class SwerveDrive extends SubsystemBase {
   public void updateOdometry() {
     m_odometry.update(getHeadingRotation2d(), getSwerveDriveModulePositionsArray());
 
-    //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-    //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-    //              .rotateBy(getHeadingRotation2d())
-    //              .plus(kModuleTranslations.get(module.getModulePosition()));
-    //
-    //      module.setModulePose(
-    //          new Pose2d(
-    //              modulePositionFromChassis,
-    //              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
-    //    }
-
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      Translation2d modulePositionFromChassis =
-          Constants.SwerveDrive.kModuleTranslations
-              .get(module.getModulePosition())
-              .rotateBy(getHeadingRotation2d())
-              .plus(getPoseMeters().getTranslation());
-      module.setModulePose(
-          new Pose2d(
-              modulePositionFromChassis,
-              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+      Transform2d moduleTransform =
+          new Transform2d(
+              Constants.SWERVEDRIVE.kModuleTranslations.get(module.getModulePosition()),
+              module.getHeadingRotation2d());
+      module.setModulePose(getPoseMeters().transformBy(moduleTransform));
     }
   }
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
 
-    var swerveTab = NetworkTableInstance.getDefault().getTable("Swerve");
-    swervePitch = swerveTab.getDoubleTopic("Pitch").publish();
-    swerveRoll = swerveTab.getDoubleTopic("Roll").publish();
-    swerveYaw = swerveTab.getDoubleTopic("Yaw").publish();
+    var swerveTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    pitchPub = swerveTab.getDoubleTopic("Pitch").publish();
+    rollPub = swerveTab.getDoubleTopic("Roll").publish();
+    yawPub = swerveTab.getDoubleTopic("Yaw").publish();
+    odometryXPub = swerveTab.getDoubleTopic("Odometry X").publish();
+    odometryYPub = swerveTab.getDoubleTopic("Odometry Y").publish();
+    odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
   }
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
-    SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber(
-        "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
-    swervePitch.set(getPitchDegrees());
-    swerveRoll.set(getRollDegrees());
-    swerveYaw.set(getHeadingDegrees());
+    pitchPub.set(getPitchDegrees());
+    rollPub.set(getRollDegrees());
+    yawPub.set(getHeadingDegrees());
+    odometryXPub.set(getOdometry().getEstimatedPosition().getX());
+    odometryYPub.set(getOdometry().getEstimatedPosition().getY());
+    odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
   }
 
   public void disabledPeriodic() {}
@@ -343,11 +331,6 @@ public class SwerveDrive extends SubsystemBase {
       calculateRotationSpeed();
     }
 
-    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      module.updateCanCoderHealth();
-    }
-    Initialize = getModuleInitStatus();
-
     updateOdometry();
     updateSmartDashboard();
   }
@@ -355,7 +338,7 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     ChassisSpeeds chassisSpeed =
-        Constants.SwerveDrive.kSwerveKinematics.toChassisSpeeds(
+        Constants.SWERVEDRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
     m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;

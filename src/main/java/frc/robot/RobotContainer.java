@@ -21,32 +21,26 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.USB;
+import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.SetElevatorState;
+import frc.robot.commands.elevator.ResetElevatorHeightMeters;
+import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
-import frc.robot.commands.wrist.SetWristState;
+import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
-import frc.robot.constants.Constants.USB;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
-import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import java.util.HashMap;
 
@@ -102,15 +96,19 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
-            () -> -rightJoystick.getRawAxis(0)));
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
+            () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
-    m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
+
+    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+
+    m_fieldSim.initSim();
   }
 
   /**
@@ -134,11 +132,11 @@ public class RobotContainer {
         .leftTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
+                    m_stateHandler.getCurrentZone().ordinal()
+                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     xboxController
         .rightTrigger(0.1)
@@ -147,23 +145,42 @@ public class RobotContainer {
         .rightTrigger(0.1)
         .onTrue(
             new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()),
                 () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
+                    m_stateHandler.getCurrentZone().ordinal()
+                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
 
     // Elevator button bindings
-    xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
-    xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
-    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
-    xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
-    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
-    xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    xboxController
+        .a()
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW.get()));
+    xboxController.a().onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW.get()));
+    xboxController
+        .b()
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID.get()));
+    xboxController
+        .b()
+        .whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID.get()));
+    xboxController
+        .x()
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+    xboxController
+        .x()
+        .whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID.get()));
+    xboxController
+        .y()
+        .whileTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH.get()));
+    xboxController
+        .y()
+        .whileTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH.get()));
 
-    xboxController.rightBumper().whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+    xboxController
+        .povDown()
+        .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+    xboxController
+        .povDown()
+        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -175,7 +192,6 @@ public class RobotContainer {
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_swerveDrive.disabledPeriodic();
   }
 
   public void teleopInit() {
@@ -186,13 +202,15 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(5));
+    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("RunIntake", new AutoRunReverseIntake(m_intake));
+    m_eventMap.put("RunReverseIntake", new AutoRunReverseIntake(m_intake));
 
     m_autoBuilder =
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.SWERVEDRIVE.kSwerveKinematics,
             new PIDConstants(
                 Constants.getInstance().SwerveDrive.kP_Translation,
                 Constants.getInstance().SwerveDrive.kI_Translation,
@@ -203,7 +221,7 @@ public class RobotContainer {
                 Constants.getInstance().SwerveDrive.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+            true,
             m_swerveDrive);
   }
 
@@ -213,24 +231,28 @@ public class RobotContainer {
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-        "BlueTopConeCubeBalance",
-        new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueTopTwoCone", new BlueTopTwoCone(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueMiddleTwoConeBalance",
-        new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "BlueTopConeCubeBalance",
+    //     new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive,
+    // m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // // m_autoChooser.addOption(
+    // //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption(
+    //     "BlueMiddleTwoConeBalance",
+    //     new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
@@ -245,10 +267,7 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
-    // TODO: Add logic
-    // Check all mechanisms
-    //    if(m_wrist && m_elevator && m_vision)
-    //      m_controls.setInitState(true);
+    m_swerveDrive.disabledPeriodic();
   }
 
   public void periodic() {
