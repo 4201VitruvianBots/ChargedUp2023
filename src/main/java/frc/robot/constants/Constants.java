@@ -195,7 +195,7 @@ public final class Constants {
         var networkInterfaces = NetworkInterface.getByInetAddress(ip).getHardwareAddress();
         String[] hex = new String[networkInterfaces.length];
         for(int i=0; i <networkInterfaces.length; i++) {
-          hex[i] = String.format("%02X", hex[i]);
+          hex[i] = String.format("%02X", networkInterfaces[i]);
         }
         mac = String.join(":", hex);
       } catch (SocketException | UnknownHostException e) {
