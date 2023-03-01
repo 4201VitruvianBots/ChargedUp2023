@@ -24,12 +24,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.ResetElevatorHeightMeters;
 import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
@@ -102,9 +104,12 @@ public class RobotContainer {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_fieldSim.initSim();
-    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
+
+    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+
+    m_fieldSim.initSim();
   }
 
   /**

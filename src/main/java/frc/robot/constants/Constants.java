@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.ModuleMap;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -153,7 +154,7 @@ public final class Constants {
       PHOTONVISION
     }
 
-    public enum CAMERA_SERVERS {
+    public enum CAMERA_SERVER {
       INTAKE("10.42.1.10"),
       OUTTAKE("10.42.1.10"),
       LEFT_LOCALIZER("10.42.1.11"),
@@ -162,7 +163,7 @@ public final class Constants {
 
       private final String ip;
 
-      CAMERA_SERVERS(final String ip) {
+      CAMERA_SERVER(final String ip) {
         this.ip = ip;
       }
 
@@ -297,6 +298,7 @@ public final class Constants {
         m_constants = new ConstantsBeta();
       }
     }
+    SmartDashboard.putString("Robot Name", m_constants.robotName);
     return m_constants;
   }
 

@@ -313,7 +313,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("Swerve Module Init Status", Initialize);
+    SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
     pitchPub.set(getPitchDegrees());
     rollPub.set(getRollDegrees());
@@ -330,8 +330,6 @@ public class SwerveDrive extends SubsystemBase {
     if (DriverStation.isEnabled() && useHeadingTarget) {
       calculateRotationSpeed();
     }
-
-    Initialize = getModuleInitStatus();
 
     updateOdometry();
     updateSmartDashboard();

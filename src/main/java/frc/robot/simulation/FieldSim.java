@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.VISION.CAMERA_SERVERS;
+import frc.robot.constants.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
@@ -167,26 +167,26 @@ public class FieldSim extends SubsystemBase {
     m_field2d.setRobotPose(robotPose);
     m_field2d
         .getObject("lLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVERS.LEFT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVERS.LEFT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.LEFT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVERS.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVERS.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.RIGHT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
 
     m_field2d
         .getObject("fLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_SERVERS.FUSED_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
 
     elevatorPose =
         m_swerveDrive

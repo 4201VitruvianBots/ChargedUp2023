@@ -24,11 +24,13 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
@@ -78,7 +80,7 @@ public class SwerveModule extends SubsystemBase {
   private final DoubleLogEntry moduleTurnCurrentEntry;
   private final DoubleLogEntry moduleDriveCurrentEntry;
 
-  private DoublePublisher moduleMotorHeadingPub, moduleEncoderHeadingPub, moduleEncoderOffsetPub;
+  private DoublePublisher moduleMotorHeadingPub, moduleEncoderHeadingPub;
   private BooleanPublisher moduleEncoderHealthPub;
 
   public SwerveModule(
@@ -94,7 +96,7 @@ public class SwerveModule extends SubsystemBase {
     m_angleEncoder = angleEncoder;
     m_angleOffset = angleOffset;
 
-    initCanCoder();
+    initModuleHeading();
 
     m_turnMotor.configFactoryDefault();
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
@@ -116,20 +118,19 @@ public class SwerveModule extends SubsystemBase {
         new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
   }
 
-  private void initCanCoder() {
-    Timer.delay(1);
+  private void initModuleHeading() {
+    Timer.delay(0.2);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     resetAngleToAbsolute();
 
-    // Check if the offset was applied properly.
+    // Check if the offset was applied properly. Delay to give it some time to set
+    Timer.delay(0.1);
     // TODO: This doesn't cover all edge cases
-    if (Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition())
-        < 1.0) {
+    if(RobotBase.isReal()) {
+      m_initSuccess = Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()) < 1.0;
+    } else
       m_initSuccess = true;
-    } else {
-      m_initSuccess = false;
-    }
   }
 
   public boolean getInitSuccess() {
@@ -230,9 +231,7 @@ public class SwerveModule extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
     moduleEncoderHeadingPub =
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Heading").publish();
-    moduleEncoderOffsetPub =
-        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset").publish();
-    moduleEncoderOffsetPub.set(m_angleOffset);
+      moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset").publish().set(m_angleOffset);
     moduleEncoderHealthPub =
         moduleTab.getBooleanTopic("Module (" + m_moduleNumber + ") Encoder Health").publish();
     moduleMotorHeadingPub =
@@ -240,9 +239,11 @@ public class SwerveModule extends SubsystemBase {
   }
 
   private void updateSmartDashboard() {
+//    SmartDashboard.putNumber("Module " + m_moduleNumber + " error", Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
+
     moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
     moduleMotorHeadingPub.set(getHeadingDegrees());
-    moduleEncoderHealthPub.set(m_initSuccess);
+    moduleEncoderHealthPub.set(getInitSuccess());
   }
 
   public void updateLog() {

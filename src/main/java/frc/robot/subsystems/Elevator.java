@@ -11,17 +11,13 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -105,22 +101,6 @@ public class Elevator extends SubsystemBase {
 
   // Shuffleboard setup
 
-  public ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
-
-  public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height Meters", 0.0).getEntry();
-  public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height Meters", m_desiredPositionMeters).getEntry();
-  public GenericEntry elevatorTargetPosTab =
-      elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
-  public GenericEntry elevatorRawPerOutTab =
-      elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
-  public GenericEntry elevatorPerOutTab =
-      elevatorTab.add("Elevator Percent Output", "0%").getEntry();
-  public GenericEntry elevatorControlLoopTab =
-      elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
-  public GenericEntry elevatorEncoderCountsTab =
-      elevatorTab.add("Elevator Height Encoder Counts", 0.0).getEntry();
-
   private DoubleSubscriber kPSub,
       kISub,
       kDSub,
@@ -128,17 +108,16 @@ public class Elevator extends SubsystemBase {
       kMaxVelSub,
       kMaxAccelSub,
       kSetpointCalcTimeSub;
-  private DoublePublisher kSetpointTargetPub;
+  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub;
+  private StringPublisher kDesiredStatePub, kPercentOutputPub, kClosedLoopModePub;
 
   // Mechanism2d visualization setup
-
   public Mechanism2d mech2d = new Mechanism2d(maxElevatorHeight * 50, maxElevatorHeight * 50);
   public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxElevatorHeight * 25, 0);
   public MechanismLigament2d elevatorLigament2d =
       root2d.append(new MechanismLigament2d("Elevator", elevatorHeight, 90));
 
   // Logging setup
-
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry elevatorCurrentEntry = new DoubleLogEntry(log, "/elevator/elevatorCurrent");
   public DoubleLogEntry elevatorSetpointEntry =
@@ -189,7 +168,7 @@ public class Elevator extends SubsystemBase {
   /*
    * Elevator's motor output as a percentage
    */
-  public double getElevatorPercentOutput() {
+  public double getPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
@@ -257,7 +236,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public boolean getElevatingState() {
-    return !(Math.abs(getElevatorPercentOutput()) < 0.05);
+    return !(Math.abs(getPercentOutput()) < 0.05);
   }
 
   public void setSetpointState(ELEVATOR.SETPOINT heightEnum) {
@@ -344,17 +323,25 @@ public class Elevator extends SubsystemBase {
   }
 
   private void initShuffleboard() {
-    SmartDashboard.putData("Elevator Command", this);
-    SmartDashboard.putData("Elevator", mech2d);
+    if(RobotBase.isSimulation()) {
+      SmartDashboard.putData("Elevator Command", this);
+      SmartDashboard.putData("Elevator", mech2d);
+    }
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+
+    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
+    kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
+    kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
+    kPercentOutputPub = elevatorNtTab.getStringTopic("Percent Output").publish();
+    kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
+
     elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
     elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
     elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
     elevatorNtTab.getDoubleTopic("setpoint calculation time").publish().set(kSetpointCalcTime);
-    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
@@ -368,21 +355,11 @@ public class Elevator extends SubsystemBase {
 
   public void updateShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
-
-    elevatorHeightTab.setDouble(getHeightMeters());
-    elevatorEncoderCountsTab.setDouble(getElevatorEncoderCounts());
-    elevatorTargetHeightTab.setDouble(m_desiredPositionMeters);
-    elevatorTargetPosTab.setString(desiredHeightState.name());
-
-    elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
-
-    /* Converts the raw percent output to something more readable, by
-     *  rounding it to the nearest whole number and turning it into an actual percentage.
-     *  Example: -0.71247 -> -71%
-     */
-    elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
-
-    elevatorControlLoopTab.setString(elevatorIsClosedLoop ? "Closed" : "Open");
+    kDesiredHeightPub.set(getHeightMeters());
+    kEncoderCountsPub.set(getElevatorEncoderCounts());
+    kDesiredStatePub.set(desiredHeightState.name());
+    kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
+    kClosedLoopModePub.set(elevatorIsClosedLoop ? "Closed" : "Open");
 
     // Elevator PID Tuning Values
     if (DriverStation.isTest()) {
@@ -409,7 +386,7 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(getElevatorPercentOutput() * 12);
+    elevatorSim.setInput(getPercentOutput() * 12);
 
     // Next, we update it. The standard loop time is 20ms.
     elevatorSim.update(0.020);
@@ -465,7 +442,7 @@ public class Elevator extends SubsystemBase {
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
         var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
         m_commandedPositionMeters = commandedSetpoint.position;
-        kSetpointTargetPub.set(Units.metersToInches(commandedSetpoint.position));
+        kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
         setTrapezoidState(commandedSetpoint);
       }
     } else {
