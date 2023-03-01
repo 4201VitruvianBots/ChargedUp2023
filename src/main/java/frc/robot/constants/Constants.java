@@ -75,6 +75,7 @@ public final class Constants {
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
+      SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW(Units.inchesToMeters(20.0)),
       SCORE_MID(Units.inchesToMeters(26.0)),
       SCORE_HIGH(Units.inchesToMeters(32.0)),
@@ -200,6 +201,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW(Units.degreesToRadians(-10.0)),
+      SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW(Units.degreesToRadians(180.0)),
       SCORE_MID(Units.degreesToRadians(180.0)),
       SCORE_HIGH(Units.degreesToRadians(180.0)),
@@ -264,7 +266,7 @@ public final class Constants {
     SETPOINT_LOW,
     SETPOINT_MEDIUM,
     SETPOINT_HIGH,
-    SMART_LOW_INTAKE,
+    SMART_LOW_REVERSE,
     SMART_LOW,
     SMART_MEDIUM,
     SMART_HIGH,

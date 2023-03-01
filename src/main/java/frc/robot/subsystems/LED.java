@@ -11,7 +11,6 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 
@@ -150,13 +149,14 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled() && m_candle.getCurrent() < 0.01) {
-      currentRobotState = robotState.DISABLED;
-      red = 255;
-      green = 0;
-      blue = 0;
-      m_toAnimate = null;
-    }
+    // TODO: Fix this from flashing
+    //    if (DriverStation.isDisabled() && m_candle.getCurrent() < 0.01) {
+    //      currentRobotState = robotState.DISABLED;
+    //      red = 255;
+    //      green = 0;
+    //      blue = 0;
+    //      m_toAnimate = null;
+    //    }
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {

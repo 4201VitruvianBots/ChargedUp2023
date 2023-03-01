@@ -18,12 +18,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.wrist.SetWristDesiredSetpoint;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.WRIST;
 
@@ -43,8 +39,9 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(Units.degreesToRadians(360), Units.degreesToRadians(600));
+  private TrapezoidProfile.Constraints m_trapezoidalConstraints =
+      new TrapezoidProfile.Constraints(
+          Constants.getInstance().Wrist.kMaxVel, Constants.getInstance().Wrist.kMaxAccel);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
@@ -82,15 +79,17 @@ public class Wrist extends SubsystemBase {
       new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
   public DoubleLogEntry wristPositionDegreesEntry =
       new DoubleLogEntry(log, "/wrist/positionDegrees");
-  public static ShuffleboardTab wristTab = Shuffleboard.getTab("Wrist");
 
-  private final DoubleSubscriber kSSub;
-  private final DoubleSubscriber kVSub;
-  private final DoubleSubscriber kGSub;
-  private final DoubleSubscriber kASub;
-  private final DoubleSubscriber kPSub;
-  private final DoubleSubscriber kDSub;
-  private final DoubleSubscriber setpointSub;
+  private DoubleSubscriber kMaxVelSub;
+  private DoubleSubscriber kMaxAccelSub;
+  private DoubleSubscriber kSSub;
+  private DoubleSubscriber kVSub;
+  private DoubleSubscriber kGSub;
+  private DoubleSubscriber kASub;
+  private DoubleSubscriber kPSub;
+  private DoubleSubscriber kISub;
+  private DoubleSubscriber kDSub;
+  private DoubleSubscriber kSetpointSub;
   private DoublePublisher kSetpointTargetPub;
 
   public Wrist() {
@@ -120,98 +119,7 @@ public class Wrist extends SubsystemBase {
     Timer.delay(1);
     resetWristAngle(-10.0);
 
-    wristTab.addDouble("Angle Degrees", this::getPositionDegrees);
-    wristTab.addDouble("Raw Position", this::getSensorPosition);
-    wristTab.addDouble(
-        "Setpoint Degrees", () -> Units.radiansToDegrees(getDesiredPositionRadians()));
-    wristTab.addDouble("Velocity DPS", this::getVelocityDegreesPerSecond);
-    wristTab.addString("State", () -> getControlState().toString());
-    wristTab.addBoolean("isClosedLoop", this::getControlMode);
-    wristTab.add(this);
-
-    SmartDashboard.putData(
-        "Wrist to Stowed", new SetWristDesiredSetpoint(this, WRIST.SETPOINT.STOWED.get()));
-
-    try {
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kA")
-          .publish()
-          .set(Constants.getInstance().Wrist.kA);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kS")
-          .publish()
-          .set(Constants.getInstance().Wrist.FFkS);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kV")
-          .publish()
-          .set(Constants.getInstance().Wrist.FFkV);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kG")
-          .publish()
-          .set(Constants.getInstance().Wrist.kG);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kP")
-          .publish()
-          .set(Constants.getInstance().Wrist.kP);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("kD")
-          .publish()
-          .set(Constants.getInstance().Wrist.kD);
-      NetworkTableInstance.getDefault()
-          .getTable("Wrist")
-          .getDoubleTopic("setpoint")
-          .publish()
-          .set(0);
-      kSetpointTargetPub =
-          NetworkTableInstance.getDefault()
-              .getTable("Wrist")
-              .getDoubleTopic("calculated setpoint")
-              .publish();
-    } catch (Exception e) {
-
-    }
-    kASub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kA")
-            .subscribe(Constants.getInstance().Wrist.kA);
-    kSSub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kS")
-            .subscribe(Constants.getInstance().Wrist.FFkS);
-    kVSub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kV")
-            .subscribe(Constants.getInstance().Wrist.FFkV);
-    kGSub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kG")
-            .subscribe(Constants.getInstance().Wrist.kG);
-    kPSub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kP")
-            .subscribe(Constants.getInstance().Wrist.kP);
-    kDSub =
-        NetworkTableInstance.getDefault()
-            .getTable("Wrist")
-            .getDoubleTopic("kD")
-            .subscribe(Constants.getInstance().Wrist.kD);
-    setpointSub =
-        NetworkTableInstance.getDefault().getTable("Wrist").getDoubleTopic("setpoint").subscribe(0);
-
-    if (RobotBase.isSimulation()) {
-      //            wristMotor.setSensorPhase(true);
-    }
+    initSmartDashboard();
   }
 
   public boolean getClosedLoopState() {
@@ -366,8 +274,62 @@ public class Wrist extends SubsystemBase {
   public String getControlModeAsString() {
     return isClosedLoop ? "Closed" : "Open";
   }
+
+  private void initSmartDashboard() {
+    var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
+
+    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.getInstance().Wrist.kMaxVel);
+    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.getInstance().Wrist.kMaxAccel);
+    wristTab.getDoubleTopic("kA").publish().set(Constants.getInstance().Wrist.kA);
+    wristTab.getDoubleTopic("kS").publish().set(Constants.getInstance().Wrist.FFkS);
+    wristTab.getDoubleTopic("kV").publish().set(Constants.getInstance().Wrist.FFkV);
+    wristTab.getDoubleTopic("kG").publish().set(Constants.getInstance().Wrist.kG);
+    wristTab.getDoubleTopic("kP").publish().set(Constants.getInstance().Wrist.kP);
+    wristTab.getDoubleTopic("kI").publish().set(Constants.getInstance().Wrist.kI);
+    wristTab.getDoubleTopic("kD").publish().set(Constants.getInstance().Wrist.kD);
+    wristTab.getDoubleTopic("setpoint").publish().set(0);
+
+    kSetpointTargetPub = wristTab.getDoubleTopic("calculated setpoint").publish();
+
+    kMaxVelSub =
+        wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.getInstance().Wrist.kMaxVel);
+    kMaxAccelSub =
+        wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.getInstance().Wrist.kMaxAccel);
+    kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.getInstance().Wrist.FFkS);
+    kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.getInstance().Wrist.kG);
+    kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.getInstance().Wrist.FFkV);
+    kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.getInstance().Wrist.kA);
+    kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.getInstance().Wrist.kP);
+    kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.getInstance().Wrist.kI);
+    kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.getInstance().Wrist.kD);
+    kSetpointSub = wristTab.getDoubleTopic("setpoint").subscribe(0);
+  }
+
   // SmartDashboard function
-  public void updateSmartDashboard() {}
+  public void updateSmartDashboard() {
+
+    if (DriverStation.isTest()) {
+      var maxVel = kMaxVelSub.get(0);
+      var maxAccel = kMaxAccelSub.get(0);
+      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+      var kS = kSSub.get(Constants.getInstance().Wrist.FFkS);
+      var kG = kGSub.get(Constants.getInstance().Wrist.kG);
+      var kV = kVSub.get(Constants.getInstance().Wrist.FFkV);
+      var kA = kASub.get(Constants.getInstance().Wrist.kA);
+
+      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+
+      wristMotor.config_kP(0, kPSub.get(0));
+      wristMotor.config_kI(0, kISub.get(0));
+      wristMotor.config_kD(0, kDSub.get(0));
+
+      var testSetpoint = kSetpointSub.get(0);
+      if (m_desiredSetpointRadians != testSetpoint) {
+        setControlState(Constants.WRIST.STATE.SETPOINT);
+        m_desiredSetpointRadians = testSetpoint;
+      }
+    }
+  }
 
   public void updateLog() {
     wristVoltageEntry.append(getWristMotorVoltage());
@@ -379,17 +341,6 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void periodic() {
-    var kS = kSSub.get(0);
-    var kG = kSSub.get(0);
-    var kV = kSSub.get(0);
-    var kA = kSSub.get(0);
-    var kP = kPSub.get(0);
-    var kD = kDSub.get(0);
-
-    m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-    wristMotor.config_kP(0, kP);
-    wristMotor.config_kD(0, kD);
-
     updateSmartDashboard();
     updateLog();
     // This method will be called once per scheduler run
@@ -408,7 +359,7 @@ public class Wrist extends SubsystemBase {
       }
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_trapezoidalConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;

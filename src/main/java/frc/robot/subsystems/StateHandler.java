@@ -31,6 +31,7 @@ public class StateHandler extends SubsystemBase {
   public enum SUPERSTRUCTURE_STATE {
     STOWED,
     INTAKE_LOW,
+    SCORE_LOW_REVERSE,
     LOW_ZONE,
     HIGH_ZONE,
     EXTENDED_ZONE,
@@ -121,6 +122,10 @@ public class StateHandler extends SubsystemBase {
             < Units.inchesToMeters(2)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW.get())
             < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get())
+            < Units.inchesToMeters(2)
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
+            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
             < Units.inchesToMeters(2)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
@@ -284,7 +289,7 @@ public class StateHandler extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getElevatorTranslation(), m_drive.getHeadingRotation2d()));
+                    m_elevator.getElevatorField2dTranslation(), m_drive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }

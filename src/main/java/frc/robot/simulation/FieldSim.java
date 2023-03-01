@@ -193,7 +193,8 @@ public class FieldSim extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getElevatorTranslation(), m_swerveDrive.getHeadingRotation2d()));
+                    m_elevator.getElevatorField2dTranslation(),
+                    m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Elevator Horizontal Pose").setPose(elevatorPose);
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);

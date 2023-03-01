@@ -57,12 +57,12 @@ public class SetpointSolver {
         correctedSolution
             .getRotation()
             .plus(
-                scoringState == Constants.SCORING_STATE.SMART_LOW_INTAKE
+                scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 
     switch (scoringState) {
-      case SMART_LOW_INTAKE:
+      case SMART_LOW_REVERSE:
         m_wristOffset = 0;
         break;
       case SMART_LOW:

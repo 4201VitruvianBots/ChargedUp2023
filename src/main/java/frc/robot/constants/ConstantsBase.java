@@ -48,12 +48,15 @@ public class ConstantsBase {
     public final int wristLowerSwitch = 0;
 
     // Values were experimentally determined
+    public final double kMaxVel = Units.degreesToRadians(360);
+    public final double kMaxAccel = Units.degreesToRadians(360);
     public final double FFkS = 0.1;
     public final double FFkV = 1.95;
     public final double kG = 1.75;
     public final double kA = 0.16;
 
     public final double kP = 0.1;
+    public final double kI = 0.0;
     public final double kD = 0.0;
   }
 

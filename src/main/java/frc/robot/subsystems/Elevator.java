@@ -45,7 +45,7 @@ public class Elevator extends SubsystemBase {
 
   private double maxVel = Units.inchesToMeters(40);
   private double maxAccel = Units.inchesToMeters(40);
-  private TrapezoidProfile.Constraints m_constraints =
+  private TrapezoidProfile.Constraints m_trapezoidialConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -73,7 +73,7 @@ public class Elevator extends SubsystemBase {
   private final double kD = 0;
   private final double kF = 0;
 
-  private double kSetpointCalcTime = 0.02;
+  private final double kSetpointCalcTime = 0.02;
 
   private static double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
@@ -183,27 +183,9 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].setInverted(TalonFXInvertType.Clockwise);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
-    SmartDashboard.putData("Elevator Command", this);
-    SmartDashboard.putData("Elevator", mech2d);
-
-    var elevatorNtTab =
-        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
-    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-    elevatorNtTab.getDoubleTopic("setpoint calculation time").publish().set(kSetpointCalcTime);
-    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
-
-    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
-    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
-    kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
-    kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
-    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
-    kSetpointCalcTimeSub =
-        elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
+    initShuffleboard();
   }
+
   /*
    * Elevator's motor output as a percentage
    */
@@ -354,11 +336,34 @@ public class Elevator extends SubsystemBase {
     elevatorHeight = getHeightMeters();
   }
 
-  public Translation2d getElevatorTranslation() {
+  public Translation2d getElevatorField2dTranslation() {
     return new Translation2d(
         getHeightMeters()
             * Math.cos(Constants.getInstance().Elevator.elevatorMountAngle.getRadians()),
         0);
+  }
+
+  private void initShuffleboard() {
+    SmartDashboard.putData("Elevator Command", this);
+    SmartDashboard.putData("Elevator", mech2d);
+
+    var elevatorNtTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    elevatorNtTab.getDoubleTopic("setpoint calculation time").publish().set(kSetpointCalcTime);
+    kSetpointTargetPub = elevatorNtTab.getDoubleTopic("setpoint target").publish();
+
+    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
+    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
+    kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
+    kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
+    kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
+    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
+    kSetpointCalcTimeSub =
+        elevatorNtTab.getDoubleTopic("setpoint calculation time").subscribe(kSetpointCalcTime);
   }
 
   public void updateShuffleboard() {
@@ -378,6 +383,22 @@ public class Elevator extends SubsystemBase {
     elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
 
     elevatorControlLoopTab.setString(elevatorIsClosedLoop ? "Closed" : "Open");
+
+    // Elevator PID Tuning Values
+    if (DriverStation.isTest()) {
+      var maxVel = kMaxVelSub.get(0);
+      var maxAccel = kMaxVelSub.get(0);
+      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+      elevatorMotors[0].config_kP(0, kPSub.get(0));
+      elevatorMotors[0].config_kI(0, kISub.get(0));
+      elevatorMotors[0].config_kD(0, kDSub.get(0));
+
+      var testSetpoint = kSetpointSub.get(0);
+      if (m_desiredPositionMeters != testSetpoint) {
+        setControlState(ELEVATOR.STATE.SETPOINT);
+        m_desiredPositionMeters = testSetpoint;
+      }
+    }
   }
 
   public void updateLog() {
@@ -439,7 +460,7 @@ public class Elevator extends SubsystemBase {
       }
       if (DriverStation.isEnabled()) {
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
         var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);

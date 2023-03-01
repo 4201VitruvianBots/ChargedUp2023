@@ -18,6 +18,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -26,7 +29,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
@@ -73,11 +75,11 @@ public class SwerveModule extends SubsystemBase {
 
   // Logging setup
 
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry swerveModuleTurnCurrentEntry;
-  public DoubleLogEntry swerveModuleDriveCurrentEntry;
-  public DoubleLogEntry swerveModuleXPositionEntry;
-  public DoubleLogEntry swerveModuleYPositionEntry;
+  private final DoubleLogEntry moduleTurnCurrentEntry;
+  private final DoubleLogEntry moduleDriveCurrentEntry;
+
+  private DoublePublisher moduleMotorHeadingPub, moduleEncoderHeadingPub, moduleEncoderOffsetPub;
+  private BooleanPublisher moduleEncoderHealthPub;
 
   public SwerveModule(
       SWERVE_MODULE_POSITION modulePosition,
@@ -106,21 +108,28 @@ public class SwerveModule extends SubsystemBase {
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
     m_lastAngle = getHeadingDegrees();
 
-    swerveModuleTurnCurrentEntry =
-        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
-    swerveModuleDriveCurrentEntry =
-        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
-    swerveModuleXPositionEntry =
-        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/xPosition");
-    swerveModuleYPositionEntry =
-        new DoubleLogEntry(log, "/swerve/" + m_modulePosition.name() + "/yPosition");
+    initSmartDashboard();
+    DataLog m_log = DataLogManager.getLog();
+    moduleTurnCurrentEntry =
+        new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
+    moduleDriveCurrentEntry =
+        new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
   }
 
   private void initCanCoder() {
     Timer.delay(1);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
-    m_initSuccess = true;
+    resetAngleToAbsolute();
+
+    // Check if the offset was applied properly.
+    // TODO: This doesn't cover all edge cases
+    if (Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition())
+        < 1.0) {
+      m_initSuccess = true;
+    } else {
+      m_initSuccess = false;
+    }
   }
 
   public boolean getInitSuccess() {
@@ -216,33 +225,29 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.setNeutralMode(mode);
   }
 
-  private void updateSmartDashboard() {
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " heading", getState().angle.getDegrees() % 360);
-    SmartDashboard.putNumber(
-        "module " + m_moduleNumber + " CANCoder reading", m_angleEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("module" + m_moduleNumber + "position", getPosition().distanceMeters);
-
-    SmartDashboard.getNumber(
-        "frontLeftCANCoderOffset", Constants.getInstance().SwerveDrive.frontLeftCANCoderOffset);
-    SmartDashboard.getNumber(
-        "frontRightCANCoderOffset", Constants.getInstance().SwerveDrive.frontRightCANCoderOffset);
-    SmartDashboard.getNumber(
-        "backLeftCANCoderOffset", Constants.getInstance().SwerveDrive.backLeftCANCoderOffset);
-    SmartDashboard.getNumber(
-        "backRightCANCoderOffset", Constants.getInstance().SwerveDrive.backRightCANCoderOffset);
+  private void initSmartDashboard() {
+    var moduleTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    moduleEncoderHeadingPub =
+        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Heading").publish();
+    moduleEncoderOffsetPub =
+        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset").publish();
+    moduleEncoderOffsetPub.set(m_angleOffset);
+    moduleEncoderHealthPub =
+        moduleTab.getBooleanTopic("Module (" + m_moduleNumber + ") Encoder Health").publish();
+    moduleMotorHeadingPub =
+        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
   }
 
-  public void updateCanCoderHealth() {
-    SmartDashboard.putBoolean(
-        "module " + m_angleEncoder + " CANCoder Health", m_angleEncoder.getDeviceID() > 0);
+  private void updateSmartDashboard() {
+    moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
+    moduleMotorHeadingPub.set(getHeadingDegrees());
+    moduleEncoderHealthPub.set(m_initSuccess);
   }
 
   public void updateLog() {
-    swerveModuleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
-    swerveModuleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
-    swerveModuleXPositionEntry.append(getModulePose().getX());
-    swerveModuleYPositionEntry.append(getModulePose().getY());
+    moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
+    moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
   }
 
   @Override

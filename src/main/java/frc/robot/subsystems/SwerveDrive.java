@@ -73,7 +73,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
-  private DoublePublisher swervePitch, swerveRoll, swerveYaw;
+  private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   public boolean useHeadingTarget = false;
   private double m_desiredRobotHeading;
@@ -301,23 +301,26 @@ public class SwerveDrive extends SubsystemBase {
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
 
-    var swerveTab = NetworkTableInstance.getDefault().getTable("Swerve");
-    swervePitch = swerveTab.getDoubleTopic("Pitch").publish();
-    swerveRoll = swerveTab.getDoubleTopic("Roll").publish();
-    swerveYaw = swerveTab.getDoubleTopic("Yaw").publish();
+    var swerveTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    pitchPub = swerveTab.getDoubleTopic("Pitch").publish();
+    rollPub = swerveTab.getDoubleTopic("Roll").publish();
+    yawPub = swerveTab.getDoubleTopic("Yaw").publish();
+    odometryXPub = swerveTab.getDoubleTopic("Odometry X").publish();
+    odometryYPub = swerveTab.getDoubleTopic("Odometry Y").publish();
+    odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
   }
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
-    SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber(
-        "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putBoolean("Swerve Module Init Status", Initialize);
 
-    swervePitch.set(getPitchDegrees());
-    swerveRoll.set(getRollDegrees());
-    swerveYaw.set(getHeadingDegrees());
+    pitchPub.set(getPitchDegrees());
+    rollPub.set(getRollDegrees());
+    yawPub.set(getHeadingDegrees());
+    odometryXPub.set(getOdometry().getEstimatedPosition().getX());
+    odometryYPub.set(getOdometry().getEstimatedPosition().getY());
+    odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
   }
 
   public void disabledPeriodic() {}
@@ -328,9 +331,6 @@ public class SwerveDrive extends SubsystemBase {
       calculateRotationSpeed();
     }
 
-    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      module.updateCanCoderHealth();
-    }
     Initialize = getModuleInitStatus();
 
     updateOdometry();
