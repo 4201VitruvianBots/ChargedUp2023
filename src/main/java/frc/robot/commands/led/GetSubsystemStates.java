@@ -51,7 +51,7 @@ public class GetSubsystemStates extends CommandBase {
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {
-      if (m_controls.getInitState()) m_led.expressState(LED.robotState.READY);
+      if (m_controls.getInitState()) m_led.expressState(LED.robotState.INITIALIZED);
       else m_led.expressState(LED.robotState.DISABLED);
     } else if (elavating) {
       m_led.expressState(LED.robotState.ELEVATING);

@@ -117,7 +117,7 @@ public class LED extends SubsystemBase {
         case DISABLED: // Solid red
           setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case READY:
+        case INITIALIZED:
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Twinkle);
           break;
         case ENABLED: // Solid green
@@ -199,7 +199,7 @@ public class LED extends SubsystemBase {
   /** Different robot states */
   public enum robotState {
     DISABLED,
-    READY,
+    INITIALIZED,
     ENABLED,
     INTAKING,
     ELEVATING,
