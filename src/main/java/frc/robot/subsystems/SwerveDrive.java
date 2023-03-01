@@ -44,28 +44,28 @@ public class SwerveDrive extends SubsystemBase {
                       new TalonFX(Constants.CAN.frontLeftTurnMotor),
                       new TalonFX(Constants.CAN.frontLeftDriveMotor),
                       new CANCoder(Constants.CAN.frontLeftCanCoder),
-                      Constants.getInstance().SwerveDrive.frontLeftCANCoderOffset),
+                      Constants.SWERVEDRIVE.frontLeftCANCoderOffset),
               SWERVE_MODULE_POSITION.FRONT_RIGHT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.FRONT_RIGHT,
                       new TalonFX(Constants.CAN.frontRightTurnMotor),
                       new TalonFX(Constants.CAN.frontRightDriveMotor),
                       new CANCoder(Constants.CAN.frontRightCanCoder),
-                      Constants.getInstance().SwerveDrive.frontRightCANCoderOffset),
+                      Constants.SWERVEDRIVE.frontRightCANCoderOffset),
               SWERVE_MODULE_POSITION.BACK_LEFT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.BACK_LEFT,
                       new TalonFX(Constants.CAN.backLeftTurnMotor),
                       new TalonFX(Constants.CAN.backLeftDriveMotor),
                       new CANCoder(Constants.CAN.backLeftCanCoder),
-                      Constants.getInstance().SwerveDrive.backLeftCANCoderOffset),
+                      Constants.SWERVEDRIVE.backLeftCANCoderOffset),
               SWERVE_MODULE_POSITION.BACK_RIGHT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.BACK_RIGHT,
                       new TalonFX(Constants.CAN.backRightTurnMotor),
                       new TalonFX(Constants.CAN.backRightDriveMotor),
                       new CANCoder(Constants.CAN.backRightCanCoder),
-                      Constants.getInstance().SwerveDrive.backRightCANCoderOffset)));
+                      Constants.SWERVEDRIVE.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private Trajectory m_trajectory;
@@ -80,15 +80,15 @@ public class SwerveDrive extends SubsystemBase {
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(
-          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond,
-          Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecondSquared);
+          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond,
+          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private final ProfiledPIDController m_rotationController =
       new ProfiledPIDController(
-          Constants.getInstance().SwerveDrive.kP_Rotation,
-          Constants.getInstance().SwerveDrive.kI_Rotation,
-          Constants.getInstance().SwerveDrive.kD_Rotation,
+          Constants.SWERVEDRIVE.kP_Rotation,
+          Constants.SWERVEDRIVE.kI_Rotation,
+          Constants.SWERVEDRIVE.kD_Rotation,
           m_constraints);
   private double m_rotationOutput;
 
@@ -121,9 +121,9 @@ public class SwerveDrive extends SubsystemBase {
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
-    strafe *= Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
-    rotation *= Constants.getInstance().SwerveDrive.kMaxRotationRadiansPerSecond;
+    throttle *= Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+    strafe *= Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+    rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
     if (useHeadingTarget) {
       // rotation = m_setpoint.velocity;
@@ -145,7 +145,7 @@ public class SwerveDrive extends SubsystemBase {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]),
-        Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond);
+        Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
@@ -183,7 +183,7 @@ public class SwerveDrive extends SubsystemBase {
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond);
+        states, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(states[module.getModulePosition().ordinal()], isOpenLoop);

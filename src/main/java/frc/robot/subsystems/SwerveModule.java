@@ -48,24 +48,24 @@ public class SwerveModule extends SubsystemBase {
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
-          Constants.getInstance().SwerveModule.ksDriveVoltSecondsPerMeter,
-          Constants.getInstance().SwerveModule.kvDriveVoltSecondsSquaredPerMeter,
-          Constants.getInstance().SwerveModule.kaDriveVoltSecondsSquaredPerMeter);
+          Constants.SWERVEMODULE.ksDriveVoltSecondsPerMeter,
+          Constants.SWERVEMODULE.kvDriveVoltSecondsSquaredPerMeter,
+          Constants.SWERVEMODULE.kaDriveVoltSecondsSquaredPerMeter);
 
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
-          Constants.getInstance().SwerveModule.kTurnGearbox,
-          Constants.getInstance().SwerveModule.kTurningMotorGearRatio,
+          Constants.SWERVEMODULE.kTurnGearbox,
+          Constants.SWERVEMODULE.kTurningMotorGearRatio,
           VecBuilder.fill(0));
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(1.5, 0.6),
-          Constants.getInstance().SwerveModule.kDriveGearbox,
-          Constants.getInstance().SwerveModule.kDriveMotorGearRatio);
+          Constants.SWERVEMODULE.kDriveGearbox,
+          Constants.SWERVEMODULE.kDriveMotorGearRatio);
 
   private double m_drivePercentOutput;
   private double m_turnPercentOutput;
@@ -144,12 +144,12 @@ public class SwerveModule extends SubsystemBase {
   public void resetAngleToAbsolute() {
     double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset;
     m_turnMotor.setSelectedSensorPosition(
-        angle / Constants.getInstance().SwerveModule.kTurningMotorDistancePerPulse);
+        angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
   }
 
   public double getHeadingDegrees() {
     return m_turnMotor.getSelectedSensorPosition()
-        * Constants.getInstance().SwerveModule.kTurningMotorDistancePerPulse;
+        * Constants.SWERVEMODULE.kTurningMotorDistancePerPulse;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -158,13 +158,13 @@ public class SwerveModule extends SubsystemBase {
 
   public double getVelocityMetersPerSecond() {
     return m_driveMotor.getSelectedSensorVelocity()
-        * Constants.getInstance().SwerveModule.kDriveMotorDistancePerPulse
+        * Constants.SWERVEMODULE.kDriveMotorDistancePerPulse
         * 10;
   }
 
   public double getDriveMeters() {
     return m_driveMotor.getSelectedSensorPosition()
-        * Constants.getInstance().SwerveModule.kDriveMotorDistancePerPulse;
+        * Constants.SWERVEMODULE.kDriveMotorDistancePerPulse;
   }
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -172,13 +172,12 @@ public class SwerveModule extends SubsystemBase {
 
     if (isOpenLoop) {
       double percentOutput =
-          desiredState.speedMetersPerSecond
-              / Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond;
+          desiredState.speedMetersPerSecond / Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
       m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
       double velocity =
           desiredState.speedMetersPerSecond
-              / (Constants.getInstance().SwerveModule.kDriveMotorDistancePerPulse * 10);
+              / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10);
       m_driveMotor.set(
           ControlMode.Velocity,
           velocity,
@@ -188,14 +187,13 @@ public class SwerveModule extends SubsystemBase {
 
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.getInstance().SwerveDrive.kMaxSpeedMetersPerSecond * 0.01))
+                <= (Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
                 .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
     m_turnMotor.set(
-        ControlMode.Position,
-        angle / Constants.getInstance().SwerveModule.kTurningMotorDistancePerPulse);
+        ControlMode.Position, angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
     m_lastAngle = angle;
 
     m_drivePercentOutput = m_driveMotor.getMotorOutputPercent();
@@ -282,26 +280,22 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int)
-                (m_turnMotorSimDistance
-                    / Constants.getInstance().SwerveModule.kTurningMotorDistancePerPulse));
+            (int) (m_turnMotorSimDistance / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse));
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
                 (m_turnMotorSim.getAngularVelocityRadPerSec()
-                    / (Constants.getInstance().SwerveModule.kTurningMotorDistancePerPulse * 10)));
+                    / (Constants.SWERVEMODULE.kTurningMotorDistancePerPulse * 10)));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int)
-                (m_driveMotorSimDistance
-                    / Constants.getInstance().SwerveModule.kDriveMotorDistancePerPulse));
+            (int) (m_driveMotorSimDistance / Constants.SWERVEMODULE.kDriveMotorDistancePerPulse));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
                 (m_driveMotorSim.getAngularVelocityRadPerSec()
-                    / (Constants.getInstance().SwerveModule.kDriveMotorDistancePerPulse * 10)));
+                    / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10)));
   }
 }

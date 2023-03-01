@@ -34,23 +34,18 @@ public class Wrist extends SubsystemBase {
   private double m_joystickInput;
   private double m_wristPercentOutput;
 
-  private static final DigitalInput wristLowerSwitch =
-      new DigitalInput(Constants.getInstance().Wrist.wristLowerSwitch);
+  private static final DigitalInput wristLowerSwitch = new DigitalInput(WRIST.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
   private TrapezoidProfile.Constraints m_trapezoidalConstraints =
-      new TrapezoidProfile.Constraints(
-          Constants.getInstance().Wrist.kMaxVel, Constants.getInstance().Wrist.kMaxAccel);
+      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxVel, Constants.WRIST.kMaxAccel);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   public ArmFeedforward m_feedforward =
       new ArmFeedforward(
-          Constants.getInstance().Wrist.FFkS,
-          Constants.getInstance().Wrist.kG,
-          Constants.getInstance().Wrist.FFkV,
-          Constants.getInstance().Wrist.kA);
+          Constants.WRIST.FFkS, Constants.WRIST.kG, Constants.WRIST.FFkV, Constants.WRIST.kA);
 
   private final double maxPercentOutput = 1.0;
   private final double setpointMultiplier = Units.degreesToRadians(60.0);
@@ -58,11 +53,10 @@ public class Wrist extends SubsystemBase {
 
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
-          Constants.getInstance().Wrist.gearBox,
-          Constants.getInstance().Wrist.wristGearRatio,
-          SingleJointedArmSim.estimateMOI(
-              Constants.getInstance().Wrist.wristLength, Constants.getInstance().Wrist.wristMass),
-          Constants.getInstance().Wrist.wristLength,
+          Constants.WRIST.gearBox,
+          Constants.WRIST.wristGearRatio,
+          SingleJointedArmSim.estimateMOI(Constants.WRIST.wristLength, Constants.WRIST.wristMass),
+          Constants.WRIST.wristLength,
           WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
           WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
           false
@@ -105,17 +99,14 @@ public class Wrist extends SubsystemBase {
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
 
-    wristMotor.config_kP(0, Constants.getInstance().Wrist.kP);
-    wristMotor.config_kD(0, Constants.getInstance().Wrist.kD);
-    wristMotor.configPeakOutputForward(
-        maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(
-        -maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+    wristMotor.config_kP(0, Constants.WRIST.kP);
+    wristMotor.config_kD(0, Constants.WRIST.kD);
+    wristMotor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
+    wristMotor.configPeakOutputReverse(-maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
 
     wristMotor.setInverted(TalonFXInvertType.CounterClockwise);
 
-    wristMotor.configAllowableClosedloopError(
-        0, 1 / Constants.getInstance().Wrist.encoderUnitsToDegrees);
+    wristMotor.configAllowableClosedloopError(0, 1 / Constants.WRIST.encoderUnitsToDegrees);
     Timer.delay(1);
     resetWristAngle(-10.0);
 
@@ -158,8 +149,7 @@ public class Wrist extends SubsystemBase {
   public void setSetpointDegrees(TrapezoidProfile.State state) {
     wristMotor.set(
         ControlMode.Position,
-        Units.radiansToDegrees(state.position)
-            / Constants.getInstance().Wrist.encoderUnitsToDegrees,
+        Units.radiansToDegrees(state.position) / Constants.WRIST.encoderUnitsToDegrees,
         DemandType.ArbitraryFeedForward,
         //                    0
         calculateFeedforward(state));
@@ -195,13 +185,11 @@ public class Wrist extends SubsystemBase {
 
   // this is get current angle
   public double getPositionDegrees() {
-    return getSensorPosition() * Constants.getInstance().Wrist.encoderUnitsToDegrees;
+    return getSensorPosition() * Constants.WRIST.encoderUnitsToDegrees;
   }
   // this is get current angle
   public double getVelocityDegreesPerSecond() {
-    return wristMotor.getSelectedSensorVelocity()
-        * Constants.getInstance().Wrist.encoderUnitsToDegrees
-        * 10;
+    return wristMotor.getSelectedSensorVelocity() * Constants.WRIST.encoderUnitsToDegrees * 10;
   }
 
   public Rotation2d getWristAngleRotation2d() {
@@ -233,11 +221,11 @@ public class Wrist extends SubsystemBase {
   // the ground.
   public void resetWristAngle(double angle) {
     wristMotor.setSelectedSensorPosition(
-        angle / Constants.getInstance().Wrist.encoderUnitsToDegrees); // setWristSensorPosition(0);
+        angle / Constants.WRIST.encoderUnitsToDegrees); // setWristSensorPosition(0);
     //    if(RobotBase.isSimulation()) {
     //      wristMotor.getSimCollection().setIntegratedSensorRawPosition(
     //              (int) (angle
-    //                      / Constants.getInstance().Wrist.encoderUnitsPerRotation));
+    //                      / Constants.WRIST.encoderUnitsPerRotation));
     //    }
   }
 
@@ -278,30 +266,28 @@ public class Wrist extends SubsystemBase {
   private void initSmartDashboard() {
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.getInstance().Wrist.kMaxVel);
-    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.getInstance().Wrist.kMaxAccel);
-    wristTab.getDoubleTopic("kA").publish().set(Constants.getInstance().Wrist.kA);
-    wristTab.getDoubleTopic("kS").publish().set(Constants.getInstance().Wrist.FFkS);
-    wristTab.getDoubleTopic("kV").publish().set(Constants.getInstance().Wrist.FFkV);
-    wristTab.getDoubleTopic("kG").publish().set(Constants.getInstance().Wrist.kG);
-    wristTab.getDoubleTopic("kP").publish().set(Constants.getInstance().Wrist.kP);
-    wristTab.getDoubleTopic("kI").publish().set(Constants.getInstance().Wrist.kI);
-    wristTab.getDoubleTopic("kD").publish().set(Constants.getInstance().Wrist.kD);
+    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxVel);
+    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxAccel);
+    wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
+    wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
+    wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
+    wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
+    wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
+    wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
+    wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
     wristTab.getDoubleTopic("setpoint").publish().set(0);
 
     kSetpointTargetPub = wristTab.getDoubleTopic("calculated setpoint").publish();
 
-    kMaxVelSub =
-        wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.getInstance().Wrist.kMaxVel);
-    kMaxAccelSub =
-        wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.getInstance().Wrist.kMaxAccel);
-    kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.getInstance().Wrist.FFkS);
-    kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.getInstance().Wrist.kG);
-    kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.getInstance().Wrist.FFkV);
-    kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.getInstance().Wrist.kA);
-    kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.getInstance().Wrist.kP);
-    kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.getInstance().Wrist.kI);
-    kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.getInstance().Wrist.kD);
+    kMaxVelSub = wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.WRIST.kMaxVel);
+    kMaxAccelSub = wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.WRIST.kMaxAccel);
+    kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
+    kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
+    kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
+    kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
+    kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
+    kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
+    kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
     kSetpointSub = wristTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
@@ -312,10 +298,10 @@ public class Wrist extends SubsystemBase {
       var maxVel = kMaxVelSub.get(0);
       var maxAccel = kMaxAccelSub.get(0);
       m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-      var kS = kSSub.get(Constants.getInstance().Wrist.FFkS);
-      var kG = kGSub.get(Constants.getInstance().Wrist.kG);
-      var kV = kVSub.get(Constants.getInstance().Wrist.FFkV);
-      var kA = kASub.get(Constants.getInstance().Wrist.kA);
+      var kS = kSSub.get(Constants.WRIST.FFkS);
+      var kG = kGSub.get(Constants.WRIST.kG);
+      var kV = kVSub.get(Constants.WRIST.FFkV);
+      var kA = kASub.get(Constants.WRIST.kA);
 
       m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
 
@@ -385,14 +371,14 @@ public class Wrist extends SubsystemBase {
         .setIntegratedSensorRawPosition(
             -(int)
                 (Units.radiansToDegrees(m_armSim.getAngleRads())
-                    / Constants.getInstance().Wrist.encoderUnitsToDegrees));
+                    / Constants.WRIST.encoderUnitsToDegrees));
 
     wristMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             -(int)
                 (Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
-                    / Constants.getInstance().Wrist.encoderUnitsToDegrees
+                    / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
   }
 }

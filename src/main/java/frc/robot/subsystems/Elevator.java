@@ -48,9 +48,7 @@ public class Elevator extends SubsystemBase {
 
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(
-          Constants.getInstance().Elevator.kS,
-          Constants.getInstance().Elevator.kV,
-          Constants.getInstance().Elevator.kA);
+          Constants.ELEVATOR.kS, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
 
   private double
       m_desiredPositionMeters; // The height in encoder units our robot is trying to reach
@@ -91,10 +89,10 @@ public class Elevator extends SubsystemBase {
 
   private final ElevatorSim elevatorSim =
       new ElevatorSim(
-          Constants.getInstance().Elevator.elevatorGearbox,
-          Constants.getInstance().Elevator.elevatorGearing,
-          Constants.getInstance().Elevator.elevatorMassKg,
-          Constants.getInstance().Elevator.elevatorDrumRadiusMeters,
+          Constants.ELEVATOR.elevatorGearbox,
+          Constants.ELEVATOR.elevatorGearing,
+          Constants.ELEVATOR.elevatorMassKg,
+          Constants.ELEVATOR.elevatorDrumRadiusMeters,
           ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
           ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get(),
           true);
@@ -134,32 +132,19 @@ public class Elevator extends SubsystemBase {
       motor.setSelectedSensorPosition(elevatorHeight);
 
       // Config PID
-      motor.selectProfileSlot(
-          Constants.getInstance().Elevator.kSlotIdx, Constants.getInstance().Elevator.kPIDLoopIdx);
-      motor.config_kF(
-          Constants.getInstance().Elevator.kSlotIdx,
-          kF,
-          Constants.getInstance().Elevator.kTimeoutMs);
-      motor.config_kP(
-          Constants.getInstance().Elevator.kSlotIdx,
-          kP,
-          Constants.getInstance().Elevator.kTimeoutMs);
-      motor.config_kI(
-          Constants.getInstance().Elevator.kSlotIdx,
-          kI,
-          Constants.getInstance().Elevator.kTimeoutMs);
-      motor.config_kD(
-          Constants.getInstance().Elevator.kSlotIdx,
-          kD,
-          Constants.getInstance().Elevator.kTimeoutMs);
+      motor.selectProfileSlot(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kPIDLoopIdx);
+      motor.config_kF(Constants.ELEVATOR.kSlotIdx, kF, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kP(Constants.ELEVATOR.kSlotIdx, kP, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-maxPercentOutput, Constants.getInstance().Elevator.kTimeoutMs);
+      motor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    elevatorMotors[0].setInverted(Constants.getInstance().Elevator.mainMotorInversionType);
+    elevatorMotors[0].setInverted(Constants.ELEVATOR.mainMotorInversionType);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
     initShuffleboard();
@@ -180,8 +165,7 @@ public class Elevator extends SubsystemBase {
 
   public void setElevatorMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
-        TalonFXControlMode.MotionMagic,
-        setpoint / Constants.getInstance().Elevator.encoderCountsToMeters);
+        TalonFXControlMode.MotionMagic, setpoint / Constants.ELEVATOR.encoderCountsToMeters);
   }
 
   private TrapezoidProfile.State limitDesiredSetpointMeters(TrapezoidProfile.State state) {
@@ -192,7 +176,7 @@ public class Elevator extends SubsystemBase {
   public void setTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
-        state.position / Constants.getInstance().Elevator.encoderCountsToMeters,
+        state.position / Constants.ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
         (m_feedForward.calculate(state.velocity) / 12.0));
   }
@@ -205,13 +189,12 @@ public class Elevator extends SubsystemBase {
    * Elevator's height position
    */
   public double getHeightMeters() {
-    return elevatorMotors[0].getSelectedSensorPosition()
-        * Constants.getInstance().Elevator.encoderCountsToMeters;
+    return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
   }
 
   public double getVelocityMps() {
     return elevatorMotors[0].getSelectedSensorVelocity()
-        * Constants.getInstance().Elevator.encoderCountsToMeters
+        * Constants.ELEVATOR.encoderCountsToMeters
         * 10;
   }
 
@@ -317,9 +300,7 @@ public class Elevator extends SubsystemBase {
 
   public Translation2d getElevatorField2dTranslation() {
     return new Translation2d(
-        getHeightMeters()
-            * Math.cos(Constants.getInstance().Elevator.elevatorMountAngle.getRadians()),
-        0);
+        getHeightMeters() * Math.cos(Constants.ELEVATOR.elevatorMountAngle.getRadians()), 0);
   }
 
   private void initShuffleboard() {
@@ -394,16 +375,14 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int)
-                (elevatorSim.getPositionMeters()
-                    / Constants.getInstance().Elevator.encoderCountsToMeters));
+            (int) (elevatorSim.getPositionMeters() / Constants.ELEVATOR.encoderCountsToMeters));
 
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
                 (elevatorSim.getVelocityMetersPerSecond()
-                    / Constants.getInstance().Elevator.encoderCountsToMeters
+                    / Constants.ELEVATOR.encoderCountsToMeters
                     * 10));
 
     RoboRioSim.setVInVoltage(

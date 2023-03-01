@@ -59,7 +59,7 @@ public class Controls extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
     allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
-    controlsTab.getStringTopic("Robot Name").publish().set(Constants.getInstance().robotName);
+    controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
   }
 
   /** Sends values to SmartDashboard */

@@ -22,7 +22,7 @@
 //         new PPSwerveControllerCommand(
 //             trajectory,
 //             swerveDrive::getPoseMeters,
-//             Constants.getInstance().SwerveDrive.kSwerveKinematics,
+//             Constants.SWERVEDRIVE.kSwerveKinematics,
 //             swerveDrive.getXPidController(),
 //             swerveDrive.getYPidController(),
 //             swerveDrive.getThetaPidController(),
