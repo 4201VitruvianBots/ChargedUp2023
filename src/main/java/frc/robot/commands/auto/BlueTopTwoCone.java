@@ -16,11 +16,11 @@ public class BlueTopTwoCone extends SequentialCommandGroup {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueTopTwoCone", new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(52)));
+            "BlueTopTwoCone", new PathConstraints(Units.feetToMeters(8), Units.feetToMeters(40)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
-        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
+        // new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

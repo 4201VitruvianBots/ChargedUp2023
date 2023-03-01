@@ -318,10 +318,10 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public Pose2d getRobotPose2d(CAMERA_LOCATION location) {
-    double[] pose = getBotPose(location);
-    return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[5]));
-  }
+  // public Pose2d getRobotPose2d(CAMERA_LOCATION location) {
+  //   double[] pose = getBotPose(location);
+  //   return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[5]));
+  // }
 
   public Pose2d[] getRobotPoses2d(CAMERA_LOCATION location) {
     Pose2d[] poseArray = {defaultPose};
@@ -399,12 +399,12 @@ public class Vision extends SubsystemBase {
     return tags;
   }
 
-  private void updateVisionPose(CAMERA_LOCATION location) {
-    if (getValidTarget(location))
-      m_swerveDrive
-          .getOdometry()
-          .addVisionMeasurement(getRobotPose2d(location), getDetectionTimestamp(location));
-  }
+  // private void updateVisionPose(CAMERA_LOCATION location) {
+  //   if (getValidTarget(location))
+  //     m_swerveDrive
+  //         .getOdometry()
+  //         .addVisionMeasurement(getRobotPose2d(location), getDetectionTimestamp(location));
+  // }
 
   private void logData() {
     limelightTargetValid.append(getValidTargetType(CAMERA_LOCATION.INTAKE));
@@ -432,8 +432,8 @@ public class Vision extends SubsystemBase {
           0
         });
     //    System.out.println("Vision Periodic");
-    // This method will be called once per scheduler run
-    updateVisionPose(CAMERA_LOCATION.LEFT_LOCALIZER);
+    // // This method will be called once per scheduler run
+    // updateVisionPose(CAMERA_LOCATION.LEFT_LOCALIZER);
     //    updateVisionPose(CAMERA_LOCATION.REAR_LOCALIZER);
     searchLimelightPipeline(CAMERA_LOCATION.INTAKE);
     logData();

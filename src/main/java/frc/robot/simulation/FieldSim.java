@@ -156,9 +156,9 @@ public class FieldSim extends SubsystemBase {
     m_field2d
         .getObject("lLocalizerPoses")
         .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_LOCATION.LEFT_LOCALIZER));
-    m_field2d
-        .getObject("lLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.LEFT_LOCALIZER));
+    // m_field2d
+    //     .getObject("lLocalizerPose")
+    //     .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.LEFT_LOCALIZER));
     //    m_field2d
     //        .getObject("Limelight Pose")
     //        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
@@ -168,9 +168,9 @@ public class FieldSim extends SubsystemBase {
     m_field2d
         .getObject("rLocalizerPoses")
         .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
-    m_field2d
-        .getObject("rLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
+    // m_field2d
+    //     .getObject("rLocalizerPose")
+    //     .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_LOCATION.RIGHT_LOCALIZER));
 
     elevatorPose =
         m_swerveDrive
