@@ -4,6 +4,10 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,14 +19,8 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.Random;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class DistanceSensor {
   private final int socketPort = 25000;
@@ -43,7 +41,7 @@ public class DistanceSensor {
   public GenericEntry sensorValue1Tab = distanceSensorTab.add("Sensor Value 1", 0).getEntry();
   public GenericEntry sensorValue2Tab = distanceSensorTab.add("Sensor Value 2", 0).getEntry();
   public GenericEntry testParserTab = distanceSensorTab.add("Test Value 1", 0).getEntry();
-  
+
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
     try {
@@ -109,41 +107,40 @@ public class DistanceSensor {
 
   public void simulationPeriodic() {
     receivedData =
-    "{\"sensor1.mm\":"
-    + Integer.toString(rand.nextInt(8190))
-    + ",\"sensor2.mm\":"
-    + Integer.toString(rand.nextInt(8190))
-    + ",\"test\":"
-    + Integer.toString(rand.nextInt(100))
-    + "}";
+        "{\"sensor1.mm\":"
+            + Integer.toString(rand.nextInt(8190))
+            + ",\"sensor2.mm\":"
+            + Integer.toString(rand.nextInt(8190))
+            + ",\"test\":"
+            + Integer.toString(rand.nextInt(100))
+            + "}";
     System.out.println(receivedData);
   }
 
   public void pollDistanceSensors() {
-      // This method will be called once per scheduler run
-      testParserTab.setInteger(testParser());
-      try {
-        if (RobotBase.isSimulation()) {
-          simulationPeriodic();
-        }
-        else {
-          byte[] buffer = new byte[512];
-          DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-          socket.receive(packet);
-  
-          receivedData = new String(packet.getData(), 0, packet.getLength());
-        }
-        rawStringTab.setString(receivedData);
-        sensorValue1Tab.setInteger(getSensorValue(1));
-        sensorValue2Tab.setInteger(getSensorValue(2));
-      } catch (SocketTimeoutException ex) {
-        System.out.println("error: " + ex.getMessage());
-        ex.printStackTrace();
-      } catch (IOException ex) {
-        System.out.println("Client error: " + ex.getMessage());
-        ex.printStackTrace();
-      } catch (Exception ex) {
-        ex.printStackTrace();
+    // This method will be called once per scheduler run
+    testParserTab.setInteger(testParser());
+    try {
+      if (RobotBase.isSimulation()) {
+        simulationPeriodic();
+      } else {
+        byte[] buffer = new byte[512];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+        socket.receive(packet);
+
+        receivedData = new String(packet.getData(), 0, packet.getLength());
       }
+      rawStringTab.setString(receivedData);
+      sensorValue1Tab.setInteger(getSensorValue(1));
+      sensorValue2Tab.setInteger(getSensorValue(2));
+    } catch (SocketTimeoutException ex) {
+      System.out.println("error: " + ex.getMessage());
+      ex.printStackTrace();
+    } catch (IOException ex) {
+      System.out.println("Client error: " + ex.getMessage());
+      ex.printStackTrace();
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
   }
 }

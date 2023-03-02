@@ -375,8 +375,8 @@ public class RobotContainer {
     m_swerveDrive.disabledPeriodic();
   }
 
-  public DistanceSensor getDistanceSensor(){ 
-    return m_distanceSensor; 
+  public DistanceSensor getDistanceSensor() {
+    return m_distanceSensor;
   }
 
   public void periodic() {
