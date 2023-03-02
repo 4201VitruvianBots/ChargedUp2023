@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
@@ -30,10 +31,11 @@ public class Wrist extends SubsystemBase {
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
   private boolean isClosedLoop = true;
-  private WRIST.STATE m_controlState = WRIST.STATE.SETPOINT;
+  private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
   private double m_joystickInput;
-  private double m_wristPercentOutput;
-  private int simEncoderSign = WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 0;
+  private double m_simPercentOutput;
+  private final int simEncoderSign =
+      WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
   private static final DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.DIO.wristLowerSwitch);
@@ -87,6 +89,7 @@ public class Wrist extends SubsystemBase {
       kASub,
       kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
+  private StringPublisher currentCommandStatePub;
 
   public Wrist() {
     // One motor for the wrist
@@ -134,7 +137,7 @@ public class Wrist extends SubsystemBase {
   // set percent output function
   // period function that edits the elevator's height, from there make sure it obeys the limit (27.7
   // rotation)
-  private void setWristPercentOutput(double value) {
+  private void setPercentOutput(double value) {
     wristMotor.set(ControlMode.PercentOutput, value);
   }
 
@@ -148,14 +151,13 @@ public class Wrist extends SubsystemBase {
   }
 
   //  setpoint for the wrist
-  public void setSetpointDegrees(TrapezoidProfile.State state) {
+  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
     wristMotor.set(
         ControlMode.Position,
         Units.radiansToDegrees(state.position) / Constants.WRIST.encoderUnitsToDegrees,
         DemandType.ArbitraryFeedForward,
         //                    0
         calculateFeedforward(state));
-    m_wristPercentOutput = wristMotor.getMotorOutputPercent() + calculateFeedforward(state);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -165,8 +167,7 @@ public class Wrist extends SubsystemBase {
   public void resetState() {
     m_setpoint =
         new TrapezoidProfile.State(
-            Units.degreesToRadians(getPositionDegrees()),
-            Units.degreesToRadians(getVelocityDegreesPerSecond()));
+            getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
   }
 
   public void setDesiredPositionRadians(double desiredAngleRadians) {
@@ -187,11 +188,11 @@ public class Wrist extends SubsystemBase {
 
   // this is get current angle
   public double getPositionDegrees() {
-    return getSensorPosition() * Constants.WRIST.encoderUnitsToDegrees;
+    return getSensorPosition() * WRIST.encoderUnitsToDegrees;
   }
   // this is get current angle
   public double getVelocityDegreesPerSecond() {
-    return wristMotor.getSelectedSensorVelocity() * Constants.WRIST.encoderUnitsToDegrees * 10;
+    return wristMotor.getSelectedSensorVelocity() * WRIST.encoderUnitsToDegrees * 10;
   }
 
   public Rotation2d getWristAngleRotation2d() {
@@ -272,6 +273,7 @@ public class Wrist extends SubsystemBase {
     wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
+    currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
 
     kMaxVelSub = wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.WRIST.kMaxVel);
     kMaxAccelSub = wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.WRIST.kMaxAccel);
@@ -287,7 +289,10 @@ public class Wrist extends SubsystemBase {
 
   // SmartDashboard function
   public void updateSmartDashboard() {
+    SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
+    SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
+    currentCommandStatePub.set(getControlState().toString());
     //    if (DriverStation.isTest()) {
     //      var maxVel = kMaxVelSub.get(0);
     //      var maxAccel = kMaxAccelSub.get(0);
@@ -337,28 +342,40 @@ public class Wrist extends SubsystemBase {
                   WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
                   WRIST.THRESHOLD.ABSOLUTE_MAX.get());
           break;
+        case OPEN_LOOP_MANUAL:
+          double percentOutput = m_joystickInput * percentOutputMultiplier;
+          if (getPositionRadians() > (getUpperLimit() - 0.0523599)) {
+            percentOutput = Math.min(percentOutput, 0);
+          }
+          if (getPositionRadians() < (getLowerLimit() + 0.0523599)) {
+            percentOutput = Math.max(percentOutput, 0);
+          }
+          setPercentOutput(percentOutput);
+          break;
+        case USER_SETPOINT:
+          m_desiredSetpointRadians += m_joystickInput * setpointMultiplier;
+          break;
         default:
-        case SETPOINT:
+        case AUTO_SETPOINT:
           break;
       }
-      if (DriverStation.isEnabled()) {
+      if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
         var profile = new TrapezoidProfile(m_trapezoidalConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;
         kCommandedAngleDegreesPub.set(Units.radiansToDegrees(commandedSetpoint.position));
-        setSetpointDegrees(commandedSetpoint);
+        setSetpointTrapezoidState(commandedSetpoint);
       }
     } else {
-      setWristPercentOutput(m_joystickInput * percentOutputMultiplier);
+      setPercentOutput(m_joystickInput * percentOutputMultiplier);
     }
   }
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInputVoltage(
-        MathUtil.clamp(m_wristPercentOutput * RobotController.getBatteryVoltage(), -12, 12));
+    m_armSim.setInputVoltage(MathUtil.clamp(wristMotor.getMotorOutputPercent(), -12, 12));
     m_armSim.update(0.020);
 
     Unmanaged.feedEnable(20);

@@ -35,29 +35,31 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   @Override
   public void initialize() {
     m_elevator.setElevatorRunning(true);
-    m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
+    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
     m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+    m_elevator.setDesiredPositionMeters(m_setpoint);
 
-    m_elevator.setDesiredPositionMeters(
-        m_setpoint + joystickYDeadbandOutput * m_elevator.setpointMultiplier);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_elevator.setJoystickY(-joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_elevator.setElevatorRunning(false);
+    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
     m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

@@ -18,10 +18,15 @@ public class ToggleElevatorControlMode extends CommandBase {
     addRequirements(m_elevator);
   }
 
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setControlMode(!m_elevator.getControlMode());
+    m_elevator.setControlMode(!m_elevator.getClosedLoopState());
     //    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
   }
 

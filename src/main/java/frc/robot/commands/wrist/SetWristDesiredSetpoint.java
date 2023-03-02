@@ -31,26 +31,31 @@ public class SetWristDesiredSetpoint extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+    m_wrist.setDesiredPositionRadians(m_setpoint);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+    m_wrist.setDesiredPositionRadians(m_setpoint);
 
-    m_wrist.setDesiredPositionRadians(
-        m_setpoint + joystickYDeadbandOutput * m_wrist.setpointMultiplier);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_wrist.setUserInput(-joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
     m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

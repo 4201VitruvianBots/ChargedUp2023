@@ -50,7 +50,7 @@ public class Elevator extends SubsystemBase {
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
-  private double elevatorJoystickY;
+  private double joystickInput;
 
   private final double kP = 0.55;
   private final double kI = 0;
@@ -79,9 +79,9 @@ public class Elevator extends SubsystemBase {
   // of the motors.
   private boolean isClosedLoop = true;
   public boolean isElevatorElevatingElevatando = false;
-  private int simEncoderSign =
+  private final int simEncoderSign =
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
-  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
+  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
   private final double maxPercentOutput = 0.75;
   private final double percentOutputMultiplier = 0.50;
@@ -111,7 +111,10 @@ public class Elevator extends SubsystemBase {
       kVSub,
       kASub;
   private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub;
-  private StringPublisher kDesiredStatePub, kPercentOutputPub, kClosedLoopModePub;
+  private StringPublisher kDesiredStatePub,
+      kPercentOutputPub,
+      kClosedLoopModePub,
+      currentCommandStatePub;
 
   // Mechanism2d visualization setup
   public Mechanism2d mech2d = new Mechanism2d(maxElevatorHeight * 50, maxElevatorHeight * 50);
@@ -160,7 +163,7 @@ public class Elevator extends SubsystemBase {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
-  public void setElevatorPercentOutput(double output) {
+  public void setPercentOutput(double output) {
     // if (getElevatorLowerSwitch())
     //   MathUtil.clamp(output, 0, 1);
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
@@ -176,7 +179,7 @@ public class Elevator extends SubsystemBase {
         MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
   }
 
-  public void setTrapezoidState(TrapezoidProfile.State state) {
+  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
         state.position / Constants.ELEVATOR.encoderCountsToMeters,
@@ -265,8 +268,8 @@ public class Elevator extends SubsystemBase {
     return m_upperLimitMeters;
   }
 
-  public void setElevatorJoystickY(double m_joystickY) {
-    elevatorJoystickY = m_joystickY;
+  public void setJoystickY(double m_joystickY) {
+    joystickInput = m_joystickY;
   }
 
   /*
@@ -286,7 +289,7 @@ public class Elevator extends SubsystemBase {
     this.isClosedLoop = isClosedLoop;
   }
 
-  public boolean getControlMode() {
+  public boolean getClosedLoopState() {
     return isClosedLoop;
   }
 
@@ -330,6 +333,7 @@ public class Elevator extends SubsystemBase {
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
     kPercentOutputPub = elevatorNtTab.getStringTopic("Percent Output").publish();
     kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
+    currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
 
     elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
@@ -357,13 +361,17 @@ public class Elevator extends SubsystemBase {
   }
 
   public void updateShuffleboard() {
-    // TODO: Add encoder counts per second or since last scheduler run
+    SmartDashboard.putBoolean("Elevator Closed Loop", getClosedLoopState());
+    SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
+
     kHeightPub.set(getHeightMeters());
     kDesiredHeightPub.set(getDesiredPositionMeters());
     kEncoderCountsPub.set(getElevatorEncoderCounts());
     kDesiredStatePub.set(desiredHeightState.name());
     kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
+
+    currentCommandStatePub.set(getControlState().toString());
 
     // Elevator PID Tuning Values
     //    if (DriverStation.isTest()) {
@@ -438,15 +446,28 @@ public class Elevator extends SubsystemBase {
         case CLOSED_LOOP_MANUAL:
           m_desiredPositionMeters =
               MathUtil.clamp(
-                  elevatorJoystickY * setpointMultiplier + getHeightMeters(),
+                  joystickInput * setpointMultiplier + getHeightMeters(),
                   ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
                   ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
           break;
+        case OPEN_LOOP_MANUAL:
+          double percentOutput = joystickInput * percentOutputMultiplier;
+          if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+            percentOutput = Math.min(percentOutput, 0);
+          }
+          if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+            percentOutput = Math.max(percentOutput, 0);
+          }
+          setPercentOutput(percentOutput);
+          break;
+        case USER_SETPOINT:
+          m_desiredPositionMeters += joystickInput * setpointMultiplier;
+          break;
         default:
-        case SETPOINT:
+        case AUTO_SETPOINT:
           break;
       }
-      if (DriverStation.isEnabled()) {
+      if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
         var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
@@ -454,11 +475,11 @@ public class Elevator extends SubsystemBase {
         var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
         m_commandedPositionMeters = commandedSetpoint.position;
         kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
-        setTrapezoidState(commandedSetpoint);
+        setSetpointTrapezoidState(commandedSetpoint);
       }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setElevatorPercentOutput(elevatorJoystickY * percentOutputMultiplier);
+      setPercentOutput(joystickInput * percentOutputMultiplier);
     }
   }
 }

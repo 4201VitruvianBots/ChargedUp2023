@@ -95,7 +95,8 @@ public final class Constants {
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
-      SETPOINT
+      USER_SETPOINT,
+      AUTO_SETPOINT
     }
 
     public enum SETPOINT {
@@ -288,7 +289,8 @@ public final class Constants {
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
-      SETPOINT
+      USER_SETPOINT,
+      AUTO_SETPOINT
     }
 
     public enum SETPOINT {

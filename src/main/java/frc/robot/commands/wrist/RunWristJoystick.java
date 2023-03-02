@@ -30,16 +30,25 @@ public class RunWristJoystick extends CommandBase {
   @Override
   public void execute() {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
-    double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
-    if (Math.abs(joystickXDeadbandOutput) != 0) {
-      m_wrist.setControlState(
-          m_wrist.getClosedLoopState()
-              ? WRIST.STATE.CLOSED_LOOP_MANUAL
-              : WRIST.STATE.OPEN_LOOP_MANUAL);
-    } else m_wrist.setControlState(WRIST.STATE.SETPOINT);
-
-    m_wrist.setUserInput(-joystickXDeadbandOutput);
+    if (Math.abs(joystickYDeadbandOutput) != 0) {
+      //      m_wrist.setControlState(
+      //          m_wrist.getClosedLoopState()
+      //              ? WRIST.STATE.CLOSED_LOOP_MANUAL
+      //              : WRIST.STATE.OPEN_LOOP_MANUAL);
+      if (m_wrist.getControlState() == WRIST.STATE.USER_SETPOINT) {
+        m_wrist.setUserInput(-joystickYDeadbandOutput);
+      } else {
+        m_wrist.setControlState(WRIST.STATE.OPEN_LOOP_MANUAL);
+        m_wrist.setUserInput(-joystickYDeadbandOutput);
+      }
+    }
+    if (joystickYDeadbandOutput == 0 && m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL) {
+      m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+      m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
+      m_wrist.resetState();
+    }
   }
 
   // Called once the command ends or is interrupted.

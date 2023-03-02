@@ -40,18 +40,28 @@ public class IncrementElevatorHeight extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_elevator.setControlState(
-          m_elevator.getControlMode()
-              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
-              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-    } else m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
+      //      m_elevator.setControlState(
+      //          m_elevator.getControlMode()
+      //              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
+      //              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+      if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
+        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      } else {
+        m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      }
+    }
+    if (joystickYDeadbandOutput == 0
+        && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+      m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+      m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
+      m_elevator.resetState();
+    }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
     // Uncomment if you want to reenable this
     // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
     // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
-
-    m_elevator.setElevatorJoystickY(-joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

@@ -8,16 +8,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -240,6 +238,138 @@ public class RobotContainer {
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+
+    initTestController();
+  }
+
+  private void initTestController() {
+    if (RobotBase.isSimulation()) {
+      CommandPS4Controller testController = new CommandPS4Controller(3);
+
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  () ->
+                      m_stateHandler.getCurrentZone().ordinal()
+                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  () ->
+                      m_stateHandler.getCurrentZone().ordinal()
+                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+
+      // Score button Bindings
+
+      // Score LOW Setpoints
+      testController
+          .cross()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .cross()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_LOW_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Score MID Setpoints
+      testController
+          .circle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .circle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_MID_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Stowed
+      testController
+          .square()
+          .whileTrue(
+              new SetElevatorDesiredSetpoint(
+                  m_elevator, ELEVATOR.SETPOINT.STOWED.get(), testController::getLeftY));
+      testController
+          .square()
+          .whileTrue(
+              new SetWristDesiredSetpoint(
+                  m_wrist, WRIST.SETPOINT.STOWED.get(), testController::getRightY));
+
+      // High
+      testController
+          .triangle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator,
+                      ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(),
+                      testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator,
+                      ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(),
+                      testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .triangle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Toggle elevator, wrist control state
+      testController
+          .povDown()
+          .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+      testController
+          .povDown()
+          .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+
+      // Will switch between closed and open loop on button press
+      testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
+      testController.options().onTrue(new ToggleWristControlMode(m_wrist));
+
+      m_elevator.setDefaultCommand(
+          new IncrementElevatorHeight(m_elevator, testController::getLeftY));
+      m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, testController::getRightY));
+    }
   }
 
   public void disableInit() {
@@ -248,7 +378,9 @@ public class RobotContainer {
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
     m_elevator.resetState();
+    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
   }
