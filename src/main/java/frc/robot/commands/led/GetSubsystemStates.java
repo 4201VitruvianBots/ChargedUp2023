@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 
 /*scoring = flashing white, intakingcube = blue,
 intakingcone = orange, locked on = flashing green,
@@ -20,8 +19,8 @@ public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LED m_led;
 
+  private final Elevator m_elevator;
   private final Vision m_vision;
-  private final StateHandler m_stateHandler;
   private final Controls m_controls;
   private final Wrist m_wrist;
   private final Intake m_intake;
@@ -36,18 +35,13 @@ public class GetSubsystemStates extends CommandBase {
 
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(
-      LED led,
-      Controls controls,
-      Intake intake,
-      Wrist wrist,
-      StateHandler stateHandler,
-      Vision vision) {
+      LED led, Controls controls, Intake intake, Wrist wrist, Vision vision, Elevator elevator) {
     m_led = led;
     m_controls = controls;
     m_intake = intake;
     m_wrist = wrist;
-    m_stateHandler = stateHandler;
     m_vision = vision;
+    m_elevator = elevator;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(led);
   }
@@ -66,7 +60,7 @@ public class GetSubsystemStates extends CommandBase {
     enabled = !disabled;
     intakingCone = m_vision.getPipeline(CAMERA_SERVER.INTAKE) == 2;
     intakingCube = m_vision.getPipeline(CAMERA_SERVER.INTAKE) == 1;
-    scoring = (m_stateHandler.getDesiredZone() == SUPERSTRUCTURE_STATE.EXTENDED_ZONE);
+    scoring = (m_elevator.getElevatorRunning() && m_wrist.isScoring());
     cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
     coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
 
