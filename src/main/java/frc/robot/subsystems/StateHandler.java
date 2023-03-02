@@ -130,17 +130,17 @@ public class StateHandler extends SubsystemBase {
             < Units.inchesToMeters(2)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
             < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW.get())
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             < Units.inchesToMeters(2)
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW.get())
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_CONE.get())
             < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_LOW;
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID.get())
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             < Units.inchesToMeters(2)
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID.get())
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID_CONE.get())
             < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_MID;
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH.get())
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             < Units.inchesToMeters(2)
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH.get())
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH_CONE.get())
             < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_HIGH;
 
     if (elevatorPositionMeters <= ELEVATOR.THRESHOLD.LOW_MAX.get()) {
@@ -279,6 +279,14 @@ public class StateHandler extends SubsystemBase {
     }
   }
 
+  private boolean isTiping() {
+    if (m_drive.getPitchDegrees() > 12.5) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // Whopper whopper whopper whopper
   // junior double triple whopper
   // flame grilled taste with perfect toppers
@@ -357,6 +365,10 @@ public class StateHandler extends SubsystemBase {
     }
 
     // TODO: Limit max swerve speed by elevator height
+    if (isTiping()) {
+      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+    }
 
     // TODO: Update this based on Intake sensors
     switch (currentIntakeState) {
@@ -390,7 +402,7 @@ public class StateHandler extends SubsystemBase {
           m_drive.getPoseMeters(),
           m_fieldSim.getTargetNode(currentIntakeState, scoringState),
           scoringState);
-      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH.get());
+      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());

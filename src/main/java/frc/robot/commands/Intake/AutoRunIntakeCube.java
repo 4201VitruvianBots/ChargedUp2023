@@ -11,7 +11,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 
-public class RunIntakeCone extends CommandBase {
+public class AutoRunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
@@ -21,7 +21,7 @@ public class RunIntakeCone extends CommandBase {
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public RunIntakeCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
+  public AutoRunIntakeCube(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
     m_vision = vision;
     m_swerve = swerve;
@@ -40,7 +40,7 @@ public class RunIntakeCone extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(-m_PercentOutput);
+    m_intake.setIntakePercentOutput(m_PercentOutput);
     if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
       m_swerve.setRobotHeading(
@@ -54,7 +54,6 @@ public class RunIntakeCone extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakePercentOutput(-0.2);
     m_intake.setIntakeState(false);
     m_swerve.enableHeadingTarget(false);
   }

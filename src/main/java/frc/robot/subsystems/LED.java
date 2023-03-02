@@ -122,23 +122,29 @@ public class LED extends SubsystemBase {
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case INTAKING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Strobe);
+        case INTAKINGCONE: // Flashing orange
+          setPattern(255, 165, 0, 0, 0, AnimationTypes.Strobe);
           break;
-        case CONE: // Solid yellow
+        case INTAKINGCUBE: // Flashing blue
+          setPattern(0, 0, 255, 0, 0, AnimationTypes.Strobe);
+          break;
+        case CONE_BUTTON: // Solid Yellow
           setPattern(255, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case CUBE: // Solid purple
-          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
+        case CUBE_BUTTON: // Solid purple
+          setPattern(128, 0, 128, 0, 0, AnimationTypes.Solid);
           break;
         case ELEVATING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.ColorFlow);
           break;
-        case WRIST: // Solid blue
-          setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
-          break;
         case CHARGING_STATION:
           setPattern(125, 125, 125, 125, 0, AnimationTypes.Rainbow);
+          break;
+        case SCORING: // Flashing white
+          setPattern(0, 0, 0, 255, 1, AnimationTypes.Strobe);
+          break;
+        case LOCKED_ON: // Flashing Green
+          setPattern(0, 255, 0, 0, 1, AnimationTypes.Strobe);
           break;
         default:
           break;
@@ -201,12 +207,15 @@ public class LED extends SubsystemBase {
     DISABLED,
     INITIALIZED,
     ENABLED,
-    INTAKING,
+    INTAKINGCONE,
+    INTAKINGCUBE,
     ELEVATING,
     WRIST,
-    CONE,
-    CUBE,
-    CHARGING_STATION
+    CONE_BUTTON,
+    CUBE_BUTTON,
+    CHARGING_STATION,
+    SCORING,
+    LOCKED_ON
   }
 
   public enum PieceType {

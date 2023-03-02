@@ -4,17 +4,26 @@
 
 package frc.robot.commands.wrist;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
+import java.util.function.DoubleSupplier;
 
 public class SetWristDesiredSetpoint extends CommandBase {
   private final Wrist m_wrist;
   private double m_setpoint;
+  private final DoubleSupplier m_input;
+
+  public SetWristDesiredSetpoint(Wrist wrist, double setpoint) {
+    this(wrist, setpoint, () -> 0);
+  }
 
   /** Creates a new RunWrist. */
-  public SetWristDesiredSetpoint(Wrist wrist, double setpoint) {
+  public SetWristDesiredSetpoint(Wrist wrist, double setpoint, DoubleSupplier input) {
     m_wrist = wrist;
     m_setpoint = setpoint;
+    m_input = input;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
@@ -27,12 +36,17 @@ public class SetWristDesiredSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+
+    m_wrist.setDesiredPositionRadians(
+        m_setpoint + joystickYDeadbandOutput * m_wrist.setpointMultiplier);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+  }
 
   // Returns true when the command should end.
   @Override

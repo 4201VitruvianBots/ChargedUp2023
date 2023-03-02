@@ -65,6 +65,12 @@ public class Intake extends SubsystemBase {
     return isIntaking;
   }
 
+  // True if Cube is detected, otherwise assume Cone
+  public boolean getIntakeGamePiece() {
+    // TODO: Update threshold
+    return getIntakeCubeMeasurement() > 0;
+  }
+
   public double getIntakeMotorCurrent() {
     return intakeMotor.getStatorCurrent();
   }

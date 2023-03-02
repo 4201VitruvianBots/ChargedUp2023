@@ -92,6 +92,7 @@ public class SwerveDrive extends SubsystemBase {
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
+  private double m_maxVelocity = Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
 
   public SwerveDrive() {
 
@@ -120,8 +121,8 @@ public class SwerveDrive extends SubsystemBase {
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
-    strafe *= Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+    throttle *= m_maxVelocity;
+    strafe *= m_maxVelocity;
     rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
     if (useHeadingTarget) {
@@ -143,8 +144,7 @@ public class SwerveDrive extends SubsystemBase {
         ModuleMap.of(Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]),
-        Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
+        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), m_maxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
@@ -181,8 +181,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, m_maxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(states[module.getModulePosition().ordinal()], isOpenLoop);
@@ -266,6 +265,10 @@ public class SwerveDrive extends SubsystemBase {
       module.setDriveNeutralMode(mode);
       module.setTurnNeutralMode(mode);
     }
+  }
+
+  public void setMaxVelocity(double mps) {
+    m_maxVelocity = mps;
   }
 
   public void setCurrentTrajectory(Trajectory trajectory) {

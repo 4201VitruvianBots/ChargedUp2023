@@ -26,7 +26,9 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_elevator.setElevatorRunning(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -35,7 +37,6 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
-    var test = m_joystickY.getAsDouble();
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
@@ -55,7 +56,9 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_elevator.setElevatorRunning(false);
+  }
 
   // Returns true when the command should end.
   @Override
