@@ -7,11 +7,23 @@ package frc.robot.utils;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.BaseAutoBuilder;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class TrajectoryUtils {
   public static List<PathPlannerTrajectory> readTrajectory(
@@ -37,6 +49,16 @@ public class TrajectoryUtils {
         DriverStation.reportWarning(
             "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
+
+        var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+
+        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        for (var trajectory : pathGroup) {
+          ppTrajectories.add(
+                  PathPlannerTrajectory.transformTrajectoryForAlliance(
+                          trajectory, DriverStation.Alliance.Red));
+        }
+        return ppTrajectories;
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
