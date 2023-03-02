@@ -114,7 +114,7 @@ public class DistanceSensor {
             + ",\"test\":"
             + Integer.toString(rand.nextInt(100))
             + "}";
-//    System.out.println(receivedData);
+    //    System.out.println(receivedData);
   }
 
   public void pollDistanceSensors() {

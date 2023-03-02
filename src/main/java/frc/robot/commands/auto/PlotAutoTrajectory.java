@@ -38,14 +38,16 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-//    var isRedPath = m_pathName.startsWith("Red");
+    //    var isRedPath = m_pathName.startsWith("Red");
     var isRedPath = false;
 
     if (m_trajectories != null) {
-//      for(int i =0; i < m_trajectories.size(); i++) {
-//        m_fieldSim.getField2d().getObject("Trajectory " + i + " InitPose").setPose(m_trajectories.get(i).getInitialHolonomicPose());
-//        m_fieldSim.getField2d().getObject("Trajectory " + i + " EndPose").setPose(m_trajectories.get(i).getEndState().poseMeters);
-//      }
+      //      for(int i =0; i < m_trajectories.size(); i++) {
+      //        m_fieldSim.getField2d().getObject("Trajectory " + i + "
+      // InitPose").setPose(m_trajectories.get(i).getInitialHolonomicPose());
+      //        m_fieldSim.getField2d().getObject("Trajectory " + i + "
+      // EndPose").setPose(m_trajectories.get(i).getEndState().poseMeters);
+      //      }
       if (isRedPath) {
         ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
         for (var trajectory : m_trajectories) {
