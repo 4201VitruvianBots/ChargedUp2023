@@ -6,30 +6,48 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
+
+/*scoring = flashing white, intakingcube = blue,
+intakingcone = orange, locked on = flashing green,
+enable = green, disabled = red,
+cubebutton = purple, conebutton = yellow */
 
 /** Sets the LED based on the subsystems' statuses */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LED m_led;
 
+  private final Vision m_vision;
+  private final StateHandler m_stateHandler;
   private final Controls m_controls;
   private final Wrist m_wrist;
   private final Intake m_intake;
-  private boolean Cone;
-  private boolean Cube;
+  private boolean intakingCone;
+  private boolean intakingCube;
   private boolean disabled;
   private boolean enabled;
   private boolean elavating;
-  private boolean intaking;
-  private boolean wrist;
+  private boolean scoring;
+  private boolean cubeButton;
+  private boolean coneButton;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LED led, Controls controls, Intake intake, Wrist wrist) {
+  public GetSubsystemStates(
+      LED led,
+      Controls controls,
+      Intake intake,
+      Wrist wrist,
+      StateHandler stateHandler,
+      Vision vision) {
     m_led = led;
     m_controls = controls;
     m_intake = intake;
     m_wrist = wrist;
+    m_stateHandler = stateHandler;
+    m_vision = vision;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(led);
   }
@@ -46,21 +64,31 @@ public class GetSubsystemStates extends CommandBase {
     // the prioritized state to be expressed to the LEDs
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
-    intaking = m_intake.getIntakeState();
+    intakingCone = m_vision.getPipeline(CAMERA_SERVER.INTAKE) == 2;
+    intakingCube = m_vision.getPipeline(CAMERA_SERVER.INTAKE) == 1;
+    scoring = (m_stateHandler.getDesiredZone() == SUPERSTRUCTURE_STATE.EXTENDED_ZONE);
+    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
+    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
 
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {
       if (m_controls.getInitState()) m_led.expressState(LED.robotState.INITIALIZED);
       else m_led.expressState(LED.robotState.DISABLED);
-    } else if (elavating) {
-      m_led.expressState(LED.robotState.ELEVATING);
-    } else if (Cone) {
-      m_led.expressState(LED.robotState.CONE);
-    } else if (Cube) {
-      m_led.expressState(LED.robotState.CUBE);
+    } else if (cubeButton) {
+      m_led.expressState(LED.robotState.CUBE_BUTTON);
+    } else if (coneButton) {
+      m_led.expressState(LED.robotState.CONE_BUTTON);
+    } else if (intakingCone) {
+      m_led.expressState(LED.robotState.INTAKINGCONE);
+    } else if (intakingCube) {
+      m_led.expressState(LED.robotState.INTAKINGCUBE);
+    } else if (scoring) {
+      m_led.expressState(LED.robotState.SCORING);
     } else if (enabled) {
       m_led.expressState(LED.robotState.ENABLED);
+    } else if (elavating) {
+      m_led.expressState(LED.robotState.ELEVATING);
     }
   }
 
