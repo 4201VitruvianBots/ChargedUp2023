@@ -36,7 +36,6 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
-import frc.robot.utils.DistanceSensor;
 import java.util.HashMap;
 
 /**
@@ -60,7 +59,7 @@ public class RobotContainer {
   private final LED m_led = new LED(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
-//  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -382,9 +381,9 @@ public class RobotContainer {
     m_swerveDrive.disabledPeriodic();
   }
 
-//  public DistanceSensor getDistanceSensor() {
-//    return m_distanceSensor;
-//  }
+  //  public DistanceSensor getDistanceSensor() {
+  //    return m_distanceSensor;
+  //  }
 
   public void periodic() {
     m_fieldSim.periodic();

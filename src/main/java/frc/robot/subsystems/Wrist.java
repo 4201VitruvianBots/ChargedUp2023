@@ -288,27 +288,27 @@ public class Wrist extends SubsystemBase {
   // SmartDashboard function
   public void updateSmartDashboard() {
 
-//    if (DriverStation.isTest()) {
-//      var maxVel = kMaxVelSub.get(0);
-//      var maxAccel = kMaxAccelSub.get(0);
-//      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-//      var kS = kSSub.get(Constants.WRIST.FFkS);
-//      var kG = kGSub.get(Constants.WRIST.kG);
-//      var kV = kVSub.get(Constants.WRIST.FFkV);
-//      var kA = kASub.get(Constants.WRIST.kA);
-//
-//      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-//
-//      wristMotor.config_kP(0, kPSub.get(0));
-//      wristMotor.config_kI(0, kISub.get(0));
-//      wristMotor.config_kD(0, kDSub.get(0));
-//
-//      var testSetpoint = kSetpointSub.get(0);
-//      if (m_desiredSetpointRadians != testSetpoint) {
-//        setControlState(Constants.WRIST.STATE.SETPOINT);
-//        m_desiredSetpointRadians = testSetpoint;
-//      }
-//    }
+    //    if (DriverStation.isTest()) {
+    //      var maxVel = kMaxVelSub.get(0);
+    //      var maxAccel = kMaxAccelSub.get(0);
+    //      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    //      var kS = kSSub.get(Constants.WRIST.FFkS);
+    //      var kG = kGSub.get(Constants.WRIST.kG);
+    //      var kV = kVSub.get(Constants.WRIST.FFkV);
+    //      var kA = kASub.get(Constants.WRIST.kA);
+    //
+    //      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+    //
+    //      wristMotor.config_kP(0, kPSub.get(0));
+    //      wristMotor.config_kI(0, kISub.get(0));
+    //      wristMotor.config_kD(0, kDSub.get(0));
+    //
+    //      var testSetpoint = kSetpointSub.get(0);
+    //      if (m_desiredSetpointRadians != testSetpoint) {
+    //        setControlState(Constants.WRIST.STATE.SETPOINT);
+    //        m_desiredSetpointRadians = testSetpoint;
+    //      }
+    //    }
   }
 
   public void updateLog() {
@@ -368,14 +368,16 @@ public class Wrist extends SubsystemBase {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (simEncoderSign * Units.radiansToDegrees(m_armSim.getAngleRads())
+                (simEncoderSign
+                    * Units.radiansToDegrees(m_armSim.getAngleRads())
                     / Constants.WRIST.encoderUnitsToDegrees));
 
     wristMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign *Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
+                (simEncoderSign
+                    * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
   }

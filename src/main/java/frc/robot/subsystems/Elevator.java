@@ -79,7 +79,8 @@ public class Elevator extends SubsystemBase {
   // of the motors.
   private boolean isClosedLoop = true;
   public boolean isElevatorElevatingElevatando = false;
-  private int simEncoderSign = Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+  private int simEncoderSign =
+      Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
   private final double maxPercentOutput = 0.75;
@@ -365,25 +366,25 @@ public class Elevator extends SubsystemBase {
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
 
     // Elevator PID Tuning Values
-//    if (DriverStation.isTest()) {
-//      elevatorMotors[0].config_kP(0, kPSub.get(0));
-//      elevatorMotors[0].config_kI(0, kISub.get(0));
-//      elevatorMotors[0].config_kD(0, kDSub.get(0));
-//
-//      maxVel = kMaxVelSub.get(0);
-//      maxAccel = kMaxAccelSub.get(0);
-//      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-//      kS = kSSub.get(0);
-//      kV = kVSub.get(0);
-//      kA = kASub.get(0);
-//      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
-//
-//      var testSetpoint = kSetpointSub.get(0);
-//      if (m_desiredPositionMeters != testSetpoint) {
-//        setControlState(ELEVATOR.STATE.SETPOINT);
-//        m_desiredPositionMeters = testSetpoint;
-//      }
-//    }
+    //    if (DriverStation.isTest()) {
+    //      elevatorMotors[0].config_kP(0, kPSub.get(0));
+    //      elevatorMotors[0].config_kI(0, kISub.get(0));
+    //      elevatorMotors[0].config_kD(0, kDSub.get(0));
+    //
+    //      maxVel = kMaxVelSub.get(0);
+    //      maxAccel = kMaxAccelSub.get(0);
+    //      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    //      kS = kSSub.get(0);
+    //      kV = kVSub.get(0);
+    //      kA = kASub.get(0);
+    //      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+    //
+    //      var testSetpoint = kSetpointSub.get(0);
+    //      if (m_desiredPositionMeters != testSetpoint) {
+    //        setControlState(ELEVATOR.STATE.SETPOINT);
+    //        m_desiredPositionMeters = testSetpoint;
+    //      }
+    //    }
   }
 
   public void updateLog() {
@@ -402,13 +403,17 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (simEncoderSign * elevatorSim.getPositionMeters() / Constants.ELEVATOR.encoderCountsToMeters));
+            (int)
+                (simEncoderSign
+                    * elevatorSim.getPositionMeters()
+                    / Constants.ELEVATOR.encoderCountsToMeters));
 
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign * elevatorSim.getVelocityMetersPerSecond()
+                (simEncoderSign
+                    * elevatorSim.getVelocityMetersPerSecond()
                     / Constants.ELEVATOR.encoderCountsToMeters
                     * 10));
 
