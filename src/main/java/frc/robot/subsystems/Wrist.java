@@ -48,7 +48,7 @@ public class Wrist extends SubsystemBase {
           Constants.WRIST.FFkS, Constants.WRIST.kG, Constants.WRIST.FFkV, Constants.WRIST.kA);
 
   private final double maxPercentOutput = 1.0;
-  private final double setpointMultiplier = Units.degreesToRadians(60.0);
+  public final double setpointMultiplier = Units.degreesToRadians(60.0);
   private final double percentOutputMultiplier = 0.4;
 
   private final SingleJointedArmSim m_armSim =

@@ -37,8 +37,8 @@ public class Vision extends SubsystemBase {
   private DoubleLogEntry limelightTargetValid;
   private DoubleLogEntry leftLocalizerTargetValid;
 
-  private Timer searchTimer = new Timer();
-  private Double searchWindow = 0.2;
+  private final Timer searchTimer = new Timer();
+  private Double searchWindow = 0.4;
 
   private enum targetType {
     INTAKING,
@@ -51,7 +51,7 @@ public class Vision extends SubsystemBase {
 
   Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
-  double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0};
+  double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0, 0};
 
   int[] tagIds = new int[10];
   double[] robotPosX = new double[10];

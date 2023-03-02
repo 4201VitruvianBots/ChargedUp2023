@@ -13,9 +13,9 @@ public class SetElevatorDesiredSetpointState extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
-  private final ELEVATOR.SETPOINT m_setpoint;
+  private final ELEVATOR.STATE m_setpoint;
 
-  public SetElevatorDesiredSetpointState(Elevator elevator, ELEVATOR.SETPOINT state) {
+  public SetElevatorDesiredSetpointState(Elevator elevator, ELEVATOR.STATE state) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -30,7 +30,7 @@ public class SetElevatorDesiredSetpointState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setSetpointState(m_setpoint);
+    m_elevator.setControlState(m_setpoint);
   }
 
   // Called once the command ends or is interrupted.

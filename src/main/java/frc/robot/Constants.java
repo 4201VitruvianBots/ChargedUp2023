@@ -102,10 +102,13 @@ public final class Constants {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
-      SCORE_LOW(Units.inchesToMeters(20.0)),
-      SCORE_MID(Units.inchesToMeters(26.0)),
-      SCORE_HIGH(Units.inchesToMeters(32.0)),
-      INTAKING_EXTENDED(SCORE_HIGH.get());
+      SCORE_LOW_CONE(Units.inchesToMeters(20.0)),
+      SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
+      SCORE_MID_CONE(Units.inchesToMeters(26.0)),
+      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
+      SCORE_HIGH_CONE(Units.inchesToMeters(32.0)),
+      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
       private final double value;
 
@@ -293,10 +296,13 @@ public final class Constants {
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW(Units.degreesToRadians(-10.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
-      SCORE_LOW(Units.degreesToRadians(180.0)),
-      SCORE_MID(Units.degreesToRadians(180.0)),
-      SCORE_HIGH(Units.degreesToRadians(180.0)),
-      INTAKING_EXTENDED(SCORE_HIGH.get());
+      SCORE_LOW_CONE(Units.degreesToRadians(180.0)),
+      SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
+      SCORE_MID_CONE(Units.degreesToRadians(180.0)),
+      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
+      SCORE_HIGH_CONE(Units.degreesToRadians(180.0)),
+      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
       private final double value;
 

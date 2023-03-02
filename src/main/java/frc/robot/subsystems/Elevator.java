@@ -81,8 +81,8 @@ public class Elevator extends SubsystemBase {
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
   private final double maxPercentOutput = 1.0;
-  private final double setpointMultiplier = 0.50;
   private final double percentOutputMultiplier = 0.50;
+  public final double setpointMultiplier = 0.50;
 
   // Simulation setup
 
