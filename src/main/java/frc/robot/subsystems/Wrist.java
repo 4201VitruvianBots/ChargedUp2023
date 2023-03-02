@@ -220,8 +220,7 @@ public class Wrist extends SubsystemBase {
   // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
   // the ground.
   public void resetWristAngle(double angle) {
-    wristMotor.setSelectedSensorPosition(
-        angle / Constants.WRIST.encoderUnitsToDegrees);
+    wristMotor.setSelectedSensorPosition(angle / Constants.WRIST.encoderUnitsToDegrees);
   }
 
   public void setControlMode(boolean isClosedLoop) {
