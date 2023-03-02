@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 import frc.robot.subsystems.StateHandler.INTAKING_STATES;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -122,7 +121,8 @@ public class DistanceSensor {
             + "}";
   }
 
-  // Returns the distance in inches from the left side of the intake to the center of the game piece.
+  // Returns the distance in inches from the left side of the intake to the center of the game
+  // piece.
   public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
     int leftSensorId;
     int rightSensorId;
@@ -146,8 +146,10 @@ public class DistanceSensor {
     double leftSensorValue = getSensorValue(leftSensorId) / 1000;
     double rightSensorValue = getSensorValue(rightSensorId) / 1000;
 
-    double distanceMeters = leftSensorValue + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2);
-    
+    double distanceMeters =
+        leftSensorValue
+            + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2);
+
     return Units.metersToInches(distanceMeters);
   }
 
@@ -161,7 +163,7 @@ public class DistanceSensor {
 
   public void pollDistanceSensors() {
     // This method will be called once per scheduler run
-    //testParserTab.setInteger(testParser());
+    // testParserTab.setInteger(testParser());
     try {
       if (RobotBase.isSimulation()) {
         simulationPeriodic();
