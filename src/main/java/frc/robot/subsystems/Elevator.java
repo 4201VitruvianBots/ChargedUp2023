@@ -78,6 +78,7 @@ public class Elevator extends SubsystemBase {
   // If the sensors are acting up, we set this value to false to directly control the percent output
   // of the motors.
   private boolean elevatorIsClosedLoop = true;
+  public boolean isElevatorElevatingElevatando = false;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
   private final double maxPercentOutput = 1.0;
@@ -205,6 +206,14 @@ public class Elevator extends SubsystemBase {
 
   public double getElevatorMotorVoltage() {
     return elevatorMotors[0].getMotorOutputVoltage();
+  }
+
+  public boolean getElevatorRunning() {
+    return isElevatorElevatingElevatando;
+  }
+
+  public boolean setElevatorRunning(boolean state) {
+    return isElevatorElevatingElevatando = state;
   }
 
   // public boolean getElevatorLowerSwitch() {

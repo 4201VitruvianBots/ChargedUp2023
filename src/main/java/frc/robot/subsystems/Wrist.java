@@ -325,6 +325,10 @@ public class Wrist extends SubsystemBase {
     wristPositionDegreesEntry.append(getPositionDegrees());
   }
 
+  public boolean isScoring() {
+    return (getPositionDegrees() > 170);
+  }
+
   @Override
   public void periodic() {
     updateSmartDashboard();
