@@ -4,28 +4,34 @@
 
 package frc.robot.commands.auto;
 
-import edu.wpi.first.math.trajectory.Trajectory;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
+import frc.robot.utils.TrajectoryUtils;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
   FieldSim m_fieldSim;
-  List<Trajectory> m_trajectories;
-  Trajectory m_trajectory;
+  List<PathPlannerTrajectory> m_trajectories;
+  PathPlannerTrajectory m_trajectory;
+  private String m_pathName;
   boolean useList = false;
 
-  public PlotAutoTrajectory(FieldSim fieldSim, List<Trajectory> trajectories) {
+  public PlotAutoTrajectory(
+      FieldSim fieldSim, String pathName, List<PathPlannerTrajectory> trajectories) {
     m_fieldSim = fieldSim;
+    m_pathName = pathName;
     m_trajectories = trajectories;
     useList = true;
     // Use addRequirements() here to declare subsystem dependencies.
   }
   /** Creates a new PlotAutoTrajectory. */
-  public PlotAutoTrajectory(FieldSim fieldSim, Trajectory trajectory) {
+  public PlotAutoTrajectory(FieldSim fieldSim, String pathName, PathPlannerTrajectory trajectory) {
     m_fieldSim = fieldSim;
+    m_pathName = pathName;
     m_trajectory = trajectory;
-    useList = false;
 
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -33,8 +39,28 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (useList) m_fieldSim.setTrajectory(m_trajectories);
-    else m_fieldSim.setTrajectory(m_trajectory);
+    var isRedPath = m_pathName.startsWith("Red");
+
+    if (m_trajectories != null) {
+      if (isRedPath) {
+        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        for (var trajectory : m_trajectories) {
+          ppTrajectories.add(
+              PathPlannerTrajectory.transformTrajectoryForAlliance(
+                  trajectory, DriverStation.Alliance.Red));
+        }
+        m_fieldSim.setTrajectory(ppTrajectories);
+      } else {
+        m_fieldSim.setTrajectory(m_trajectories);
+      }
+    } else {
+      if (isRedPath) {
+        m_trajectory =
+            PathPlannerTrajectory.transformTrajectoryForAlliance(
+                m_trajectory, DriverStation.Alliance.Red);
+      }
+      m_fieldSim.setTrajectory(m_trajectory);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

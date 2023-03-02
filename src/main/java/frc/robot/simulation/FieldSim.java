@@ -4,10 +4,10 @@
 
 package frc.robot.simulation;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -141,7 +141,7 @@ public class FieldSim extends SubsystemBase {
     return m_field2d;
   }
 
-  public void setTrajectory(List<Trajectory> trajectories) {
+  public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
     List<Pose2d> trajectoryPoses = new ArrayList<>();
 
     for (var trajectory : trajectories) {
@@ -154,7 +154,7 @@ public class FieldSim extends SubsystemBase {
     m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
   }
 
-  public void setTrajectory(Trajectory trajectory) {
+  public void setTrajectory(PathPlannerTrajectory trajectory) {
     m_field2d.getObject("trajectory").setTrajectory(trajectory);
   }
 
@@ -229,7 +229,8 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == Constants.SCORING_STATE.SMART_LOW) {
+    if (mainState == Constants.SCORING_STATE.SMART_LOW
+        || mainState == Constants.SCORING_STATE.SMART_LOW_REVERSE) {
       possibleNodes.retainAll(lowNodes);
     } else if (mainState == Constants.SCORING_STATE.SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
@@ -238,7 +239,8 @@ public class FieldSim extends SubsystemBase {
     }
 
     // Only works on WPILIB version 2023.3.2 and above
-    return robotPose.nearest(possibleNodes);
+    if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
+    else return robotPose.nearest(possibleNodes);
   }
 
   @Override

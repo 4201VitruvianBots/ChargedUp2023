@@ -232,14 +232,17 @@ public class RobotContainer {
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
-        "BlueTopTwoCone", new BlueTopTwoCone(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueTopTwoCone",
+        new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption(
     //     "BlueTopConeCubeBalance",
-    //     new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    //     new TopConeCubeBalance("BlueTopConeCubeBalance", m_autoBuilder, m_swerveDrive, m_fieldSim));
     // m_autoChooser.addOption(
-    //     "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive,
+    //     "RedTopTwoConeBalance", new TopTwoConeBalance("RedTopTwoConeBalance", m_autoBuilder, m_swerveDrive,
     // m_fieldSim));
     // m_autoChooser.addOption(
     //     "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
@@ -251,7 +254,7 @@ public class RobotContainer {
 
     // m_autoChooser.addOption(
     //     "BlueMiddleTwoConeBalance",
-    //     new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    //     new MiddleTwoConeBottomBalance("BlueMiddleTwoConeBalance", m_autoBuilder, m_swerveDrive, m_fieldSim));
     // // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }

@@ -41,6 +41,8 @@ public class TrajectoryUtils {
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
       try {
+        var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
         DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
