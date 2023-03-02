@@ -34,6 +34,7 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristDesiredSetpoint;
@@ -123,7 +124,9 @@ public class RobotContainer {
     for (int i = 0; i < rightJoystickTriggers.length; i++)
       rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    // TODO: add a driver button that hard limits the max swerve speed while held for fine control
+    leftJoystickTriggers[0].whileTrue(
+        new SetSwerveMaxTranslationVeolcity(
+            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond / 25.0));
 
     xboxController
         .leftTrigger(0.1)

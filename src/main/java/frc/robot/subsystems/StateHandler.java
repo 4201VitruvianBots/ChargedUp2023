@@ -279,6 +279,14 @@ public class StateHandler extends SubsystemBase {
     }
   }
 
+  private boolean isTiping() {
+    if (m_drive.getPitchDegrees() > 12.5) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // Whopper whopper whopper whopper
   // junior double triple whopper
   // flame grilled taste with perfect toppers
@@ -357,6 +365,10 @@ public class StateHandler extends SubsystemBase {
     }
 
     // TODO: Limit max swerve speed by elevator height
+    if (isTiping()) {
+      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+    }
 
     // TODO: Update this based on Intake sensors
     switch (currentIntakeState) {
