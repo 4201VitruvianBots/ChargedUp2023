@@ -226,6 +226,7 @@ public class RobotContainer {
                     m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getRightY),
                 m_intake::getIntakeGamePiece));
 
+    // Toggle elevator, wrist control state
     xboxController
         .povDown()
         .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
@@ -254,10 +255,12 @@ public class RobotContainer {
 
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(2));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntake(m_intake));
-    m_eventMap.put("RunIntakeCone", new AutoRunReverseIntake(m_intake));
-    m_eventMap.put("RunIntakeCubeReverse", new AutoRunReverseIntake(m_intake));
-    m_eventMap.put("RunIntakeConeReverse", new AutoRunIntake(m_intake));
+    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
         "SetWristIntaking",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
