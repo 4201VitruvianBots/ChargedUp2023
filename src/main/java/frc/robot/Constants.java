@@ -376,10 +376,10 @@ public final class Constants {
   private static void initAlpha() {
     robotName = "Alpha";
 
-    SWERVEDRIVE.frontLeftCANCoderOffset = -197.402;
-    SWERVEDRIVE.frontRightCANCoderOffset = -36.211;
-    SWERVEDRIVE.backLeftCANCoderOffset = -82.002;
-    SWERVEDRIVE.backRightCANCoderOffset = -311.084;
+    SWERVEDRIVE.frontLeftCANCoderOffset = 16.26; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 215.596; // 41.748;
+    SWERVEDRIVE.backLeftCANCoderOffset = 262.705; // 261.475;
+    SWERVEDRIVE.backRightCANCoderOffset = 151.348;
 
     ELEVATOR.mainMotorInversionType = TalonFXInvertType.CounterClockwise;
     WRIST.motorInversionType = TalonFXInvertType.Clockwise;
