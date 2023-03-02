@@ -57,7 +57,7 @@ public class StateHandler extends SubsystemBase {
   public SUPERSTRUCTURE_STATE m_desiredZone = m_currentZone;
   public ZONE_TRANSITIONS m_nextZone = ZONE_TRANSITIONS.NONE;
   public Pose2d targetNode;
-  private boolean m_zoneEnforcement = true;
+  private boolean m_zoneEnforcement = false;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
 

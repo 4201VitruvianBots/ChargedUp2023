@@ -19,6 +19,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
@@ -32,6 +33,7 @@ public class Wrist extends SubsystemBase {
   private WRIST.STATE m_controlState = WRIST.STATE.SETPOINT;
   private double m_joystickInput;
   private double m_wristPercentOutput;
+  private int simEncoderSign = WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 0;
 
   private static final DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.DIO.wristLowerSwitch);
@@ -108,7 +110,7 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
     Timer.delay(1);
-    resetWristAngle(-10.0);
+    resetWristAngle(90.0);
 
     initSmartDashboard();
   }
@@ -254,6 +256,8 @@ public class Wrist extends SubsystemBase {
   }
 
   private void initSmartDashboard() {
+    SmartDashboard.putData(this);
+
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
     wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxVel);
@@ -284,27 +288,27 @@ public class Wrist extends SubsystemBase {
   // SmartDashboard function
   public void updateSmartDashboard() {
 
-    if (DriverStation.isTest()) {
-      var maxVel = kMaxVelSub.get(0);
-      var maxAccel = kMaxAccelSub.get(0);
-      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-      var kS = kSSub.get(Constants.WRIST.FFkS);
-      var kG = kGSub.get(Constants.WRIST.kG);
-      var kV = kVSub.get(Constants.WRIST.FFkV);
-      var kA = kASub.get(Constants.WRIST.kA);
-
-      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-
-      wristMotor.config_kP(0, kPSub.get(0));
-      wristMotor.config_kI(0, kISub.get(0));
-      wristMotor.config_kD(0, kDSub.get(0));
-
-      var testSetpoint = kSetpointSub.get(0);
-      if (m_desiredSetpointRadians != testSetpoint) {
-        setControlState(Constants.WRIST.STATE.SETPOINT);
-        m_desiredSetpointRadians = testSetpoint;
-      }
-    }
+//    if (DriverStation.isTest()) {
+//      var maxVel = kMaxVelSub.get(0);
+//      var maxAccel = kMaxAccelSub.get(0);
+//      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+//      var kS = kSSub.get(Constants.WRIST.FFkS);
+//      var kG = kGSub.get(Constants.WRIST.kG);
+//      var kV = kVSub.get(Constants.WRIST.FFkV);
+//      var kA = kASub.get(Constants.WRIST.kA);
+//
+//      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+//
+//      wristMotor.config_kP(0, kPSub.get(0));
+//      wristMotor.config_kI(0, kISub.get(0));
+//      wristMotor.config_kD(0, kDSub.get(0));
+//
+//      var testSetpoint = kSetpointSub.get(0);
+//      if (m_desiredSetpointRadians != testSetpoint) {
+//        setControlState(Constants.WRIST.STATE.SETPOINT);
+//        m_desiredSetpointRadians = testSetpoint;
+//      }
+//    }
   }
 
   public void updateLog() {
@@ -363,15 +367,15 @@ public class Wrist extends SubsystemBase {
     wristMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            -(int)
-                (Units.radiansToDegrees(m_armSim.getAngleRads())
+            (int)
+                (simEncoderSign * Units.radiansToDegrees(m_armSim.getAngleRads())
                     / Constants.WRIST.encoderUnitsToDegrees));
 
     wristMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
-            -(int)
-                (Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
+            (int)
+                (simEncoderSign *Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
   }

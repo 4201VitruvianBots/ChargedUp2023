@@ -76,8 +76,8 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(40);
-    public static double kMaxAccel = Units.inchesToMeters(40);
+    public static double kMaxVel = Units.inchesToMeters(20);
+    public static double kMaxAccel = Units.inchesToMeters(20);
 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;

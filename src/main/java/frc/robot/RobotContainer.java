@@ -60,7 +60,7 @@ public class RobotContainer {
   private final LED m_led = new LED(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+//  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -102,7 +102,7 @@ public class RobotContainer {
         new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist, m_vision, m_elevator));
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
-    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, 90.0));
 
     m_fieldSim.initSim();
   }
@@ -382,9 +382,9 @@ public class RobotContainer {
     m_swerveDrive.disabledPeriodic();
   }
 
-  public DistanceSensor getDistanceSensor() {
-    return m_distanceSensor;
-  }
+//  public DistanceSensor getDistanceSensor() {
+//    return m_distanceSensor;
+//  }
 
   public void periodic() {
     m_fieldSim.periodic();

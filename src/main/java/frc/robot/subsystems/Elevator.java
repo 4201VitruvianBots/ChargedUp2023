@@ -77,11 +77,12 @@ public class Elevator extends SubsystemBase {
   // to get to our setpoint.
   // If the sensors are acting up, we set this value false to directly control the percent output
   // of the motors.
-  private boolean elevatorIsClosedLoop = true;
+  private boolean isClosedLoop = true;
   public boolean isElevatorElevatingElevatando = false;
+  private int simEncoderSign = Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.SETPOINT;
 
-  private final double maxPercentOutput = 1.0;
+  private final double maxPercentOutput = 0.75;
   private final double percentOutputMultiplier = 0.50;
   public final double setpointMultiplier = 0.50;
 
@@ -281,11 +282,11 @@ public class Elevator extends SubsystemBase {
    * Open loop: Changes motor output directly
    */
   public void setControlMode(boolean isClosedLoop) {
-    elevatorIsClosedLoop = isClosedLoop;
+    this.isClosedLoop = isClosedLoop;
   }
 
   public boolean getControlMode() {
-    return elevatorIsClosedLoop;
+    return isClosedLoop;
   }
 
   public void setControlState(ELEVATOR.STATE state) {
@@ -317,6 +318,7 @@ public class Elevator extends SubsystemBase {
       SmartDashboard.putData("Elevator Command", this);
       SmartDashboard.putData("Elevator", mech2d);
     }
+    SmartDashboard.putData(this);
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
@@ -360,28 +362,28 @@ public class Elevator extends SubsystemBase {
     kEncoderCountsPub.set(getElevatorEncoderCounts());
     kDesiredStatePub.set(desiredHeightState.name());
     kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
-    kClosedLoopModePub.set(elevatorIsClosedLoop ? "Closed" : "Open");
+    kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
 
     // Elevator PID Tuning Values
-    if (DriverStation.isTest()) {
-      elevatorMotors[0].config_kP(0, kPSub.get(0));
-      elevatorMotors[0].config_kI(0, kISub.get(0));
-      elevatorMotors[0].config_kD(0, kDSub.get(0));
-
-      maxVel = kMaxVelSub.get(0);
-      maxAccel = kMaxAccelSub.get(0);
-      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-      kS = kSSub.get(0);
-      kV = kVSub.get(0);
-      kA = kASub.get(0);
-      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
-
-      var testSetpoint = kSetpointSub.get(0);
-      if (m_desiredPositionMeters != testSetpoint) {
-        setControlState(ELEVATOR.STATE.SETPOINT);
-        m_desiredPositionMeters = testSetpoint;
-      }
-    }
+//    if (DriverStation.isTest()) {
+//      elevatorMotors[0].config_kP(0, kPSub.get(0));
+//      elevatorMotors[0].config_kI(0, kISub.get(0));
+//      elevatorMotors[0].config_kD(0, kDSub.get(0));
+//
+//      maxVel = kMaxVelSub.get(0);
+//      maxAccel = kMaxAccelSub.get(0);
+//      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+//      kS = kSSub.get(0);
+//      kV = kVSub.get(0);
+//      kA = kASub.get(0);
+//      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+//
+//      var testSetpoint = kSetpointSub.get(0);
+//      if (m_desiredPositionMeters != testSetpoint) {
+//        setControlState(ELEVATOR.STATE.SETPOINT);
+//        m_desiredPositionMeters = testSetpoint;
+//      }
+//    }
   }
 
   public void updateLog() {
@@ -400,13 +402,13 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (elevatorSim.getPositionMeters() / Constants.ELEVATOR.encoderCountsToMeters));
+            (int) (simEncoderSign * elevatorSim.getPositionMeters() / Constants.ELEVATOR.encoderCountsToMeters));
 
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (elevatorSim.getVelocityMetersPerSecond()
+                (simEncoderSign * elevatorSim.getVelocityMetersPerSecond()
                     / Constants.ELEVATOR.encoderCountsToMeters
                     * 10));
 
@@ -426,7 +428,7 @@ public class Elevator extends SubsystemBase {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateElevatorHeight();
-    if (elevatorIsClosedLoop) {
+    if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
           m_desiredPositionMeters =
