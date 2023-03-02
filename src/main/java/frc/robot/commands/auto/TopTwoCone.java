@@ -16,7 +16,7 @@ public class TopTwoCone extends SequentialCommandGroup {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(8), Units.feetToMeters(40)));
+            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(20)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
 

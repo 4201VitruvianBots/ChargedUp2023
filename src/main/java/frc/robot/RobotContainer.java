@@ -202,7 +202,8 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("wait", new WaitCommand(1));
+    m_eventMap.put("secondwait", new WaitCommand(0.25));
     m_eventMap.put("RunIntake", new AutoRunReverseIntake(m_intake));
     m_eventMap.put("RunReverseIntake", new AutoRunReverseIntake(m_intake));
 
@@ -259,6 +260,16 @@ public class RobotContainer {
     //     new MiddleTwoConeBottomBalance("BlueMiddleTwoConeBalance", m_autoBuilder, m_swerveDrive,
     // m_fieldSim));
     // // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+      "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    m_autoChooser.addOption(
+      "BlueleftDrivefoward", new BlueleftDrivefoward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    m_autoChooser.addOption(
+      "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
