@@ -393,6 +393,9 @@ public final class Constants {
     SWERVEDRIVE.backLeftCANCoderOffset = 0;
     SWERVEDRIVE.backRightCANCoderOffset = 0;
   }
+  private static void initUnknown() {
+    robotName = "Unknown (Default Beta values)";
+  }
 
   public static void initConstants() {
     String mac = "";
@@ -415,7 +418,7 @@ public final class Constants {
     } else if (RobotBase.isSimulation()) {
       initSim();
     } else {
-      initBeta();
+      initUnknown();
     }
     SmartDashboard.putString("Robot Name", robotName);
   }

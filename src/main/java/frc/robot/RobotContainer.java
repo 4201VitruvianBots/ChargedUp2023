@@ -48,7 +48,7 @@ import java.util.HashMap;
 public class RobotContainer {
   private final DataLog m_logger = DataLogManager.getLog();
 
-  // The robot's subsystems and commands are defined here...4
+  // The robot's subsystems and commands are defined here...
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
@@ -261,6 +261,7 @@ public class RobotContainer {
         "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
         "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
     m_eventMap.put(
         "SetWristIntaking",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
