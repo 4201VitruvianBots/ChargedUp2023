@@ -34,11 +34,11 @@ public class Vision extends SubsystemBase {
   private final DoubleArrayPublisher m_leftLocalizerPositionPub;
   private final DoubleArrayPublisher m_rightLocalizerPositionPub;
 
-  private DoubleLogEntry limelightTargetValid;
-  private DoubleLogEntry leftLocalizerTargetValid;
+  private final DoubleLogEntry limelightTargetValid;
+  private final DoubleLogEntry leftLocalizerTargetValid;
 
   private final Timer searchTimer = new Timer();
-  private Double searchWindow = 0.4;
+  private final double searchWindow = 0.4;
 
   private enum targetType {
     INTAKING,
@@ -290,7 +290,7 @@ public class Vision extends SubsystemBase {
    * Collects transformation/rotation data from limelight
    */
   public double[] getBotPose(CAMERA_SERVER location) {
-    DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
+    DriverStation.Alliance allianceColor = DriverStation.getAlliance();
     double[] botPose = new double[0];
     switch (location) {
       case LEFT_LOCALIZER:
@@ -386,7 +386,7 @@ public class Vision extends SubsystemBase {
   }
 
   public Pose2d[] getTagPoses2d(CAMERA_SERVER location) {
-    NetworkTable localizer = null;
+    NetworkTable localizer;
     Pose2d[] poseArray = {defaultPose};
 
     if (getValidTarget(location)) {

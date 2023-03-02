@@ -73,9 +73,9 @@ public class Elevator extends SubsystemBase {
 
   private final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
-  // By default this is set to true as we use motion magic to determine what speed we should be at
+  // By default, this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
-  // If the sensors are acting up, we set this value to false to directly control the percent output
+  // If the sensors are acting up, we set this value false to directly control the percent output
   // of the motors.
   private boolean elevatorIsClosedLoop = true;
   public boolean isElevatorElevatingElevatando = false;
@@ -107,8 +107,7 @@ public class Elevator extends SubsystemBase {
       kMaxAccelSub,
       kSSub,
       kVSub,
-      kASub,
-      kSetpointCalcTimeSub;
+      kASub;
   private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub;
   private StringPublisher kDesiredStatePub, kPercentOutputPub, kClosedLoopModePub;
 
@@ -322,6 +321,7 @@ public class Elevator extends SubsystemBase {
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
+    kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
@@ -355,7 +355,8 @@ public class Elevator extends SubsystemBase {
 
   public void updateShuffleboard() {
     // TODO: Add encoder counts per second or since last scheduler run
-    kDesiredHeightPub.set(getHeightMeters());
+    kHeightPub.set(getHeightMeters());
+    kDesiredHeightPub.set(getDesiredPositionMeters());
     kEncoderCountsPub.set(getElevatorEncoderCounts());
     kDesiredStatePub.set(desiredHeightState.name());
     kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
@@ -363,16 +364,16 @@ public class Elevator extends SubsystemBase {
 
     // Elevator PID Tuning Values
     if (DriverStation.isTest()) {
-      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
       elevatorMotors[0].config_kP(0, kPSub.get(0));
       elevatorMotors[0].config_kI(0, kISub.get(0));
       elevatorMotors[0].config_kD(0, kDSub.get(0));
 
       maxVel = kMaxVelSub.get(0);
-      maxAccel = kMaxVelSub.get(0);
+      maxAccel = kMaxAccelSub.get(0);
+      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
       kS = kSSub.get(0);
-      kV = kSSub.get(0);
-      kA = kSSub.get(0);
+      kV = kVSub.get(0);
+      kA = kASub.get(0);
       m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
 
       var testSetpoint = kSetpointSub.get(0);

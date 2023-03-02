@@ -221,12 +221,7 @@ public class Wrist extends SubsystemBase {
   // the ground.
   public void resetWristAngle(double angle) {
     wristMotor.setSelectedSensorPosition(
-        angle / Constants.WRIST.encoderUnitsToDegrees); // setWristSensorPosition(0);
-    //    if(RobotBase.isSimulation()) {
-    //      wristMotor.getSimCollection().setIntegratedSensorRawPosition(
-    //              (int) (angle
-    //                      / Constants.WRIST.encoderUnitsPerRotation));
-    //    }
+        angle / Constants.WRIST.encoderUnitsToDegrees);
   }
 
   public void setControlMode(boolean isClosedLoop) {
@@ -257,10 +252,6 @@ public class Wrist extends SubsystemBase {
   private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
-  }
-
-  public String getControlModeAsString() {
-    return isClosedLoop ? "Closed" : "Open";
   }
 
   private void initSmartDashboard() {

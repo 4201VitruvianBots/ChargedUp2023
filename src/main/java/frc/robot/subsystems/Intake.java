@@ -22,7 +22,7 @@ public class Intake extends SubsystemBase {
 
   private final double kF = 0;
   private final double kP = 0.2;
-  private TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
+  private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
   // Log setup
@@ -84,6 +84,7 @@ public class Intake extends SubsystemBase {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
   // Shuffleboard or SmartDashboard function
+
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
   }
@@ -95,6 +96,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateSmartDashboard();
     updateLog();
     // TODO: If the cube or cone distance sensors see a game object, run the intake motor to hold
     // the game piece in.

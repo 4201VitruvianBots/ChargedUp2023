@@ -279,18 +279,14 @@ public class StateHandler extends SubsystemBase {
     }
   }
 
-  private boolean isTiping() {
-    if (m_drive.getPitchDegrees() > 12.5) {
-      return true;
-    } else {
-      return false;
-    }
+  private boolean isTipping() {
+    return m_drive.getPitchDegrees() > 12.5;
   }
 
   // Whopper whopper whopper whopper
   // junior double triple whopper
   // flame grilled taste with perfect toppers
-  // i rule this day
+  // I rule this day
   public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
     var elevatorPose =
         m_drive
@@ -313,14 +309,11 @@ public class StateHandler extends SubsystemBase {
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
     m_wristLowerLimPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
     m_wristUpperLimPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
-    //    stateHandlerTab.addDouble("Angle", this::getWristAngleDegrees);
-    //    stateHandlerTab.addDouble("Raw position", this::getWristSensorPosition);
-    //    stateHandlerTab.addDouble("Setpoint", this::getSetpointDegrees);
   }
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentZone().toString());
-    //    SmartDashboard.putString("Superstructure State", getSuperStructureState().toString());
+
     m_currentStatePub.set(getCurrentZone().toString());
     m_desiredStatePub.set(getDesiredZone().toString());
     m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
@@ -365,7 +358,7 @@ public class StateHandler extends SubsystemBase {
     }
 
     // TODO: Limit max swerve speed by elevator height
-    if (isTiping()) {
+    if (isTipping()) {
       m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
     }
