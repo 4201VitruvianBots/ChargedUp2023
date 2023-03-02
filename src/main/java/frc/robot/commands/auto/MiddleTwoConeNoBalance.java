@@ -6,21 +6,21 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class BlueMiddleTwoConeNoBalance extends SequentialCommandGroup {
-  public BlueMiddleTwoConeNoBalance(
-      SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
+public class MiddleTwoConeNoBalance extends SequentialCommandGroup {
+  public MiddleTwoConeNoBalance(
+      String pathName, SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueMiddleTwoConeNoBalance",
-            new PathConstraints(Units.feetToMeters(13), Units.feetToMeters(52)));
+            pathName, new PathConstraints(Units.feetToMeters(13), Units.feetToMeters(52)));
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
-        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
+        //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
+        // fieldSim),
+        new PlotAutoTrajectory(fieldSim, pathName, trajectory),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

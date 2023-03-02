@@ -6,7 +6,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
@@ -35,11 +35,15 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
-    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
+    var test = m_joystickY.getAsDouble();
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_elevator.setElevatorState(ELEVATOR_STATE.JOYSTICK);
-    }
+      m_elevator.setControlState(
+          m_elevator.getControlMode()
+              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
+              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+    } else m_elevator.setControlState(ELEVATOR.STATE.SETPOINT);
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
     // Uncomment if you want to reenable this

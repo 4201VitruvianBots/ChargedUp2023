@@ -5,13 +5,17 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Controls extends SubsystemBase {
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
+  private boolean isInit;
+
   public Controls() {
     initSmartDashboard();
+    isInit = false;
   }
 
   /**
@@ -36,6 +40,14 @@ public class Controls extends SubsystemBase {
     // pdh.setSwitchableChannel(on);
   }
 
+  public boolean getInitState() {
+    return isInit;
+  }
+
+  public void setInitState(boolean init) {
+    isInit = init;
+  }
+
   /** Initializes values on SmartDashboard */
   private void initSmartDashboard() {
     //    Shuffleboard.getTab("SmartDashboard")
@@ -47,6 +59,7 @@ public class Controls extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
     allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
+    controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
   }
 
   /** Sends values to SmartDashboard */

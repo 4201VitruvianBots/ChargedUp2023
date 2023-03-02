@@ -34,7 +34,6 @@ public class TrajectoryUtils {
     if (fileName.startsWith("Red")) {
       var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
       if (!file.exists()) {
-        // TODO: handle exception
         DriverStation.reportWarning(
             "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
@@ -42,11 +41,12 @@ public class TrajectoryUtils {
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
       try {
+        var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
         DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-        return new ArrayList<PathPlannerTrajectory>();
-        // TODO: handle exception
+        return new ArrayList<>();
       }
     }
   }

@@ -2,32 +2,34 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.elevator;
+package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Elevator;
+import frc.robot.Constants.WRIST;
+import frc.robot.subsystems.Wrist;
 
-public class ToggleElevatorControlMode extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
-  private Elevator m_elevator;
+public class SetWristDesiredSetpointState extends CommandBase {
+  private final Wrist m_wrist;
+  private WRIST.STATE m_state;
 
-  public ToggleElevatorControlMode(Elevator elevator) {
+  /** Creates a new RunWrist. */
+  public SetWristDesiredSetpointState(Wrist wrist, WRIST.STATE state) {
+    m_wrist = wrist;
+    m_state = state;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    m_elevator = elevator;
-
-    addRequirements(m_elevator);
+    addRequirements(wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_elevator.setControlMode(!m_elevator.getControlMode());
-    //    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_wrist.setControlState(m_state);
+  }
 
   // Called once the command ends or is interrupted.
   @Override

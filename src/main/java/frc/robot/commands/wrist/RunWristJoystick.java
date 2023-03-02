@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Intake;
+package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
@@ -29,10 +30,16 @@ public class RunWristJoystick extends CommandBase {
   @Override
   public void execute() {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
-    double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
+    double joystickXDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
-    //    m_wrist.setWristState(WRIST_STATE.JOYSTICK);
-    m_wrist.setWristInput(-joystickXDeadbandOutput);
+    if (Math.abs(joystickXDeadbandOutput) != 0) {
+      m_wrist.setControlState(
+          m_wrist.getClosedLoopState()
+              ? WRIST.STATE.CLOSED_LOOP_MANUAL
+              : WRIST.STATE.OPEN_LOOP_MANUAL);
+    } else m_wrist.setControlState(WRIST.STATE.SETPOINT);
+
+    m_wrist.setUserInput(-joystickXDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
