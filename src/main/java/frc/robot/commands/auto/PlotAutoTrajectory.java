@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
-import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
 import java.util.List;
 
