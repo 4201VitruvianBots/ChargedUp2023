@@ -461,8 +461,14 @@ public class Elevator extends SubsystemBase {
           break;
         default:
         case AUTO_SETPOINT:
-          setPercentOutput(joystickInput * percentOutputMultiplier);
-          System.out.println(joystickInput * percentOutputMultiplier);
+          double percentOutput = joystickInput * percentOutputMultiplier;
+          if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+            percentOutput = Math.min(percentOutput, 0);
+          }
+          if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+            percentOutput = Math.max(percentOutput, 0);
+          }
+          setPercentOutput(percentOutput);
           break;
       }
       // if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
@@ -477,7 +483,14 @@ public class Elevator extends SubsystemBase {
       // }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setPercentOutput(joystickInput * percentOutputMultiplier);
+      double percentOutput = joystickInput * percentOutputMultiplier;
+      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+        percentOutput = Math.min(percentOutput, 0);
+      }
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+        percentOutput = Math.max(percentOutput, 0);
+      }
+      setPercentOutput(percentOutput);
     }
   }
 }

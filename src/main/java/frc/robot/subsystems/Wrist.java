@@ -112,7 +112,6 @@ public class Wrist extends SubsystemBase {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
-    Timer.delay(1);
     resetWristAngle(-15);
 
     initSmartDashboard();
@@ -336,20 +335,14 @@ public class Wrist extends SubsystemBase {
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
-          m_desiredSetpointRadians =
-              MathUtil.clamp(
-                  m_joystickInput * setpointMultiplier + getPositionRadians(),
-                  WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-                  WRIST.THRESHOLD.ABSOLUTE_MAX.get());
+          m_desiredSetpointRadians = m_joystickInput * setpointMultiplier + getPositionRadians();
+              // MathUtil.clamp(
+              //     m_joystickInput * setpointMultiplier + getPositionRadians(),
+              //     WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
+              //     WRIST.THRESHOLD.ABSOLUTE_MAX.get());
           break;
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * percentOutputMultiplier;
-          if (getPositionRadians() > (getUpperLimit() - 0.0523599)) {
-            percentOutput = Math.min(percentOutput, 0);
-          }
-          if (getPositionRadians() < (getLowerLimit() + 0.0523599)) {
-            percentOutput = Math.max(percentOutput, 0);
-          }
           setPercentOutput(percentOutput);
           break;
         case USER_SETPOINT:
