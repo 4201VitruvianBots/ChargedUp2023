@@ -484,11 +484,11 @@ public class Elevator extends SubsystemBase {
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       double percentOutput = joystickInput * percentOutputMultiplier;
-      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
-        percentOutput = Math.min(percentOutput, 0);
-      }
+      // if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+      //   percentOutput = Math.min(percentOutput, 0);
+      // }
       if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
-        percentOutput = Math.max(percentOutput, 0);
+        percentOutput = 0;
       }
       setPercentOutput(percentOutput);
     }
