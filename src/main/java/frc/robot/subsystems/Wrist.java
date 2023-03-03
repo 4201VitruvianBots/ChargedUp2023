@@ -30,7 +30,7 @@ public class Wrist extends SubsystemBase {
   private double m_commandedAngleRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
-  private boolean isClosedLoop = true;
+  private boolean isClosedLoop = false;
   private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
   private double m_joystickInput;
   private double m_simPercentOutput;

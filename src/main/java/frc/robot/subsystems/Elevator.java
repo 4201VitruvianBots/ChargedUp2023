@@ -145,7 +145,7 @@ public class Elevator extends SubsystemBase {
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
       motor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(-0.1, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.25, Constants.ELEVATOR.kTimeoutMs);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -484,11 +484,11 @@ public class Elevator extends SubsystemBase {
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       double percentOutput = joystickInput * percentOutputMultiplier;
-      // if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
-      //   percentOutput = Math.min(percentOutput, 0);
-      // }
+      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+        percentOutput = Math.min(percentOutput, 0);
+      }
       if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
-        percentOutput = 0;
+        percentOutput = Math.max(percentOutput, 0);
       }
       setPercentOutput(percentOutput);
     }
