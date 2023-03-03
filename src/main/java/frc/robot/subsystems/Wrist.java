@@ -113,7 +113,7 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
     Timer.delay(1);
-    resetWristAngle(90.0);
+    resetWristAngle(-15);
 
     initSmartDashboard();
   }
