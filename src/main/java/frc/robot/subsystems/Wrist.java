@@ -112,7 +112,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
-    resetWristAngle(-15);
+    resetWristAngle(90);
 
     initSmartDashboard();
   }

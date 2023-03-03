@@ -104,11 +104,11 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(5.32)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(11.65)),
+      SCORE_MID_CONE(Units.inchesToMeters(12.37)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(21.75)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(22.75)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
+      INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
       private final double value;
 
@@ -372,10 +372,10 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    SWERVEDRIVE.frontLeftCANCoderOffset = 92.0655; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 225.879; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 191.777; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 33.047;
+    SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
+    SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
+    SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
   }
 
   private static void initAlpha() {

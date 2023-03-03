@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -126,20 +127,10 @@ public class RobotContainer {
     xboxController
         .leftTrigger(0.1)
         .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
-    xboxController
-        .leftTrigger(0.1)
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     xboxController
         .rightTrigger(0.1)
         .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
-    xboxController
-        .rightTrigger(0.1)
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     // Score button Bindings
 
@@ -227,7 +218,19 @@ public class RobotContainer {
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
     xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController
+        .rightBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController
+        .leftBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist,
+                Units.degreesToRadians(-11.0),
+                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
@@ -476,30 +479,27 @@ public class RobotContainer {
         "RedBottomDriveForward",
         new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueDriveForward",
-        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
-    SmartDashboard.putData("Auto Selector", m_autoChooser);
+    // m_autoChooser.addOption(
+    //     "BlueDriveForward",
+    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "RedDriveForward",
         new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
-    SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(
         "BlueTopDriveForward",
         new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
-    SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(
         "RedTopDriveForward",
         new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
-    SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(
         "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
