@@ -445,22 +445,14 @@ public class Elevator extends SubsystemBase {
     updateElevatorHeight();
     if (isClosedLoop) {
       switch (m_controlState) {
-        // case CLOSED_LOOP_MANUAL:
-        //   m_desiredPositionMeters =
-        //       MathUtil.clamp(
-        //           joystickInput * setpointMultiplier + getHeightMeters(),
-        //           ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
-        //           ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
-        //   break;
-        // case OPEN_LOOP_MANUAL:
-        //   double percentOutput = joystickInput * percentOutputMultiplier;
-        //   setPercentOutput(percentOutput);
-        //   break;
-        case USER_SETPOINT:
-          m_desiredPositionMeters += joystickInput * setpointMultiplier;
+        case CLOSED_LOOP_MANUAL:
+          m_desiredPositionMeters =
+              MathUtil.clamp(
+                  joystickInput * setpointMultiplier + getHeightMeters(),
+                  ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+                  ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
           break;
-        default:
-        case AUTO_SETPOINT:
+        case OPEN_LOOP_MANUAL:
           double percentOutput = joystickInput * percentOutputMultiplier;
           if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
             percentOutput = Math.min(percentOutput, 0);
@@ -470,24 +462,30 @@ public class Elevator extends SubsystemBase {
           }
           setPercentOutput(percentOutput);
           break;
+        case USER_SETPOINT:
+          m_desiredPositionMeters += joystickInput * setpointMultiplier;
+          break;
+        default:
+        case AUTO_SETPOINT:
+          break;
       }
-      // if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-      //   m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-      //   var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
-      //   m_setpoint = profile.calculate(0.02);
-      //   //      var commandedSetpoint = limitDesiredAngleSetpoint();
-      //   var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
-      //   m_commandedPositionMeters = commandedSetpoint.position;
-      //   kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
-      //   setSetpointTrapezoidState(commandedSetpoint);
-      // }
+      if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
+        m_setpoint = profile.calculate(0.02);
+        //      var commandedSetpoint = limitDesiredAngleSetpoint();
+        var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
+        m_commandedPositionMeters = commandedSetpoint.position;
+        kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
+        setSetpointTrapezoidState(commandedSetpoint);
+      }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       double percentOutput = joystickInput * percentOutputMultiplier;
       if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
         percentOutput = Math.min(percentOutput, 0);
       }
-      if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) {
         percentOutput = Math.max(percentOutput, 0);
       }
       setPercentOutput(percentOutput);
