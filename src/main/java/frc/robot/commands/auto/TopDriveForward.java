@@ -10,16 +10,15 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class TopTwoCone extends SequentialCommandGroup {
-  public TopTwoCone(
+public class TopDriveForward extends SequentialCommandGroup {
+  public TopDriveForward(
       String pathName, SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(20)));
+            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
-
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),

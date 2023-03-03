@@ -26,15 +26,15 @@
     },
     {
       "anchorPoint": {
-        "x": 5.75,
+        "x": 7.8,
         "y": 2.75
       },
       "prevControl": {
-        "x": 4.734435059765663,
+        "x": 6.784435059765656,
         "y": 2.75
       },
       "nextControl": {
-        "x": 5.762774484571422,
+        "x": 7.81277448457142,
         "y": 2.75
       },
       "holonomicAngle": 0,
@@ -46,7 +46,7 @@
         "names": [
           "wait"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "before",
         "waitTime": 2.0
       }
