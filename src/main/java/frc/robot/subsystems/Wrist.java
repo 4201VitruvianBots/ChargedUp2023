@@ -336,10 +336,10 @@ public class Wrist extends SubsystemBase {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
           m_desiredSetpointRadians = m_joystickInput * setpointMultiplier + getPositionRadians();
-              MathUtil.clamp(
-                   m_joystickInput * setpointMultiplier + getPositionRadians(),
-                   WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-                   WRIST.THRESHOLD.ABSOLUTE_MAX.get());
+          MathUtil.clamp(
+              m_joystickInput * setpointMultiplier + getPositionRadians(),
+              WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
+              WRIST.THRESHOLD.ABSOLUTE_MAX.get());
           break;
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * percentOutputMultiplier;

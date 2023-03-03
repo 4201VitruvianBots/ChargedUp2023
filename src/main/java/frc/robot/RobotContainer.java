@@ -130,8 +130,8 @@ public class RobotContainer {
     xboxController
         .leftTrigger(0.1)
         .whileTrue(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     xboxController
         .rightTrigger(0.1)
