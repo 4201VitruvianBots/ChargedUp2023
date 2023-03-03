@@ -106,7 +106,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(11.65)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(20.78)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(21.75)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -295,13 +295,13 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-10.0)),
+      INTAKING_LOW(Units.degreesToRadians(-13.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(180.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(180.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(180.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(135.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 

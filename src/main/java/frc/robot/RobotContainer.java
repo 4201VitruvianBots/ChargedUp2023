@@ -128,14 +128,8 @@ public class RobotContainer {
     xboxController
         .leftTrigger(0.1)
         .whileTrue(
-            new ConditionalCommand(
                 new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getRightY),
-                () ->
-                    m_stateHandler.getCurrentZone().ordinal()
-                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+                    m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     xboxController
         .rightTrigger(0.1)
@@ -143,14 +137,8 @@ public class RobotContainer {
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
-            new ConditionalCommand(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getRightY),
-                () ->
-                    m_stateHandler.getCurrentZone().ordinal()
-                        <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     // Score button Bindings
 

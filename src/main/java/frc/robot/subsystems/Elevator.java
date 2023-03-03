@@ -144,8 +144,8 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(0.25, Constants.ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(-0.25, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(0.3, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.3, Constants.ELEVATOR.kTimeoutMs);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
