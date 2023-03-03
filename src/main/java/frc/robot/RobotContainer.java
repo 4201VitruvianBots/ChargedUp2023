@@ -34,6 +34,9 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.utils.DistanceSensor;
+import frc.robot.utils.LogManager;
+
 import java.util.HashMap;
 
 /**
@@ -66,6 +69,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   private final MemoryLog m_memorylog = new MemoryLog();
+  private final LogManager m_logManager = new LogManager();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -521,5 +525,6 @@ public class RobotContainer {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
+    m_logManager.periodic();
   }
 }
