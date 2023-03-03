@@ -26,6 +26,7 @@ import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -34,6 +35,7 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LED.PieceType;
 import java.util.HashMap;
 
 /**
@@ -235,6 +237,8 @@ public class RobotContainer {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
