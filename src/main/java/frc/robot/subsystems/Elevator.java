@@ -144,7 +144,7 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(0.25, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(-0.25, Constants.ELEVATOR.kTimeoutMs);
     }
 
@@ -485,7 +485,7 @@ public class Elevator extends SubsystemBase {
       if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
         percentOutput = Math.min(percentOutput, 0);
       }
-      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) {
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.0015)) {
         percentOutput = Math.max(percentOutput, 0);
       }
       setPercentOutput(percentOutput);
