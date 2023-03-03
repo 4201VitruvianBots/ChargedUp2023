@@ -110,7 +110,7 @@ public class Elevator extends SubsystemBase {
       kSSub,
       kVSub,
       kASub;
-  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub;
+  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub;
   private StringPublisher kDesiredStatePub,
       kPercentOutputPub,
       kClosedLoopModePub,
@@ -136,7 +136,7 @@ public class Elevator extends SubsystemBase {
       motor.configFactoryDefault();
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      motor.setSelectedSensorPosition(elevatorHeight);
+      motor.setSelectedSensorPosition(0.0);
 
       // Config PID
       motor.selectProfileSlot(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kPIDLoopIdx);
@@ -144,8 +144,8 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(-maxPercentOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(0.3, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.3, Constants.ELEVATOR.kTimeoutMs);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -225,7 +225,7 @@ public class Elevator extends SubsystemBase {
   // }
 
   public void setElevatorSensorPosition(double meters) {
-    elevatorMotors[0].setSelectedSensorPosition(meters);
+    elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
   }
 
   public ELEVATOR.SETPOINT getElevatorState() {
@@ -328,6 +328,7 @@ public class Elevator extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
+    kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
     kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
@@ -365,6 +366,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
 
     kHeightPub.set(getHeightMeters());
+    kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
     kEncoderCountsPub.set(getElevatorEncoderCounts());
     kDesiredStatePub.set(desiredHeightState.name());
@@ -455,7 +457,7 @@ public class Elevator extends SubsystemBase {
           if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
             percentOutput = Math.min(percentOutput, 0);
           }
-          if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+          if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) {
             percentOutput = Math.max(percentOutput, 0);
           }
           setPercentOutput(percentOutput);
@@ -479,7 +481,14 @@ public class Elevator extends SubsystemBase {
       }
     } else {
       // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
-      setPercentOutput(joystickInput * percentOutputMultiplier);
+      double percentOutput = joystickInput * percentOutputMultiplier;
+      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
+        percentOutput = Math.min(percentOutput, 0);
+      }
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.0015)) {
+        percentOutput = Math.max(percentOutput, 0);
+      }
+      setPercentOutput(percentOutput);
     }
   }
 }

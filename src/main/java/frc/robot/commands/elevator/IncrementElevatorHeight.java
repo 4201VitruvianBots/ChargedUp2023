@@ -53,7 +53,7 @@ public class IncrementElevatorHeight extends CommandBase {
     }
     if (joystickYDeadbandOutput == 0
         && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-      m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+      m_elevator.setJoystickY(-joystickYDeadbandOutput);
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.resetState();
     }

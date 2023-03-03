@@ -76,9 +76,8 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(20);
-    public static double kMaxAccel = Units.inchesToMeters(20);
-
+    public static double kMaxVel = Units.inchesToMeters(60);
+    public static double kMaxAccel = Units.inchesToMeters(45); 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -103,11 +102,11 @@ public final class Constants {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
-      SCORE_LOW_CONE(Units.inchesToMeters(20.0)),
+      SCORE_LOW_CONE(Units.inchesToMeters(5.32)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(26.0)),
+      SCORE_MID_CONE(Units.inchesToMeters(11.65)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(32.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(21.75)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -127,14 +126,14 @@ public final class Constants {
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(16.0)),
+      LOW_MAX(Units.inchesToMeters(50.0)),
       HIGH_MIN(Units.inchesToMeters(8.0)),
-      HIGH_MAX(Units.inchesToMeters(24.0)),
+      HIGH_MAX(Units.inchesToMeters(50.0)),
       EXTENDED_MIN(Units.inchesToMeters(12.0)),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
       LOW_TO_HIGH(Units.inchesToMeters(14.0)),
-      HIGH_TO_LOW(Units.inchesToMeters(10.0)),
-      HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
+      HIGH_TO_LOW(Units.inchesToMeters(3.5)),
+      HIGH_TO_EXTENDED(Units.inchesToMeters(24.0)),
       EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
 
       private final double value;
@@ -296,13 +295,13 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-10.0)),
+      INTAKING_LOW(Units.degreesToRadians(-13.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(180.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(180.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(180.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(135.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 

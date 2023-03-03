@@ -32,8 +32,8 @@ public class SetWristDesiredSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    // m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+    // m_wrist.setDesiredPositionRadians(m_setpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

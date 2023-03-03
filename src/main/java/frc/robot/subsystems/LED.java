@@ -12,6 +12,7 @@ import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -123,10 +124,7 @@ public class LED extends SubsystemBase {
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case INTAKINGCONE: // Flashing orange
-          setPattern(255, 165, 0, 0, 0, AnimationTypes.Strobe);
-          break;
-        case INTAKINGCUBE: // Flashing blue
+        case INTAKING: // Flashing blue
           setPattern(0, 0, 255, 0, 0, AnimationTypes.Strobe);
           break;
         case CONE_BUTTON: // Solid Yellow
@@ -157,13 +155,13 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     // TODO: Fix this from flashing
-    if (DriverStation.isDisabled()) {
-      currentRobotState = robotState.DISABLED;
-      red = 255;
-      green = 0;
-      blue = 0;
-      m_toAnimate = null;
-    }
+    // if (DriverStation.isDisabled()) {
+    //   currentRobotState = robotState.DISABLED;
+    //   red = 255;
+    //   green = 0;
+    //   blue = 0;
+    //   m_toAnimate = null;
+    // }
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
@@ -172,8 +170,8 @@ public class LED extends SubsystemBase {
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
-    //    SmartDashboard.putString("LED Mode", currentRobotState.toString());
-    ledStatePub.set(currentRobotState.toString());
+    SmartDashboard.putString("LED Mode", currentRobotState.toString());
+    // ledStatePub.set(currentRobotState.toString());
     // the code below was printing out just LED Mode over and over again in the Led tab for some
     // reason but the code above does show the current state
     //   Shuffleboard.getTab("Controls")
@@ -208,8 +206,7 @@ public class LED extends SubsystemBase {
     DISABLED,
     INITIALIZED,
     ENABLED,
-    INTAKINGCONE,
-    INTAKINGCUBE,
+    INTAKING,
     ELEVATING,
     WRIST,
     CONE_BUTTON,
