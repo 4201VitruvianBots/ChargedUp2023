@@ -259,9 +259,9 @@ public class RobotContainer {
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
-        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
-    m_eventMap.put(
         "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
     m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
     m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
     m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
@@ -280,7 +280,7 @@ public class RobotContainer {
         new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
             .withTimeout(1));
     m_eventMap.put(
-        "SetWristLowCubeNode",
+        "SetWristLowConeNode",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
@@ -288,20 +288,20 @@ public class RobotContainer {
         new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
-        "SetWristMidCubeNode",
+        "SetWristMidConeNode",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
-        "SetWristHighCubeNode",
+        "SetWristHighConeNode",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowReverseCubeNode",
@@ -340,41 +340,36 @@ public class RobotContainer {
     m_autoChooser.addOption(
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
     m_autoChooser.addOption(
         "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
+    m_autoChooser.addOption(
+        "BlueBottomDriveForward",
+        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "RedBottomDriveForward",
+        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
     m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "BlueTopConeCubeBalance",
-    //     new TopConeCubeBalance("BlueTopConeCubeBalance", m_autoBuilder, m_swerveDrive,
-    // m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "RedTopTwoConeBalance", new TopTwoConeBalance("RedTopTwoConeBalance", m_autoBuilder,
-    // m_swerveDrive,
-    // m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // // m_autoChooser.addOption(
-    // //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption(
-    //     "BlueMiddleTwoConeBalance",
-    //     new MiddleTwoConeBottomBalance("BlueMiddleTwoConeBalance", m_autoBuilder, m_swerveDrive,
-    // m_fieldSim));
-    // // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-      "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "DriveForward", new DriveForward("DriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(
-      "BlueleftDrivefoward", new BlueleftDrivefoward(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueTopDriveForward",
+        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(
-      "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "RedTopDriveForward",
+        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    m_autoChooser.addOption(
+        "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 

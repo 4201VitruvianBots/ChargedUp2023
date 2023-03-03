@@ -10,8 +10,8 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.utils.TrajectoryUtils;
 
-public class DriveForward extends SequentialCommandGroup {
-  public DriveForward(
+public class BottomDriveForward extends SequentialCommandGroup {
+  public BottomDriveForward(
       String pathName, SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim) {
 
     var trajectory =

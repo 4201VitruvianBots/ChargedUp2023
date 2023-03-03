@@ -371,7 +371,10 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    
+    SWERVEDRIVE.frontLeftCANCoderOffset = 92.0655; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 225.879; // 41.748;
+    SWERVEDRIVE.backLeftCANCoderOffset = 191.777; // 261.475;
+    SWERVEDRIVE.backRightCANCoderOffset = 33.047;
   }
 
   private static void initAlpha() {
