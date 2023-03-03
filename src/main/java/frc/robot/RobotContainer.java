@@ -99,8 +99,7 @@ public class RobotContainer {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(
-        new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist, m_vision, m_elevator));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, 90.0));
@@ -480,7 +479,13 @@ public class RobotContainer {
     m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
-        "DriveForward", new DriveForward("DriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueDriveForward",
+        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    m_autoChooser.addOption(
+        "RedDriveForward",
+        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     m_autoChooser.addOption(

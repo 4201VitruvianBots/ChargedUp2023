@@ -35,6 +35,7 @@ public class RunIntakeCube extends CommandBase {
   @Override
   public void initialize() {
     m_intake.setIntakeState(true);
+    m_intake.setIntakeStateCube(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -57,6 +58,7 @@ public class RunIntakeCube extends CommandBase {
     m_intake.setIntakePercentOutput(0.2);
     m_intake.setIntakeState(false);
     m_swerve.enableHeadingTarget(false);
+    m_intake.setIntakeStateCube(false);
   }
 
   // Returns true when the command should end.

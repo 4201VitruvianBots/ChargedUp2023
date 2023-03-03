@@ -20,6 +20,9 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private static boolean isIntaking = false;
 
+  private static boolean isIntakingCone = false;
+  private static boolean isIntakingCube = false;
+
   private final double kF = 0;
   private final double kP = 0.2;
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
@@ -63,6 +66,22 @@ public class Intake extends SubsystemBase {
   // control mode function
   public boolean getIntakeState() {
     return isIntaking;
+  }
+
+  public boolean getIntakeStateCone() {
+    return isIntakingCone;
+  }
+
+  public void setIntakeStateCone(boolean state) {
+    isIntakingCone = state;
+  }
+
+  public boolean getIntakeStateCube() {
+    return isIntakingCube;
+  }
+
+  public void setIntakeStateCube(boolean state) {
+    isIntakingCube = state;
   }
 
   // True if Cube is detected, otherwise assume Cone
