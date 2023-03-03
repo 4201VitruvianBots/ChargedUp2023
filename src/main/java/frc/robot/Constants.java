@@ -133,8 +133,8 @@ public final class Constants {
       EXTENDED_MIN(Units.inchesToMeters(12.0)),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
       LOW_TO_HIGH(Units.inchesToMeters(14.0)),
-      HIGH_TO_LOW(Units.inchesToMeters(10.0)),
-      HIGH_TO_EXTENDED(Units.inchesToMeters(26.0)),
+      HIGH_TO_LOW(Units.inchesToMeters(3.5)),
+      HIGH_TO_EXTENDED(Units.inchesToMeters(24.0)),
       EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
 
       private final double value;

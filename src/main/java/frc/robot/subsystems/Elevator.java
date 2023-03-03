@@ -465,7 +465,7 @@ public class Elevator extends SubsystemBase {
           if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
             percentOutput = Math.min(percentOutput, 0);
           }
-          if (getHeightMeters() < (getLowerLimitMeters() + 0.0254)) {
+          if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) {
             percentOutput = Math.max(percentOutput, 0);
           }
           setPercentOutput(percentOutput);
