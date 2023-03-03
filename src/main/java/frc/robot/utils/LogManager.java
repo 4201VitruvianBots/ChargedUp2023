@@ -4,6 +4,8 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.util.DeleteAllLogs;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,67 +13,65 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.util.DeleteAllLogs;
-
 /** Add your docs here. */
 public class LogManager {
-    private final String mainPath = new File("").getAbsolutePath();
-    
-    private ArrayList<String> logFilePaths = new ArrayList<String>();
+  private final String mainPath = new File("").getAbsolutePath();
 
-    public LogManager() {
-        SmartDashboard.putData("Delete All Logs", new DeleteAllLogs(this));
+  private ArrayList<String> logFilePaths = new ArrayList<String>();
+
+  public LogManager() {
+    SmartDashboard.putData("Delete All Logs", new DeleteAllLogs(this));
+  }
+
+  public ArrayList<String> getLogFilePaths() {
+    ArrayList<String> filePaths = new ArrayList<String>();
+
+    File folder = new File(mainPath);
+    File[] allFiles = folder.listFiles();
+
+    for (File file : allFiles) {
+      if (file.isFile() && file.getName().contains("wpilog")) {
+        filePaths.add(file.getAbsolutePath());
+      }
     }
 
-    public ArrayList<String> getLogFilePaths() {
-        ArrayList<String> filePaths = new ArrayList<String>();
+    return filePaths;
+  }
 
-        File folder = new File(mainPath);
-        File[] allFiles = folder.listFiles();
-
-        for (File file : allFiles) {
-            if (file.isFile() && file.getName().contains("wpilog")) {
-                filePaths.add(file.getAbsolutePath());
-            }
+  // WIP
+  public void autoDeleteLogs(double secondsSinceModify) {
+    for (String file : logFilePaths) {
+      BasicFileAttributes attr;
+      try {
+        attr = Files.readAttributes(Paths.get(file), BasicFileAttributes.class);
+        if (Math.abs(attr.lastModifiedTime().toMillis() - System.currentTimeMillis())
+            > secondsSinceModify) {
+          File fileObj = new File(file);
+          if (fileObj.delete()) {
+            System.out.println("Successfully deleted log file " + fileObj.getName());
+          } else {
+            System.out.println("Failed to delete log file " + fileObj.getName());
+          }
         }
-
-        return filePaths;
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
+  }
 
-    // WIP
-    public void autoDeleteLogs(double secondsSinceModify) {
-        for (String file : logFilePaths) {
-            BasicFileAttributes attr;
-            try {
-                attr = Files.readAttributes(Paths.get(file), BasicFileAttributes.class);
-                if (Math.abs(attr.lastModifiedTime().toMillis() - System.currentTimeMillis()) > secondsSinceModify) {
-                    File fileObj = new File(file);
-                    if (fileObj.delete()) { 
-                      System.out.println("Successfully deleted log file " + fileObj.getName());
-                    } else {
-                      System.out.println("Failed to delete log file " + fileObj.getName());
-                    } 
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+  public void deleteAllLogs() {
+    for (String file : logFilePaths) {
+      File fileObj = new File(file);
+      if (fileObj.delete()) {
+        System.out.println("Successfully deleted log file " + fileObj.getName());
+      } else {
+        System.out.println("Failed to delete log file " + fileObj.getName());
+      }
     }
+  }
 
-    public void deleteAllLogs() {
-        for (String file : logFilePaths) {
-            File fileObj = new File(file);
-            if (fileObj.delete()) { 
-                System.out.println("Successfully deleted log file " + fileObj.getName());
-            } else {
-                System.out.println("Failed to delete log file " + fileObj.getName());
-            } 
-        }
-    }
-
-    public void periodic() {
-        logFilePaths = getLogFilePaths();
-        //deleteAllLogs();
-    }
+  public void periodic() {
+    logFilePaths = getLogFilePaths();
+    // deleteAllLogs();
+  }
 }

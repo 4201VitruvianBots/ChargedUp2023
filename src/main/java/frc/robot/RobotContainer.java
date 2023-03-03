@@ -34,9 +34,7 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
-import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
-
 import java.util.HashMap;
 
 /**
