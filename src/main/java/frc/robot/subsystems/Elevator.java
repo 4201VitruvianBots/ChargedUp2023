@@ -136,7 +136,7 @@ public class Elevator extends SubsystemBase {
       motor.configFactoryDefault();
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      motor.setSelectedSensorPosition(elevatorHeight);
+      motor.setSelectedSensorPosition(0.0);
 
       // Config PID
       motor.selectProfileSlot(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kPIDLoopIdx);
@@ -225,7 +225,7 @@ public class Elevator extends SubsystemBase {
   // }
 
   public void setElevatorSensorPosition(double meters) {
-    elevatorMotors[0].setSelectedSensorPosition(meters);
+    elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
   }
 
   public ELEVATOR.SETPOINT getElevatorState() {
@@ -328,7 +328,7 @@ public class Elevator extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
-    kHeightMetersPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
+    kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
     kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
