@@ -104,7 +104,7 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(5.32)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(12.37)),
+      SCORE_MID_CONE(Units.inchesToMeters(13.62)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.inchesToMeters(22.75)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
@@ -115,6 +115,7 @@ public final class Constants {
       SETPOINT(final double value) {
         this.value = value;
       }
+
 
       public double get() {
         return value;
@@ -171,10 +172,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = -197.402;
-    public static double frontRightCANCoderOffset = -36.211;
-    public static double backLeftCANCoderOffset = -82.002;
-    public static double backRightCANCoderOffset = -311.084;
+    public static double frontLeftCANCoderOffset = 126.914;
+    public static double frontRightCANCoderOffset = 222.9785;
+    public static double backLeftCANCoderOffset = 191.25;
+    public static double backRightCANCoderOffset = 34.7605;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
@@ -275,7 +276,7 @@ public final class Constants {
 
     // Values were experimentally determined
     public static final double kMaxVel = Units.degreesToRadians(360);
-    public static final double kMaxAccel = Units.degreesToRadians(360);
+    public static final double kMaxAccel = Units.degreesToRadians(250);
     public static final double FFkS = 0.1;
     public static final double kG = 1.75;
     public static final double FFkV = 1.95;
@@ -301,7 +302,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.degreesToRadians(145.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(135.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -319,10 +320,10 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
-      ABSOLUTE_MAX(Units.degreesToRadians(225.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(120.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.degreesToRadians(130.0)),
-      HIGH_MIN(Units.degreesToRadians(0.0)),
+      HIGH_MIN(Units.degreesToRadians(10.0)),
       HIGH_MAX(LOW_MAX.get()),
       EXTENDED_MIN(HIGH_MIN.get()),
       EXTENDED_MAX(ABSOLUTE_MAX.get());
@@ -372,19 +373,23 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
+    // SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
+    // SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
+    // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
+    // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
+    SWERVEDRIVE.frontLeftCANCoderOffset = 125.8985; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 229.351; // 41.748;
+    SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
+    SWERVEDRIVE.backRightCANCoderOffset = 31.6845;
   }
 
   private static void initAlpha() {
     robotName = "Alpha";
 
-    SWERVEDRIVE.frontLeftCANCoderOffset = 16.26; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 215.596; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 262.705; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 151.348;
+    SWERVEDRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;
+    SWERVEDRIVE.backLeftCANCoderOffset = 191.25; // 261.475;
+    SWERVEDRIVE.backRightCANCoderOffset = 34.7605;
 
     ELEVATOR.mainMotorInversionType = TalonFXInvertType.CounterClockwise;
     WRIST.motorInversionType = TalonFXInvertType.Clockwise;

@@ -83,6 +83,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     initializeSubsystems();
+    m_logger.pause();
     configureBindings();
 
     initAutoBuilder();
@@ -103,7 +104,7 @@ public class RobotContainer {
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
-    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, 90.0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
 
     m_fieldSim.initSim();
   }
@@ -205,14 +206,14 @@ public class RobotContainer {
                 new SetWristDesiredSetpoint(
                     m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getRightY),
                 m_intake::getIntakeGamePiece));
-
     // Toggle elevator, wrist control state
     xboxController
-        .povDown()
-        .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+        .povUp()
+        .onTrue(
+            new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
     xboxController
-        .povDown()
-        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+        .povUp()
+        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -381,6 +382,15 @@ public class RobotContainer {
     m_swerveDrive.resetState();
   }
 
+  public void autonomousInit() {
+    m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
+    m_elevator.resetState();
+    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
+    m_wrist.resetState();
+    m_swerveDrive.resetState();
+  }
+
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(2));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
@@ -481,13 +491,13 @@ public class RobotContainer {
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption(
-    //     "BlueDriveForward",
-    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    m_autoChooser.addOption(
+        "BlueDriveForward",
+        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
     m_autoChooser.addOption(
         "RedDriveForward",
-        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
     m_autoChooser.addOption(
         "BlueTopDriveForward",
@@ -498,7 +508,9 @@ public class RobotContainer {
         new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
-        "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+
+    m_autoChooser.addOption("RealDoNothing", new RealDoNothing(m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
@@ -525,6 +537,6 @@ public class RobotContainer {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
-    m_logManager.periodic();
+    // m_logManager.periodic();
   }
 }
