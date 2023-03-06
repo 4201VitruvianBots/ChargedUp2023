@@ -479,6 +479,11 @@ public class RobotContainer {
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
+        "BlueOnePiece",
+        new OnePiece(
+            "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision));
+
+    m_autoChooser.addOption(
         "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(

@@ -272,7 +272,7 @@ public final class Constants {
     public static final double length = Units.inchesToMeters(22);
     public static int kTimeoutMs = 0;
 
-    public static TalonFXInvertType motorInversionType = TalonFXInvertType.CounterClockwise;
+    public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined
     public static final double kMaxVel = Units.degreesToRadians(360);
