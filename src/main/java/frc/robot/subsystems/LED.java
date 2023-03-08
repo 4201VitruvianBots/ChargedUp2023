@@ -11,9 +11,9 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
+import frc.robot.Constants;
 
 // creates LED subsystem
 public class LED extends SubsystemBase {
@@ -123,23 +123,26 @@ public class LED extends SubsystemBase {
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case INTAKING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.Strobe);
+        case INTAKING: // Flashing blue
+          setPattern(0, 0, 255, 0, 0, AnimationTypes.Strobe);
           break;
-        case CONE: // Solid yellow
+        case CONE_BUTTON: // Solid Yellow
           setPattern(255, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case CUBE: // Solid purple
-          setPattern(255, 0, 255, 0, 0, AnimationTypes.Solid);
+        case CUBE_BUTTON: // Solid purple
+          setPattern(128, 0, 128, 0, 0, AnimationTypes.Solid);
           break;
         case ELEVATING:
           setPattern(0, 0, 0, 0, 0, AnimationTypes.ColorFlow);
           break;
-        case WRIST: // Solid blue
-          setPattern(66, 95, 255, 0, 0, AnimationTypes.Solid);
-          break;
         case CHARGING_STATION:
           setPattern(125, 125, 125, 125, 0, AnimationTypes.Rainbow);
+          break;
+        case SCORING: // Flashing white
+          setPattern(0, 0, 0, 255, 1, AnimationTypes.Strobe);
+          break;
+        case LOCKED_ON: // Flashing Green
+          setPattern(0, 255, 0, 0, 1, AnimationTypes.Strobe);
           break;
         default:
           break;
@@ -150,13 +153,14 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled() && m_candle.getCurrent() < 0.01) {
-      currentRobotState = robotState.DISABLED;
-      red = 255;
-      green = 0;
-      blue = 0;
-      m_toAnimate = null;
-    }
+    // TODO: Fix this from flashing
+    // if (DriverStation.isDisabled()) {
+    //   currentRobotState = robotState.DISABLED;
+    //   red = 255;
+    //   green = 0;
+    //   blue = 0;
+    //   m_toAnimate = null;
+    // }
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
@@ -165,8 +169,8 @@ public class LED extends SubsystemBase {
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
-    //    SmartDashboard.putString("LED Mode", currentRobotState.toString());
-    ledStatePub.set(currentRobotState.toString());
+    SmartDashboard.putString("LED Mode", currentRobotState.toString());
+    // ledStatePub.set(currentRobotState.toString());
     // the code below was printing out just LED Mode over and over again in the Led tab for some
     // reason but the code above does show the current state
     //   Shuffleboard.getTab("Controls")
@@ -204,9 +208,11 @@ public class LED extends SubsystemBase {
     INTAKING,
     ELEVATING,
     WRIST,
-    CONE,
-    CUBE,
-    CHARGING_STATION
+    CONE_BUTTON,
+    CUBE_BUTTON,
+    CHARGING_STATION,
+    SCORING,
+    LOCKED_ON
   }
 
   public enum PieceType {

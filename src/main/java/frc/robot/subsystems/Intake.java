@@ -14,15 +14,18 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
+import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private static boolean isIntaking = false;
 
+  private static boolean isIntakingCone = false;
+  private static boolean isIntakingCube = false;
+
   private final double kF = 0;
   private final double kP = 0.2;
-  private TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
+  private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
   // Log setup
@@ -65,6 +68,28 @@ public class Intake extends SubsystemBase {
     return isIntaking;
   }
 
+  public boolean getIntakeStateCone() {
+    return isIntakingCone;
+  }
+
+  public void setIntakeStateCone(boolean state) {
+    isIntakingCone = state;
+  }
+
+  public boolean getIntakeStateCube() {
+    return isIntakingCube;
+  }
+
+  public void setIntakeStateCube(boolean state) {
+    isIntakingCube = state;
+  }
+
+  // True if Cube is detected, otherwise assume Cone
+  public boolean getIntakeGamePiece() {
+    // TODO: Update threshold
+    return getIntakeCubeMeasurement() > 0;
+  }
+
   public double getIntakeMotorCurrent() {
     return intakeMotor.getStatorCurrent();
   }
@@ -78,6 +103,7 @@ public class Intake extends SubsystemBase {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
   // Shuffleboard or SmartDashboard function
+
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Intake", getIntakeState());
   }
@@ -89,6 +115,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateSmartDashboard();
     updateLog();
     // TODO: If the cube or cone distance sensors see a game object, run the intake motor to hold
     // the game piece in.

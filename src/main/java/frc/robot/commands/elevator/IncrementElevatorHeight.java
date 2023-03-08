@@ -6,7 +6,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
+import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
@@ -26,7 +26,9 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_elevator.setElevatorRunning(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -35,23 +37,38 @@ public class IncrementElevatorHeight extends CommandBase {
     // statement to prioritize shortcut buttons
 
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
-    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.05);
+    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_elevator.setElevatorState(ELEVATOR_STATE.JOYSTICK);
+      //      m_elevator.setControlState(
+      //          m_elevator.getControlMode()
+      //              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
+      //              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+      if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
+        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      } else {
+        m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      }
+    }
+    if (joystickYDeadbandOutput == 0
+        && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+      m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
+      m_elevator.resetState();
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
     // Uncomment if you want to reenable this
     // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
     // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
-
-    m_elevator.setElevatorJoystickY(-joystickYDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_elevator.setElevatorRunning(false);
+  }
 
   // Returns true when the command should end.
   @Override

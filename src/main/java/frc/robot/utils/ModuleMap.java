@@ -1,6 +1,6 @@
 package frc.robot.utils;
 
-import frc.robot.constants.Constants.SwerveDrive.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import java.util.*;
 
 /**

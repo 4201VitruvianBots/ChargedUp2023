@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
@@ -16,8 +15,8 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
+import frc.robot.Constants;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase {
@@ -30,19 +29,16 @@ public class Vision extends SubsystemBase {
   private final NetworkTable outtake;
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
+  private final NetworkTable m_fLocalizer;
 
   private final DoubleArrayPublisher m_leftLocalizerPositionPub;
   private final DoubleArrayPublisher m_rightLocalizerPositionPub;
 
-  private DoubleLogEntry limelightTargetValid;
-  private DoubleLogEntry leftLocalizerTargetValid;
+  private final DoubleLogEntry limelightTargetValid;
+  private final DoubleLogEntry leftLocalizerTargetValid;
 
-  private Timer searchTimer = new Timer();
-  private Double searchWindow = 0.2;
-
-  private double desiredAngleSetpoint;
-
-  private DoublePublisher kSetpointPub;
+  private final Timer searchTimer = new Timer();
+  private final double searchWindow = 0.4;
 
   private enum targetType {
     INTAKING,
@@ -55,7 +51,7 @@ public class Vision extends SubsystemBase {
 
   Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
-  double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0};
+  double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0, 0};
 
   int[] tagIds = new int[10];
   double[] robotPosX = new double[10];
@@ -74,17 +70,18 @@ public class Vision extends SubsystemBase {
     outtake = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
+    m_fLocalizer = NetworkTableInstance.getDefault().getTable("fusedLocalizer");
 
-    PortForwarder.add(5800, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5800);
-    PortForwarder.add(5801, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5801);
-    PortForwarder.add(5802, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5802);
-    PortForwarder.add(5803, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5803);
-    PortForwarder.add(5804, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5804);
-    PortForwarder.add(5805, Constants.Vision.SERVER_IPS.INTAKE.toString(), 5805);
-    PortForwarder.add(5806, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5800);
-    PortForwarder.add(5807, Constants.Vision.SERVER_IPS.LEFT_LOCALIZER.toString(), 5801);
-    PortForwarder.add(5808, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5800);
-    PortForwarder.add(5809, Constants.Vision.SERVER_IPS.RIGHT_LOCALIZER.toString(), 5801);
+    PortForwarder.add(5800, CAMERA_SERVER.INTAKE.toString(), 5800);
+    PortForwarder.add(5801, CAMERA_SERVER.INTAKE.toString(), 5801);
+    PortForwarder.add(5802, CAMERA_SERVER.INTAKE.toString(), 5802);
+    PortForwarder.add(5803, CAMERA_SERVER.INTAKE.toString(), 5803);
+    PortForwarder.add(5804, CAMERA_SERVER.INTAKE.toString(), 5804);
+    PortForwarder.add(5805, CAMERA_SERVER.INTAKE.toString(), 5805);
+    PortForwarder.add(5806, CAMERA_SERVER.LEFT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5807, CAMERA_SERVER.LEFT_LOCALIZER.toString(), 5801);
+    PortForwarder.add(5808, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5800);
+    PortForwarder.add(5809, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5801);
 
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
@@ -109,14 +106,14 @@ public class Vision extends SubsystemBase {
    *
    * @return true: Camera has a target. false: Camera does not have a target
    */
-  public boolean getValidTarget(CAMERA_LOCATION location) {
+  public boolean getValidTarget(CAMERA_SERVER location) {
     return getValidTargetType(location) > 0;
   }
 
   /*
    * Whether the limelight has any valid targets (0 or 1)
    */
-  public double getValidTargetType(CAMERA_LOCATION location) {
+  public double getValidTargetType(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tv").getDouble(0);
@@ -126,12 +123,14 @@ public class Vision extends SubsystemBase {
         return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
         return m_rightLocalizer.getEntry("tv").getDouble(0);
+      case FUSED_LOCALIZER:
+        return m_fLocalizer.getEntry("tv").getDouble(0);
       default:
         return 0;
     }
   }
 
-  public double[] getAprilTagIds(CAMERA_LOCATION location) {
+  public double[] getAprilTagIds(CAMERA_SERVER location) {
     switch (location) {
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("tid").getDoubleArray(defaultDoubleArray);
@@ -145,7 +144,7 @@ public class Vision extends SubsystemBase {
   /*
    * Horizontal Offset From Crosshair To Target
    */
-  public double getTargetXAngle(CAMERA_LOCATION location) {
+  public double getTargetXAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return -m_intakeNet.getEntry("tx").getDouble(0);
@@ -159,7 +158,7 @@ public class Vision extends SubsystemBase {
   /*
    * Vertical Offset From Crosshair To Target
    */
-  public double getTargetYAngle(CAMERA_LOCATION location) {
+  public double getTargetYAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ty").getDouble(0);
@@ -173,7 +172,7 @@ public class Vision extends SubsystemBase {
   /*
    * The pipeline’s latency contribution (ms). Add to "cl" to get total latency.
    */
-  public double getCameraLatency(CAMERA_LOCATION location) {
+  public double getCameraLatency(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tl").getDouble(0);
@@ -187,7 +186,7 @@ public class Vision extends SubsystemBase {
   /*
    * Target Area (0% of image to 100% of image)
    */
-  public double getTargetArea(CAMERA_LOCATION location) {
+  public double getTargetArea(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ta").getDouble(0);
@@ -201,7 +200,7 @@ public class Vision extends SubsystemBase {
   /*
    * Full JSON dump of targeting results
    */
-  public double getJSON(CAMERA_LOCATION location) {
+  public double getJSON(CAMERA_SERVER location) {
     switch (location) {
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("json").getDouble(0);
@@ -216,7 +215,7 @@ public class Vision extends SubsystemBase {
    * Pipeline 1 = cube
    * Pipeline 2 = cone
    */
-  public void setPipeline(CAMERA_LOCATION location, double pipeline) {
+  public void setPipeline(CAMERA_SERVER location, double pipeline) {
     switch (location) {
       case INTAKE:
         m_intakeNet.getEntry("pipeline").setDouble(pipeline);
@@ -224,7 +223,7 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  public double getPipeline(CAMERA_LOCATION location) {
+  public double getPipeline(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("pipeline").getDouble(0);
@@ -245,7 +244,7 @@ public class Vision extends SubsystemBase {
   /*
    * Look for any target
    */
-  public boolean searchLimelightTarget(CAMERA_LOCATION location) {
+  public boolean searchLimelightTarget(CAMERA_SERVER location) {
     if (getPipeline(location) == 1.0) { // CUBE
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read and threshold
@@ -259,7 +258,7 @@ public class Vision extends SubsystemBase {
   /*
    * Look for a pipeline until a clear target is found when intaking
    */
-  public void searchLimelightPipeline(CAMERA_LOCATION location) {
+  public void searchLimelightPipeline(CAMERA_SERVER location) {
     if (m_intakeSub.getIntakeState()) {
       int pipeline = (int) (Math.floor(searchTimer.get() / searchWindow) % 2) + 1;
 
@@ -290,14 +289,13 @@ public class Vision extends SubsystemBase {
   /*
    * Collects transformation/rotation data from limelight
    */
-  public double[] getBotPose(CAMERA_LOCATION location) {
-    DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
-    double[] botPose;
+  public double[] getBotPose(CAMERA_SERVER location) {
+    DriverStation.Alliance allianceColor = DriverStation.getAlliance();
+    double[] botPose = new double[0];
     switch (location) {
       case LEFT_LOCALIZER:
         botPose = m_leftLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
-
-        if (botPose.length > 0) return botPose;
+        break;
         //      case RIGHT_LOCALIZER:
         //        var rawBotPose = defaultDoubleArray;
         //        switch (allianceColor) {
@@ -324,12 +322,13 @@ public class Vision extends SubsystemBase {
         //        }
       case RIGHT_LOCALIZER:
         botPose = m_rightLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
-
-        if (botPose.length > 0) return botPose;
-      default:
-        return defaultDoubleArray;
+        break;
+      case FUSED_LOCALIZER:
+        botPose = m_fLocalizer.getEntry("botpose").getDoubleArray(defaultDoubleArray);
+        break;
     }
-    //    return defaultDoubleArray;
+    if (botPose.length > 0) return botPose;
+    else return defaultDoubleArray;
   }
 
   /**
@@ -337,37 +336,41 @@ public class Vision extends SubsystemBase {
    *
    * @return Robot Pose in meters
    */
-  public double getDetectionTimestamp(CAMERA_LOCATION location) {
+  public double getDetectionTimestamp(CAMERA_SERVER location) {
     switch (location) {
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("timestamp").getDouble(0);
       case RIGHT_LOCALIZER:
         return m_rightLocalizer.getEntry("timestamp").getDouble(0);
+      case FUSED_LOCALIZER:
+        return m_fLocalizer.getEntry("timestamp").getDouble(0);
       default:
         return 0;
     }
   }
 
-  public Pose2d getRobotPose2d(CAMERA_LOCATION location) {
+  public Pose2d getRobotPose2d(CAMERA_SERVER location) {
     double[] pose = getBotPose(location);
     return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[5]));
   }
 
-  public Pose2d[] getRobotPoses2d(CAMERA_LOCATION location) {
+  public Pose2d[] getRobotPoses2d(CAMERA_SERVER location) {
     Pose2d[] poseArray = {defaultPose};
     NetworkTable localizer = null;
 
     if (getValidTarget(location)) {
       switch (location) {
+        case INTAKE:
+        case OUTTAKE:
+          break;
         case RIGHT_LOCALIZER:
           localizer = m_rightLocalizer;
           break;
         case LEFT_LOCALIZER:
           localizer = m_leftLocalizer;
           break;
-        case INTAKE:
-          break;
-        case OUTTAKE:
+        case FUSED_LOCALIZER:
+          localizer = m_fLocalizer;
           break;
       }
       robotPosX = localizer.getEntry("Robot Pose X").getDoubleArray(new double[] {});
@@ -382,18 +385,21 @@ public class Vision extends SubsystemBase {
     return poseArray;
   }
 
-  public Pose2d[] getTagPoses2d(CAMERA_LOCATION location) {
-    NetworkTable localizer = null;
+  public Pose2d[] getTagPoses2d(CAMERA_SERVER location) {
+    NetworkTable localizer;
     Pose2d[] poseArray = {defaultPose};
 
     if (getValidTarget(location)) {
       switch (location) {
+        case LEFT_LOCALIZER:
+          localizer = m_leftLocalizer;
+          break;
         case RIGHT_LOCALIZER:
           localizer = m_rightLocalizer;
           break;
         default:
-        case LEFT_LOCALIZER:
-          localizer = m_leftLocalizer;
+        case FUSED_LOCALIZER:
+          localizer = m_fLocalizer;
           break;
       }
       try {
@@ -410,18 +416,24 @@ public class Vision extends SubsystemBase {
     return poseArray;
   }
 
-  public int[] getTagIds(CAMERA_LOCATION location) {
+  public int[] getTagIds(CAMERA_SERVER location) {
     var tags = tagIds;
+    double[] rawTags;
     if (getValidTarget(location)) {
       switch (location) {
         case LEFT_LOCALIZER:
-          double[] rawTags = m_leftLocalizer.getEntry("tid").getDoubleArray(new double[] {});
+          rawTags = m_leftLocalizer.getEntry("tid").getDoubleArray(new double[] {});
           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
           break;
         case RIGHT_LOCALIZER:
+          rawTags = m_rightLocalizer.getEntry("tid").getDoubleArray(new double[] {});
+          tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
+          break;
+        case FUSED_LOCALIZER:
+          rawTags = m_fLocalizer.getEntry("tid").getDoubleArray(new double[] {});
+          tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
           break;
         case INTAKE:
-          break;
         case OUTTAKE:
           break;
       }
@@ -429,7 +441,7 @@ public class Vision extends SubsystemBase {
     return tags;
   }
 
-  private void updateVisionPose(CAMERA_LOCATION location) {
+  private void updateVisionPose(CAMERA_SERVER location) {
     if (getValidTarget(location))
       m_swerveDrive
           .getOdometry()
@@ -437,35 +449,34 @@ public class Vision extends SubsystemBase {
   }
 
   private void logData() {
-    limelightTargetValid.append(getValidTargetType(CAMERA_LOCATION.INTAKE));
-    leftLocalizerTargetValid.append(getValidTargetType(CAMERA_LOCATION.OUTTAKE));
+    limelightTargetValid.append(getValidTargetType(CAMERA_SERVER.INTAKE));
+    leftLocalizerTargetValid.append(getValidTargetType(CAMERA_SERVER.OUTTAKE));
   }
 
   @Override
   public void periodic() {
     m_leftLocalizerPositionPub.set(
         new double[] {
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
           0,
           0,
           0
         });
     m_rightLocalizerPositionPub.set(
         new double[] {
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
-          Constants.Vision.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
+          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
           0,
           0,
           0
         });
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
-    updateVisionPose(CAMERA_LOCATION.LEFT_LOCALIZER);
-    //    updateVisionPose(CAMERA_LOCATION.REAR_LOCALIZER);
-    searchLimelightPipeline(CAMERA_LOCATION.INTAKE);
+    updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
+    searchLimelightPipeline(CAMERA_SERVER.INTAKE);
     logData();
   }
 

@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,10 +29,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    PathPlannerServer.startServer(5811);
+    //    PathPlannerServer.startServer(5811);
+    Constants.initConstants();
     m_robotContainer = new RobotContainer();
     SmartDashboard.putData(CommandScheduler.getInstance());
     DataLogManager.start();
+    // addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.02, 0.01);
   }
 
   /**
@@ -51,6 +52,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     m_robotContainer.periodic();
+    //    m_robotContainer.getDistanceSensor().pollDistanceSensors();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

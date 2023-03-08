@@ -7,47 +7,37 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.USB;
+import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.SetElevatorState;
-import frc.robot.commands.elevator.ToggleElevatorControlMode;
+import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.wrist.RunWristJoystick;
-import frc.robot.commands.wrist.SetWristState;
-import frc.robot.commands.wrist.ToggleWristControlMode;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Elevator.ELEVATOR_STATE;
-import frc.robot.constants.Constants.USB;
-import frc.robot.constants.Constants.Wrist.WRIST_STATE;
+import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
+import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
-import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
-import frc.robot.utils.DistanceSensor;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.LED.PieceType;
+import frc.robot.utils.LogManager;
 import java.util.HashMap;
 
 /**
@@ -59,7 +49,7 @@ import java.util.HashMap;
 public class RobotContainer {
   private final DataLog m_logger = DataLogManager.getLog();
 
-  // The robot's subsystems and commands are defined here...4
+  // The robot's subsystems and commands are defined here...
   private final Intake m_intake = new Intake();
   private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
@@ -71,7 +61,7 @@ public class RobotContainer {
   private final LED m_led = new LED(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   HashMap<String, Command> m_eventMap = new HashMap<>();
@@ -80,6 +70,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   private final MemoryLog m_memorylog = new MemoryLog();
+  private final LogManager m_logManager = new LogManager();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -102,15 +93,19 @@ public class RobotContainer {
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
-            () -> -leftJoystick.getRawAxis(1),
-            () -> -leftJoystick.getRawAxis(0),
-            () -> -rightJoystick.getRawAxis(0)));
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
+            () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
-    m_fieldSim.initSim();
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_intake, m_wrist));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
+
+    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, 90.0));
+
+    m_fieldSim.initSim();
   }
 
   /**
@@ -125,82 +120,338 @@ public class RobotContainer {
     for (int i = 0; i < rightJoystickTriggers.length; i++)
       rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    // TODO: add a driver button that hard limits the max swerve speed while held for fine control
+    leftJoystickTriggers[0].whileTrue(
+        new SetSwerveMaxTranslationVeolcity(
+            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond / 25.0));
 
     xboxController
         .leftTrigger(0.1)
         .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
-    xboxController
-        .leftTrigger(0.1)
-        .onTrue(
-            new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
-                () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
 
     xboxController
         .rightTrigger(0.1)
         .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+
+    // Score button Bindings
+
+    // Score LOW Setpoints
     xboxController
-        .rightTrigger(0.1)
-        .onTrue(
+        .a()
+        .whileTrue(
             new ConditionalCommand(
-                new SetWristState(m_wrist, WRIST_STATE.INTAKING),
-                new SetWristState(m_wrist, WRIST_STATE.HIGH),
-                () ->
-                    m_stateHandler.getSuperStructureState()
-                        == StateHandler.SUPERSTRUCTURE_STATE.LOW));
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getLeftY),
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getLeftY),
+                m_intake::getIntakeGamePiece));
+    xboxController
+        .a()
+        .whileTrue(
+            new ConditionalCommand(
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getRightY),
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getRightY),
+                m_intake::getIntakeGamePiece));
 
-    // Elevator button bindings
-    xboxController.a().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.LOW));
-    xboxController.a().onTrue(new SetWristState(m_wrist, WRIST_STATE.LOW));
-    xboxController.b().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.MID));
-    xboxController.b().whileTrue(new SetWristState(m_wrist, WRIST_STATE.MID));
-    xboxController.x().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.STOWED));
-    xboxController.x().whileTrue(new SetWristState(m_wrist, WRIST_STATE.STOWED));
-    xboxController.y().whileTrue(new SetElevatorState(m_elevator, ELEVATOR_STATE.HIGH));
-    xboxController.y().whileTrue(new SetWristState(m_wrist, WRIST_STATE.HIGH));
+    // Score MID Setpoints
+    xboxController
+        .b()
+        .whileTrue(
+            new ConditionalCommand(
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), xboxController::getLeftY),
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getLeftY),
+                m_intake::getIntakeGamePiece));
+    xboxController
+        .b()
+        .whileTrue(
+            new ConditionalCommand(
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get(), xboxController::getRightY),
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getRightY),
+                m_intake::getIntakeGamePiece));
 
-    xboxController.rightBumper().whileTrue(new SetWristState(m_wrist, WRIST_STATE.INTAKING));
+    // Stowed
+    xboxController
+        .x()
+        .whileTrue(
+            new SetElevatorDesiredSetpoint(
+                m_elevator, ELEVATOR.SETPOINT.STOWED.get(), xboxController::getLeftY));
+    xboxController
+        .x()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
+
+    // High
+    xboxController
+        .y()
+        .whileTrue(
+            new ConditionalCommand(
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getLeftY),
+                new SetElevatorDesiredSetpoint(
+                    m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getLeftY),
+                m_intake::getIntakeGamePiece));
+    xboxController
+        .y()
+        .whileTrue(
+            new ConditionalCommand(
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getRightY),
+                new SetWristDesiredSetpoint(
+                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getRightY),
+                m_intake::getIntakeGamePiece));
+
+    // Toggle elevator, wrist control state
+    xboxController
+        .povDown()
+        .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+    xboxController
+        .povDown()
+        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController
+        .rightBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController
+        .leftBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist,
+                Units.degreesToRadians(-11.0),
+                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+
+    initTestController();
+  }
+
+  private void initTestController() {
+    if (RobotBase.isSimulation()) {
+      CommandPS4Controller testController = new CommandPS4Controller(3);
+
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(new RunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  () ->
+                      m_stateHandler.getCurrentZone().ordinal()
+                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(new RunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  () ->
+                      m_stateHandler.getCurrentZone().ordinal()
+                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+
+      // Score button Bindings
+
+      // Score LOW Setpoints
+      testController
+          .cross()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .cross()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_LOW_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Score MID Setpoints
+      testController
+          .circle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .circle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_MID_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Stowed
+      testController
+          .square()
+          .whileTrue(
+              new SetElevatorDesiredSetpoint(
+                  m_elevator, ELEVATOR.SETPOINT.STOWED.get(), testController::getLeftY));
+      testController
+          .square()
+          .whileTrue(
+              new SetWristDesiredSetpoint(
+                  m_wrist, WRIST.SETPOINT.STOWED.get(), testController::getRightY));
+
+      // High
+      testController
+          .triangle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator,
+                      ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(),
+                      testController::getLeftY),
+                  new SetElevatorDesiredSetpoint(
+                      m_elevator,
+                      ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(),
+                      testController::getLeftY),
+                  m_intake::getIntakeGamePiece));
+      testController
+          .triangle()
+          .whileTrue(
+              new ConditionalCommand(
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
+                  new SetWristDesiredSetpoint(
+                      m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), testController::getRightY),
+                  m_intake::getIntakeGamePiece));
+
+      // Toggle elevator, wrist control state
+      testController
+          .povDown()
+          .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+      testController
+          .povDown()
+          .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+
+      // Will switch between closed and open loop on button press
+      testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
+      testController.options().onTrue(new ToggleWristControlMode(m_wrist));
+
+      m_elevator.setDefaultCommand(
+          new IncrementElevatorHeight(m_elevator, testController::getLeftY));
+      m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, testController::getRightY));
+    }
   }
 
   public void disableInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Coast);
-    m_swerveDrive.disabledPeriodic();
   }
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
+    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
     m_elevator.resetState();
+    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(5));
+    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "SetWristIntaking",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorIntaking",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetWristStowed",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorStowed",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetWristLowConeNode",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorLowConeNode",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetWristMidConeNode",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorMidConeNode",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetWristHighConeNode",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorHighConeNode",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetWristLowReverseCubeNode",
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
+    m_eventMap.put(
+        "SetElevatorLowReverseCubeNode",
+        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+            .withTimeout(1));
 
     m_autoBuilder =
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.SwerveDrive.kSwerveKinematics,
+            Constants.SWERVEDRIVE.kSwerveKinematics,
             new PIDConstants(
-                Constants.getInstance().SwerveDrive.kP_Translation,
-                Constants.getInstance().SwerveDrive.kI_Translation,
-                Constants.getInstance().SwerveDrive.kD_Translation),
+                Constants.SWERVEDRIVE.kP_Translation,
+                Constants.SWERVEDRIVE.kI_Translation,
+                Constants.SWERVEDRIVE.kD_Translation),
             new PIDConstants(
-                Constants.getInstance().SwerveDrive.kP_Rotation,
-                Constants.getInstance().SwerveDrive.kI_Rotation,
-                Constants.getInstance().SwerveDrive.kD_Rotation),
+                Constants.SWERVEDRIVE.kP_Rotation,
+                Constants.SWERVEDRIVE.kI_Rotation,
+                Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
             false,
@@ -213,24 +464,42 @@ public class RobotContainer {
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption("DriveSideway2", new DriveSideway2(m_swerveDrive, m_fieldSim));
     m_autoChooser.addOption(
-        "BlueTopConeCubeBalance",
-        new BlueTopConeCubeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "RedTopTwoConeBalance", new RedTopTwoConeBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveSideway", new DriveSideway(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption(
-        "DriveForward", new DriveForward(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption(
-    //     "DriveForwardIntakeTest", new DriveForwardIntakeTest(m_swerveDrive, m_fieldSim));
-    m_autoChooser.addOption("WayPoint", new Waypoint(m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "BlueTopTwoCone",
+        new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
-        "BlueMiddleTwoConeBalance",
-        new BlueMiddleTwoConeBottomBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
-    // m_autoChooser.addOption("DriveTest", new DriveTest(m_swerveDrive, m_fieldSim));
+        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "BlueBottomDriveForward",
+        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "RedBottomDriveForward",
+        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    // m_autoChooser.addOption(
+    //     "BlueDriveForward",
+    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "RedDriveForward",
+        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "BlueTopDriveForward",
+        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "RedTopDriveForward",
+        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "JustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
@@ -245,16 +514,17 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
-    // TODO: Add logic
-    // Check all mechanisms
-    //    if(m_wrist && m_elevator && m_vision)
-    //      m_controls.setInitState(true);
+    m_swerveDrive.disabledPeriodic();
   }
+
+  //  public DistanceSensor getDistanceSensor() {
+  //    return m_distanceSensor;
+  //  }
 
   public void periodic() {
     m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
-    m_distanceSensor.periodic();
+    m_logManager.periodic();
   }
 }

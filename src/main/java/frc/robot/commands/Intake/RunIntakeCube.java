@@ -6,7 +6,7 @@ package frc.robot.commands.Intake;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants.Vision.CAMERA_LOCATION;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
@@ -35,18 +35,19 @@ public class RunIntakeCube extends CommandBase {
   @Override
   public void initialize() {
     m_intake.setIntakeState(true);
+    m_intake.setIntakeStateCube(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_intake.setIntakePercentOutput(m_PercentOutput);
-    if (m_vision.searchLimelightTarget(CAMERA_LOCATION.INTAKE)) {
+    if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
       m_swerve.setRobotHeading(
           m_swerve
               .getHeadingRotation2d()
-              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_LOCATION.INTAKE)))
+              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
               .getRadians());
     }
   }
@@ -54,9 +55,10 @@ public class RunIntakeCube extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakePercentOutput(0);
+    m_intake.setIntakePercentOutput(0.2);
     m_intake.setIntakeState(false);
     m_swerve.enableHeadingTarget(false);
+    m_intake.setIntakeStateCube(false);
   }
 
   // Returns true when the command should end.
