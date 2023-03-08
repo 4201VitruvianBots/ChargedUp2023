@@ -36,12 +36,13 @@ public class OnePiece extends SequentialCommandGroup {
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
+            new PlotAutoTrajectory(fieldSim, pathName, trajectory),
         new ParallelCommandGroup(
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
                 new AutoRunIntakeCone(intake, 0.8, vision, swerveDrive))
             .withTimeout(1),
         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-        new PlotAutoTrajectory(fieldSim, pathName, trajectory),
+    
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

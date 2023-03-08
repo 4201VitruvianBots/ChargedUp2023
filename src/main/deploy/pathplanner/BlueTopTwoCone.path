@@ -17,8 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "SetElevatorHighConeNode",
-          "SetWristHighConeNode",
           "RunIntakeConeReverse"
         ],
         "executionBehavior": "parallel",
