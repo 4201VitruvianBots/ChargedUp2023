@@ -374,7 +374,9 @@ public class Wrist extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInputVoltage(MathUtil.clamp(wristMotor.getMotorOutputPercent(), -12, 12));
+    m_armSim.setInputVoltage(
+        MathUtil.clamp(
+            wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
     m_armSim.update(0.020);
 
     Unmanaged.feedEnable(20);

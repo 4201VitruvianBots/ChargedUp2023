@@ -14,10 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -405,7 +402,8 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(getPercentOutput() * 12);
+    elevatorSim.setInput(
+        MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12.0, 12.0));
 
     // Next, we update it. The standard loop time is 20ms.
     elevatorSim.update(0.020);
