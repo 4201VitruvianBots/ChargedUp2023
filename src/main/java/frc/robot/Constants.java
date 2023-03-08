@@ -116,7 +116,6 @@ public final class Constants {
         this.value = value;
       }
 
-
       public double get() {
         return value;
       }
