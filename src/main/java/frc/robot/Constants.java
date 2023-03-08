@@ -286,8 +286,10 @@ public final class Constants {
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined
-    public static final double kMaxVel = Units.degreesToRadians(360);
-    public static final double kMaxAccel = Units.degreesToRadians(250);
+    public static final double kMaxSlowVel = Units.degreesToRadians(360);
+    public static final double kMaxSlowAccel = Units.degreesToRadians(250);
+    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.13);
+    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.13);
     public static final double FFkS = 0.1;
     public static final double kG = 1.75;
     public static final double FFkV = 1.95;
