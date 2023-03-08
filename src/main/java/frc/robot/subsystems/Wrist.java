@@ -330,6 +330,8 @@ public class Wrist extends SubsystemBase {
 
   public Translation2d getHorizontalTranslation() {
     // TODO: Update this calculation
+    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
+    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
     return new Translation2d(0, 0);
   }
 

@@ -329,7 +329,7 @@ public final class Constants {
       EXTENDED_MIN(HIGH_MIN.get()),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
-      HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
       HORIZONTAL_LENGTH_0_CONE(Units.inchesToMeters(19.5)),
       HORIZONTAL_LENGTH_140_CUBE(Units.inchesToMeters(-17.0)),
