@@ -119,7 +119,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureBindings() { // TODO: Replace Joystick Button?
+  private void configureBindings() {
     for (int i = 0; i < leftJoystickTriggers.length; i++)
       leftJoystickTriggers[i] = new JoystickButton(leftJoystick, (i + 1));
     for (int i = 0; i < rightJoystickTriggers.length; i++)

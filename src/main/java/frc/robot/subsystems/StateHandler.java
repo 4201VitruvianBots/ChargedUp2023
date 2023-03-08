@@ -367,10 +367,10 @@ public class StateHandler extends SubsystemBase {
     }
 
     // TODO: Limit max swerve speed by elevator height
-    if (isTipping()) {
-      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
-    }
+//    if (isTipping()) {
+//      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+//      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+//    }
 
     // TODO: Update this based on Intake sensors
     switch (currentIntakeState) {

@@ -27,7 +27,7 @@ public class LED extends SubsystemBase {
 
   private final Controls m_controls; // figure out during robotics class
 
-  private final int LEDcount = 144; // TODO: Change LEDCount
+  private final int LEDcount = 72;
 
   private final StringPublisher ledStatePub;
   // Create LED strip

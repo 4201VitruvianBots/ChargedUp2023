@@ -73,7 +73,6 @@ public class Controls extends SubsystemBase {
     allianceString.set(getAllianceColor().toString());
     allianceBoolean.set(getAllianceColorBoolean());
     //    System.out.println("Alliance Color: " + getAllianceColor().toString());
-    // TODO: fix
   }
 
   @Override

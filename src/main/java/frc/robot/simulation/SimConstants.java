@@ -22,11 +22,6 @@ import java.util.Map;
  * methods to flip these values based on the current alliance color.
  */
 public final class SimConstants {
-  // TODO: Check in with design & other directorates to update these values
-
-  public static final double robotWidthMeters = Units.inchesToMeters(24);
-  public static final double robotLengthMeters = Units.inchesToMeters(24);
-
   public static final double fieldLength = Units.inchesToMeters(651.25);
   public static final double fieldWidth = Units.inchesToMeters(315.5);
   public static final double tapeWidth = Units.inchesToMeters(2.0);
