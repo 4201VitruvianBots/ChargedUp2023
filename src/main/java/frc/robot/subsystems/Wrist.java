@@ -10,6 +10,7 @@ import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -325,6 +326,11 @@ public class Wrist extends SubsystemBase {
 
   public boolean isScoring() {
     return (getPositionDegrees() > 170);
+  }
+
+  public Translation2d getHorizontalTranslation() {
+    // TODO: Update this calculation
+    return new Translation2d(0, 0);
   }
 
   @Override

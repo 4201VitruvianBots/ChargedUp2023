@@ -333,7 +333,15 @@ public final class Constants {
       HIGH_MIN(Units.degreesToRadians(10.0)),
       HIGH_MAX(LOW_MAX.get()),
       EXTENDED_MIN(HIGH_MIN.get()),
-      EXTENDED_MAX(ABSOLUTE_MAX.get());
+      EXTENDED_MAX(ABSOLUTE_MAX.get()),
+      HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
+      HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
+      HORIZONTAL_LENGTH_0_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_140_CUBE(Units.inchesToMeters(-17.0)),
+      HORIZONTAL_LENGTH_140_CONE(Units.inchesToMeters(-25.0)),
+      HORIZONTAL_LENGTH_180_CUBE(Units.inchesToMeters(-22.0)),
+      HORIZONTAL_LENGTH_180_CONE(Units.inchesToMeters(-28.0));
 
       private final double value;
 
@@ -347,23 +355,7 @@ public final class Constants {
     }
   }
 
-  public static class STATEHANDLER {
-    public enum WRIST_SETPOINT_OFFSET {
-      LOW(Units.inchesToMeters(6)),
-      MID(Units.inchesToMeters(6)),
-      HIGH(Units.inchesToMeters(6));
-
-      private final double value;
-
-      WRIST_SETPOINT_OFFSET(final double value) {
-        this.value = value;
-      }
-
-      public double get() {
-        return value;
-      }
-    }
-  }
+  public static class STATEHANDLER {}
 
   public enum SCORING_STATE {
     STOWED,

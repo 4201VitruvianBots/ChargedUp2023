@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
-import frc.robot.Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;
@@ -17,6 +16,7 @@ public class SetpointSolver {
   private Rotation2d chassisSetpointDegrees;
   private double elevatorHorizontalSetpointMeters;
   private double elevatorSetpointMeters;
+  private double wristSetpointDegrees;
 
   private SetpointSolver() {}
 
@@ -28,8 +28,11 @@ public class SetpointSolver {
   }
 
   public void solveSetpoints(
-      Pose2d currentRobotPose, Pose2d targetPose, Constants.SCORING_STATE scoringState) {
-    solveSetpoints(currentRobotPose, targetPose, scoringState, 0);
+      Pose2d currentRobotPose,
+      Pose2d targetPose,
+      double wristOffset,
+      Constants.SCORING_STATE scoringState) {
+    solveSetpoints(currentRobotPose, targetPose, wristOffset, scoringState, 0);
   }
 
   /**
@@ -41,6 +44,7 @@ public class SetpointSolver {
   public void solveSetpoints(
       Pose2d currentRobotPose,
       Pose2d targetPose,
+      double wristOffset,
       Constants.SCORING_STATE scoringState,
       double targetTangentalOffset) {
     m_currentRobotPose = currentRobotPose;
@@ -61,23 +65,7 @@ public class SetpointSolver {
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 
-    switch (scoringState) {
-      case SMART_LOW_REVERSE:
-        m_wristOffset = 0;
-        break;
-      case SMART_LOW:
-        m_wristOffset = WRIST_SETPOINT_OFFSET.LOW.get();
-        break;
-      case SMART_MEDIUM:
-        m_wristOffset = WRIST_SETPOINT_OFFSET.MID.get();
-        break;
-      default:
-      case SMART_HIGH:
-        m_wristOffset = WRIST_SETPOINT_OFFSET.HIGH.get();
-        break;
-    }
-
-    elevatorHorizontalSetpointMeters = correctedSolution.getTranslation().getNorm() - m_wristOffset;
+    elevatorHorizontalSetpointMeters = correctedSolution.getTranslation().getNorm() - wristOffset;
     elevatorSetpointMeters =
         Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
             * elevatorHorizontalSetpointMeters;
@@ -89,5 +77,9 @@ public class SetpointSolver {
 
   public double getElevatorSetpointMeters() {
     return elevatorSetpointMeters;
+  }
+
+  public double getWristSetpointDegrees() {
+    return wristSetpointDegrees;
   }
 }

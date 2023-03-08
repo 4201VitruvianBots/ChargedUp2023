@@ -309,9 +309,9 @@ public class Elevator extends SubsystemBase {
     elevatorHeight = getHeightMeters();
   }
 
-  public Translation2d getElevatorField2dTranslation() {
+  public Translation2d getHorizontalTranslation() {
     return new Translation2d(
-        getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()), 0);
+        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()), 0);
   }
 
   private void initShuffleboard() {

@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.WRIST;
@@ -302,7 +301,8 @@ public class StateHandler extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getElevatorField2dTranslation(), m_drive.getHeadingRotation2d()));
+                    m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
+                    m_drive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
@@ -386,23 +386,12 @@ public class StateHandler extends SubsystemBase {
     }
 
     if (m_smartScoringEnabled) {
-      switch (scoringState) {
-        case SMART_HIGH:
-          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.HIGH.get();
-          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
-          break;
-        case SMART_MEDIUM:
-          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.MID.get();
-          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
-          break;
-        case SMART_LOW:
-          m_wristOffset = Constants.STATEHANDLER.WRIST_SETPOINT_OFFSET.LOW.get();
-          m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
-      }
+      m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
           m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+          m_wrist.getHorizontalTranslation().getX(),
           scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());

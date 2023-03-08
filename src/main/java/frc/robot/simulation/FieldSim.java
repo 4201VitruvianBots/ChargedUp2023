@@ -26,6 +26,7 @@ public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
   private final Vision m_vision;
   private final Elevator m_elevator;
+  private final Wrist m_wrist;
   private final Controls m_controls;
 
   private final Field2d m_field2d = new Field2d();
@@ -53,7 +54,8 @@ public class FieldSim extends SubsystemBase {
 
   private ArrayList<Pose2d> coopertitionNodes = new ArrayList<>();
 
-  public FieldSim(SwerveDrive swerveDrive, Vision vision, Elevator elevator, Controls controls) {
+  public FieldSim(
+      SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
 
     boolean cone = true;
 
@@ -130,6 +132,7 @@ public class FieldSim extends SubsystemBase {
     m_swerveDrive = swerveDrive;
     m_vision = vision;
     m_elevator = elevator;
+    m_wrist = wrist;
     m_controls = controls;
   }
 
@@ -191,9 +194,9 @@ public class FieldSim extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getElevatorField2dTranslation(),
+                    m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
-    m_field2d.getObject("Elevator Horizontal Pose").setPose(elevatorPose);
+    m_field2d.getObject("Wrist Scoring Pose").setPose(elevatorPose);
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
@@ -243,7 +246,7 @@ public class FieldSim extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // updateRobotPoses();
+    updateRobotPoses();
 
     if (RobotBase.isSimulation()) simulationPeriodic();
 

@@ -51,14 +51,15 @@ public class RobotContainer {
   private final DataLog m_logger = DataLogManager.getLog();
 
   // The robot's subsystems and commands are defined here...
-  private final Intake m_intake = new Intake();
-  private final Elevator m_elevator = new Elevator();
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
+  private final Elevator m_elevator = new Elevator();
+  private final Wrist m_wrist = new Wrist();
+  private final Intake m_intake = new Intake();
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
-  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator, m_controls);
+  private final FieldSim m_fieldSim =
+      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final Wrist m_wrist = new Wrist();
   private final LED m_led = new LED(m_controls);
 
   private final SimConstants m_simConstants = new SimConstants(m_controls);
