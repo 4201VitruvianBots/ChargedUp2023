@@ -265,7 +265,7 @@ public class Elevator extends SubsystemBase {
     return m_upperLimitMeters;
   }
 
-  public void setJoystickY(double m_joystickY) {
+  public void setUserInput(double m_joystickY) {
     joystickInput = m_joystickY;
   }
 

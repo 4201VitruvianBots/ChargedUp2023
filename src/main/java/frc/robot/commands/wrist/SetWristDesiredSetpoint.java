@@ -42,8 +42,8 @@ public class SetWristDesiredSetpoint extends CommandBase {
     m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
     m_wrist.setDesiredPositionRadians(m_setpoint);
 
-    double joystickYDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
-    m_wrist.setUserInput(-joystickYDeadbandOutput);
+    double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_wrist.setUserInput(-joystickDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.

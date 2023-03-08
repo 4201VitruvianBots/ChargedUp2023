@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -17,10 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.*;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +26,7 @@ public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
   private final Vision m_vision;
   private final Elevator m_elevator;
+  private final Controls m_controls;
 
   private final Field2d m_field2d = new Field2d();
 
@@ -56,7 +53,7 @@ public class FieldSim extends SubsystemBase {
 
   private ArrayList<Pose2d> coopertitionNodes = new ArrayList<>();
 
-  public FieldSim(SwerveDrive swerveDrive, Vision vision, Elevator elevator) {
+  public FieldSim(SwerveDrive swerveDrive, Vision vision, Elevator elevator, Controls controls) {
 
     boolean cone = true;
 
@@ -133,6 +130,7 @@ public class FieldSim extends SubsystemBase {
     m_swerveDrive = swerveDrive;
     m_vision = vision;
     m_elevator = elevator;
+    m_controls = controls;
   }
 
   public void initSim() {}
@@ -217,9 +215,9 @@ public class FieldSim extends SubsystemBase {
       StateHandler.INTAKING_STATES intakeState, Constants.SCORING_STATE mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
-    if (DriverStation.getAlliance() == Alliance.Red) {
+    if (m_controls.getAllianceColor() == Alliance.Red) {
       possibleNodes.retainAll(redNodes);
-    } else if (DriverStation.getAlliance() == Alliance.Blue) {
+    } else if (m_controls.getAllianceColor() == Alliance.Blue) {
       possibleNodes.retainAll(blueNodes);
     }
 

@@ -45,15 +45,15 @@ public class IncrementElevatorHeight extends CommandBase {
       //              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
       //              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
       if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+        m_elevator.setUserInput(-joystickYDeadbandOutput);
       } else {
         m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
+        m_elevator.setUserInput(-joystickYDeadbandOutput);
       }
     }
     if (joystickYDeadbandOutput == 0
         && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-      m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      m_elevator.setUserInput(-joystickYDeadbandOutput);
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.resetState();
     }

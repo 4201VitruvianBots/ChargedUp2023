@@ -12,6 +12,7 @@ public class Controls extends SubsystemBase {
   BooleanPublisher allianceBoolean;
 
   private boolean isInit;
+  private DriverStation.Alliance allianceColor = DriverStation.Alliance.Invalid;
 
   public Controls() {
     initSmartDashboard();
@@ -24,7 +25,7 @@ public class Controls extends SubsystemBase {
    * @return Returns the current alliance color.
    */
   public DriverStation.Alliance getAllianceColor() {
-    return DriverStation.getAlliance();
+    return allianceColor;
   }
 
   /**
@@ -33,7 +34,7 @@ public class Controls extends SubsystemBase {
    * @return Returns the current alliance color.
    */
   public boolean getAllianceColorBoolean() {
-    return DriverStation.getAlliance() != DriverStation.Alliance.Blue;
+    return getAllianceColor() != DriverStation.Alliance.Blue;
   }
 
   public void setPDHChannel(boolean on) {
@@ -62,6 +63,10 @@ public class Controls extends SubsystemBase {
     controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
   }
 
+  public void updateAllianceColor() {
+    allianceColor = DriverStation.getAlliance();
+  }
+
   /** Sends values to SmartDashboard */
   private void updateSmartDashboard() {
     // SmartDashboard.putBoolean("Alliance", getAllianceColorBoolean());
@@ -73,6 +78,9 @@ public class Controls extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+      updateAllianceColor();
+    }
     // This method will be called once per scheduler run
     updateSmartDashboard();
     //    System.out.println("Test1");

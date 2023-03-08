@@ -290,7 +290,7 @@ public class Vision extends SubsystemBase {
    * Collects transformation/rotation data from limelight
    */
   public double[] getBotPose(CAMERA_SERVER location) {
-    DriverStation.Alliance allianceColor = DriverStation.getAlliance();
+    DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
     double[] botPose = new double[0];
     switch (location) {
       case LEFT_LOCALIZER:
