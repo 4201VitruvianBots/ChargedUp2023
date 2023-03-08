@@ -16,7 +16,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -267,7 +270,7 @@ public class Elevator extends SubsystemBase {
     return m_upperLimitMeters;
   }
 
-  public void setUserInput(double m_joystickY) {
+  public void setJoystickY(double m_joystickY) {
     joystickInput = m_joystickY;
   }
 
@@ -311,7 +314,7 @@ public class Elevator extends SubsystemBase {
     elevatorHeight = getHeightMeters();
   }
 
-  public Translation2d getHorizontalTranslation() {
+  public Translation2d getElevatorField2dTranslation() {
     return new Translation2d(
         -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
             + centerOffset,
@@ -398,15 +401,14 @@ public class Elevator extends SubsystemBase {
   }
 
   public void updateLog() {
-    elevatorCurrentEntry.append(getElevatorMotorVoltage());
+    // elevatorCurrentEntry.append(getElevatorMotorVoltage());
     elevatorSetpointEntry.append(m_desiredPositionMeters);
     elevatorPositionEntry.append(elevatorHeight);
   }
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(
-        MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12.0, 12.0));
+    elevatorSim.setInput(getPercentOutput() * 12);
 
     // Next, we update it. The standard loop time is 20ms.
     elevatorSim.update(0.020);

@@ -256,8 +256,8 @@ public class SwerveModule extends SubsystemBase {
   }
 
   public void updateLog() {
-    moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
-    moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
+    // moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
+    // moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
   }
 
   @Override

@@ -195,7 +195,9 @@ public class FieldSim extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
+                    m_elevator
+                        .getElevatorField2dTranslation()
+                        .plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
     System.out.println(

@@ -51,8 +51,8 @@ public class Wrist extends SubsystemBase {
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
   private TrapezoidProfile.Constraints m_fastWristTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
-  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints; 
-
+  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
+      m_slowWristTrapezoidalConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -100,7 +100,7 @@ public class Wrist extends SubsystemBase {
       kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
   private DoublePublisher currentTrapezoidVelocity;
-  private DoublePublisher currentTrapezoidAcceleration; 
+  private DoublePublisher currentTrapezoidAcceleration;
   private StringPublisher currentCommandStatePub;
 
   public Wrist(Intake intake) {
@@ -262,19 +262,19 @@ public class Wrist extends SubsystemBase {
     return m_upperLimitRadians;
   }
 
-  public void updateTrapezoidProfileConstraints(WRIST_SPEED speed){
-    switch(speed){
-      case FAST: 
-      m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints; 
-      break;
-      default: 
-      case SLOW: 
-      m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
-      break; 
+  public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
+    switch (speed) {
+      case FAST:
+        m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints;
+        break;
+      default:
+      case SLOW:
+        m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
+        break;
     }
   }
 
-  public enum WRIST_SPEED{
+  public enum WRIST_SPEED {
     SLOW,
     FAST
   };
@@ -307,7 +307,8 @@ public class Wrist extends SubsystemBase {
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
     kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
-    kMaxAccelSub = wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
+    kMaxAccelSub =
+        wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
     kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
     kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
     kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);

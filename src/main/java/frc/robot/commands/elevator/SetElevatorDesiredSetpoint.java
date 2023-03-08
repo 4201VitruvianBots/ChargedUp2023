@@ -46,7 +46,7 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
     m_elevator.setDesiredPositionMeters(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
-    m_elevator.setUserInput(-joystickDeadbandOutput);
+    m_elevator.setJoystickY(-joystickDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
