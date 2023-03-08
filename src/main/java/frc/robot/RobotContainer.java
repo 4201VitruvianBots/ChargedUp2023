@@ -476,7 +476,7 @@ public class RobotContainer {
 
     m_autoChooser.addOption(
         "BlueTopTwoCone",
-        new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
@@ -484,7 +484,7 @@ public class RobotContainer {
             "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision));
 
     m_autoChooser.addOption(
-        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
@@ -515,7 +515,7 @@ public class RobotContainer {
     m_autoChooser.addOption(
         "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption("RealDoNothing", new RealDoNothing(m_wrist));
+    m_autoChooser.addOption("RealDoNothing", new RealDoNothing(m_wrist, m_elevator));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
