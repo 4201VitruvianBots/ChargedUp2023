@@ -336,7 +336,7 @@ public class StateHandler extends SubsystemBase {
   @Override
   public void periodic() {
     updateSmartDashboard();
-    targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
+    // targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
 
     // Determine current zone based on elevator/wrist position
     m_currentZone =

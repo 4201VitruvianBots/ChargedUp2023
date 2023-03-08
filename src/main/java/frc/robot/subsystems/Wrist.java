@@ -53,7 +53,7 @@ public class Wrist extends SubsystemBase {
 
   private final double maxPercentOutput = 1.0;
   public final double setpointMultiplier = Units.degreesToRadians(60.0);
-  private final double percentOutputMultiplier = 0.4;
+  private final double percentOutputMultiplier = 0.3;
 
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
@@ -112,7 +112,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
-    resetWristAngle(90);
+    resetWristAngle(-15.0);
 
     initSmartDashboard();
   }
