@@ -53,6 +53,8 @@ public class GetSubsystemStates extends CommandBase {
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
     var desiredState = m_stateHandler.getDesiredZone();
+    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
+    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
 
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -78,17 +80,14 @@ public class GetSubsystemStates extends CommandBase {
           } else {
             m_led.expressState(LED.robotState.ELEVATING);
           }
-          break;
-        case CUBE_BUTTON:
-          m_led.expressState(LED.robotState.CUBE_BUTTON);
-          break;
-        case CONE_BUTTON:
-          m_led.expressState(LED.robotState.CONE_BUTTON);
-          break;
-        default:
-          m_led.expressState(LED.robotState.ENABLED);
-          break;
       }
+    }
+    if (coneButton) {
+      m_led.expressState(LED.robotState.CONE_BUTTON);
+    } else if (cubeButton) {
+      m_led.expressState(LED.robotState.CUBE_BUTTON);
+    } else if (enabled) {
+      m_led.expressState(LED.robotState.ENABLED);
     }
   }
 
