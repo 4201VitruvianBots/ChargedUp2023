@@ -43,8 +43,13 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private TrapezoidProfile.Constraints m_trapezoidalConstraints =
-      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxVel, Constants.WRIST.kMaxAccel);
+  private TrapezoidProfile.Constraints m_slowWristTrapezoidalConstraints =
+      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+  private TrapezoidProfile.Constraints m_fastWristTrapezoidalConstraints =
+      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints; 
+
+
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
@@ -90,6 +95,8 @@ public class Wrist extends SubsystemBase {
       kASub,
       kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
+  private DoublePublisher currentTrapezoidVelocity;
+  private DoublePublisher currentTrapezoidAcceleration; 
   private StringPublisher currentCommandStatePub;
 
   public Wrist() {
@@ -250,6 +257,23 @@ public class Wrist extends SubsystemBase {
     return m_upperLimitRadians;
   }
 
+  public void updateTrapezoidProfileConstraints(WRIST_SPEED speed){
+    switch(speed){
+      case FAST: 
+      m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints; 
+      break;
+      default: 
+      case SLOW: 
+      m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
+      break; 
+    }
+  }
+
+  public enum WRIST_SPEED{
+    SLOW,
+    FAST
+  };
+
   //
   private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
@@ -261,8 +285,8 @@ public class Wrist extends SubsystemBase {
 
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxVel);
-    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxAccel);
+    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
+    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
     wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
     wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
     wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
@@ -274,9 +298,11 @@ public class Wrist extends SubsystemBase {
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
+    currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
+    currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
-    kMaxVelSub = wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.WRIST.kMaxVel);
-    kMaxAccelSub = wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.WRIST.kMaxAccel);
+    kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
+    kMaxAccelSub = wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
     kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
     kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
     kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
@@ -291,6 +317,9 @@ public class Wrist extends SubsystemBase {
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
+
+    currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
+    currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
     currentCommandStatePub.set(getControlState().toString());
     //    if (DriverStation.isTest()) {
@@ -366,7 +395,7 @@ public class Wrist extends SubsystemBase {
       }
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        var profile = new TrapezoidProfile(m_trapezoidalConstraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;
