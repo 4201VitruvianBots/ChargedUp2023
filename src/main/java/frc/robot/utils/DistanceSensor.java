@@ -4,10 +4,13 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import frc.robot.Constants;
+import frc.robot.subsystems.StateHandler.INTAKING_STATES;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -41,6 +44,8 @@ public class DistanceSensor {
   public GenericEntry sensorValue1Tab = distanceSensorTab.add("Sensor Value 1", 0).getEntry();
   public GenericEntry sensorValue2Tab = distanceSensorTab.add("Sensor Value 2", 0).getEntry();
   public GenericEntry testParserTab = distanceSensorTab.add("Test Value 1", 0).getEntry();
+  public GenericEntry coneInchesTab = distanceSensorTab.add("Cone Distance Inches", 0).getEntry();
+  public GenericEntry cubeInchesTab = distanceSensorTab.add("Cube Distance Inches", 0).getEntry();
 
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
@@ -114,12 +119,51 @@ public class DistanceSensor {
             + ",\"test\":"
             + Integer.toString(rand.nextInt(100))
             + "}";
-    //    System.out.println(receivedData);
+  }
+
+  // Returns the distance in inches from the left side of the intake to the center of the game
+  // piece.
+  public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
+    int leftSensorId;
+    int rightSensorId;
+
+    switch (intakeState) {
+      case CONE:
+        leftSensorId = Constants.INTAKE.leftConeSensor;
+        rightSensorId = Constants.INTAKE.rightConeSensor;
+        break;
+      case CUBE:
+        leftSensorId = Constants.INTAKE.leftCubeSensor;
+        rightSensorId = Constants.INTAKE.rightCubeSensor;
+        break;
+      case INTAKING:
+        return 0;
+      default:
+      case NONE:
+        return 0;
+    }
+
+    double leftSensorValue = getSensorValue(leftSensorId) / 1000;
+    double rightSensorValue = getSensorValue(rightSensorId) / 1000;
+
+    double distanceMeters =
+        leftSensorValue
+            + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2);
+
+    return Units.metersToInches(distanceMeters);
+  }
+
+  public double getConeDistanceInches() {
+    return getGamepieceDistanceInches(INTAKING_STATES.CONE);
+  }
+
+  public double getCubeDistanceInches() {
+    return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
   }
 
   public void pollDistanceSensors() {
     // This method will be called once per scheduler run
-    testParserTab.setInteger(testParser());
+    // testParserTab.setInteger(testParser());
     try {
       if (RobotBase.isSimulation()) {
         simulationPeriodic();
@@ -133,6 +177,8 @@ public class DistanceSensor {
       rawStringTab.setString(receivedData);
       sensorValue1Tab.setInteger(getSensorValue(1));
       sensorValue2Tab.setInteger(getSensorValue(2));
+      coneInchesTab.setDouble(getConeDistanceInches());
+      cubeInchesTab.setDouble(getCubeDistanceInches());
     } catch (SocketTimeoutException ex) {
       System.out.println("error: " + ex.getMessage());
       ex.printStackTrace();
