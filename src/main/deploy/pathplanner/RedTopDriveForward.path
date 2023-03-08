@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.81,
-        "y": 2.75
+        "x": 1.83,
+        "y": 4.95
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8099999999999996,
-        "y": 2.75
+        "x": 2.83,
+        "y": 4.95
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -16,32 +16,10 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0.0
-      }
-    },
-    {
-      "anchorPoint": {
-        "x": 4.4,
-        "y": 2.75
-      },
-      "prevControl": {
-        "x": 2.1013841919855207,
-        "y": 2.75
-      },
-      "nextControl": {
-        "x": 4.430296022933804,
-        "y": 2.75
-      },
-      "holonomicAngle": 0,
-      "isReversal": false,
-      "velOverride": null,
-      "isLocked": false,
-      "isStopPoint": true,
-      "stopEvent": {
-        "names": [],
+        "names": [
+          "SetElevatorHighConeNode",
+          "SetWristHighConeNode"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -49,12 +27,12 @@
     },
     {
       "anchorPoint": {
-        "x": 4.4,
-        "y": 2.65
+        "x": 6.7377199666680045,
+        "y": 4.588496896292039
       },
       "prevControl": {
-        "x": 4.4,
-        "y": 2.7518441832008786
+        "x": 5.7377199666680045,
+        "y": 4.588496896292039
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -63,7 +41,9 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "RunIntakeCone"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0

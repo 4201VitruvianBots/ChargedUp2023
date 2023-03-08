@@ -18,11 +18,9 @@ public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LED m_led;
 
-  private final Elevator m_elevator;
-  private final Vision m_vision;
-  private final Controls m_controls;
-  private final Wrist m_wrist;
   private final Intake m_intake;
+  private final Controls m_controls;
+  private final StateHandler m_stateHandler;
   private boolean intaking;
   private boolean disabled;
   private boolean enabled;
@@ -32,14 +30,12 @@ public class GetSubsystemStates extends CommandBase {
   private boolean coneButton;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(
-      LED led, Controls controls, Intake intake, Wrist wrist, Vision vision, Elevator elevator) {
+  public GetSubsystemStates(LED led, Controls controls, StateHandler stateHandler, Intake intake) {
     m_led = led;
-    m_controls = controls;
+    m_stateHandler = stateHandler;
     m_intake = intake;
-    m_wrist = wrist;
-    m_vision = vision;
-    m_elevator = elevator;
+    m_controls = controls;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(led);
   }
@@ -56,28 +52,43 @@ public class GetSubsystemStates extends CommandBase {
     // the prioritized state to be expressed to the LEDs
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
-    intaking = m_intake.getIntakeState();
-    scoring = (m_elevator.getElevatorRunning() && m_wrist.isScoring());
-    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
-    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
+    var desiredState = m_stateHandler.getDesiredZone();
 
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {
-      if (m_controls.getInitState()) m_led.expressState(LED.robotState.INITIALIZED);
-      else m_led.expressState(LED.robotState.DISABLED);
-    } else if (cubeButton) {
-      m_led.expressState(LED.robotState.CUBE_BUTTON);
-    } else if (coneButton) {
-      m_led.expressState(LED.robotState.CONE_BUTTON);
-    } else if (intaking) {
-      m_led.expressState(LED.robotState.INTAKING);
-    } else if (scoring) {
-      m_led.expressState(LED.robotState.SCORING);
-    } else if (enabled) {
-      m_led.expressState(LED.robotState.ENABLED);
-    } else if (elavating) {
-      m_led.expressState(LED.robotState.ELEVATING);
+      if (m_controls.getInitState()) {
+        m_led.expressState(LED.robotState.INITIALIZED);
+      } else {
+        m_led.expressState(LED.robotState.DISABLED);
+      }
+    } else {
+      switch (desiredState) {
+        case INTAKING_LOW:
+          m_led.expressState(LED.robotState.INTAKING);
+          break;
+        case SCORE_LOW_CONE:
+        case SCORE_LOW_CUBE:
+        case SCORE_MID_CONE:
+        case SCORE_MID_CUBE:
+        case SCORE_HIGH_CONE:
+        case SCORE_HIGH_CUBE:
+          if (m_stateHandler.isOnTarget()) {
+            m_led.expressState(LED.robotState.LOCKED_ON);
+          } else {
+            m_led.expressState(LED.robotState.ELEVATING);
+          }
+          break;
+        case CUBE_BUTTON:
+          m_led.expressState(LED.robotState.CUBE_BUTTON);
+          break;
+        case CONE_BUTTON:
+          m_led.expressState(LED.robotState.CONE_BUTTON);
+          break;
+        default:
+          m_led.expressState(LED.robotState.ENABLED);
+          break;
+      }
     }
   }
 
