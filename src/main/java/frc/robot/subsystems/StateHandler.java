@@ -302,7 +302,9 @@ public class StateHandler extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
+                    m_elevator
+                        .getElevatorField2dTranslation()
+                        .plus(m_wrist.getHorizontalTranslation()),
                     m_drive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;

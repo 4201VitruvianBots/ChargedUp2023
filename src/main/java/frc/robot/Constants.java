@@ -150,6 +150,12 @@ public final class Constants {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+
+    // TODO find values
+    public static final int leftConeSensor = 1;
+    public static final int rightConeSensor = 2;
+    public static final int leftCubeSensor = 1;
+    public static final int rightCubeSensor = 2;
   }
 
   public static final class LED {}
