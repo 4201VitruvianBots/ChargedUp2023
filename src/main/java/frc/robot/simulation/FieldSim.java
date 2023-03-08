@@ -245,7 +245,7 @@ public class FieldSim extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateRobotPoses();
+    // updateRobotPoses();
 
     if (RobotBase.isSimulation()) simulationPeriodic();
 

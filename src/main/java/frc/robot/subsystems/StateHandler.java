@@ -39,7 +39,16 @@ public class StateHandler extends SubsystemBase {
     SCORE_LOW,
     SCORE_MID,
     SCORE_HIGH,
-    DANGER_ZONE
+    DANGER_ZONE,
+    SCORE_LOW_CONE,
+    SCORE_LOW_CUBE,
+    SCORE_MID_CONE,
+    SCORE_MID_CUBE,
+    SCORE_HIGH_CONE,
+    SCORE_HIGH_CUBE,
+    INTAKING_LOW,
+    CUBE_BUTTON,
+    CONE_BUTTON
   }
 
   public enum ZONE_TRANSITIONS {
@@ -327,7 +336,7 @@ public class StateHandler extends SubsystemBase {
   @Override
   public void periodic() {
     updateSmartDashboard();
-    targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
+    // targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
 
     // Determine current zone based on elevator/wrist position
     m_currentZone =

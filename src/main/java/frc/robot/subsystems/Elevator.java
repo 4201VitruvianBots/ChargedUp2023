@@ -84,7 +84,7 @@ public class Elevator extends SubsystemBase {
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
   private final double maxPercentOutput = 0.75;
-  private final double percentOutputMultiplier = 0.50;
+  private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.50;
 
   // Simulation setup
@@ -144,7 +144,7 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(0.3, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(0.55, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(-0.3, Constants.ELEVATOR.kTimeoutMs);
     }
 
