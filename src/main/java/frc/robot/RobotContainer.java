@@ -219,19 +219,19 @@ public class RobotContainer {
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
     xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
-    xboxController
-        .rightBumper()
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
+    // xboxController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         new SetWristDesiredSetpoint(
+    //             m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-    xboxController
-        .leftBumper()
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist,
-                Units.degreesToRadians(-11.0),
-                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
+    // xboxController
+    //     .leftBumper()
+    //     .whileTrue(
+    //         new SetWristDesiredSetpoint(
+    //             m_wrist,
+    //             Units.degreesToRadians(-11.0),
+    //             xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));

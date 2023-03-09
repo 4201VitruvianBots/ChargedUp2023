@@ -81,12 +81,7 @@ public class GetSubsystemStates extends CommandBase {
             m_led.expressState(LED.robotState.ELEVATING);
           }
       }
-    }
-    if (coneButton) {
-      m_led.expressState(LED.robotState.CONE_BUTTON);
-    } else if (cubeButton) {
-      m_led.expressState(LED.robotState.CUBE_BUTTON);
-    } else if (enabled) {
+    } if (enabled) {
       m_led.expressState(LED.robotState.ENABLED);
     }
   }
