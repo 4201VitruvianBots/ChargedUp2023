@@ -474,7 +474,7 @@ public class RobotContainer {
 
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
-    m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
+    m_autoChooser.addOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
@@ -482,6 +482,12 @@ public class RobotContainer {
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
+
+        m_autoChooser.addOption(
+            "ReallyOldBlueTopTwoCone",
+            new ReallyOldTopTwoCone("ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+            
     m_autoChooser.addOption(
         "BlueOnePiece",
         new OnePiece(
@@ -519,7 +525,11 @@ public class RobotContainer {
     m_autoChooser.addOption(
         "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption("RealDoNothing", new RealDoNothing(m_wrist));
+       m_autoChooser.addOption(
+        "test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+
+    m_autoChooser.setDefaultOption("RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
