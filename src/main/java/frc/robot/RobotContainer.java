@@ -136,24 +136,19 @@ public class RobotContainer {
     // Score button Bindings
 
     // Score LOW Setpoints
+    xboxController.a().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+
     xboxController
         .a()
         .whileTrue(
-            new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getLeftY),
-                m_intake::getIntakeGamePiece));
+            new SetElevatorDesiredSetpoint(
+                m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), xboxController::getLeftY));
+
     xboxController
         .a()
         .whileTrue(
-            new ConditionalCommand(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getRightY),
-                m_intake::getIntakeGamePiece));
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get(), xboxController::getRightY));
 
     // Score MID Setpoints
     xboxController
@@ -215,23 +210,34 @@ public class RobotContainer {
         .povUp()
         .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
 
+    xboxController // Left pov button should move elevator and wrist to substation intaking cube &
+        // change the leds to cube
+        .povLeft()
+        .onTrue(
+            new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
+    xboxController
+        .povLeft()
+        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
+
+    xboxController.povLeft().onTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
-    // xboxController
-    //     .rightBumper()
-    //     .whileTrue(
-    //         new SetWristDesiredSetpoint(
-    //             m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
-    // xboxController
-    //     .leftBumper()
-    //     .whileTrue(
-    //         new SetWristDesiredSetpoint(
-    //             m_wrist,
-    //             Units.degreesToRadians(-11.0),
-    //             xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
+    // xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController
+        .rightBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
+    // xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController
+        .leftBumper()
+        .whileTrue(
+            new SetWristDesiredSetpoint(
+                m_wrist,
+                Units.degreesToRadians(-11.0),
+                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));

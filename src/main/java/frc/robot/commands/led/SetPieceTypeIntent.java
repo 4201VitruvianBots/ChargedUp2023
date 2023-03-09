@@ -30,12 +30,11 @@ public class SetPieceTypeIntent extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-  if (m_pieceType == PieceType.CONE) {
-    m_led.expressState(LED.robotState.CONE_BUTTON);
-  }
-  else if (m_pieceType == PieceType.CUBE){
-    m_led.expressState(LED.robotState.CUBE_BUTTON);
-  }
+    if (m_pieceType == PieceType.CONE) {
+      m_led.expressState(LED.robotState.CONE_BUTTON);
+    } else if (m_pieceType == PieceType.CUBE) {
+      m_led.expressState(LED.robotState.CUBE_BUTTON);
+    }
   }
 
   // Called once the command ends or is interrupted.
