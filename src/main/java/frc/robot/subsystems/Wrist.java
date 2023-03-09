@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase {
   private double m_desiredSetpointRadians;
@@ -125,6 +126,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
+    Timer.delay(1);
     resetWristAngle(-15.0);
 
     initSmartDashboard();
@@ -287,6 +289,7 @@ public class Wrist extends SubsystemBase {
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
+    SmartDashboard.putData("Reset90",new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
 
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 

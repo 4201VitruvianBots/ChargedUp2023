@@ -333,9 +333,9 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
-      ABSOLUTE_MAX(Units.degreesToRadians(120.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.degreesToRadians(130.0)),
+      LOW_MAX(Units.degreesToRadians(110.0)),
       HIGH_MIN(Units.degreesToRadians(10.0)),
       HIGH_MAX(LOW_MAX.get()),
       EXTENDED_MIN(HIGH_MIN.get()),

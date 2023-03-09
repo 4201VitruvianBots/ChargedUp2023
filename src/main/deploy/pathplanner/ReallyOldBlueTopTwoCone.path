@@ -17,9 +17,10 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "RunReverseIntake"
+          "wait",
+          "RunIntakeConeReverse"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "parallelDeadline",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -44,9 +45,12 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "RunIntake"
+          "wait",
+          "SetWristIntaking",
+          "SetElevatorIntaking",
+          "RunIntakeCone"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "parallelDeadline",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -96,9 +100,10 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "RunReverseIntake"
+          "wait",
+          "RunIntakeConeReverse"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "parallelDeadline",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -154,5 +159,20 @@
   "maxVelocity": 5.4,
   "maxAcceleration": null,
   "isReversed": null,
-  "markers": []
+  "markers": [
+    {
+      "position": 0.18181818181818188,
+      "names": [
+        "SetWristStowed",
+        "SetElevatorStowed"
+      ]
+    },
+    {
+      "position": 1.4,
+      "names": [
+        "SetElevatorStowed",
+        "SetWristStowed"
+      ]
+    }
+  ]
 }
