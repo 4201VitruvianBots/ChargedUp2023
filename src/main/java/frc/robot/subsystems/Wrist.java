@@ -289,7 +289,7 @@ public class Wrist extends SubsystemBase {
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
-    SmartDashboard.putData("Reset90",new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
+    SmartDashboard.putData("Reset90", new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
 
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 

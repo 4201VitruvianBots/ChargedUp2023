@@ -14,32 +14,27 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 
 public class RealDoNothing extends SequentialCommandGroup {
-  public RealDoNothing(Wrist wrist, Intake intake, Vision vision, Elevator elevator, SwerveDrive swerveDrive) {
+  public RealDoNothing(
+      Wrist wrist, Intake intake, Vision vision, Elevator elevator, SwerveDrive swerveDrive) {
 
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
-        
-          new ParallelCommandGroup(
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),  
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-          new AutoRunIntakeCone(intake, -0.7, vision, swerveDrive)
-          ).withTimeout(1),
 
-          new ParallelCommandGroup(
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()))
+        new ParallelCommandGroup(
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+                new AutoRunIntakeCone(intake, -0.7, vision, swerveDrive))
+            .withTimeout(1),
+        new ParallelCommandGroup(
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetElevatorDesiredSetpoint(
+                    elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()))
             .withTimeout(2.5),
-
+        new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+        new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2),
+        new ParallelCommandGroup(
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            
-            new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2),
-
-            new ParallelCommandGroup(
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()))
-
-        
-        );
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())));
   }
 }
