@@ -73,6 +73,7 @@ public final class Constants {
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(0.5625);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
+    public static final double centerOffset = Units.inchesToMeters(10);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
@@ -153,6 +154,12 @@ public final class Constants {
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
     public static final int coneSensorId = 2;
+
+    public enum HELD_GAMEPIECE {
+      NONE,
+      CUBE,
+      CONE
+    }
   }
 
   public static final class LED {}
@@ -335,6 +342,8 @@ public final class Constants {
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
       HORIZONTAL_LENGTH_0_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_90_CUBE(Units.inchesToMeters(-4.0)),
+      HORIZONTAL_LENGTH_90_CONE(Units.inchesToMeters(-9.0)),
       HORIZONTAL_LENGTH_140_CUBE(Units.inchesToMeters(-17.0)),
       HORIZONTAL_LENGTH_140_CONE(Units.inchesToMeters(-25.0)),
       HORIZONTAL_LENGTH_180_CUBE(Units.inchesToMeters(-22.0)),

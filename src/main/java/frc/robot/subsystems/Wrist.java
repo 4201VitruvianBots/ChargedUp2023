@@ -38,6 +38,10 @@ public class Wrist extends SubsystemBase {
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
+  private Translation2d m_wristHorizontalTranslation = new Translation2d();
+
+  private final Intake m_intake;
+
   private static final DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
@@ -92,7 +96,8 @@ public class Wrist extends SubsystemBase {
   private DoublePublisher kCommandedAngleDegreesPub;
   private StringPublisher currentCommandStatePub;
 
-  public Wrist() {
+  public Wrist(Intake intake) {
+    m_intake = intake;
     // One motor for the wrist
 
     // factory default configs
@@ -328,11 +333,27 @@ public class Wrist extends SubsystemBase {
     return (getPositionDegrees() > 170);
   }
 
-  public Translation2d getHorizontalTranslation() {
-    // TODO: Update this calculation
+  public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
-    return new Translation2d(0, 0);
+    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
+    // Cone: f(x)=-0.270347*t+16.8574;
+    double horizontalDistance = 0;
+    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
+      horizontalDistance =
+              0.00000913468 * Math.pow(getPositionDegrees(), 3)
+              -0.00232508 * Math.pow(getPositionDegrees(), 2)
+              -0.0894341 * getPositionDegrees()
+              + 16.1239;
+    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
+      horizontalDistance =
+//          0.00860801 * Math.pow(getPositionDegrees(), 2) +
+          -0.270347 * getPositionDegrees() + 16.8574;
+    m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+  }
+
+  public Translation2d getHorizontalTranslation() {
+    return m_wristHorizontalTranslation;
   }
 
   @Override

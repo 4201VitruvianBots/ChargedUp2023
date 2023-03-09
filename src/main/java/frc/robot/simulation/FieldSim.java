@@ -8,6 +8,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -32,7 +33,7 @@ public class FieldSim extends SubsystemBase {
   private final Field2d m_field2d = new Field2d();
 
   private static Pose2d robotPose;
-  private static Pose2d elevatorPose;
+  private static Pose2d intakePose;
 
   /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
     - Cones and cubes
@@ -189,14 +190,16 @@ public class FieldSim extends SubsystemBase {
         .getObject("fLocalizerPose")
         .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
 
-    elevatorPose =
+    intakePose =
         m_swerveDrive
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
                     m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
-    m_field2d.getObject("Wrist Scoring Pose").setPose(elevatorPose);
+    m_field2d.getObject("Intake Pose").setPose(intakePose);
+    System.out.println("Wrist Extension: " + Units.metersToInches(m_wrist.getHorizontalTranslation().getX()));
+    System.out.println("Horizontal Extension: " + Units.metersToInches(m_swerveDrive.getPoseMeters().getX() - intakePose.getX()));
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 

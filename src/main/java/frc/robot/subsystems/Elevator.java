@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 
+import static frc.robot.Constants.ELEVATOR.centerOffset;
+
 public class Elevator extends SubsystemBase {
 
   // Initializing both motors
@@ -311,15 +313,14 @@ public class Elevator extends SubsystemBase {
 
   public Translation2d getHorizontalTranslation() {
     return new Translation2d(
-        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()), 0);
+        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()) + centerOffset, 0);
   }
 
   private void initShuffleboard() {
     if (RobotBase.isSimulation()) {
-      SmartDashboard.putData("Elevator Command", this);
-      SmartDashboard.putData("Elevator", mech2d);
+      SmartDashboard.putData("Elevator Sim", mech2d);
     }
-    SmartDashboard.putData(this);
+    SmartDashboard.putData("Elevator Subsystem", this);
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
