@@ -179,28 +179,28 @@ public class SwerveModule extends SubsystemBase {
 
     if (isOpenLoop) {
       double percentOutput =
-              desiredState.speedMetersPerSecond / Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+          desiredState.speedMetersPerSecond / Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
       m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
       double velocity =
-              desiredState.speedMetersPerSecond
-                      / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10);
+          desiredState.speedMetersPerSecond
+              / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10);
       m_driveMotor.set(
-              ControlMode.Velocity,
-              velocity,
-              DemandType.ArbitraryFeedForward,
-              feedforward.calculate(desiredState.speedMetersPerSecond));
+          ControlMode.Velocity,
+          velocity,
+          DemandType.ArbitraryFeedForward,
+          feedforward.calculate(desiredState.speedMetersPerSecond));
     }
 
     double angle =
-            (Math.abs(desiredState.speedMetersPerSecond)
-                    <= (Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.01))
-                    ? m_lastAngle
-                    : desiredState.angle
-                    .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
+        (Math.abs(desiredState.speedMetersPerSecond)
+                <= (Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.01))
+            ? m_lastAngle
+            : desiredState.angle
+                .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
     m_turnMotor.set(
-            ControlMode.Position, angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
+        ControlMode.Position, angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
     m_lastAngle = angle;
 
     m_drivePercentOutput = m_driveMotor.getMotorOutputPercent();
