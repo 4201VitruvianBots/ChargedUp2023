@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.ELEVATOR.centerOffset;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
@@ -25,8 +27,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
-
-import static frc.robot.Constants.ELEVATOR.centerOffset;
 
 public class Elevator extends SubsystemBase {
 
@@ -313,7 +313,9 @@ public class Elevator extends SubsystemBase {
 
   public Translation2d getHorizontalTranslation() {
     return new Translation2d(
-        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()) + centerOffset, 0);
+        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
+            + centerOffset,
+        0);
   }
 
   private void initShuffleboard() {

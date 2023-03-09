@@ -341,13 +341,13 @@ public class Wrist extends SubsystemBase {
     double horizontalDistance = 0;
     if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
       horizontalDistance =
-              0.00000913468 * Math.pow(getPositionDegrees(), 3)
-              -0.00232508 * Math.pow(getPositionDegrees(), 2)
-              -0.0894341 * getPositionDegrees()
+          0.00000913468 * Math.pow(getPositionDegrees(), 3)
+              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
+              - 0.0894341 * getPositionDegrees()
               + 16.1239;
     else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
       horizontalDistance =
-//          0.00860801 * Math.pow(getPositionDegrees(), 2) +
+          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;
     m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
   }
