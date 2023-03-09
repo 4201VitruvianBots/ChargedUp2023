@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
 
   private double joystickInput;
 
-  private final double kP = 0.55;
+  private final double kP = 0.3;
   private final double kI = 0;
   private final double kD = 0;
 
