@@ -254,8 +254,8 @@ public class RobotContainer {
                   new SetWristDesiredSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().ordinal()
-                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+                      m_stateHandler.getCurrentZone().getZone()
+                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
       testController
@@ -267,8 +267,8 @@ public class RobotContainer {
                   new SetWristDesiredSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().ordinal()
-                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+                      m_stateHandler.getCurrentZone().getZone()
+                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       // Score button Bindings
 

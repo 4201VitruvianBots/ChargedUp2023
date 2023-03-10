@@ -303,7 +303,7 @@ public class Wrist extends SubsystemBase {
     wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
     wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
     wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-//    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
+    //    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
@@ -321,7 +321,7 @@ public class Wrist extends SubsystemBase {
     kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
     kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
     kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-//    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
+    //    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   // SmartDashboard function

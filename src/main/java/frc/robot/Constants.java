@@ -124,24 +124,25 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
+      LOW_MID_TRANSITION(Units.inchesToMeters(5)),
+      MID_HIGH_TRANSITION(Units.inchesToMeters(8)),
+      HIGH_EXTENDED_TRANSITION(Units.inchesToMeters(12)),
+      LOW_TO_MID(LOW_MID_TRANSITION.get() - Units.inchesToMeters(1)),
+      MID_TO_LOW(LOW_MID_TRANSITION.get() + Units.inchesToMeters(1)),
+      MID_TO_HIGH(MID_HIGH_TRANSITION.get() - Units.inchesToMeters(1)),
+      HIGH_TO_MID(MID_HIGH_TRANSITION.get() + Units.inchesToMeters(1)),
+      HIGH_TO_EXTENDED(HIGH_EXTENDED_TRANSITION.get() - Units.inchesToMeters(1)),
+      EXTENDED_TO_HIGH(HIGH_EXTENDED_TRANSITION.get() + Units.inchesToMeters(1)),
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
-      // The MAX of one zone needs to be higher than the MIN of the next zone
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(4.0)),
-      MID_MIN(Units.inchesToMeters(4.0)),
-      MID_MAX(Units.inchesToMeters(8.0)),
-      HIGH_MIN(Units.inchesToMeters(8.0)),
-      HIGH_MAX(Units.inchesToMeters(12.0)),
-      EXTENDED_MIN(Units.inchesToMeters(12.0)),
-      EXTENDED_MAX(ABSOLUTE_MAX.get()),
-      //
-      LOW_TO_MID(LOW_MAX.get() - Units.inchesToMeters(1)),
-      MID_TO_LOW(MID_MIN.get() + Units.inchesToMeters(1)),
-      MID_TO_HIGH(MID_MAX.get() - Units.inchesToMeters(1)),
-      HIGH_TO_MID(HIGH_MIN.get() + Units.inchesToMeters(1)),
-      HIGH_TO_EXTENDED(HIGH_MAX.get() - Units.inchesToMeters(1)),
-      EXTENDED_TO_HIGH(EXTENDED_MIN.get() + Units.inchesToMeters(1));
+      LOW_MAX(LOW_MID_TRANSITION.get() + Units.inchesToMeters(1)),
+      MID_MIN(LOW_MID_TRANSITION.get() - Units.inchesToMeters(1)),
+      MID_MAX(MID_HIGH_TRANSITION.get() + Units.inchesToMeters(1)),
+      HIGH_MIN(MID_HIGH_TRANSITION.get() - Units.inchesToMeters(1)),
+      HIGH_MAX(HIGH_EXTENDED_TRANSITION.get() + Units.inchesToMeters(1)),
+      EXTENDED_MIN(HIGH_EXTENDED_TRANSITION.get() - Units.inchesToMeters(1)),
+      EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 

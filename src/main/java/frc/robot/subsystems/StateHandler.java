@@ -29,27 +29,40 @@ public class StateHandler extends SubsystemBase {
   }
 
   public enum SUPERSTRUCTURE_STATE {
-    STOWED,
-    INTAKE_LOW,
-    SCORE_LOW_REVERSE,
-    LOW_ZONE,
-    MID_ZONE,
-    HIGH_ZONE,
-    EXTENDED_ZONE,
-    INTAKE_EXTENDED,
-    SCORE_LOW,
-    SCORE_MID,
-    SCORE_HIGH,
-    DANGER_ZONE,
-    SCORE_LOW_CONE,
-    SCORE_LOW_CUBE,
-    SCORE_MID_CONE,
-    SCORE_MID_CUBE,
-    SCORE_HIGH_CONE,
-    SCORE_HIGH_CUBE,
-    INTAKING_LOW,
-    CUBE_BUTTON,
-    CONE_BUTTON
+    // UNDEFINED
+    DANGER_ZONE(0),
+    // LOW
+    STOWED(1),
+    INTAKE_LOW(1),
+    SCORE_LOW_REVERSE(1),
+    SCORE_LOW(1),
+    SCORE_LOW_CONE(1),
+    SCORE_LOW_CUBE(1),
+    LOW_ZONE(1),
+    // MID
+    MID_ZONE(2),
+    // HIGH
+    HIGH_ZONE(3),
+    // EXTENDED
+    EXTENDED_ZONE(4),
+    INTAKE_EXTENDED(4),
+    SCORE_MID(4),
+    SCORE_HIGH(4),
+    SCORE_MID_CONE(4),
+    SCORE_MID_CUBE(4),
+    SCORE_HIGH_CONE(4),
+    SCORE_HIGH_CUBE(4);
+
+    // State Zone is determined by elevator setpoints
+    private final int zone;
+
+    SUPERSTRUCTURE_STATE(final int zone) {
+      this.zone = zone;
+    }
+
+    public int getZone() {
+      return zone;
+    }
   }
 
   public enum ZONE_TRANSITIONS {
@@ -131,223 +144,256 @@ public class StateHandler extends SubsystemBase {
 
   public SUPERSTRUCTURE_STATE determineSuperStructureState(
       double elevatorPositionMeters, double wristPositionRadians) {
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.STOWED.get()) < Units.inchesToMeters(2)
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.STOWED.get()) < Units.degreesToRadians(5))
+    SUPERSTRUCTURE_STATE assumedZone = SUPERSTRUCTURE_STATE.DANGER_ZONE;
+
+    // Specific states defined by elevator/wrist setpoints
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.STOWED.get()) < Units.inchesToMeters(1)
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.STOWED.get()) < Units.degreesToRadians(4))
       return SUPERSTRUCTURE_STATE.STOWED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_LOW.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_LOW;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_CONE;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get())
+            < Units.inchesToMeters(1)
+            && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_CUBE.get())
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID_CONE.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_MID;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_MID_CONE;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID_CUBE.get())
+            < Units.inchesToMeters(1)
+            && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID_CUBE.get())
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_MID_CUBE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
-            < Units.inchesToMeters(2)
+            < Units.inchesToMeters(1)
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-            < Units.degreesToRadians(5)) return SUPERSTRUCTURE_STATE.SCORE_HIGH;
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get())
+            < Units.inchesToMeters(1)
+            && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH_CUBE.get())
+            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE;
 
+    // General states (zones) defined by region
     if (elevatorPositionMeters <= ELEVATOR.THRESHOLD.LOW_MAX.get()) {
       if (WRIST.THRESHOLD.LOW_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.LOW_MAX.get())
         return SUPERSTRUCTURE_STATE.LOW_ZONE;
+      else
+        assumedZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
     }
     if (ELEVATOR.THRESHOLD.MID_MIN.get() < elevatorPositionMeters
         && elevatorPositionMeters <= ELEVATOR.THRESHOLD.MID_MAX.get()) {
       if (WRIST.THRESHOLD.MID_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.MID_MAX.get())
         return SUPERSTRUCTURE_STATE.MID_ZONE;
+      else
+        assumedZone = SUPERSTRUCTURE_STATE.MID_ZONE;
     }
     if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < elevatorPositionMeters
         && elevatorPositionMeters <= ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
       if (WRIST.THRESHOLD.HIGH_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.HIGH_MAX.get())
         return SUPERSTRUCTURE_STATE.HIGH_ZONE;
+      else
+        assumedZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
     }
     if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < elevatorPositionMeters
         && elevatorPositionMeters <= ELEVATOR.THRESHOLD.EXTENDED_MAX.get()) {
       if (WRIST.THRESHOLD.EXTENDED_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.EXTENDED_MAX.get())
         return SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
+      else
+        assumedZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
     }
-    return SUPERSTRUCTURE_STATE.DANGER_ZONE;
+
+    // Undefined state, put a breakpoint here when debugging to check logic
+    if(assumedZone == SUPERSTRUCTURE_STATE.DANGER_ZONE)
+      System.out.println("This should never be reached");
+
+    return assumedZone;
   }
 
   public void zoneAdvancement() {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
     // zones
-    if (m_desiredZone != m_currentZone) {
-      if (m_currentZone == SUPERSTRUCTURE_STATE.EXTENDED_ZONE) {
-        if (m_desiredZone.ordinal() < m_currentZone.ordinal())
-          m_nextZone = ZONE_TRANSITIONS.EXTENDED_TO_HIGH;
-      } else if (m_currentZone == SUPERSTRUCTURE_STATE.HIGH_ZONE) {
-        if (m_desiredZone.ordinal() > m_currentZone.ordinal())
-          m_nextZone = ZONE_TRANSITIONS.HIGH_TO_EXTENDED;
-        else if (m_desiredZone.ordinal() < m_currentZone.ordinal())
-          m_nextZone = ZONE_TRANSITIONS.HIGH_TO_MID;
-      } else if (m_currentZone == SUPERSTRUCTURE_STATE.MID_ZONE) {
-        if (m_desiredZone.ordinal() > m_currentZone.ordinal())
-          m_nextZone = ZONE_TRANSITIONS.MID_TO_HIGH;
-        else if (m_desiredZone.ordinal() < m_currentZone.ordinal()) {
-          m_nextZone = ZONE_TRANSITIONS.MID_TO_LOW;
-        } else if (m_currentZone == SUPERSTRUCTURE_STATE.LOW_ZONE) {
-          if (m_desiredZone.ordinal() > m_currentZone.ordinal())
-            m_nextZone = ZONE_TRANSITIONS.LOW_TO_MID;
-        } else
-          m_nextZone = ZONE_TRANSITIONS.NONE;
-      } else m_nextZone = ZONE_TRANSITIONS.NONE;
+    if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
+      if (m_desiredZone.getZone() > m_currentZone.getZone())
+        m_nextZone = ZONE_TRANSITIONS.LOW_TO_MID;
+    } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.MID_ZONE.getZone()) {
+          if (m_desiredZone.getZone() > m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.MID_TO_HIGH;
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.MID_TO_LOW;
+    } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.HIGH_ZONE.getZone()) {
+          if (m_desiredZone.getZone() > m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.HIGH_TO_EXTENDED;
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.HIGH_TO_MID;
+    } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.EXTENDED_ZONE.getZone()) {
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.EXTENDED_TO_HIGH;
+    } else {
+      // Undefined behavior, put a breakpoint here when debugging to check logic
+      System.out.println("This should never be reached");
+    }
 
-      // Use zone transition info to set mechanism limits. Only threshold limit when within
-      // transition
-      // zones
-      switch (m_nextZone) {
-        case LOW_TO_MID:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.LOW_TO_MID.get())
-              < Units.inchesToMeters(1.0)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
-            break;
-          }
-        case MID_TO_LOW:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.MID_TO_LOW.get())
-              < Units.inchesToMeters(1.0)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
-            break;
-          }
-        case MID_TO_HIGH:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.MID_TO_HIGH.get())
-              < Units.inchesToMeters(2.0)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
-            break;
-          }
-        case HIGH_TO_MID:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.HIGH_TO_MID.get())
-              < Units.inchesToMeters(1.0)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
-            break;
-          }
-        case HIGH_TO_EXTENDED:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.HIGH_TO_EXTENDED.get())
-              < Units.inchesToMeters(4)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
-            break;
-          }
-        case EXTENDED_TO_HIGH:
-          if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.EXTENDED_TO_HIGH.get())
-              < Units.inchesToMeters(4)) {
-            m_elevator.setLowerLimitMeters(
-                Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
-            m_elevator.setUpperLimitMeters(
-                Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
-            m_wrist.setLowerLimit(
-                Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
-            m_wrist.setUpperLimit(
-                Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
-            break;
-          }
-        default:
-        case NONE:
-          switch (m_currentZone) {
-            case LOW_ZONE:
-            case INTAKE_LOW:
-            case STOWED:
-              m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
-              m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.LOW_MAX.get());
-              m_wrist.setLowerLimit(WRIST.THRESHOLD.LOW_MIN.get());
-              m_wrist.setUpperLimit(WRIST.THRESHOLD.LOW_MAX.get());
-              break;
-            case MID_ZONE:
-              m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.MID_MIN.get());
-              m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.MID_MAX.get());
-              m_wrist.setLowerLimit(WRIST.THRESHOLD.MID_MIN.get());
-              m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
-              break;
-            case HIGH_ZONE:
-              m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
-              m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.HIGH_MAX.get());
-              m_wrist.setLowerLimit(WRIST.THRESHOLD.HIGH_MIN.get());
-              m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
-              break;
-            case EXTENDED_ZONE:
-            case INTAKE_EXTENDED:
-              m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MIN.get());
-              m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
-              m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
-              m_wrist.setUpperLimit(WRIST.THRESHOLD.EXTENDED_MAX.get());
-              break;
-          }
+    // Use zone transition info to set mechanism limits. Only threshold limit when within
+    // transition
+    // zones
+    switch (m_nextZone) {
+      case LOW_TO_MID:
+        if (ELEVATOR.THRESHOLD.LOW_TO_MID.get() < m_elevator.getHeightMeters()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
           break;
-      }
+        }
+      case MID_TO_LOW:
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_TO_LOW.get()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
+          break;
+        }
+      case MID_TO_HIGH:
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_TO_HIGH.get()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+          break;
+        }
+      case HIGH_TO_MID:
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_TO_MID.get()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+          break;
+        }
+      case HIGH_TO_EXTENDED:
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_TO_EXTENDED.get()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+          break;
+        }
+      case EXTENDED_TO_HIGH:
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.EXTENDED_TO_HIGH.get()) {
+          m_elevator.setLowerLimitMeters(
+              Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
+          m_elevator.setUpperLimitMeters(
+              Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
+          m_wrist.setLowerLimit(
+              Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
+          m_wrist.setUpperLimit(
+              Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+          break;
+        }
+      default:
+      case NONE:
+        switch (m_currentZone.getZone()) {
+          case 1: // LOW
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.LOW_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.LOW_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.LOW_MAX.get());
+            break;
+          case 2: // MID
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.MID_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.MID_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.MID_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
+            break;
+          case 3: // HIGH
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.HIGH_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.HIGH_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+            break;
+          case 4: // EXTENDED
+            m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MIN.get());
+            m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
+            m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
+            m_wrist.setUpperLimit(WRIST.THRESHOLD.EXTENDED_MAX.get());
+            break;
+          default:
+            // Undefined state, put a breakpoint here when debugging to check logic
+            System.out.println("This should never be reached");
+            break;
+        }
+        break;
+    }
 
-      // Check current mechanism positions before advancing zones
-      switch (m_currentZone) {
-        case EXTENDED_ZONE:
-          if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.EXTENDED_TO_HIGH.get())
-            m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-          break;
-        case HIGH_ZONE:
-        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.HIGH_TO_EXTENDED.get())
-          m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
-          if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_TO_MID.get())
+    // Check current mechanism positions before advancing zones
+    switch (m_currentZone.getZone()) {
+      case 1: // LOW
+        if (ELEVATOR.THRESHOLD.LOW_TO_MID.get() < m_elevator.getHeightMeters())
+          if (WRIST.THRESHOLD.MID_MIN.get() < m_wrist.getPositionRadians())
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
-          break;
-        case MID_ZONE:
-        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.MID_TO_HIGH.get())
-          m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
-          if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_TO_LOW.get())
+        break;
+      case 2: // MID
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_TO_LOW.get())
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.LOW_MAX.get())
             m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
-          break;
-        case LOW_ZONE:
-          if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.LOW_TO_MID.get())
+        if (ELEVATOR.THRESHOLD.MID_TO_HIGH.get() < m_elevator.getHeightMeters())
+          if (WRIST.THRESHOLD.HIGH_MIN.get() < m_wrist.getPositionRadians())
+            m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
+        break;
+      case 3: // HIGH
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_TO_MID.get())
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get())
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
-          break;
-      }
+        if (ELEVATOR.THRESHOLD.HIGH_TO_EXTENDED.get() < m_elevator.getHeightMeters())
+          if (WRIST.THRESHOLD.EXTENDED_MIN.get() < m_wrist.getPositionRadians())
+            m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
+        break;
+      case 4: // EXTENDED
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.EXTENDED_TO_HIGH.get())
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get())
+            m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
+        break;
+      default:
+        // Undefined behavior, put a breakpoint here when debugging to check logic
+        System.out.println("This should never be reached");
+        break;
     }
   }
 
