@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -200,12 +199,6 @@ public class FieldSim extends SubsystemBase {
                         .plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
-    System.out.println(
-        "Wrist Extension: " + Units.metersToInches(m_wrist.getHorizontalTranslation().getX()));
-    System.out.println(
-        "Horizontal Extension: "
-            + Units.metersToInches(m_swerveDrive.getPoseMeters().getX() - intakePose.getX()));
-
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
     if (RobotBase.isSimulation()) {
