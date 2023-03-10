@@ -7,12 +7,12 @@ package frc.robot.commands.wrist;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 
-public class ResetWristAngleDegrees extends CommandBase {
+public class ResetAngleDegrees extends CommandBase {
   private final Wrist m_wrist;
   private double m_angle;
 
   /** Creates a new RunWrist. */
-  public ResetWristAngleDegrees(Wrist wrist, double angle) {
+  public ResetAngleDegrees(Wrist wrist, double angle) {
     m_wrist = wrist;
     m_angle = angle;
 
@@ -32,7 +32,7 @@ public class ResetWristAngleDegrees extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.resetWristAngle(m_angle);
+    m_wrist.resetAngleDegrees(m_angle);
   }
 
   // Called once the command ends or is interrupted.

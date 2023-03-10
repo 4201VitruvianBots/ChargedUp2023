@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.wrist.ResetWristAngleDegrees;
+import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase {
   private double m_desiredSetpointRadians;
@@ -35,7 +35,7 @@ public class Wrist extends SubsystemBase {
   private boolean isClosedLoop = true;
   private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
   private double m_joystickInput;
-  private double m_simPercentOutput;
+
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
@@ -43,17 +43,17 @@ public class Wrist extends SubsystemBase {
 
   private final Intake m_intake;
 
-  private static final DigitalInput wristLowerSwitch =
+  private static final DigitalInput lowerSwitch =
       new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private TrapezoidProfile.Constraints m_slowWristTrapezoidalConstraints =
+  private final TrapezoidProfile.Constraints m_slowTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
-  private TrapezoidProfile.Constraints m_fastWristTrapezoidalConstraints =
+  private final TrapezoidProfile.Constraints m_fastTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
   private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
-      m_slowWristTrapezoidalConstraints;
+          m_slowTrapezoidalConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -80,13 +80,13 @@ public class Wrist extends SubsystemBase {
   // Logging setup
 
   public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry wristVoltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
-  public DoubleLogEntry wristCurrentEntry = new DoubleLogEntry(log, "/wrist/current");
-  public DoubleLogEntry wristDesiredPositionEntry =
+  public DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
+  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
+  public DoubleLogEntry desiredPositionEntry =
       new DoubleLogEntry(log, "/wrist/desiredPositionDegrees");
-  public DoubleLogEntry wristCommandedPositionEntry =
+  public DoubleLogEntry commandedPositionEntry =
       new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
-  public DoubleLogEntry wristPositionDegreesEntry =
+  public DoubleLogEntry positionDegreesEntry =
       new DoubleLogEntry(log, "/wrist/positionDegrees");
 
   private DoubleSubscriber kPSub,
@@ -127,7 +127,7 @@ public class Wrist extends SubsystemBase {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
     Timer.delay(1);
-    resetWristAngle(-15.0);
+    resetAngleDegrees(-15.0);
 
     initSmartDashboard();
   }
@@ -156,11 +156,11 @@ public class Wrist extends SubsystemBase {
   }
 
   // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
-  public double getWristMotorVoltage() {
+  public double getMotorOutputVoltage() {
     return wristMotor.getMotorOutputVoltage();
   }
 
-  public double getWristMotorCurrent() {
+  public double getMotorOutputCurrent() {
     return wristMotor.getSupplyCurrent();
   }
 
@@ -236,8 +236,8 @@ public class Wrist extends SubsystemBase {
 
   // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
   // the ground.
-  public void resetWristAngle(double angle) {
-    wristMotor.setSelectedSensorPosition(angle / Constants.WRIST.encoderUnitsToDegrees);
+  public void resetAngleDegrees(double angleDegrees) {
+    wristMotor.setSelectedSensorPosition(angleDegrees / Constants.WRIST.encoderUnitsToDegrees);
   }
 
   public void setControlMode(boolean isClosedLoop) {
@@ -267,11 +267,11 @@ public class Wrist extends SubsystemBase {
   public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
     switch (speed) {
       case FAST:
-        m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints;
+        m_currentTrapezoidalConstraints = m_fastTrapezoidalConstraints;
         break;
       default:
       case SLOW:
-        m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
+        m_currentTrapezoidalConstraints = m_slowTrapezoidalConstraints;
         break;
     }
   }
@@ -279,7 +279,7 @@ public class Wrist extends SubsystemBase {
   public enum WRIST_SPEED {
     SLOW,
     FAST
-  };
+  }
 
   //
   private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
@@ -289,7 +289,7 @@ public class Wrist extends SubsystemBase {
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
-    SmartDashboard.putData("Reset90", new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
+    SmartDashboard.putData("Reset90", new ResetAngleDegrees(this, Units.degreesToRadians(90)));
 
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
@@ -355,11 +355,11 @@ public class Wrist extends SubsystemBase {
   }
 
   public void updateLog() {
-    wristVoltageEntry.append(getWristMotorVoltage());
-    wristCurrentEntry.append(getWristMotorCurrent());
-    wristDesiredPositionEntry.append(getDesiredPositionRadians());
-    wristCommandedPositionEntry.append(getCommandedPositionRadians());
-    wristPositionDegreesEntry.append(getPositionDegrees());
+    voltageEntry.append(getMotorOutputVoltage());
+    currentEntry.append(getMotorOutputCurrent());
+    desiredPositionEntry.append(getDesiredPositionRadians());
+    commandedPositionEntry.append(getCommandedPositionRadians());
+    positionDegreesEntry.append(getPositionDegrees());
   }
 
   public boolean isScoring() {

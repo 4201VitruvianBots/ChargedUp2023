@@ -108,7 +108,7 @@ public class RobotContainer {
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
-    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+    SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
 
     m_fieldSim.initSim();
   }

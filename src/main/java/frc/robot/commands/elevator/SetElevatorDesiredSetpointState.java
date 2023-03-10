@@ -26,7 +26,7 @@ public class SetElevatorDesiredSetpointState extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setElevatorRunning(true);
+    m_elevator.setRunningBool(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,7 +38,7 @@ public class SetElevatorDesiredSetpointState extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setElevatorRunning(false);
+    m_elevator.setRunningBool(false);
   }
 
   // Returns true when the command should end.

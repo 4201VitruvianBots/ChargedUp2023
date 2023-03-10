@@ -25,21 +25,21 @@ public class RunIntakeCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setIntakeState(true);
+    m_intake.setBooleanState(true);
     m_intake.setIntakeStateCone(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setIntakePercentOutput(-m_PercentOutput);
+    m_intake.setPercentOutput(-m_PercentOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakePercentOutput(-0.3);
-    m_intake.setIntakeState(false);
+    m_intake.setPercentOutput(-0.3);
+    m_intake.setBooleanState(false);
     m_intake.setIntakeStateCone(false);
   }
 

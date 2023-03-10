@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
 
   // Log setup
   public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry intakeCurrentEntry = new DoubleLogEntry(log, "/intake/intakeCurrent");
+  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   public Intake() {
     // one or two motors
@@ -96,16 +96,16 @@ public class Intake extends SubsystemBase {
     return INTAKE.HELD_GAMEPIECE.NONE;
   }
 
-  public double getIntakeMotorCurrent() {
+  public double getMotorOutputCurrent() {
     return intakeMotor.getStatorCurrent();
   }
 
-  public void setIntakeState(boolean state) {
+  public void setBooleanState(boolean state) {
     isIntaking = state;
   }
 
   // set percent output function
-  public void setIntakePercentOutput(double value) {
+  public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
   // Shuffleboard or SmartDashboard function
@@ -115,7 +115,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void updateLog() {
-    intakeCurrentEntry.append(getIntakeMotorCurrent());
+    currentEntry.append(getMotorOutputCurrent());
   }
 
   @Override
@@ -133,7 +133,7 @@ public class Intake extends SubsystemBase {
       } else {
         m_percentOutput = 0;
       }
-      setIntakePercentOutput(m_percentOutput);
+      setPercentOutput(m_percentOutput);
     }
   }
 }
