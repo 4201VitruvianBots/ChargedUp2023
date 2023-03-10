@@ -70,7 +70,7 @@ public class LogManager {
     }
   }
 
-  public void periodic() {
+  public void updateLogFilePaths() {
     logFilePaths = getLogFilePaths();
     // deleteAllLogs();
   }

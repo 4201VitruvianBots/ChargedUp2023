@@ -16,6 +16,7 @@ import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
 
 public class StateHandler extends SubsystemBase {
@@ -301,7 +302,9 @@ public class StateHandler extends SubsystemBase {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator.getHorizontalTranslation().plus(m_wrist.getHorizontalTranslation()),
+                    m_elevator
+                        .getElevatorField2dTranslation()
+                        .plus(m_wrist.getHorizontalTranslation()),
                     m_drive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
@@ -364,6 +367,13 @@ public class StateHandler extends SubsystemBase {
     // to go
     if (m_zoneEnforcement) {
       zoneAdvancement();
+    }
+
+    if (m_elevator.getHeightMeters() < Units.inchesToMeters(3.0)) {
+      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
+
+    } else {
+      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }
 
     // TODO: Limit max swerve speed by elevator height

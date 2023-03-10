@@ -22,6 +22,12 @@ public class DeleteAllLogs extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_logManager.updateLogFilePaths();
     m_logManager.deleteAllLogs();
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 }

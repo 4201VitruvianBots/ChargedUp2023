@@ -247,10 +247,10 @@ public class Vision extends SubsystemBase {
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
     if (getPipeline(location) == 1.0) { // CUBE
       return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 3.0; // target read and threshold
+          && getTargetArea(location) > 3.0; // target read within threshold
     } else if (getPipeline(location) == 2.0) { // CONE
       return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 3.0; // target read and threshold
+          && getTargetArea(location) > 3.0; // target read within threshold
     }
     return false;
   }

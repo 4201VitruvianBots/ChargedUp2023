@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.0,
-        "y": 3.0
+        "x": 1.7999927428426288,
+        "y": 4.709550419100839
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7071067811865475,
-        "y": 2.2928932188134525
+        "x": 2.799992742842628,
+        "y": 4.709550419100839
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -16,7 +16,9 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "SetWristIntaking"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -24,12 +26,12 @@
     },
     {
       "anchorPoint": {
-        "x": 2.0,
-        "y": 2.0
+        "x": 5.435937443303458,
+        "y": 4.71
       },
       "prevControl": {
-        "x": 1.2928932188134525,
-        "y": 2.7071067811865475
+        "x": 4.435937443303457,
+        "y": 4.71
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -45,5 +47,12 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.5,
+      "names": [
+        "RunIntakeCone"
+      ]
+    }
+  ]
 }

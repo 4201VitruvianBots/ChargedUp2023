@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -75,7 +76,7 @@ public class SwerveDrive extends SubsystemBase {
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   private boolean useHeadingTarget = false;
-  private double m_desiredRobotHeading;
+  private double m_desiredHeadingRadians;
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(
@@ -154,17 +155,20 @@ public class SwerveDrive extends SubsystemBase {
    * Uses trapezoidal profile to set robot heading to a clear target
    */
 
-  public void setRobotHeading(double desiredAngleSetpoint) {
-    m_desiredRobotHeading = desiredAngleSetpoint;
+  public void setRobotHeadingRadians(double radians) {
+    m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
   }
 
   public void calculateRotationSpeed() {
     // m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
     // var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
     // m_setpoint = profile.calculate(0.02);
-
-    m_rotationOutput =
-        m_rotationController.calculate(getHeadingRotation2d().getRadians(), m_desiredRobotHeading);
+    if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
+        > Units.degreesToRadians(1))
+      m_rotationOutput =
+          m_rotationController.calculate(
+              getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
+    else m_rotationOutput = 0;
   }
 
   /*

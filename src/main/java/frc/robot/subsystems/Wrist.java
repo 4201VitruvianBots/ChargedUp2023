@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase {
   private double m_desiredSetpointRadians;
@@ -38,13 +39,22 @@ public class Wrist extends SubsystemBase {
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
+  private Translation2d m_wristHorizontalTranslation = new Translation2d();
+
+  private final Intake m_intake;
+
   private static final DigitalInput wristLowerSwitch =
       new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private TrapezoidProfile.Constraints m_trapezoidalConstraints =
-      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxVel, Constants.WRIST.kMaxAccel);
+  private TrapezoidProfile.Constraints m_slowWristTrapezoidalConstraints =
+      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+  private TrapezoidProfile.Constraints m_fastWristTrapezoidalConstraints =
+      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
+      m_slowWristTrapezoidalConstraints;
+
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
@@ -90,9 +100,12 @@ public class Wrist extends SubsystemBase {
       kASub,
       kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
+  private DoublePublisher currentTrapezoidVelocity;
+  private DoublePublisher currentTrapezoidAcceleration;
   private StringPublisher currentCommandStatePub;
 
-  public Wrist() {
+  public Wrist(Intake intake) {
+    m_intake = intake;
     // One motor for the wrist
 
     // factory default configs
@@ -113,6 +126,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
+    Timer.delay(1);
     resetWristAngle(-15.0);
 
     initSmartDashboard();
@@ -250,6 +264,23 @@ public class Wrist extends SubsystemBase {
     return m_upperLimitRadians;
   }
 
+  public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
+    switch (speed) {
+      case FAST:
+        m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints;
+        break;
+      default:
+      case SLOW:
+        m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
+        break;
+    }
+  }
+
+  public enum WRIST_SPEED {
+    SLOW,
+    FAST
+  };
+
   //
   private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
@@ -258,11 +289,12 @@ public class Wrist extends SubsystemBase {
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
+    SmartDashboard.putData("Reset90", new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
 
     var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxVel);
-    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxAccel);
+    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
+    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
     wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
     wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
     wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
@@ -274,9 +306,12 @@ public class Wrist extends SubsystemBase {
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
+    currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
+    currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
-    kMaxVelSub = wristTab.getDoubleTopic("kMaxVel").subscribe(Constants.WRIST.kMaxVel);
-    kMaxAccelSub = wristTab.getDoubleTopic("kMaxAccel").subscribe(Constants.WRIST.kMaxAccel);
+    kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
+    kMaxAccelSub =
+        wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
     kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
     kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
     kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
@@ -291,6 +326,9 @@ public class Wrist extends SubsystemBase {
   public void updateSmartDashboard() {
     SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
+
+    currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
+    currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
     currentCommandStatePub.set(getControlState().toString());
     //    if (DriverStation.isTest()) {
@@ -328,9 +366,27 @@ public class Wrist extends SubsystemBase {
     return (getPositionDegrees() > 170);
   }
 
+  public void updateHorizontalTranslation() {
+    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
+    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
+    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
+    // Cone: f(x)=-0.270347*t+16.8574;
+    double horizontalDistance = 0;
+    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
+      horizontalDistance =
+          0.00000913468 * Math.pow(getPositionDegrees(), 3)
+              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
+              - 0.0894341 * getPositionDegrees()
+              + 16.1239;
+    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
+      horizontalDistance =
+          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
+          -0.270347 * getPositionDegrees() + 16.8574;
+    m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+  }
+
   public Translation2d getHorizontalTranslation() {
-    // TODO: Update this calculation
-    return new Translation2d(0, 0);
+    return m_wristHorizontalTranslation;
   }
 
   @Override
@@ -366,7 +422,7 @@ public class Wrist extends SubsystemBase {
       }
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        var profile = new TrapezoidProfile(m_trapezoidalConstraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(0.02);
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;

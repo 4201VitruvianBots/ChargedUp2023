@@ -17,8 +17,6 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "SetElevatorHighConeNode",
-          "SetWristHighConeNode",
           "RunIntakeConeReverse"
         ],
         "executionBehavior": "parallel",
@@ -75,7 +73,7 @@
           "SetWristIntaking",
           "RunIntakeCube"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "parallelDeadline",
         "waitBehavior": "deadline",
         "waitTime": 0.25
       }
@@ -319,11 +317,12 @@
       "position": 0.25,
       "names": [
         "SetElevatorStowed",
-        "SetWristStowed"
+        "SetWristStowed",
+        "StopIntake"
       ]
     },
     {
-      "position": 2.4000000000000004,
+      "position": 2.1,
       "names": [
         "SetElevatorStowed",
         "SetWristStowed",
@@ -334,8 +333,7 @@
       "position": 4.5,
       "names": [
         "SetElevatorHighConeNode",
-        "SetWristHighConeNode",
-        "IntakeHoldCube"
+        "SetWristHighConeNode"
       ]
     },
     {
@@ -358,8 +356,7 @@
       "position": 10.399999999999997,
       "names": [
         "SetElevatorHighConeNode",
-        "SetWristHighConeNode",
-        "IntakeHoldCone"
+        "SetWristHighConeNode"
       ]
     }
   ]
