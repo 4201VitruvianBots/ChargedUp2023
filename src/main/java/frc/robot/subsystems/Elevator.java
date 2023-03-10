@@ -128,10 +128,8 @@ public class Elevator extends SubsystemBase {
   // Logging setup
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
-  public DoubleLogEntry setpointMetersEntry =
-      new DoubleLogEntry(log, "/elevator/setpoint");
-  public DoubleLogEntry positionMetersEntry =
-      new DoubleLogEntry(log, "/elevator/position");
+  public DoubleLogEntry setpointMetersEntry = new DoubleLogEntry(log, "/elevator/setpoint");
+  public DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
 
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {

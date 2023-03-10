@@ -43,8 +43,7 @@ public class Wrist extends SubsystemBase {
 
   private final Intake m_intake;
 
-  private static final DigitalInput lowerSwitch =
-      new DigitalInput(Constants.DIO.wristLowerSwitch);
+  private static final DigitalInput lowerSwitch = new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
@@ -53,7 +52,7 @@ public class Wrist extends SubsystemBase {
   private final TrapezoidProfile.Constraints m_fastTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
   private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
-          m_slowTrapezoidalConstraints;
+      m_slowTrapezoidalConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -86,8 +85,7 @@ public class Wrist extends SubsystemBase {
       new DoubleLogEntry(log, "/wrist/desiredPositionDegrees");
   public DoubleLogEntry commandedPositionEntry =
       new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
-  public DoubleLogEntry positionDegreesEntry =
-      new DoubleLogEntry(log, "/wrist/positionDegrees");
+  public DoubleLogEntry positionDegreesEntry = new DoubleLogEntry(log, "/wrist/positionDegrees");
 
   private DoubleSubscriber kPSub,
       kISub,
