@@ -82,7 +82,7 @@ public class StateHandler extends SubsystemBase {
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
 
-  private StringPublisher m_currentStatePub, m_desiredStatePub;
+  private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
   private DoublePublisher m_elevatorHeightPub,
       m_elevatorLowerLimPub,
       m_elevatorUpperLimPub,
@@ -115,6 +115,10 @@ public class StateHandler extends SubsystemBase {
 
   public SUPERSTRUCTURE_STATE getDesiredZone() {
     return m_desiredZone;
+  }
+
+  public ZONE_TRANSITIONS getNextZone() {
+    return m_nextZone;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -201,7 +205,8 @@ public class StateHandler extends SubsystemBase {
         } else if (m_currentZone == SUPERSTRUCTURE_STATE.LOW_ZONE) {
           if (m_desiredZone.ordinal() > m_currentZone.ordinal())
             m_nextZone = ZONE_TRANSITIONS.LOW_TO_MID;
-        }
+        } else
+          m_nextZone = ZONE_TRANSITIONS.NONE;
       } else m_nextZone = ZONE_TRANSITIONS.NONE;
 
       // Use zone transition info to set mechanism limits. Only threshold limit when within
@@ -219,6 +224,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
+            break;
           }
         case MID_TO_LOW:
           if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.MID_TO_LOW.get())
@@ -231,6 +237,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
+            break;
           }
         case MID_TO_HIGH:
           if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.MID_TO_HIGH.get())
@@ -243,6 +250,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+            break;
           }
         case HIGH_TO_MID:
           if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.HIGH_TO_MID.get())
@@ -255,6 +263,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+            break;
           }
         case HIGH_TO_EXTENDED:
           if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.HIGH_TO_EXTENDED.get())
@@ -267,6 +276,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+            break;
           }
         case EXTENDED_TO_HIGH:
           if (Math.abs(m_elevator.getHeightMeters() - ELEVATOR.THRESHOLD.EXTENDED_TO_HIGH.get())
@@ -279,6 +289,7 @@ public class StateHandler extends SubsystemBase {
                 Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
             m_wrist.setUpperLimit(
                 Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+            break;
           }
         default:
         case NONE:
@@ -367,6 +378,7 @@ public class StateHandler extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
     m_desiredStatePub = stateHandlerTab.getStringTopic("desiredState").publish();
+    m_nextZonePub = stateHandlerTab.getStringTopic("nextZone").publish();
     m_elevatorHeightPub = stateHandlerTab.getDoubleTopic("elevatorHeightInches").publish();
     m_elevatorLowerLimPub = stateHandlerTab.getDoubleTopic("elevatorMinLimit").publish();
     m_elevatorUpperLimPub = stateHandlerTab.getDoubleTopic("elevatorMaxLimit").publish();
@@ -380,6 +392,7 @@ public class StateHandler extends SubsystemBase {
 
     m_currentStatePub.set(getCurrentZone().toString());
     m_desiredStatePub.set(getDesiredZone().toString());
+    m_nextZonePub.set(getNextZone().toString());
     m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
     m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimitMeters()));
     m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimitMeters()));

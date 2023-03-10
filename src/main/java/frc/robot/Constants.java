@@ -126,20 +126,22 @@ public final class Constants {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
+      // The MAX of one zone needs to be higher than the MIN of the next zone
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(4.0)),
       MID_MIN(Units.inchesToMeters(4.0)),
       MID_MAX(Units.inchesToMeters(8.0)),
       HIGH_MIN(Units.inchesToMeters(8.0)),
-      HIGH_MAX(Units.inchesToMeters(20.0)),
-      EXTENDED_MIN(Units.inchesToMeters(20.0)),
+      HIGH_MAX(Units.inchesToMeters(12.0)),
+      EXTENDED_MIN(Units.inchesToMeters(12.0)),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
-      LOW_TO_MID(Units.inchesToMeters(4.0)),
-      MID_TO_LOW(Units.inchesToMeters(3.0)),
-      MID_TO_HIGH(Units.inchesToMeters(8.0)),
-      HIGH_TO_MID(Units.inchesToMeters(7.0)),
-      HIGH_TO_EXTENDED(Units.inchesToMeters(24.0)),
-      EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
+      //
+      LOW_TO_MID(LOW_MAX.get() - Units.inchesToMeters(1)),
+      MID_TO_LOW(MID_MIN.get() + Units.inchesToMeters(1)),
+      MID_TO_HIGH(MID_MAX.get() - Units.inchesToMeters(1)),
+      HIGH_TO_MID(HIGH_MIN.get() + Units.inchesToMeters(1)),
+      HIGH_TO_EXTENDED(HIGH_MAX.get() - Units.inchesToMeters(1)),
+      EXTENDED_TO_HIGH(EXTENDED_MIN.get() + Units.inchesToMeters(1));
 
       private final double value;
 
