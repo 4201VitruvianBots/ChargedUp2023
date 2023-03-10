@@ -38,7 +38,7 @@ public class OnePiece extends SequentialCommandGroup {
         // fieldSim),
         new ParallelCommandGroup(
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCone(intake, 0.8, vision, swerveDrive))
+                new AutoRunIntakeCone(intake, 0.8))
             .withTimeout(1),
         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         new PlotAutoTrajectory(fieldSim, pathName, trajectory),
