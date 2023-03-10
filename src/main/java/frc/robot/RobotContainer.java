@@ -129,7 +129,13 @@ public class RobotContainer {
         new SetSwerveMaxTranslationVeolcity(
             m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond / 25.0));
 
-    leftJoystickTriggers[1].whileTrue(new IntakeVisionAlignment(m_vision, m_swerveDrive));
+    leftJoystickTriggers[1].whileTrue(
+        new IntakeVisionAlignment(
+            m_vision,
+            m_swerveDrive,
+            () -> leftJoystick.getRawAxis(1),
+            () -> leftJoystick.getRawAxis(0),
+            () -> rightJoystick.getRawAxis(0)));
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
 
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
