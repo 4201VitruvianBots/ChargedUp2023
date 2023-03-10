@@ -41,21 +41,21 @@ public class AutoRunIntakeCube extends CommandBase {
   @Override
   public void execute() {
     m_intake.setIntakePercentOutput(m_PercentOutput);
-    if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
-      m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeading(
-          m_swerve
-              .getHeadingRotation2d()
-              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-              .getRadians());
-    }
+    // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
+    //   m_swerve.enableHeadingTarget(true);
+    //   m_swerve.setRobotHeading(
+    //       m_swerve
+    //           .getHeadingRotation2d()
+    //           .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+    //           .getRadians());
+    // }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_intake.setIntakeState(false);
-    m_swerve.enableHeadingTarget(false);
+    // m_swerve.enableHeadingTarget(false);
   }
 
   // Returns true when the command should end.
