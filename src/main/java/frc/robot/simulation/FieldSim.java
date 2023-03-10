@@ -200,11 +200,6 @@ public class FieldSim extends SubsystemBase {
                         .plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
-    System.out.println(
-        "Wrist Extension: " + Units.metersToInches(m_wrist.getHorizontalTranslation().getX()));
-    System.out.println(
-        "Horizontal Extension: "
-            + Units.metersToInches(m_swerveDrive.getPoseMeters().getX() - intakePose.getX()));
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
