@@ -4,11 +4,13 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
+import java.util.function.DoubleSupplier;
 
 public class IntakeVisionAlignment extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -16,28 +18,52 @@ public class IntakeVisionAlignment extends CommandBase {
 
   private final SwerveDrive m_swerve;
 
-  public IntakeVisionAlignment(Vision vision, SwerveDrive swerve) {
+  private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
+
+  public IntakeVisionAlignment(
+      Vision vision,
+      SwerveDrive swerve,
+      DoubleSupplier throttleInput,
+      DoubleSupplier strafeInput,
+      DoubleSupplier rotationInput) {
     m_vision = vision;
     m_swerve = swerve;
+    m_throttleInput = throttleInput;
+    m_strafeInput = strafeInput;
+    m_rotationInput = rotationInput;
+
+    addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_swerve.enableHeadingTarget(true);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeading(
+      m_swerve.setRobotHeadingRadians(
           m_swerve
               .getHeadingRotation2d()
-              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+              .plus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
               .getRadians());
+    } else {
+      m_swerve.enableHeadingTarget(false);
     }
+
+    double throttle =
+        MathUtil.applyDeadband(Math.abs(m_throttleInput.getAsDouble()), 0.05)
+            * Math.signum(m_throttleInput.getAsDouble());
+    double strafe =
+        MathUtil.applyDeadband(Math.abs(m_strafeInput.getAsDouble()), 0.05)
+            * Math.signum(m_strafeInput.getAsDouble());
+    double rotation =
+        MathUtil.applyDeadband(Math.abs(m_rotationInput.getAsDouble()), 0.05)
+            * Math.signum(m_rotationInput.getAsDouble());
+
+    m_swerve.drive(throttle, strafe, rotation, true, false);
   }
 
   // Called once the command ends or is interrupted.
