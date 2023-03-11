@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.constants.Constants;
+import frc.robot.Constants;
 import java.util.List;
 
 public class DynamicPathGeneration extends CommandBase {
@@ -21,7 +21,7 @@ public class DynamicPathGeneration extends CommandBase {
 
     TrajectoryConfig config =
         new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(3))
-            .setKinematics(Constants.constants.SwerveDrive.kSwerveKinematics);
+            .setKinematics(Constants.SWERVEDRIVE.kSwerveKinematics);
 
     Trajectory trajectory =
         TrajectoryGenerator.generateTrajectory(

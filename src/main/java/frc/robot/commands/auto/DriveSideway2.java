@@ -5,7 +5,7 @@
 // import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 // import edu.wpi.first.math.util.Units;
 // import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-// import frc.robot.constants.Constants;
+// import frc.robot.Constants;
 // import frc.robot.commands.swerve.SetSwerveNeutralMode;
 // import frc.robot.commands.swerve.SetSwerveOdometry;
 // import frc.robot.simulation.FieldSim;
@@ -22,7 +22,7 @@
 //         new PPSwerveControllerCommand(
 //             trajectory,
 //             swerveDrive::getPoseMeters,
-//             Constants.constants.SwerveDrive.kSwerveKinematics,
+//             Constants.SWERVEDRIVE.kSwerveKinematics,
 //             swerveDrive.getXPidController(),
 //             swerveDrive.getYPidController(),
 //             swerveDrive.getThetaPidController(),

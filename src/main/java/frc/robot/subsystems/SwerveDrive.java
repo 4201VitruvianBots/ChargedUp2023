@@ -9,75 +9,99 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.SwerveDriveModulePosition;
+import frc.robot.Constants;
+import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SwerveDrive extends SubsystemBase {
 
-  private final HashMap<SwerveDriveModulePosition, SwerveModule> m_swerveModules =
+  private final HashMap<SWERVE_MODULE_POSITION, SwerveModule> m_swerveModules =
       new HashMap<>(
           Map.of(
-              SwerveDriveModulePosition.FRONT_LEFT,
+              SWERVE_MODULE_POSITION.FRONT_LEFT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.FRONT_LEFT,
+                      SWERVE_MODULE_POSITION.FRONT_LEFT,
                       new TalonFX(Constants.CAN.frontLeftTurnMotor),
                       new TalonFX(Constants.CAN.frontLeftDriveMotor),
                       new CANCoder(Constants.CAN.frontLeftCanCoder),
-                      Constants.constants.SwerveDrive.frontLeftCANCoderOffset),
-              SwerveDriveModulePosition.FRONT_RIGHT,
+                      Constants.SWERVEDRIVE.frontLeftCANCoderOffset),
+              SWERVE_MODULE_POSITION.FRONT_RIGHT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.FRONT_RIGHT,
+                      SWERVE_MODULE_POSITION.FRONT_RIGHT,
                       new TalonFX(Constants.CAN.frontRightTurnMotor),
                       new TalonFX(Constants.CAN.frontRightDriveMotor),
                       new CANCoder(Constants.CAN.frontRightCanCoder),
-                      Constants.constants.SwerveDrive.frontRightCANCoderOffset),
-              SwerveDriveModulePosition.BACK_LEFT,
+                      Constants.SWERVEDRIVE.frontRightCANCoderOffset),
+              SWERVE_MODULE_POSITION.BACK_LEFT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.BACK_LEFT,
+                      SWERVE_MODULE_POSITION.BACK_LEFT,
                       new TalonFX(Constants.CAN.backLeftTurnMotor),
                       new TalonFX(Constants.CAN.backLeftDriveMotor),
                       new CANCoder(Constants.CAN.backLeftCanCoder),
-                      Constants.constants.SwerveDrive.backLeftCANCoderOffset),
-              SwerveDriveModulePosition.BACK_RIGHT,
+                      Constants.SWERVEDRIVE.backLeftCANCoderOffset),
+              SWERVE_MODULE_POSITION.BACK_RIGHT,
                   new SwerveModule(
-                      SwerveDriveModulePosition.BACK_RIGHT,
+                      SWERVE_MODULE_POSITION.BACK_RIGHT,
                       new TalonFX(Constants.CAN.backRightTurnMotor),
                       new TalonFX(Constants.CAN.backRightDriveMotor),
                       new CANCoder(Constants.CAN.backRightCanCoder),
-                      Constants.constants.SwerveDrive.backRightCANCoderOffset)));
+                      Constants.SWERVEDRIVE.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private Trajectory m_trajectory;
-  private boolean Initialize = false;
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
-  private DoublePublisher swervePitch, swerveRoll, swerveYaw;
+  private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
+
+  private boolean useHeadingTarget = false;
+  private double m_desiredHeadingRadians;
+
+  private final TrapezoidProfile.Constraints m_constraints =
+      new TrapezoidProfile.Constraints(
+          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond,
+          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private final ProfiledPIDController m_rotationController =
+      new ProfiledPIDController(
+          Constants.SWERVEDRIVE.kP_Rotation,
+          Constants.SWERVEDRIVE.kI_Rotation,
+          Constants.SWERVEDRIVE.kD_Rotation,
+          m_constraints);
+  private double m_rotationOutput;
+
+  ChassisSpeeds chassisSpeeds;
+  private double m_maxVelocity = Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
 
   public SwerveDrive() {
+
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
         new SwerveDrivePoseEstimator(
-            Constants.constants.SwerveDrive.kSwerveKinematics,
+            Constants.SWERVEDRIVE.kSwerveKinematics,
             getHeadingRotation2d(),
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
@@ -98,31 +122,70 @@ public class SwerveDrive extends SubsystemBase {
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
-    strafe *= Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond;
-    rotation *= Constants.constants.SwerveDrive.kMaxRotationRadiansPerSecond;
+    throttle *= m_maxVelocity;
+    strafe *= m_maxVelocity;
+    rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
-    ChassisSpeeds chassisSpeeds =
-        isFieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                throttle, strafe, rotation, getHeadingRotation2d())
-            : new ChassisSpeeds(throttle, strafe, rotation);
+    if (useHeadingTarget) {
+      // rotation = m_setpoint.velocity;
+      rotation = m_rotationOutput;
+      // SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
+      // SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
+      chassisSpeeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
+    } else {
+      chassisSpeeds =
+          isFieldRelative
+              ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                  throttle, strafe, rotation, getHeadingRotation2d())
+              : new ChassisSpeeds(throttle, strafe, rotation);
+    }
 
-    Map<SwerveDriveModulePosition, SwerveModuleState> moduleStates =
-        ModuleMap.of(
-            Constants.constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
+    Map<SWERVE_MODULE_POSITION, SwerveModuleState> moduleStates =
+        ModuleMap.of(Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]),
-        Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond);
+        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), m_maxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
   }
 
+  /*
+   * Uses trapezoidal profile to set robot heading to a clear target
+   */
+
+  public void setHeadingTargetRadians(double radians) {
+    m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
+  }
+
+  public void calculateRotationSpeed() {
+    // m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
+    // var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
+    // m_setpoint = profile.calculate(0.02);
+    if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
+        > Units.degreesToRadians(1))
+      m_rotationOutput =
+          m_rotationController.calculate(
+              getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
+    else m_rotationOutput = 0;
+  }
+
+  /*
+   * ability to let head of swerve drive face the target
+   */
+  public void enableHeadingTarget(boolean enable) {
+    useHeadingTarget = enable;
+  }
+
+  public void resetState() {
+    m_setpoint =
+        new TrapezoidProfile.State(
+            Units.degreesToRadians(getHeadingDegrees()), Units.degreesToRadians(0));
+  }
+
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        states, Constants.constants.SwerveDrive.kMaxSpeedMetersPerSecond);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, m_maxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(states[module.getModulePosition().ordinal()], isOpenLoop);
@@ -133,8 +196,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
-    var states =
-        Constants.constants.SwerveDrive.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
   }
 
@@ -164,20 +226,20 @@ public class SwerveDrive extends SubsystemBase {
     return m_odometry.getEstimatedPosition();
   }
 
-  public SwerveModule getSwerveModule(SwerveDriveModulePosition modulePosition) {
+  public SwerveModule getSwerveModule(SWERVE_MODULE_POSITION modulePosition) {
     return m_swerveModules.get(modulePosition);
   }
 
-  public Map<SwerveDriveModulePosition, SwerveModuleState> getModuleStates() {
-    Map<SwerveDriveModulePosition, SwerveModuleState> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, SwerveModuleState> getModuleStates() {
+    Map<SWERVE_MODULE_POSITION, SwerveModuleState> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getState());
     return map;
   }
 
-  public Map<SwerveDriveModulePosition, SwerveModulePosition> getModulePositions() {
-    Map<SwerveDriveModulePosition, SwerveModulePosition> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, SwerveModulePosition> getModulePositions() {
+    Map<SWERVE_MODULE_POSITION, SwerveModulePosition> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getPosition());
     return map;
   }
@@ -186,16 +248,15 @@ public class SwerveDrive extends SubsystemBase {
     return ModuleMap.orderedValues(getModulePositions(), new SwerveModulePosition[0]);
   }
 
-  public Map<SwerveDriveModulePosition, Pose2d> getModulePoses() {
-    Map<SwerveDriveModulePosition, Pose2d> map = new HashMap<>();
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet())
+  public Map<SWERVE_MODULE_POSITION, Pose2d> getModulePoses() {
+    Map<SWERVE_MODULE_POSITION, Pose2d> map = new HashMap<>();
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet())
       map.put(i, m_swerveModules.get(i).getModulePose());
     return map;
   }
 
   public boolean getModuleInitStatus() {
-    for (SwerveDriveModulePosition i : m_swerveModules.keySet()) {
-
+    for (SWERVE_MODULE_POSITION i : m_swerveModules.keySet()) {
       if (!m_swerveModules.get(i).getInitSuccess()) {
         return false;
       }
@@ -208,6 +269,10 @@ public class SwerveDrive extends SubsystemBase {
       module.setDriveNeutralMode(mode);
       module.setTurnNeutralMode(mode);
     }
+  }
+
+  public void setMaxVelocity(double mps) {
+    m_maxVelocity = mps;
   }
 
   public void setCurrentTrajectory(Trajectory trajectory) {
@@ -230,67 +295,48 @@ public class SwerveDrive extends SubsystemBase {
   public void updateOdometry() {
     m_odometry.update(getHeadingRotation2d(), getSwerveDriveModulePositionsArray());
 
-    //    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-    //      Translation2d modulePositionFromChassis = getPoseMeters().getTranslation()
-    //              .rotateBy(getHeadingRotation2d())
-    //              .plus(kModuleTranslations.get(module.getModulePosition()));
-    //
-    //      module.setModulePose(
-    //          new Pose2d(
-    //              modulePositionFromChassis,
-    //              getHeadingRotation2d().plus(module.getHeadingRotation2d())));
-    //    }
-
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      Translation2d modulePositionFromChassis =
-          Constants.constants
-              .SwerveDrive
-              .kModuleTranslations
-              .get(module.getModulePosition())
-              .rotateBy(getHeadingRotation2d())
-              .plus(getPoseMeters().getTranslation());
-      module.setModulePose(
-          new Pose2d(
-              modulePositionFromChassis,
-              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+      Transform2d moduleTransform =
+          new Transform2d(
+              Constants.SWERVEDRIVE.kModuleTranslations.get(module.getModulePosition()),
+              module.getHeadingRotation2d());
+      module.setModulePose(getPoseMeters().transformBy(moduleTransform));
     }
   }
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
 
-    var swerveTab = NetworkTableInstance.getDefault().getTable("Swerve");
-    swervePitch = swerveTab.getDoubleTopic("Pitch").publish();
-    swerveRoll = swerveTab.getDoubleTopic("Roll").publish();
-    swerveYaw = swerveTab.getDoubleTopic("Yaw").publish();
+    var swerveTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    pitchPub = swerveTab.getDoubleTopic("Pitch").publish();
+    rollPub = swerveTab.getDoubleTopic("Roll").publish();
+    yawPub = swerveTab.getDoubleTopic("Yaw").publish();
+    odometryXPub = swerveTab.getDoubleTopic("Odometry X").publish();
+    odometryYPub = swerveTab.getDoubleTopic("Odometry Y").publish();
+    odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
   }
 
   private void updateSmartDashboard() {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("ModuleInitStatus", Initialize);
-    SmartDashboard.putNumber("X Odometry", m_odometry.getEstimatedPosition().getX());
-    SmartDashboard.putNumber("Y Odometry", m_odometry.getEstimatedPosition().getY());
-    SmartDashboard.putNumber(
-        "Rotation Odometry", m_odometry.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
-    swervePitch.set(getPitchDegrees());
-    swerveRoll.set(getRollDegrees());
-    swerveYaw.set(getHeadingDegrees());
+    pitchPub.set(getPitchDegrees());
+    rollPub.set(getRollDegrees());
+    yawPub.set(getHeadingDegrees());
+    odometryXPub.set(getOdometry().getEstimatedPosition().getX());
+    odometryYPub.set(getOdometry().getEstimatedPosition().getY());
+    odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
   }
 
-  public void disabledInit() {
-    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
-      module.updateCanCoderHealth();
-    }
-  }
+  public void disabledPeriodic() {}
 
   @Override
   public void periodic() {
-    if (Initialize == false) {
-      if (getModuleInitStatus()) {
-        Initialize = true;
-      }
+    if (DriverStation.isEnabled() && useHeadingTarget) {
+      calculateRotationSpeed();
     }
+
     updateOdometry();
     updateSmartDashboard();
   }
@@ -298,7 +344,7 @@ public class SwerveDrive extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     ChassisSpeeds chassisSpeed =
-        Constants.constants.SwerveDrive.kSwerveKinematics.toChassisSpeeds(
+        Constants.SWERVEDRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
     m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;

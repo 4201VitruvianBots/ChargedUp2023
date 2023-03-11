@@ -5,13 +5,18 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Controls extends SubsystemBase {
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
+  private boolean isInit;
+  private DriverStation.Alliance allianceColor = DriverStation.Alliance.Invalid;
+
   public Controls() {
     initSmartDashboard();
+    isInit = false;
   }
 
   /**
@@ -20,7 +25,7 @@ public class Controls extends SubsystemBase {
    * @return Returns the current alliance color.
    */
   public DriverStation.Alliance getAllianceColor() {
-    return DriverStation.getAlliance();
+    return allianceColor;
   }
 
   /**
@@ -29,11 +34,19 @@ public class Controls extends SubsystemBase {
    * @return Returns the current alliance color.
    */
   public boolean getAllianceColorBoolean() {
-    return DriverStation.getAlliance() != DriverStation.Alliance.Blue;
+    return getAllianceColor() != DriverStation.Alliance.Blue;
   }
 
   public void setPDHChannel(boolean on) {
     // pdh.setSwitchableChannel(on);
+  }
+
+  public boolean getInitState() {
+    return isInit;
+  }
+
+  public void setInitState(boolean init) {
+    isInit = init;
   }
 
   /** Initializes values on SmartDashboard */
@@ -47,6 +60,11 @@ public class Controls extends SubsystemBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
     allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
+    controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
+  }
+
+  public void updateAllianceColor() {
+    allianceColor = DriverStation.getAlliance();
   }
 
   /** Sends values to SmartDashboard */
@@ -55,11 +73,13 @@ public class Controls extends SubsystemBase {
     allianceString.set(getAllianceColor().toString());
     allianceBoolean.set(getAllianceColorBoolean());
     //    System.out.println("Alliance Color: " + getAllianceColor().toString());
-    // TODO: fix
   }
 
   @Override
   public void periodic() {
+    if (DriverStation.isDisabled()) {
+      updateAllianceColor();
+    }
     // This method will be called once per scheduler run
     updateSmartDashboard();
     //    System.out.println("Test1");

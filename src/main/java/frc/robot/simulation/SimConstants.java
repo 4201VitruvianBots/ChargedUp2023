@@ -10,6 +10,7 @@ package frc.robot.simulation;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.Controls;
 import java.util.Map;
 
 /**
@@ -21,11 +22,6 @@ import java.util.Map;
  * methods to flip these values based on the current alliance color.
  */
 public final class SimConstants {
-  // TODO: Check in with design & other directorates to update these values
-
-  public static final double robotWidthMeters = Units.inchesToMeters(24);
-  public static final double robotLengthMeters = Units.inchesToMeters(24);
-
   public static final double fieldLength = Units.inchesToMeters(651.25);
   public static final double fieldWidth = Units.inchesToMeters(315.5);
   public static final double tapeWidth = Units.inchesToMeters(2.0);
@@ -33,6 +29,11 @@ public final class SimConstants {
   public static final double fieldHeightMeters = Units.feetToMeters(27);
 
   public static final Pose2d startPositionMeters = new Pose2d();
+  private static Controls m_controls;
+
+  public SimConstants(Controls controls) {
+    m_controls = controls;
+  }
 
   // Everything above here is our code, everything below is 6328's field constants
 
@@ -268,7 +269,7 @@ public final class SimConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Translation2d allianceFlip(Translation2d translation) {
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    if (m_controls.getAllianceColor() == DriverStation.Alliance.Red) {
       return new Translation2d(fieldLength - translation.getX(), translation.getY());
     } else {
       return translation;
@@ -281,7 +282,7 @@ public final class SimConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Pose2d allianceFlip(Pose2d pose) {
-    if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
+    if (m_controls.getAllianceColor() == DriverStation.Alliance.Red) {
       return new Pose2d(
           fieldLength - pose.getX(),
           pose.getY(),

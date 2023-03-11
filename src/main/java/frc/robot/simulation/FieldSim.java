@@ -4,34 +4,35 @@
 
 package frc.robot.simulation;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants;
-import frc.robot.constants.Constants.Vision.CAMERA_POSITION;
+import frc.robot.Constants;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.*;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class FieldSim extends SubsystemBase {
   private final SwerveDrive m_swerveDrive;
   private final Vision m_vision;
   private final Elevator m_elevator;
+  private final Wrist m_wrist;
+  private final Controls m_controls;
 
   private final Field2d m_field2d = new Field2d();
 
-  private static Pose2d robotPose;
-  private static Pose2d elevatorPose;
+  private Pose2d robotPose;
+  private Pose2d intakePose;
 
   /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
     - Cones and cubes
@@ -39,7 +40,7 @@ public class FieldSim extends SubsystemBase {
     - Low, mid and high positions
     - And coopertition grids
   */
-  private static ArrayList<Pose2d> gridNodes = new ArrayList<>();
+  private ArrayList<Pose2d> gridNodes = new ArrayList<>();
 
   private ArrayList<Pose2d> coneNodes = new ArrayList<>();
   private ArrayList<Pose2d> cubeNodes = new ArrayList<>();
@@ -53,7 +54,8 @@ public class FieldSim extends SubsystemBase {
 
   private ArrayList<Pose2d> coopertitionNodes = new ArrayList<>();
 
-  public FieldSim(SwerveDrive swerveDrive, Vision vision, Elevator elevator) {
+  public FieldSim(
+      SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
 
     boolean cone = true;
 
@@ -95,7 +97,7 @@ public class FieldSim extends SubsystemBase {
       for (int j = 0; j < 6; j++) {
         Pose2d currentNode = gridNodes.get(i * 6 + j);
 
-        // Adds the poses to the coopertition node if applicable
+        // Adds the poses to the cooperatition node if applicable
         if (i >= 3 && i <= 5) {
           coopertitionNodes.add(currentNode);
         }
@@ -130,6 +132,8 @@ public class FieldSim extends SubsystemBase {
     m_swerveDrive = swerveDrive;
     m_vision = vision;
     m_elevator = elevator;
+    m_wrist = wrist;
+    m_controls = controls;
   }
 
   public void initSim() {}
@@ -138,7 +142,20 @@ public class FieldSim extends SubsystemBase {
     return m_field2d;
   }
 
-  public void setTrajectory(Trajectory trajectory) {
+  public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
+    List<Pose2d> trajectoryPoses = new ArrayList<>();
+
+    for (var trajectory : trajectories) {
+      trajectoryPoses.addAll(
+          trajectory.getStates().stream()
+              .map(state -> state.poseMeters)
+              .collect(Collectors.toList()));
+    }
+
+    m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
+  }
+
+  public void setTrajectory(PathPlannerTrajectory trajectory) {
     m_field2d.getObject("trajectory").setTrajectory(trajectory);
   }
 
@@ -151,25 +168,37 @@ public class FieldSim extends SubsystemBase {
     m_field2d.setRobotPose(robotPose);
     m_field2d
         .getObject("lLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.LEFT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("lLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.LEFT_LOCALIZER));
-    //    m_field2d
-    //        .getObject("Limelight Pose")
-    //        .setPose(m_vision.getRobotPose2d(CAMERA_POSITION.RIGHT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_POSITION.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(Constants.Vision.CAMERA_POSITION.RIGHT_LOCALIZER));
+        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     m_field2d
         .getObject("rLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(Constants.Vision.CAMERA_POSITION.RIGHT_LOCALIZER));
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+
+    m_field2d
+        .getObject("fLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
+
+    intakePose =
+        m_swerveDrive
+            .getPoseMeters()
+            .transformBy(
+                new Transform2d(
+                    m_elevator
+                        .getElevatorField2dTranslation()
+                        .plus(m_wrist.getHorizontalTranslation()),
+                    m_swerveDrive.getHeadingRotation2d()));
+    m_field2d.getObject("Intake Pose").setPose(intakePose);
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 
@@ -204,27 +233,28 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(coopertitionNodes);
     }
     else {
-      if (DriverStation.getAlliance() == Alliance.Red) {
+      if (m_controls.getAllianceColor() == Alliance.Red) {
         possibleNodes.retainAll(redNodes);
-      } else if (DriverStation.getAlliance() == Alliance.Blue) {
+      } else if (m_controls.getAllianceColor() == Alliance.Blue) {
         possibleNodes.retainAll(blueNodes);
       }  
     }
 
-    if (intakeState == StateHandler.intakingStates.CONE) {
+    if (intakeState == StateHandler.INTAKING_STATES.CONE) {
       possibleNodes.retainAll(coneNodes);
-    } else if (intakeState == StateHandler.intakingStates.CUBE) {
+    } else if (intakeState == StateHandler.INTAKING_STATES.CUBE) {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == StateHandler.mainRobotStates.SCORE_LOW) {
+    if (mainState == Constants.SCORING_STATE.SMART_LOW
+        || mainState == Constants.SCORING_STATE.SMART_LOW_REVERSE) {
       possibleNodes.retainAll(lowNodes);
-    } else if (mainState == StateHandler.mainRobotStates.SCORE_MEDIUM) {
+    } else if (mainState == Constants.SCORING_STATE.SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (mainState == StateHandler.mainRobotStates.SCORE_HIGH) {
+    } else if (mainState == Constants.SCORING_STATE.SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
-
+    
     return possibleNodes;
   }
 
@@ -233,38 +263,8 @@ public class FieldSim extends SubsystemBase {
       ArrayList<Pose2d> possibleNodes = getPossibleNodes(intakeState, mainState);
 
       // Only works on WPILIB version 2023.3.2 and above
-      return robotPose.nearest(possibleNodes);
-  }
-
-  // Whopper whopper whopper whopper
-  // junior double triple whopper
-  // flame grilled taste with perfect toppers
-  // i rule this day
-  public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
-    // TODO: Fix elevator pose math
-    double elevatorRotation = robotPose.getRotation().getRadians();
-    double elevatorDistance = m_elevator.getElevatorHeight();
-
-    double elevatorDeltaX = Math.cos(elevatorRotation) * elevatorDistance;
-    double elevatorDeltaY = Math.sin(elevatorRotation) * elevatorDistance;
-
-    elevatorPose =
-        new Pose2d(
-            robotPose.getX() + elevatorDeltaX,
-            robotPose.getX() + elevatorDeltaY,
-            robotPose.getRotation());
-
-    m_field2d.getObject("Elevator Pose").setPose(elevatorPose);
-
-    double deltaX = Math.abs(targetPose.getX() - elevatorPose.getX());
-    double deltaY = Math.abs(targetPose.getY() - elevatorPose.getY());
-
-    double distance =
-        Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)); // Standard distance formula
-
-    return distance < margin
-        ? true
-        : false; // Returns true if the robot is on target, returns false if not on target
+      if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
+      else return robotPose.nearest(possibleNodes);
   }
 
   // True for left, false for right
@@ -274,13 +274,13 @@ public class FieldSim extends SubsystemBase {
 
     // TODO: Make code more efficient/compact
     while (true) {
-      if (DriverStation.getAlliance() == Alliance.Blue) {
+      if (m_controls.getAllianceColor() == Alliance.Blue) {
         if (left)
           adjacentNode = gridNodes.get(nodeIndex-6);
         else
           adjacentNode = gridNodes.get(nodeIndex+6);
       }
-      else if (DriverStation.getAlliance() == Alliance.Red) {
+      else if (m_controls.getAllianceColor() == Alliance.Red) {
         if (left)
           adjacentNode = gridNodes.get(nodeIndex+6);
         else

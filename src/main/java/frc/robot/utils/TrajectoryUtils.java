@@ -34,19 +34,29 @@ public class TrajectoryUtils {
     if (fileName.startsWith("Red")) {
       var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
       if (!file.exists()) {
-        // TODO: handle exception
         DriverStation.reportWarning(
             "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
+
+        var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+
+        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        for (var trajectory : pathGroup) {
+          ppTrajectories.add(
+              PathPlannerTrajectory.transformTrajectoryForAlliance(
+                  trajectory, DriverStation.Alliance.Red));
+        }
+        return ppTrajectories;
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
       try {
+        var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
         DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-        return new ArrayList<PathPlannerTrajectory>();
-        // TODO: handle exception
+        return new ArrayList<>();
       }
     }
   }
