@@ -28,6 +28,7 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
+import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -238,6 +239,10 @@ public class RobotContainer {
                 m_wrist,
                 Units.degreesToRadians(-11.0),
                 xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
+
+    // Will switch our target node on the field sim to the adjacent node on D-pad press
+    xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
+    xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));

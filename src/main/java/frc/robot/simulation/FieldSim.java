@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -216,34 +218,86 @@ public class FieldSim extends SubsystemBase {
    * 3 - Node is on the same level as our elevator
    * 4 - Node is closest to our robot
    */
-  public Pose2d getTargetNode(
-      StateHandler.INTAKING_STATES intakeState, Constants.SCORING_STATE mainState) {
+  public ArrayList<Pose2d> getPossibleNodes(
+      SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
-    if (m_controls.getAllianceColor() == Alliance.Red) {
-      possibleNodes.retainAll(redNodes);
-    } else if (m_controls.getAllianceColor() == Alliance.Blue) {
-      possibleNodes.retainAll(blueNodes);
+    // If we are closer to the opposite alliance, prioritize scoring in their coopertition grid
+    ArrayList<Pose2d> nearestNodes = new ArrayList<>();
+    nearestNodes.add(robotPose.nearest(redNodes));
+    nearestNodes.add(robotPose.nearest(blueNodes));
+    Pose2d closestAllianceNode = robotPose.nearest(nearestNodes);
+
+    if (redNodes.contains(closestAllianceNode) && m_controls.getAllianceColor() == Alliance.Blue) {
+      possibleNodes.retainAll(coopertitionNodes);
+    } else if (blueNodes.contains(closestAllianceNode)
+        && m_controls.getAllianceColor() == Alliance.Red) {
+      possibleNodes.retainAll(coopertitionNodes);
+    } else {
+      if (m_controls.getAllianceColor() == Alliance.Red) {
+        possibleNodes.retainAll(redNodes);
+      } else if (m_controls.getAllianceColor() == Alliance.Blue) {
+        possibleNodes.retainAll(blueNodes);
+      }
     }
 
-    if (intakeState == StateHandler.INTAKING_STATES.CONE) {
+    if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE) {
       possibleNodes.retainAll(coneNodes);
-    } else if (intakeState == StateHandler.INTAKING_STATES.CUBE) {
+    } else if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == Constants.SCORING_STATE.SMART_LOW
-        || mainState == Constants.SCORING_STATE.SMART_LOW_REVERSE) {
+    if (scoringState == Constants.SCORING_STATE.SMART_LOW) {
       possibleNodes.retainAll(lowNodes);
-    } else if (mainState == Constants.SCORING_STATE.SMART_MEDIUM) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (mainState == Constants.SCORING_STATE.SMART_HIGH) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
+
+    return possibleNodes;
+  }
+
+  public Pose2d getTargetNode(
+      Constants.SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
+    ArrayList<Pose2d> possibleNodes = getPossibleNodes(scoringState, mainState);
 
     // Only works on WPILIB version 2023.3.2 and above
     if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
     else return robotPose.nearest(possibleNodes);
+  }
+
+  // True for left, false for right
+  public Pose2d getAdjacentNode(
+      Pose2d node, boolean left, ArrayList<Pose2d> possibleNodes, boolean sameTypeOnly) {
+    int nodeIndex = gridNodes.indexOf(node);
+    Pose2d adjacentNode;
+
+    // TODO: Make code more efficient/compact
+    while (true) {
+      if (m_controls.getAllianceColor() == Alliance.Blue) {
+        if (left) adjacentNode = gridNodes.get(nodeIndex - 6);
+        else adjacentNode = gridNodes.get(nodeIndex + 6);
+      } else if (m_controls.getAllianceColor() == Alliance.Red) {
+        if (left) adjacentNode = gridNodes.get(nodeIndex + 6);
+        else adjacentNode = gridNodes.get(nodeIndex - 6);
+      } else {
+        adjacentNode = node;
+      }
+
+      if (sameTypeOnly) {
+        if (possibleNodes.contains(adjacentNode)) break;
+        else nodeIndex = gridNodes.indexOf(adjacentNode);
+      } else {
+        break;
+      }
+    }
+
+    return adjacentNode;
   }
 
   @Override

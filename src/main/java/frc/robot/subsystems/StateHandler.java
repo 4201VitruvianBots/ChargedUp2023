@@ -18,6 +18,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
+import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
@@ -449,6 +450,11 @@ public class StateHandler extends SubsystemBase {
     m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
+  public void switchTargetNode(boolean left, boolean sameTypeOnly) {
+    ArrayList<Pose2d> possibleNodes = m_fieldSim.getPossibleNodes(scoringState, m_currentZone);
+    targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
+  }
+
   @Override
   public void periodic() {
     updateSmartDashboard();
@@ -507,7 +513,7 @@ public class StateHandler extends SubsystemBase {
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+          m_fieldSim.getTargetNode(scoringState, m_currentZone),
           m_wrist.getHorizontalTranslation().getX(),
           scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
