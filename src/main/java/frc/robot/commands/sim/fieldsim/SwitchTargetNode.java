@@ -4,13 +4,13 @@
 
 package frc.robot.commands.sim.fieldsim;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StateHandler;
 
 public class SwitchTargetNode extends CommandBase {
   /** Creates a new SwitchTargetNode. */
   private StateHandler m_stateHandler;
+
   private boolean m_left;
 
   public SwitchTargetNode(StateHandler stateHandler, boolean left) {

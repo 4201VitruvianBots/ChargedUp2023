@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
@@ -20,6 +18,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
+import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
@@ -451,8 +450,9 @@ public class StateHandler extends SubsystemBase {
     m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
-  public void switchTargetNode(boolean left, boolean sameTypeOnly){
-    ArrayList<Pose2d> possibleNodes = m_FieldSim.getPossibleNodes(currentScoringState, currentMainState);
+  public void switchTargetNode(boolean left, boolean sameTypeOnly) {
+    ArrayList<Pose2d> possibleNodes =
+        m_FieldSim.getPossibleNodes(currentScoringState, currentMainState);
     targetNode = m_FieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
   }
 

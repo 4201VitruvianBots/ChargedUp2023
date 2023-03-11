@@ -228,16 +228,15 @@ public class FieldSim extends SubsystemBase {
 
     if (redNodes.contains(closestAllianceNode) && DriverStation.getAlliance() == Alliance.Blue) {
       possibleNodes.retainAll(coopertitionNodes);
-    }
-    else if (blueNodes.contains(closestAllianceNode) && DriverStation.getAlliance() == Alliance.Red) {
+    } else if (blueNodes.contains(closestAllianceNode)
+        && DriverStation.getAlliance() == Alliance.Red) {
       possibleNodes.retainAll(coopertitionNodes);
-    }
-    else {
+    } else {
       if (m_controls.getAllianceColor() == Alliance.Red) {
         possibleNodes.retainAll(redNodes);
       } else if (m_controls.getAllianceColor() == Alliance.Blue) {
         possibleNodes.retainAll(blueNodes);
-      }  
+      }
     }
 
     if (intakeState == StateHandler.INTAKING_STATES.CONE) {
@@ -254,49 +253,41 @@ public class FieldSim extends SubsystemBase {
     } else if (mainState == Constants.SCORING_STATE.SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
-    
+
     return possibleNodes;
   }
 
   public Pose2d getTargetNode(
-    StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
-      ArrayList<Pose2d> possibleNodes = getPossibleNodes(intakeState, mainState);
+      StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
+    ArrayList<Pose2d> possibleNodes = getPossibleNodes(intakeState, mainState);
 
-      // Only works on WPILIB version 2023.3.2 and above
-      if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
-      else return robotPose.nearest(possibleNodes);
+    // Only works on WPILIB version 2023.3.2 and above
+    if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
+    else return robotPose.nearest(possibleNodes);
   }
 
   // True for left, false for right
-  public Pose2d getAdjacentNode(Pose2d node, boolean left, ArrayList<Pose2d> possibleNodes, boolean sameTypeOnly) {
+  public Pose2d getAdjacentNode(
+      Pose2d node, boolean left, ArrayList<Pose2d> possibleNodes, boolean sameTypeOnly) {
     int nodeIndex = gridNodes.indexOf(node);
     Pose2d adjacentNode;
 
     // TODO: Make code more efficient/compact
     while (true) {
       if (m_controls.getAllianceColor() == Alliance.Blue) {
-        if (left)
-          adjacentNode = gridNodes.get(nodeIndex-6);
-        else
-          adjacentNode = gridNodes.get(nodeIndex+6);
-      }
-      else if (m_controls.getAllianceColor() == Alliance.Red) {
-        if (left)
-          adjacentNode = gridNodes.get(nodeIndex+6);
-        else
-          adjacentNode = gridNodes.get(nodeIndex-6);
-      }
-      else {
+        if (left) adjacentNode = gridNodes.get(nodeIndex - 6);
+        else adjacentNode = gridNodes.get(nodeIndex + 6);
+      } else if (m_controls.getAllianceColor() == Alliance.Red) {
+        if (left) adjacentNode = gridNodes.get(nodeIndex + 6);
+        else adjacentNode = gridNodes.get(nodeIndex - 6);
+      } else {
         adjacentNode = node;
       }
-      
+
       if (sameTypeOnly) {
-        if (possibleNodes.contains(adjacentNode))
-          break;
-        else
-          nodeIndex = gridNodes.indexOf(adjacentNode);
-      }
-      else {
+        if (possibleNodes.contains(adjacentNode)) break;
+        else nodeIndex = gridNodes.indexOf(adjacentNode);
+      } else {
         break;
       }
     }
