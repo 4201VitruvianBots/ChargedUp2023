@@ -458,30 +458,17 @@ public class StateHandler extends SubsystemBase {
     m_currentZone =
         determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
 
+    // Undefined behavior, use previous zone as a backup
     if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.DANGER_ZONE.getZone()) {
       m_currentZone = m_lastZone;
     } else {
       m_lastZone = m_currentZone;
     }
 
-    //    DriverStation.reportError(
-    //            "StateHandler - Superstructure is in an undefined state. ElevatorHeightMeters: "
-    //                    + m_elevator.getHeightMeters()
-    //                    + "\tWristAngleDegrees: "
-    //                    + Units.radiansToDegrees(m_wrist.getPositionRadians()),
-    //            false);
-
     // Determine desired zone based on elevator/wrist setpoints
     m_desiredZone =
         determineSuperStructureState(
             m_elevator.getDesiredPositionMeters(), m_wrist.getDesiredPositionRadians());
-    //    if (m_desiredZone == SUPERSTRUCTURE_STATE.DANGER_ZONE)
-    //      DriverStation.reportWarning(
-    //              "StateHandler - Desired State is not defined. ElevatorDesiredPositionMeters: "
-    //                      + m_elevator.getDesiredPositionMeters()
-    //                      + "\tWristDesiredPositionDegrees: "
-    //                      + Units.radiansToDegrees(m_wrist.getDesiredPositionRadians()),
-    //              false);
 
     // Limit wrist/elevator setpoints to safe thresholds based on where you are and where you want
     // to go
@@ -495,7 +482,7 @@ public class StateHandler extends SubsystemBase {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }
 
-    // TODO: Limit max swerve speed by elevator height
+    // Limit max swerve speed by elevator height (Probably a bad idea, have operator do this manually)
     //    if (isTipping()) {
     //      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
     //      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());

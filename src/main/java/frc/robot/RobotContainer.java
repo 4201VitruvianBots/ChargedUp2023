@@ -129,9 +129,9 @@ public class RobotContainer {
         new SetSwerveMaxTranslationVeolcity(
             m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond / 25.0));
 
-    leftJoystickTriggers[1].whileTrue(new IntakeVisionAlignment(m_vision, m_swerveDrive));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+    rightJoystickTriggers[1].whileTrue(new IntakeVisionAlignment(m_vision, m_swerveDrive));
 
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
 
     // Score button Bindings
