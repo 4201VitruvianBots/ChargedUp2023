@@ -155,7 +155,7 @@ public class SwerveDrive extends SubsystemBase {
    * Uses trapezoidal profile to set robot heading to a clear target
    */
 
-  public void setRobotHeadingRadians(double radians) {
+  public void setHeadingTargetRadians(double radians) {
     m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
   }
 

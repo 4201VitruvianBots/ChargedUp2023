@@ -4,12 +4,14 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 
-public class AutoRunIntakeCone extends CommandBase {
+public class AutoRunIntakeVisionCone extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
@@ -19,7 +21,8 @@ public class AutoRunIntakeCone extends CommandBase {
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public AutoRunIntakeCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
+  public AutoRunIntakeVisionCone(
+      Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
     m_vision = vision;
     m_swerve = swerve;
@@ -39,21 +42,21 @@ public class AutoRunIntakeCone extends CommandBase {
   @Override
   public void execute() {
     m_intake.setPercentOutput(-m_PercentOutput);
-    // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
-    //   m_swerve.enableHeadingTarget(true);
-    //   m_swerve.setRobotHeading(
-    //       m_swerve
-    //           .getHeadingRotation2d()
-    //           .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-    //           .getRadians());
-    // }
+    if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
+      m_swerve.enableHeadingTarget(true);
+      m_swerve.setHeadingTargetRadians(
+          m_swerve
+              .getHeadingRotation2d()
+              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+              .getRadians());
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_intake.setBooleanState(false);
-    // m_swerve.enableHeadingTarget(false);
+    m_swerve.enableHeadingTarget(false);
   }
 
   // Returns true when the command should end.

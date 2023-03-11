@@ -33,6 +33,14 @@ public class RunIntakeCube extends CommandBase {
   @Override
   public void execute() {
     m_intake.setPercentOutput(m_PercentOutput);
+    // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
+    //   m_swerve.enableHeadingTarget(true);
+    //   m_swerve.setRobotHeading(
+    //       m_swerve
+    //           .getHeadingRotation2d()
+    //           .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+    //           .getRadians());
+    // }
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +48,7 @@ public class RunIntakeCube extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setPercentOutput(0.3);
     m_intake.setBooleanState(false);
+    // m_swerve.enableHeadingTarget(false);
     m_intake.setIntakeStateCube(false);
   }
 
