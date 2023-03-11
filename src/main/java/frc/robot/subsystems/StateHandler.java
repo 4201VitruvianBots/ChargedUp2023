@@ -451,8 +451,7 @@ public class StateHandler extends SubsystemBase {
   }
 
   public void switchTargetNode(boolean left, boolean sameTypeOnly) {
-    ArrayList<Pose2d> possibleNodes =
-        m_fieldSim.getPossibleNodes(scoringState, m_currentZone);
+    ArrayList<Pose2d> possibleNodes = m_fieldSim.getPossibleNodes(scoringState, m_currentZone);
     targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
   }
 

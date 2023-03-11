@@ -18,7 +18,6 @@ import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.StateHandler.INTAKING_STATES;
 import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
@@ -219,7 +218,8 @@ public class FieldSim extends SubsystemBase {
    * 3 - Node is on the same level as our elevator
    * 4 - Node is closest to our robot
    */
-  public ArrayList<Pose2d> getPossibleNodes(SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
+  public ArrayList<Pose2d> getPossibleNodes(
+      SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
     // If we are closer to the opposite alliance, prioritize scoring in their coopertition grid
@@ -241,9 +241,13 @@ public class FieldSim extends SubsystemBase {
       }
     }
 
-    if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CONE || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE) {
+    if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE) {
       possibleNodes.retainAll(coneNodes);
-    } else if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
+    } else if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE
+        || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
       possibleNodes.retainAll(cubeNodes);
     }
 
