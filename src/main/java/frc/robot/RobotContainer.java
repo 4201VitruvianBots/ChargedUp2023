@@ -510,20 +510,20 @@ public class RobotContainer {
         "RedDriveForward",
         new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
+    m_autoChooser.setDefaultOption(
         "BlueTopDriveForward",
-        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_intake, m_vision));
 
     m_autoChooser.addOption(
         "RedTopDriveForward",
-        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_intake, m_vision));
 
     m_autoChooser.addOption(
         "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
     m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.setDefaultOption(
+    m_autoChooser.addOption(
         "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
