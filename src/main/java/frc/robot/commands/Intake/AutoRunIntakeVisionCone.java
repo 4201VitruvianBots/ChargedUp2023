@@ -44,7 +44,7 @@ public class AutoRunIntakeVisionCone extends CommandBase {
     m_intake.setPercentOutput(-m_PercentOutput);
     if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
-      m_swerve.setHeadingTargetRadians(
+      m_swerve.setRobotHeadingRadians(
           m_swerve
               .getHeadingRotation2d()
               .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))

@@ -37,8 +37,13 @@ public class Vision extends SubsystemBase {
   private final DoubleLogEntry limelightTargetValid;
   private final DoubleLogEntry leftLocalizerTargetValid;
 
+  private final Timer searchPipelineTimer = new Timer();
+  private final double searchPipelineWindow = 0.4;
+
   private final Timer searchTimer = new Timer();
-  private final double searchWindow = 0.4;
+  
+  private double startTime, timestamp;
+  private boolean timerStart;
 
   private enum targetType {
     INTAKING,
@@ -98,7 +103,7 @@ public class Vision extends SubsystemBase {
             .getDoubleArrayTopic("camToRobotT3D")
             .publish();
 
-    resetSearch();
+    resetPipelineSearch();
   }
 
   /**
@@ -235,10 +240,10 @@ public class Vision extends SubsystemBase {
   /*
    * resets timer for pipeline finder
    */
-  public void resetSearch() {
+  public void resetPipelineSearch() {
     targetFound = targetType.NONE;
-    searchTimer.reset();
-    searchTimer.start();
+    searchPipelineTimer.reset();
+    searchPipelineTimer.start();
   }
 
   /*
@@ -260,7 +265,7 @@ public class Vision extends SubsystemBase {
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     if (m_intakeSub.getIntakeState()) {
-      int pipeline = (int) (Math.floor(searchTimer.get() / searchWindow) % 2) + 1;
+      int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
       if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
@@ -275,13 +280,45 @@ public class Vision extends SubsystemBase {
       // threshold to lose game object once it's found
       if (targetFound == targetType.CUBE) {
         if (getTargetArea(location) < 2.0) {
-          targetFound = targetType.NONE;
+          reconnectLimelightPipeline(location);
+          //targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
         if (getTargetArea(location) < 2.0) {
-          targetFound = targetType.NONE;
+          reconnectLimelightPipeline(location);
+          //targetFound = targetType.NONE;
         }
+      }
+    }
+  }
+
+  /*
+   * resets timer for pipeline finder
+   */
+  public void resetSearch() {
+    searchTimer.reset();
+    searchTimer.start();
+  }
+
+  /*
+   * Attempts to reconnect with pipeline within a timespan once target is lost
+   */
+  public void reconnectLimelightPipeline(CAMERA_SERVER location) {
+    resetSearch();
+    startTime = searchTimer.get();
+
+    if (!timerStart && !searchLimelightTarget(location)) { 
+      timerStart = true;
+      timestamp = searchTimer.get();
+    } else if (timerStart && searchLimelightTarget(location)) {
+      timestamp = 0;
+      timerStart = false;
+    }
+
+    if (timestamp != 0 || searchTimer.get() - startTime > 3) {
+      if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
+        searchLimelightPipeline(location);
       }
     }
   }

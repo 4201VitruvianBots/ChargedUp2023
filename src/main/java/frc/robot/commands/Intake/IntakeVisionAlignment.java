@@ -44,7 +44,7 @@ public class IntakeVisionAlignment extends CommandBase {
   public void execute() {
     if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
       m_swerve.enableHeadingTarget(true);
-      m_swerve.setHeadingTargetRadians(
+      m_swerve.setRobotHeadingRadians(
           m_swerve
               .getHeadingRotation2d()
               .plus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
