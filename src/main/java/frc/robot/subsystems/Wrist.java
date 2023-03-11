@@ -61,6 +61,9 @@ public class Wrist extends SubsystemBase {
   public ArmFeedforward m_feedforward =
       new ArmFeedforward(
           Constants.WRIST.FFkS, Constants.WRIST.kG, Constants.WRIST.FFkV, Constants.WRIST.kA);
+  private final Timer m_timer = new Timer();
+  private double m_lastTimestamp = 0;
+  private double m_lastSimTimestamp = 0;
 
   private final double maxPercentOutput = 1.0;
   public final double setpointMultiplier = Units.degreesToRadians(60.0);
@@ -131,6 +134,8 @@ public class Wrist extends SubsystemBase {
     resetWristAngle(-15.0);
 
     initSmartDashboard();
+    m_timer.reset();
+    m_timer.start();
   }
 
   public boolean getClosedLoopState() {
@@ -426,7 +431,9 @@ public class Wrist extends SubsystemBase {
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
         var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
-        m_setpoint = profile.calculate(0.02);
+        var currentTime = m_timer.get();
+        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
+        m_lastTimestamp = currentTime;
         var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;
         kCommandedAngleDegreesPub.set(Units.radiansToDegrees(commandedSetpoint.position));
@@ -442,7 +449,9 @@ public class Wrist extends SubsystemBase {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
             wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
-    m_armSim.update(0.020);
+    var currentTime = m_timer.get();
+    m_armSim.update(currentTime - m_lastSimTimestamp);
+    m_lastSimTimestamp = currentTime;
 
     Unmanaged.feedEnable(20);
 
