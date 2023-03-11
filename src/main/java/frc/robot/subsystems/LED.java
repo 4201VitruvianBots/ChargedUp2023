@@ -123,8 +123,8 @@ public class LED extends SubsystemBase {
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case INTAKING: // Flashing blue
-          setPattern(0, 0, 255, 0, 0, AnimationTypes.Strobe);
+        case INTAKING: // Solid blue
+          setPattern(0, 0, 255, 0, 0, AnimationTypes.Solid);
           break;
         case CONE_BUTTON: // Solid Yellow
           setPattern(150, 120, 0, 0, 0, AnimationTypes.Solid);
