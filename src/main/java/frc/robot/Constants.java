@@ -126,6 +126,7 @@ public final class Constants {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
+      // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(6)),
       MID_MIN(Units.inchesToMeters(4)),

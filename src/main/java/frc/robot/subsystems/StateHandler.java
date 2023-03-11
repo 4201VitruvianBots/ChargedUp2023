@@ -226,7 +226,7 @@ public class StateHandler extends SubsystemBase {
 
   public void zoneAdvancement() {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
-    // zones
+    // zones, otherwise don't set a transition limit
     if(m_currentZone.getZone() != m_desiredZone.getZone()) {
       if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
         if (m_desiredZone.getZone() > m_currentZone.getZone())
@@ -251,8 +251,7 @@ public class StateHandler extends SubsystemBase {
     } else m_nextZone = ZONE_TRANSITIONS.NONE;
 
     // Use zone transition info to set mechanism limits. Only threshold limit when within
-    // transition
-    // zones
+    // transition zones
     switch (m_nextZone) {
       case LOW_TO_MID:
         if (ELEVATOR.THRESHOLD.MID_MIN.get() < m_elevator.getHeightMeters()) {
@@ -364,8 +363,8 @@ public class StateHandler extends SubsystemBase {
     // Check current mechanism positions before advancing zones
     switch (m_currentZone.getZone()) {
       case 1: // LOW
-        // LOW -> MIN
         if (ELEVATOR.THRESHOLD.MID_MIN.get() < m_elevator.getHeightMeters()) {
+          // LOW -> MIN
           if (WRIST.THRESHOLD.MID_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
@@ -373,13 +372,14 @@ public class StateHandler extends SubsystemBase {
         }
         break;
       case 2: // MID
-        // MID -> LOW
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.LOW_MAX.get()) {
+          // MID -> LOW
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.LOW_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
             return;
           }
         } else if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < m_elevator.getHeightMeters()) {
+          // MID -> HIGH
           if (WRIST.THRESHOLD.HIGH_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
@@ -388,11 +388,13 @@ public class StateHandler extends SubsystemBase {
         break;
       case 3: // HIGH
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_MAX.get()) {
+          // HIGH -> MID
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
           }
         } else if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < m_elevator.getHeightMeters()) {
+          // HIGH -> EXTENDED
           if (WRIST.THRESHOLD.EXTENDED_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
             return;
@@ -401,6 +403,7 @@ public class StateHandler extends SubsystemBase {
         break;
       case 4: // EXTENDED
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
+          // EXTENDED -> HIGH
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
