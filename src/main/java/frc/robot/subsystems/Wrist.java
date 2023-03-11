@@ -48,12 +48,11 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private TrapezoidProfile.Constraints m_slowWristTrapezoidalConstraints =
+  private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
-  private TrapezoidProfile.Constraints m_fastWristTrapezoidalConstraints =
+  private final TrapezoidProfile.Constraints m_fastConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
-  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
-      m_slowWristTrapezoidalConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -273,11 +272,11 @@ public class Wrist extends SubsystemBase {
   public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
     switch (speed) {
       case FAST:
-        m_currentTrapezoidalConstraints = m_fastWristTrapezoidalConstraints;
+        m_currentConstraints = m_fastConstraints;
         break;
       default:
       case SLOW:
-        m_currentTrapezoidalConstraints = m_slowWristTrapezoidalConstraints;
+        m_currentConstraints = m_slowConstraints;
         break;
     }
   }
@@ -334,8 +333,8 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
-    currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
-    currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
+    currentTrapezoidAcceleration.set(m_currentConstraints.maxAcceleration);
+    currentTrapezoidVelocity.set(m_currentConstraints.maxVelocity);
 
     currentCommandStatePub.set(getControlState().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
@@ -430,7 +429,7 @@ public class Wrist extends SubsystemBase {
       }
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         var currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;

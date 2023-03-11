@@ -61,8 +61,11 @@ public class Elevator extends SubsystemBase {
   private double kV = ELEVATOR.kV;
   private double kA = ELEVATOR.kA;
 
-  private TrapezoidProfile.Constraints m_trapezoidialConstraints =
+  private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
+  private final TrapezoidProfile.Constraints m_fastConstraints =
+      new TrapezoidProfile.Constraints(maxVel * 1.5, maxAccel * 1.5);
+  private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
@@ -388,7 +391,7 @@ public class Elevator extends SubsystemBase {
     //
     //      maxVel = kMaxVelSub.get(0);
     //      maxAccel = kMaxAccelSub.get(0);
-    //      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    //      m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
     //      kS = kSSub.get(0);
     //      kV = kVSub.get(0);
     //      kA = kASub.get(0);
@@ -477,8 +480,12 @@ public class Elevator extends SubsystemBase {
           break;
       }
       if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+        if (m_desiredPositionMeters - getHeightMeters() > 0)
+          m_currentConstraints = m_fastConstraints;
+        else m_currentConstraints = m_slowConstraints;
+
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         var currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
