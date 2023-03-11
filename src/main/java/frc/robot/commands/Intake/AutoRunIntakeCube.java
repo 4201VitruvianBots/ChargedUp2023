@@ -6,16 +6,23 @@ package frc.robot.commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
 public class AutoRunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
+  private final Vision m_vision;
+  private final SwerveDrive m_swerve;
+
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public AutoRunIntakeCube(Intake intake, double PercentOutput) {
+  public AutoRunIntakeCube(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
+    m_vision = vision;
+    m_swerve = swerve;
     m_PercentOutput = PercentOutput;
 
     // Use addRequirements() here to declare subsystem dependencies.

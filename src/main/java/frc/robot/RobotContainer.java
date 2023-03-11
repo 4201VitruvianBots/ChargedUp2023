@@ -390,13 +390,15 @@ public class RobotContainer {
 
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(2));
-    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5));
-    m_eventMap.put("RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5));
-    m_eventMap.put("RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5));
-    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2));
-    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2));
-    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0));
+    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
     m_eventMap.put(
         "SetWristIntaking",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));

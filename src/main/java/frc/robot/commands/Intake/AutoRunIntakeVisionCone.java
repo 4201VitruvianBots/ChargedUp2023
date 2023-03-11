@@ -21,7 +21,8 @@ public class AutoRunIntakeVisionCone extends CommandBase {
   private double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public AutoRunIntakeVisionCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
+  public AutoRunIntakeVisionCone(
+      Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
     m_vision = vision;
     m_swerve = swerve;

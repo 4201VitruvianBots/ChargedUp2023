@@ -482,7 +482,8 @@ public class StateHandler extends SubsystemBase {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }
 
-    // Limit max swerve speed by elevator height (Probably a bad idea, have operator do this manually)
+    // Limit max swerve speed by elevator height (Probably a bad idea, have operator do this
+    // manually)
     //    if (isTipping()) {
     //      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
     //      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
