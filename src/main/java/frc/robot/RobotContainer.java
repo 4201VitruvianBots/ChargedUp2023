@@ -39,6 +39,7 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
+import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
 
@@ -61,11 +62,14 @@ public class RobotContainer {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
+  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
 
   private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision, m_scoringStateChooser, m_mainStateChooser);
+
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
@@ -93,6 +97,8 @@ public class RobotContainer {
 
     initAutoBuilder();
     initializeAutoChooser();
+    initializeScoringChooser();
+    initializeMainStateChooser();
   }
 
   public void initializeSubsystems() {
@@ -551,6 +557,25 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
 
+  public void initializeScoringChooser() {
+    for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
+        m_scoringStateChooser.addOption(state.toString(), state);
+    }
+
+    m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
+
+    SmartDashboard.putData("Scoring State Selector", m_scoringStateChooser);
+  }
+
+  public void initializeMainStateChooser() {
+    for (SUPERSTRUCTURE_STATE state : SUPERSTRUCTURE_STATE.values()) {
+        m_mainStateChooser.addOption(state.toString(), state);
+    }
+    m_mainStateChooser.setDefaultOption("STOWED", SUPERSTRUCTURE_STATE.STOWED);
+
+    SmartDashboard.putData("Main State Selector", m_mainStateChooser);
+  }
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return m_autoChooser.getSelected();
@@ -562,7 +587,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    m_memorylog.simulationPeriodic();
+    //m_memorylog.simulationPeriodic();
   }
 
   public void disabledPeriodic() {
@@ -578,5 +603,10 @@ public class RobotContainer {
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
     // m_logManager.periodic();
+  }
+
+  public void testPeriodic() {
+    m_stateHandler.testPeriodic();
+    m_fieldSim.periodic();
   }
 }

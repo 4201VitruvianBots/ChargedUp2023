@@ -105,7 +105,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    m_robotContainer.testPeriodic();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
