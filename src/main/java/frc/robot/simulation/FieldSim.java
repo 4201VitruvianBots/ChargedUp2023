@@ -279,13 +279,17 @@ public class FieldSim extends SubsystemBase {
 
     // TODO: Make code more efficient/compact
     while (true) {
-      if (m_controls.getAllianceColor() == Alliance.Blue) {
-        if (left) adjacentNode = gridNodes.get(nodeIndex - 6);
-        else adjacentNode = gridNodes.get(nodeIndex + 6);
-      } else if (m_controls.getAllianceColor() == Alliance.Red) {
-        if (left) adjacentNode = gridNodes.get(nodeIndex + 6);
-        else adjacentNode = gridNodes.get(nodeIndex - 6);
-      } else {
+      try {
+        if (m_controls.getAllianceColor() == Alliance.Blue) {
+          if (left) adjacentNode = gridNodes.get(nodeIndex - 6);
+          else adjacentNode = gridNodes.get(nodeIndex + 6);
+        } else if (m_controls.getAllianceColor() == Alliance.Red) {
+          if (left) adjacentNode = gridNodes.get(nodeIndex + 6);
+          else adjacentNode = gridNodes.get(nodeIndex - 6);
+        } else {
+          adjacentNode = node;
+        }
+      } catch (IndexOutOfBoundsException e) {
         adjacentNode = node;
       }
 
