@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.ModuleMap;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 /**
@@ -126,16 +124,15 @@ public final class Constants {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
+      // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(50.0)),
-      HIGH_MIN(Units.inchesToMeters(8.0)),
-      HIGH_MAX(Units.inchesToMeters(50.0)),
-      EXTENDED_MIN(Units.inchesToMeters(12.0)),
-      EXTENDED_MAX(ABSOLUTE_MAX.get()),
-      LOW_TO_HIGH(Units.inchesToMeters(14.0)),
-      HIGH_TO_LOW(Units.inchesToMeters(3.5)),
-      HIGH_TO_EXTENDED(Units.inchesToMeters(24.0)),
-      EXTENDED_TO_HIGH(Units.inchesToMeters(22.0));
+      LOW_MAX(Units.inchesToMeters(6)),
+      MID_MIN(Units.inchesToMeters(4)),
+      MID_MAX(Units.inchesToMeters(9)),
+      HIGH_MIN(Units.inchesToMeters(7)),
+      HIGH_MAX(Units.inchesToMeters(13)),
+      EXTENDED_MIN(Units.inchesToMeters(11)),
+      EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 
@@ -311,7 +308,7 @@ public final class Constants {
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW(Units.degreesToRadians(-13.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
-      SCORE_LOW_CONE(Units.degreesToRadians(180.0)),
+      SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.degreesToRadians(138.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
@@ -335,9 +332,11 @@ public final class Constants {
       ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.degreesToRadians(110.0)),
-      HIGH_MIN(Units.degreesToRadians(10.0)),
-      HIGH_MAX(LOW_MAX.get()),
+      LOW_MAX(Units.degreesToRadians(100.0)),
+      MID_MIN(Units.degreesToRadians(10.0)),
+      MID_MAX(Units.degreesToRadians(110.0)),
+      HIGH_MIN(MID_MIN.get()),
+      HIGH_MAX(Units.degreesToRadians(120.0)),
       EXTENDED_MIN(HIGH_MIN.get()),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
@@ -425,7 +424,7 @@ public final class Constants {
         hex[i] = String.format("%02X", networkInterfaces[i]);
       }
       mac = String.join(":", hex);
-    } catch (SocketException | UnknownHostException e) {
+    } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

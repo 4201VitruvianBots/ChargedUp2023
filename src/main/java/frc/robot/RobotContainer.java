@@ -137,7 +137,6 @@ public class RobotContainer {
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
 
     // Score button Bindings
@@ -260,8 +259,8 @@ public class RobotContainer {
                   new SetWristDesiredSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().ordinal()
-                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+                      m_stateHandler.getCurrentZone().getZone()
+                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
       testController
@@ -273,8 +272,8 @@ public class RobotContainer {
                   new SetWristDesiredSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().ordinal()
-                          <= StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.ordinal()));
+                      m_stateHandler.getCurrentZone().getZone()
+                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       // Score button Bindings
 
@@ -396,13 +395,15 @@ public class RobotContainer {
 
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(2));
-    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5));
-    m_eventMap.put("RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5));
-    m_eventMap.put("RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5));
-    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2));
-    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2));
-    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0));
+    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put(
+        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
+    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
     m_eventMap.put(
         "SetWristIntaking",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));

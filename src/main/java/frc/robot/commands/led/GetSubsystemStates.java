@@ -64,7 +64,8 @@ public class GetSubsystemStates extends CommandBase {
       }
     } else {
       switch (desiredState) {
-        case INTAKING_LOW:
+        case INTAKE_LOW:
+        case INTAKE_EXTENDED:
           m_led.expressState(LED.robotState.INTAKING);
           break;
         case SCORE_LOW_CONE:
@@ -79,12 +80,13 @@ public class GetSubsystemStates extends CommandBase {
             m_led.expressState(LED.robotState.ELEVATING);
           }
           break;
-        case CUBE_BUTTON:
-          m_led.expressState(LED.robotState.CUBE_BUTTON);
-          break;
-        case CONE_BUTTON:
-          m_led.expressState(LED.robotState.CONE_BUTTON);
-          break;
+          // TODO: Tie this to Intake Vision Code
+          //        case CUBE_BUTTON:
+          //          m_led.expressState(LED.robotState.CUBE_BUTTON);
+          //          break;
+          //        case CONE_BUTTON:
+          //          m_led.expressState(LED.robotState.CONE_BUTTON);
+          //          break;
         default:
           m_led.expressState(LED.robotState.ENABLED);
           break;

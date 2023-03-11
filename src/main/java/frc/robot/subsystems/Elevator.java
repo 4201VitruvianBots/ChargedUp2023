@@ -16,10 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -63,12 +60,18 @@ public class Elevator extends SubsystemBase {
   private double kS = ELEVATOR.kS;
   private double kV = ELEVATOR.kV;
   private double kA = ELEVATOR.kA;
-  private TrapezoidProfile.Constraints m_trapezoidialConstraints =
+
+  private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
+  private final TrapezoidProfile.Constraints m_fastConstraints =
+      new TrapezoidProfile.Constraints(maxVel * 1.5, maxAccel * 1.5);
+  private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-
   private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+  private final Timer m_timer = new Timer();
+  private double m_lastTimestamp = 0;
+  private double m_lastSimTimestamp = 0;
 
   private static double heightMeters =
       0; // the amount of meters the motor has gone up from the initial stowed position
@@ -155,6 +158,8 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
     initShuffleboard();
+    m_timer.reset();
+    m_timer.start();
   }
 
   /*
@@ -385,7 +390,7 @@ public class Elevator extends SubsystemBase {
     //
     //      maxVel = kMaxVelSub.get(0);
     //      maxAccel = kMaxAccelSub.get(0);
-    //      m_trapezoidialConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    //      m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
     //      kS = kSSub.get(0);
     //      kV = kVSub.get(0);
     //      kA = kASub.get(0);
@@ -410,7 +415,9 @@ public class Elevator extends SubsystemBase {
     elevatorSim.setInput(getPercentOutput() * 12);
 
     // Next, we update it. The standard loop time is 20ms.
-    elevatorSim.update(0.020);
+    var currentTime = m_timer.get();
+    elevatorSim.update(currentTime - m_lastSimTimestamp);
+    m_lastSimTimestamp = currentTime;
 
     elevatorMotors[0]
         .getSimCollection()
@@ -472,9 +479,16 @@ public class Elevator extends SubsystemBase {
           break;
       }
       if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+        if (m_desiredPositionMeters - getHeightMeters() > 0)
+          m_currentConstraints = m_fastConstraints;
+        else m_currentConstraints = m_slowConstraints;
+
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        var profile = new TrapezoidProfile(m_trapezoidialConstraints, m_goal, m_setpoint);
-        m_setpoint = profile.calculate(0.02);
+        var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        var currentTime = m_timer.get();
+        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
+        m_lastTimestamp = currentTime;
+
         //      var commandedSetpoint = limitDesiredAngleSetpoint();
         var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
         m_commandedPositionMeters = commandedSetpoint.position;
