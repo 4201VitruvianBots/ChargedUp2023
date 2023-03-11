@@ -404,7 +404,7 @@ public class StateHandler extends SubsystemBase {
           m_wrist.getHorizontalTranslation().getX(),
           scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
-      m_elevator.setElevatorMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
+      m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }

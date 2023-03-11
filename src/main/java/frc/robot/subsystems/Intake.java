@@ -9,12 +9,14 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -30,7 +32,7 @@ public class Intake extends SubsystemBase {
 
   // Log setup
   public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry intakeCurrentEntry = new DoubleLogEntry(log, "/intake/intakeCurrent");
+  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   public Intake() {
     // one or two motors
@@ -55,11 +57,11 @@ public class Intake extends SubsystemBase {
   // TODO: Need two measurement values: One that averages the two used to measure the cone and
   // another to measure the
   //  distance to the cube
-  public double getIntakeConeMeasurement() {
+  public double getConeDistance() {
     return 0;
   }
 
-  public double getIntakeCubeMeasurement() {
+  public double getCubeDistance() {
     return 0;
   }
 
@@ -85,21 +87,25 @@ public class Intake extends SubsystemBase {
   }
 
   // True if Cube is detected, otherwise assume Cone
-  public boolean getIntakeGamePiece() {
-    // TODO: Update threshold
-    return getIntakeCubeMeasurement() > 0;
+  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
+    if (getConeDistance() > Units.inchesToMeters(15)
+        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.HELD_GAMEPIECE.NONE;
+    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.HELD_GAMEPIECE.CONE;
+    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.HELD_GAMEPIECE.CUBE;
+
+    return INTAKE.HELD_GAMEPIECE.NONE;
   }
 
-  public double getIntakeMotorCurrent() {
+  public double getMotorOutputCurrent() {
     return intakeMotor.getStatorCurrent();
   }
 
-  public void setIntakeState(boolean state) {
+  public void setBooleanState(boolean state) {
     isIntaking = state;
   }
 
   // set percent output function
-  public void setIntakePercentOutput(double value) {
+  public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
   // Shuffleboard or SmartDashboard function
@@ -109,7 +115,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void updateLog() {
-    intakeCurrentEntry.append(getIntakeMotorCurrent());
+    currentEntry.append(getMotorOutputCurrent());
   }
 
   @Override
@@ -120,14 +126,14 @@ public class Intake extends SubsystemBase {
     // TODO: If the cube or cone distance sensors see a game object, run the intake motor to hold
     // the game piece in.
     if (!isIntaking) {
-      if (getIntakeConeMeasurement() > 0) {
+      if (getConeDistance() > 0) {
         m_percentOutput = 0;
-      } else if (getIntakeCubeMeasurement() > 0) {
+      } else if (getCubeDistance() > 0) {
         m_percentOutput = 0;
       } else {
         m_percentOutput = 0;
       }
-      setIntakePercentOutput(m_percentOutput);
+      setPercentOutput(m_percentOutput);
     }
   }
 }

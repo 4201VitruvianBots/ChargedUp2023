@@ -69,6 +69,10 @@ public class SwerveModule extends SubsystemBase {
   private double m_turnPercentOutput;
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
+  private final Timer m_simTimer = new Timer();
+  private double m_lastSimTime = 0;
+  private final double m_driveEncoderSimDirection;
+  private final double m_turnEncoderSimDirection;
 
   // Logging setup
 
@@ -97,10 +101,12 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
     m_turnMotor.setSelectedSensorPosition(0);
+    m_turnEncoderSimDirection = m_turnMotor.getInverted() ? -1.0 : 1.0;
 
     m_driveMotor.configFactoryDefault();
     m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
     m_driveMotor.setInverted(false);
+    m_driveEncoderSimDirection = m_driveMotor.getInverted() ? -1.0 : 1.0;
 
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
     m_lastAngle = getHeadingDegrees();
@@ -111,6 +117,11 @@ public class SwerveModule extends SubsystemBase {
         new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
     moduleDriveCurrentEntry =
         new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
+
+    if (RobotBase.isSimulation()) {
+      m_simTimer.reset();
+      m_simTimer.start();
+    }
   }
 
   private void initModuleHeading() {
@@ -262,8 +273,10 @@ public class SwerveModule extends SubsystemBase {
     m_driveMotorSim.setInputVoltage(
         MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
-    m_turnMotorSim.update(0.02);
-    m_driveMotorSim.update(0.02);
+    var currentTime = m_simTimer.get();
+    m_turnMotorSim.update(currentTime - m_lastSimTime);
+    m_driveMotorSim.update(currentTime - m_lastSimTime);
+    m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
 
@@ -276,22 +289,30 @@ public class SwerveModule extends SubsystemBase {
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (m_turnMotorSimDistance / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse));
+            (int)
+                (m_turnEncoderSimDirection
+                    * m_turnMotorSimDistance
+                    / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse));
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (m_turnMotorSim.getAngularVelocityRadPerSec()
+                (m_turnEncoderSimDirection
+                    * m_turnMotorSim.getAngularVelocityRadPerSec()
                     / (Constants.SWERVEMODULE.kTurningMotorDistancePerPulse * 10)));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (m_driveMotorSimDistance / Constants.SWERVEMODULE.kDriveMotorDistancePerPulse));
+            (int)
+                (m_driveEncoderSimDirection
+                    * m_driveMotorSimDistance
+                    / Constants.SWERVEMODULE.kDriveMotorDistancePerPulse));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (m_driveMotorSim.getAngularVelocityRadPerSec()
+                (m_driveEncoderSimDirection
+                    * m_driveMotorSim.getAngularVelocityRadPerSec()
                     / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10)));
   }
 }

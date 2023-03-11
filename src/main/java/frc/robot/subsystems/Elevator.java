@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.ELEVATOR.centerOffset;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
@@ -52,7 +54,7 @@ public class Elevator extends SubsystemBase {
 
   private double joystickInput;
 
-  private final double kP = 0.55;
+  private final double kP = 0.3;
   private final double kI = 0;
   private final double kD = 0;
 
@@ -68,10 +70,10 @@ public class Elevator extends SubsystemBase {
 
   private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
 
-  private static double elevatorHeight =
+  private static double heightMeters =
       0; // the amount of meters the motor has gone up from the initial stowed position
 
-  private final double maxElevatorHeight = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
+  private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   // By default, this is set to true as we use motion magic to determine what speed we should be at
   // to get to our setpoint.
@@ -83,7 +85,8 @@ public class Elevator extends SubsystemBase {
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
-  private final double maxPercentOutput = 0.75;
+  private final double maxForwardOutput = 0.43;
+  private final double maxReverseOutput = -0.3;
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.50;
 
@@ -117,18 +120,16 @@ public class Elevator extends SubsystemBase {
       currentCommandStatePub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d mech2d = new Mechanism2d(maxElevatorHeight * 50, maxElevatorHeight * 50);
-  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxElevatorHeight * 25, 0);
+  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 50, maxHeightMeters * 50);
+  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxHeightMeters * 25, 0);
   public MechanismLigament2d elevatorLigament2d =
-      root2d.append(new MechanismLigament2d("Elevator", elevatorHeight, 90));
+      root2d.append(new MechanismLigament2d("Elevator", heightMeters, 90));
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry elevatorCurrentEntry = new DoubleLogEntry(log, "/elevator/elevatorCurrent");
-  public DoubleLogEntry elevatorSetpointEntry =
-      new DoubleLogEntry(log, "/elevator/elevatorSetpoint");
-  public DoubleLogEntry elevatorPositionEntry =
-      new DoubleLogEntry(log, "/elevator/elevatorPosition");
+  public DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
+  public DoubleLogEntry setpointMetersEntry = new DoubleLogEntry(log, "/elevator/setpoint");
+  public DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
 
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
@@ -144,8 +145,8 @@ public class Elevator extends SubsystemBase {
       motor.config_kI(Constants.ELEVATOR.kSlotIdx, kI, Constants.ELEVATOR.kTimeoutMs);
       motor.config_kD(Constants.ELEVATOR.kSlotIdx, kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(0.43, Constants.ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(-0.3, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(maxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(maxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -169,7 +170,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-  public void setElevatorMotionMagicMeters(double setpoint) {
+  public void setSetpointMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
         TalonFXControlMode.MotionMagic, setpoint / Constants.ELEVATOR.encoderCountsToMeters);
   }
@@ -204,19 +205,19 @@ public class Elevator extends SubsystemBase {
         * 10;
   }
 
-  public double getElevatorEncoderCounts() {
+  public double getEncoderCounts() {
     return elevatorMotors[0].getSelectedSensorPosition();
   }
 
-  public double getElevatorMotorVoltage() {
+  public double getMotorOutputVoltage() {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
-  public boolean getElevatorRunning() {
+  public boolean getRunningBool() {
     return isElevatorElevatingElevatando;
   }
 
-  public boolean setElevatorRunning(boolean state) {
+  public boolean setRunningBool(boolean state) {
     return isElevatorElevatingElevatando = state;
   }
 
@@ -224,11 +225,11 @@ public class Elevator extends SubsystemBase {
   //   // return !elevatorLowerSwitch.get();
   // }
 
-  public void setElevatorSensorPosition(double meters) {
+  public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
   }
 
-  public ELEVATOR.SETPOINT getElevatorState() {
+  public ELEVATOR.SETPOINT getSetpointState() {
     return desiredHeightState;
   }
 
@@ -276,7 +277,7 @@ public class Elevator extends SubsystemBase {
    * Coast: Motor moving without power
    * Brake: Motor is kept in place
    */
-  public void setElevatorNeutralMode(NeutralMode mode) {
+  public void setNeutralMode(NeutralMode mode) {
     elevatorMotors[0].setNeutralMode(mode);
     elevatorMotors[1].setNeutralMode(mode);
   }
@@ -302,27 +303,28 @@ public class Elevator extends SubsystemBase {
   }
 
   // Update elevator height using encoders and bottom limit switch
-  public void updateElevatorHeight() {
+  public void updateHeightMeters() {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
     // if (getElevatorLowerSwitch()) {
     //   setElevatorSensorPosition(0.0);
     // }
-    elevatorHeight = getHeightMeters();
+    heightMeters = getHeightMeters();
   }
 
   public Translation2d getElevatorField2dTranslation() {
     return new Translation2d(
-        getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians()), 0);
+        -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
+            + centerOffset,
+        0);
   }
 
   private void initShuffleboard() {
     if (RobotBase.isSimulation()) {
-      SmartDashboard.putData("Elevator Command", this);
-      SmartDashboard.putData("Elevator", mech2d);
+      SmartDashboard.putData("Elevator Sim", mech2d);
     }
-    SmartDashboard.putData(this);
+    SmartDashboard.putData("Elevator Subsystem", this);
 
     var elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
@@ -368,7 +370,7 @@ public class Elevator extends SubsystemBase {
     kHeightPub.set(getHeightMeters());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
-    kEncoderCountsPub.set(getElevatorEncoderCounts());
+    kEncoderCountsPub.set(getEncoderCounts());
     kDesiredStatePub.set(desiredHeightState.name());
     kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
@@ -398,9 +400,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void updateLog() {
-    // elevatorCurrentEntry.append(getElevatorMotorVoltage());
-    elevatorSetpointEntry.append(m_desiredPositionMeters);
-    elevatorPositionEntry.append(elevatorHeight);
+    outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
+    setpointMetersEntry.append(m_desiredPositionMeters);
+    positionMetersEntry.append(heightMeters);
   }
 
   @Override
@@ -442,7 +444,7 @@ public class Elevator extends SubsystemBase {
     updateLog();
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
-    updateElevatorHeight();
+    updateHeightMeters();
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:

@@ -31,8 +31,8 @@ public class FieldSim extends SubsystemBase {
 
   private final Field2d m_field2d = new Field2d();
 
-  private static Pose2d robotPose;
-  private static Pose2d elevatorPose;
+  private Pose2d robotPose;
+  private Pose2d intakePose;
 
   /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
     - Cones and cubes
@@ -40,7 +40,7 @@ public class FieldSim extends SubsystemBase {
     - Low, mid and high positions
     - And coopertition grids
   */
-  private static ArrayList<Pose2d> gridNodes = new ArrayList<>();
+  private ArrayList<Pose2d> gridNodes = new ArrayList<>();
 
   private ArrayList<Pose2d> coneNodes = new ArrayList<>();
   private ArrayList<Pose2d> cubeNodes = new ArrayList<>();
@@ -189,7 +189,7 @@ public class FieldSim extends SubsystemBase {
         .getObject("fLocalizerPose")
         .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
 
-    elevatorPose =
+    intakePose =
         m_swerveDrive
             .getPoseMeters()
             .transformBy(
@@ -198,7 +198,7 @@ public class FieldSim extends SubsystemBase {
                         .getElevatorField2dTranslation()
                         .plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
-    m_field2d.getObject("Wrist Scoring Pose").setPose(elevatorPose);
+    m_field2d.getObject("Intake Pose").setPose(intakePose);
 
     m_field2d.getObject("Grid Node").setPoses(gridNodes);
 

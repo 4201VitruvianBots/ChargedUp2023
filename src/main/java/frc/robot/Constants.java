@@ -73,6 +73,7 @@ public final class Constants {
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(0.5625);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
+    public static final double centerOffset = Units.inchesToMeters(10);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
@@ -102,7 +103,7 @@ public final class Constants {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
-      SCORE_LOW_CONE(Units.inchesToMeters(5.32)),
+      SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(13.62)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
@@ -150,12 +151,15 @@ public final class Constants {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+    public static final int leftConeSensorId = 0;
+    public static final int rightConeSensorId = 1;
+    public static final int coneSensorId = 2;
 
-    // TODO find values
-    public static final int leftConeSensor = 1;
-    public static final int rightConeSensor = 2;
-    public static final int leftCubeSensor = 1;
-    public static final int rightCubeSensor = 2;
+    public enum HELD_GAMEPIECE {
+      NONE,
+      CUBE,
+      CONE
+    }
   }
 
   public static final class LED {}
@@ -309,9 +313,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(180.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(138.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(138.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -337,9 +341,11 @@ public final class Constants {
       EXTENDED_MIN(HIGH_MIN.get()),
       EXTENDED_MAX(ABSOLUTE_MAX.get()),
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
-      HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
       HORIZONTAL_LENGTH_0_CONE(Units.inchesToMeters(19.5)),
+      HORIZONTAL_LENGTH_90_CUBE(Units.inchesToMeters(-4.0)),
+      HORIZONTAL_LENGTH_90_CONE(Units.inchesToMeters(-9.0)),
       HORIZONTAL_LENGTH_140_CUBE(Units.inchesToMeters(-17.0)),
       HORIZONTAL_LENGTH_140_CONE(Units.inchesToMeters(-25.0)),
       HORIZONTAL_LENGTH_180_CUBE(Units.inchesToMeters(-22.0)),

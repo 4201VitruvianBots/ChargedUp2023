@@ -164,7 +164,6 @@ public class LED extends SubsystemBase {
 
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
-      //      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount);
       m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
     } else {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null

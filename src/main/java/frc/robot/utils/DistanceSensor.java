@@ -129,22 +129,21 @@ public class DistanceSensor {
 
     switch (intakeState) {
       case CONE:
-        leftSensorId = Constants.INTAKE.leftConeSensor;
-        rightSensorId = Constants.INTAKE.rightConeSensor;
+        leftSensorId = Constants.INTAKE.leftConeSensorId;
+        rightSensorId = Constants.INTAKE.rightConeSensorId;
         break;
       case CUBE:
-        leftSensorId = Constants.INTAKE.leftCubeSensor;
-        rightSensorId = Constants.INTAKE.rightCubeSensor;
+        leftSensorId = Constants.INTAKE.coneSensorId;
+        rightSensorId = Constants.INTAKE.coneSensorId;
         break;
       case INTAKING:
-        return 0;
       default:
       case NONE:
         return 0;
     }
 
-    double leftSensorValue = getSensorValue(leftSensorId) / 1000;
-    double rightSensorValue = getSensorValue(rightSensorId) / 1000;
+    double leftSensorValue = getSensorValue(leftSensorId) / 1000.0;
+    double rightSensorValue = getSensorValue(rightSensorId) / 1000.0;
 
     double distanceMeters =
         leftSensorValue
