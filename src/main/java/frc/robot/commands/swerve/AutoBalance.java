@@ -52,20 +52,30 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if((m_swerveDrive.getPitchDegrees() + 2.460938) > 1.0) {
+      
     double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
     //TODO; set a way to initiallze pitch to 0
-    if((m_swerveDrive.getPitchDegrees() + 2.460938) < -1 && (m_swerveDrive.getPitchDegrees() + 2.460938) > 1) {
+    
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
       }
-      else {
-        isFinished();
+      
+      else {    
+        states =
+        new SwerveModuleState[] {
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+        };
+    m_swerveDrive.setSwerveModuleStates(states, false);
       }
   }
 
@@ -74,10 +84,10 @@ public class AutoBalance extends CommandBase {
   public void end(boolean interrupted) {
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(90)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
   }
