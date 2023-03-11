@@ -47,11 +47,12 @@ public class Wrist extends SubsystemBase {
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private final TrapezoidProfile.Constraints m_slowConstraints =
+  private final TrapezoidProfile.Constraints m_slowTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
   private final TrapezoidProfile.Constraints m_fastConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
-  private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
+  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
+      m_slowTrapezoidalConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -270,11 +271,11 @@ public class Wrist extends SubsystemBase {
   public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
     switch (speed) {
       case FAST:
-        m_currentConstraints = m_fastConstraints;
+        m_currentTrapezoidalConstraints = m_fastTrapezoidalConstraints;
         break;
       default:
       case SLOW:
-        m_currentConstraints = m_slowConstraints;
+        m_currentTrapezoidalConstraints = m_slowTrapezoidalConstraints;
         break;
     }
   }
