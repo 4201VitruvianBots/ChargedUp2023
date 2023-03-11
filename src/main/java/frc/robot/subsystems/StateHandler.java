@@ -410,7 +410,7 @@ public class StateHandler extends SubsystemBase {
       default:
         // Undefined behavior, put a breakpoint here when debugging to check logic
         System.out.println("This should never be reached");
-        return;
+        break;
     }
   }
 
