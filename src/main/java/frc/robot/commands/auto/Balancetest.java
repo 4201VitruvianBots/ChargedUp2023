@@ -29,7 +29,7 @@ public class Balancetest extends SequentialCommandGroup {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(3), Units.feetToMeters(3)));
+            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(

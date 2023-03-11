@@ -45,10 +45,9 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "wait1",
           "SetWristIntaking",
-          "SetElevatorIntaking",
-          "RunIntakeCone"
+          "RunIntakeCone",
+          "SetElevatorIntaking"
         ],
         "executionBehavior": "parallelDeadline",
         "waitBehavior": "none",
@@ -58,11 +57,11 @@
     {
       "anchorPoint": {
         "x": 3.722574869743707,
-        "y": 3.4228778434355016
+        "y": 3.1
       },
       "prevControl": {
         "x": 5.9875530877755825,
-        "y": 3.422877843435502
+        "y": 3.1000000000000005
       },
       "nextControl": null,
       "holonomicAngle": 0,

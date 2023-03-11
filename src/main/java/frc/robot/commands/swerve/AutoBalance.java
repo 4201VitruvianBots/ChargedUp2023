@@ -52,7 +52,9 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double output = outputCalculator.calculate(-m_swerveDrive.getPitchDegrees());
+    double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
+    //TODO; set a way to initiallze pitch to 0
+    if((m_swerveDrive.getPitchDegrees() + 2.460938) < -1 && (m_swerveDrive.getPitchDegrees() + 2.460938) > 1) {
     states =
         new SwerveModuleState[] {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
@@ -61,6 +63,10 @@ public class AutoBalance extends CommandBase {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
+      }
+      else {
+        isFinished();
+      }
   }
 
   // Called once the command ends or is interrupted.

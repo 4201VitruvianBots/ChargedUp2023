@@ -403,7 +403,7 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("wait1", new WaitCommand(1.5));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
@@ -497,7 +497,7 @@ public class RobotContainer {
     m_autoChooser.addOption(
         "BlueOnePiece",
         new OnePiece(
-            "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision));
+            "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_rotationInput, m_rotationInput, m_rotationInput, m_vision, m_elevator));
 
     m_autoChooser.addOption(
         "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
