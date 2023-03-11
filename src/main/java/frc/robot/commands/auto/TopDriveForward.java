@@ -22,7 +22,14 @@ import frc.robot.utils.TrajectoryUtils;
 
 public class TopDriveForward extends SequentialCommandGroup {
   public TopDriveForward(
-      String pathName, SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim, Wrist wrist, Elevator elevator, Intake intake, Vision vision) {
+      String pathName,
+      SwerveAutoBuilder autoBuilder,
+      SwerveDrive swerveDrive,
+      FieldSim fieldSim,
+      Wrist wrist,
+      Elevator elevator,
+      Intake intake,
+      Vision vision) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
@@ -34,21 +41,19 @@ public class TopDriveForward extends SequentialCommandGroup {
         // fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectory),
         new ParallelCommandGroup(
-         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-          // new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-          // new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-          new AutoRunIntakeCone(intake, -0.7))
-      .withTimeout(1),
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                // new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+                // new AutoSetElevatorDesiredSetpoint(elevator,
+                // ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+                new AutoRunIntakeCone(intake, -0.7, vision, swerveDrive))
+            .withTimeout(1),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
-
-          new ParallelCommandGroup(
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-          new AutoRunIntakeCone(intake, 0.7))
-      .withTimeout(1)
-
-      );
+        new ParallelCommandGroup(
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+                new AutoRunIntakeCone(intake, 0.7, vision, swerveDrive))
+            .withTimeout(1));
   }
 }

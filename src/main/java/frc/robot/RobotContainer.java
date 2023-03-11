@@ -513,11 +513,27 @@ public class RobotContainer {
 
     m_autoChooser.setDefaultOption(
         "BlueTopDriveForward",
-        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_intake, m_vision));
+        new TopDriveForward(
+            "BlueTopDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_elevator,
+            m_intake,
+            m_vision));
 
     m_autoChooser.addOption(
         "RedTopDriveForward",
-        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_intake, m_vision));
+        new TopDriveForward(
+            "RedTopDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_elevator,
+            m_intake,
+            m_vision));
 
     m_autoChooser.addOption(
         "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));

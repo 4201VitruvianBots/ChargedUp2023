@@ -49,7 +49,7 @@ public class Wrist extends SubsystemBase {
 
   private final TrapezoidProfile.Constraints m_slowTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
-  private final TrapezoidProfile.Constraints m_fastConstraints =
+  private final TrapezoidProfile.Constraints m_fastTrapezoidalConstraints =
       new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
   private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
       m_slowTrapezoidalConstraints;
@@ -332,8 +332,8 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
-    currentTrapezoidAcceleration.set(m_currentConstraints.maxAcceleration);
-    currentTrapezoidVelocity.set(m_currentConstraints.maxVelocity);
+    currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
+    currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
     currentCommandStatePub.set(getControlState().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
@@ -428,7 +428,7 @@ public class Wrist extends SubsystemBase {
       }
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
         var currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
