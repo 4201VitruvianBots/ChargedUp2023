@@ -70,7 +70,6 @@ public class Elevator extends SubsystemBase {
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
 
-
   private static double elevatorHeight =
       0; // the amount of meters the motor has gone up from the initial stowed position
 

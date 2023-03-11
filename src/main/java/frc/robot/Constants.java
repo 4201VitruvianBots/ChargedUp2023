@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.ModuleMap;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 /**
@@ -426,7 +424,7 @@ public final class Constants {
         hex[i] = String.format("%02X", networkInterfaces[i]);
       }
       mac = String.join(":", hex);
-    } catch (SocketException | UnknownHostException e) {
+    } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

@@ -227,26 +227,32 @@ public class StateHandler extends SubsystemBase {
   public void zoneAdvancement() {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
     // zones, otherwise don't set a transition limit
-    if(m_currentZone.getZone() != m_desiredZone.getZone()) {
-      if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
-        if (m_desiredZone.getZone() > m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.LOW_TO_MID;
-      } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.MID_ZONE.getZone()) {
-        if (m_desiredZone.getZone() > m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.MID_TO_HIGH;
-        if (m_desiredZone.getZone() < m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.MID_TO_LOW;
-      } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.HIGH_ZONE.getZone()) {
-        if (m_desiredZone.getZone() > m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.HIGH_TO_EXTENDED;
-        if (m_desiredZone.getZone() < m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.HIGH_TO_MID;
-      } else if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.EXTENDED_ZONE.getZone()) {
-        if (m_desiredZone.getZone() < m_currentZone.getZone())
-          m_nextZone = ZONE_TRANSITIONS.EXTENDED_TO_HIGH;
-      } else {
-        // Undefined behavior, put a breakpoint here when debugging to check logic
-        System.out.println("This should never be reached");
+    if (m_currentZone.getZone() != m_desiredZone.getZone()) {
+      switch (m_currentZone.getZone()) {
+        case 1: // LOW
+          if (m_desiredZone.getZone() > m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.LOW_TO_MID;
+          break;
+        case 2: // MID
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.MID_TO_LOW;
+          else if (m_desiredZone.getZone() > m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.MID_TO_HIGH;
+          break;
+        case 3: // HIGH
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.HIGH_TO_MID;
+          else if (m_desiredZone.getZone() > m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.HIGH_TO_EXTENDED;
+          break;
+        case 4: // EXTENDED
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
+            m_nextZone = ZONE_TRANSITIONS.EXTENDED_TO_HIGH;
+          break;
+        default:
+          // Undefined behavior, put a breakpoint here when debugging to check logic
+          System.out.println("This should never be reached");
+          break;
       }
     } else m_nextZone = ZONE_TRANSITIONS.NONE;
 
@@ -255,76 +261,52 @@ public class StateHandler extends SubsystemBase {
     switch (m_nextZone) {
       case LOW_TO_MID:
         if (ELEVATOR.THRESHOLD.MID_MIN.get() < m_elevator.getHeightMeters()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.MID_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.MID_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.LOW_MAX.get());
+          break;
         }
-        break;
       case MID_TO_LOW:
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.LOW_MAX.get()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.LOW_MIN.get(), ELEVATOR.THRESHOLD.MID_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.LOW_MAX.get(), ELEVATOR.THRESHOLD.MID_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.LOW_MIN.get(), WRIST.THRESHOLD.MID_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.LOW_MAX.get(), WRIST.THRESHOLD.MID_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.MID_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.MID_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.LOW_MAX.get());
+          break;
         }
-        break;
       case MID_TO_HIGH:
         if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < m_elevator.getHeightMeters()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.MID_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.HIGH_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.HIGH_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
+          break;
         }
-        break;
       case HIGH_TO_MID:
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.MID_MAX.get()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.MID_MIN.get(), ELEVATOR.THRESHOLD.HIGH_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.MID_MAX.get(), ELEVATOR.THRESHOLD.HIGH_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.MID_MIN.get(), WRIST.THRESHOLD.HIGH_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.MID_MAX.get(), WRIST.THRESHOLD.HIGH_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.MID_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.HIGH_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.HIGH_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
+          break;
         }
-        break;
       case HIGH_TO_EXTENDED:
         if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < m_elevator.getHeightMeters()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          break;
         }
-        break;
       case EXTENDED_TO_HIGH:
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
-          m_elevator.setLowerLimitMeters(
-              Math.max(ELEVATOR.THRESHOLD.HIGH_MIN.get(), ELEVATOR.THRESHOLD.EXTENDED_MIN.get()));
-          m_elevator.setUpperLimitMeters(
-              Math.min(ELEVATOR.THRESHOLD.HIGH_MAX.get(), ELEVATOR.THRESHOLD.EXTENDED_MAX.get()));
-          m_wrist.setLowerLimit(
-              Math.max(WRIST.THRESHOLD.HIGH_MIN.get(), WRIST.THRESHOLD.EXTENDED_MIN.get()));
-          m_wrist.setUpperLimit(
-              Math.min(WRIST.THRESHOLD.HIGH_MAX.get(), WRIST.THRESHOLD.EXTENDED_MAX.get()));
+          m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
+          m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
+          m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          break;
         }
-        break;
       default:
       case NONE:
         switch (m_currentZone.getZone()) {
