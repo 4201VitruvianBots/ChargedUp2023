@@ -41,6 +41,7 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
+import java.util.function.DoubleSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -62,6 +63,9 @@ public class RobotContainer {
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
+  DoubleSupplier m_throttleInput;
+  DoubleSupplier m_strafeInput;
+  DoubleSupplier m_rotationInput;
 
   private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
@@ -477,7 +481,7 @@ public class RobotContainer {
 
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
-    m_autoChooser.addOption("Do Nothing", new WaitCommand(0));
+    m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
@@ -547,6 +551,18 @@ public class RobotContainer {
 
     m_autoChooser.addOption(
         "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
+
+    m_autoChooser.addOption(
+        "Balancetest",
+        new Balancetest(
+            "BalanceTest",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_rotationInput,
+            m_rotationInput,
+            m_rotationInput,
+            m_fieldSim,
+            m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }
