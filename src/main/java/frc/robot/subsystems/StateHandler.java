@@ -452,8 +452,8 @@ public class StateHandler extends SubsystemBase {
 
   public void switchTargetNode(boolean left, boolean sameTypeOnly) {
     ArrayList<Pose2d> possibleNodes =
-        m_FieldSim.getPossibleNodes(currentScoringState, currentMainState);
-    targetNode = m_FieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
+        m_fieldSim.getPossibleNodes(scoringState, m_currentZone);
+    targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
   }
 
   @Override
@@ -514,7 +514,7 @@ public class StateHandler extends SubsystemBase {
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+          m_fieldSim.getTargetNode(scoringState, m_currentZone),
           m_wrist.getHorizontalTranslation().getX(),
           scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());

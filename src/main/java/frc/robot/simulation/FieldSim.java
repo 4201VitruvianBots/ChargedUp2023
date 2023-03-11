@@ -14,9 +14,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.StateHandler.INTAKING_STATES;
+import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -216,8 +219,7 @@ public class FieldSim extends SubsystemBase {
    * 3 - Node is on the same level as our elevator
    * 4 - Node is closest to our robot
    */
-  public ArrayList<Pose2d> getPossibleNodes(
-      StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
+  public ArrayList<Pose2d> getPossibleNodes(SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
     ArrayList<Pose2d> possibleNodes = gridNodes;
 
     // If we are closer to the opposite alliance, prioritize scoring in their coopertition grid
@@ -226,10 +228,10 @@ public class FieldSim extends SubsystemBase {
     nearestNodes.add(robotPose.nearest(blueNodes));
     Pose2d closestAllianceNode = robotPose.nearest(nearestNodes);
 
-    if (redNodes.contains(closestAllianceNode) && DriverStation.getAlliance() == Alliance.Blue) {
+    if (redNodes.contains(closestAllianceNode) && m_controls.getAllianceColor() == Alliance.Blue) {
       possibleNodes.retainAll(coopertitionNodes);
     } else if (blueNodes.contains(closestAllianceNode)
-        && DriverStation.getAlliance() == Alliance.Red) {
+        && m_controls.getAllianceColor() == Alliance.Red) {
       possibleNodes.retainAll(coopertitionNodes);
     } else {
       if (m_controls.getAllianceColor() == Alliance.Red) {
@@ -239,18 +241,17 @@ public class FieldSim extends SubsystemBase {
       }
     }
 
-    if (intakeState == StateHandler.INTAKING_STATES.CONE) {
+    if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CONE || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE) {
       possibleNodes.retainAll(coneNodes);
-    } else if (intakeState == StateHandler.INTAKING_STATES.CUBE) {
+    } else if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE || mainState == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (mainState == Constants.SCORING_STATE.SMART_LOW
-        || mainState == Constants.SCORING_STATE.SMART_LOW_REVERSE) {
+    if (scoringState == Constants.SCORING_STATE.SMART_LOW) {
       possibleNodes.retainAll(lowNodes);
-    } else if (mainState == Constants.SCORING_STATE.SMART_MEDIUM) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (mainState == Constants.SCORING_STATE.SMART_HIGH) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
 
@@ -258,8 +259,8 @@ public class FieldSim extends SubsystemBase {
   }
 
   public Pose2d getTargetNode(
-      StateHandler.intakingStates intakeState, StateHandler.mainRobotStates mainState) {
-    ArrayList<Pose2d> possibleNodes = getPossibleNodes(intakeState, mainState);
+      Constants.SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState) {
+    ArrayList<Pose2d> possibleNodes = getPossibleNodes(scoringState, mainState);
 
     // Only works on WPILIB version 2023.3.2 and above
     if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
