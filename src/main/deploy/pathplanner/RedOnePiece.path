@@ -2,12 +2,12 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.78,
+        "x": 1.8,
         "y": 4.95
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6606137880372804,
+        "x": 1.7653691713746102,
         "y": 4.95
       },
       "holonomicAngle": 0.0,
@@ -15,6 +15,31 @@
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.78,
+        "y": 4.95
+      },
+      "prevControl": {
+        "x": 1.7656868680574327,
+        "y": 4.95
+      },
+      "nextControl": {
+        "x": 1.7656868680574327,
+        "y": 4.95
+      },
+      "holonomicAngle": 0,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": true,
       "stopEvent": {
         "names": [
           "SetWristStowed",
@@ -27,15 +52,15 @@
     },
     {
       "anchorPoint": {
-        "x": 6.89,
+        "x": 6.829999999999999,
         "y": 4.580717732864038
       },
       "prevControl": {
-        "x": 6.313797388728128,
+        "x": 6.2537973887281275,
         "y": 4.9211995782823825
       },
       "nextControl": {
-        "x": 7.193304936407684,
+        "x": 7.133304936407684,
         "y": 4.401492886512455
       },
       "holonomicAngle": 0.0,
@@ -56,11 +81,11 @@
     },
     {
       "anchorPoint": {
-        "x": 3.7,
+        "x": 3.722574869743707,
         "y": 3.1
       },
       "prevControl": {
-        "x": 5.9649782180318764,
+        "x": 5.9875530877755825,
         "y": 3.1000000000000005
       },
       "nextControl": null,
@@ -77,14 +102,5 @@
       }
     }
   ],
-  "markers": [
-    {
-      "position": 1.1,
-      "names": [
-        "SetWristStowed",
-        "SetElevatorStowed",
-        "IntakeHoldCone"
-      ]
-    }
-  ]
+  "markers": []
 }
