@@ -2,23 +2,21 @@ package frc.robot.simulation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.*;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
 
-public class FieldSimTest {
-    protected final static DataLog m_log = new DataLog();
-    protected final static SwerveDrive m_swerveDrive = new SwerveDrive();
-    protected final static Elevator m_elevator = new Elevator();
-    protected final static Intake m_intake = new Intake();
-    protected final static Wrist m_wrist = new Wrist(m_intake);
-    protected final static Controls m_controls = new Controls();
-    protected final static Vision m_vision = new Vision(m_swerveDrive, m_log,m_controls, m_intake);
+import static utils.TestUtils.getPrivateObject;
 
-    protected final static FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
+public class FieldSimTest {
+    protected RobotContainer m_robotContainer = new RobotContainer();
+    protected SwerveDrive m_swerveDrive = m_robotContainer.getSwerveDrive();
+    protected FieldSim m_fieldSim = m_robotContainer.getFieldSim();
 
     @Test
     public void FieldSimTest() {

@@ -108,8 +108,6 @@ public class RobotContainer {
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
-
-    m_fieldSim.initSim();
   }
 
   /**
@@ -473,6 +471,10 @@ public class RobotContainer {
             m_swerveDrive);
   }
 
+  public SwerveAutoBuilder getAutoBuilder() {
+    return m_autoBuilder;
+  }
+
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.addOption("Do Nothing", new WaitCommand(0));
@@ -554,8 +556,32 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
+  public SwerveDrive getSwerveDrive() {
+    return m_swerveDrive;
+  }
+
+  public Elevator getElevator() {
+    return m_elevator;
+  }
+
   public Wrist getWrist() {
     return m_wrist;
+  }
+
+  public Intake getIntake() {
+    return m_intake;
+  }
+
+  public Vision getVision() {
+    return m_vision;
+  }
+
+  public Controls getControls() {
+    return m_controls;
+  }
+
+  public FieldSim getFieldSim() {
+    return m_fieldSim;
   }
 
   public void simulationPeriodic() {

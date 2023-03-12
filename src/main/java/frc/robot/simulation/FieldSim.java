@@ -69,7 +69,7 @@ public class FieldSim extends SubsystemBase {
 
   private DriverStation.Alliance m_currentAlliance = Alliance.Red;
   SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
-  private final boolean testScoringState = true;
+  private final boolean testScoringState = false;
 
   public FieldSim(
       SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
@@ -92,6 +92,7 @@ public class FieldSim extends SubsystemBase {
             SCORING_STATE.values()[i].toString(), SCORING_STATE.values()[i]);
       }
       SmartDashboard.putData("Test Scoring State", scoringStateChooser);
+      testScoringState = true;
     }
   }
 
@@ -244,9 +245,9 @@ public class FieldSim extends SubsystemBase {
    * 4 - Node is closest to our robot
    */
   public void updateValidNodes(SCORING_STATE scoringState) {
-//    if (RobotBase.isSimulation() && testScoringState) {
-//      scoringState = scoringStateChooser.getSelected();
-//    }
+    if (RobotBase.isSimulation() && testScoringState) {
+      scoringState = scoringStateChooser.getSelected();
+    }
 
     ArrayList<Translation2d> filteredNodes;
     boolean filterRed;

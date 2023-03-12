@@ -2,6 +2,7 @@ package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -17,7 +18,10 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
+import java.util.List;
+
 public class OnePiece extends SequentialCommandGroup {
+  private List<PathPlannerTrajectory> m_trajectory;
   public OnePiece(
       String pathName,
       SwerveAutoBuilder autoBuilder,
@@ -27,11 +31,11 @@ public class OnePiece extends SequentialCommandGroup {
       Intake intake,
       Vision vision) {
 
-    var trajectory =
+    m_trajectory =
         TrajectoryUtils.readTrajectory(
             pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
-    var autoPath = autoBuilder.fullAuto(trajectory);
+    var autoPath = autoBuilder.fullAuto(m_trajectory);
 
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
@@ -41,9 +45,13 @@ public class OnePiece extends SequentialCommandGroup {
                 new AutoRunIntakeCone(intake, 0.8, vision, swerveDrive))
             .withTimeout(1),
         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-        new PlotAutoTrajectory(fieldSim, pathName, trajectory),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public List<PathPlannerTrajectory> getTrajectory() {
+    return m_trajectory;
   }
 }
