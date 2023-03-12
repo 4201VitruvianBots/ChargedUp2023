@@ -263,11 +263,15 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(cubeNodes);
     }
 
-    if (scoringState == Constants.SCORING_STATE.SMART_LOW) {
+    if (scoringState == Constants.SCORING_STATE.SMART_LOW
+      || scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
+      || scoringState == Constants.SCORING_STATE.SETPOINT_LOW
+      || scoringState == Constants.SCORING_STATE.SETPOINT_LOW_INTAKE
+    ) {
       possibleNodes.retainAll(lowNodes);
-    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM || scoringState == Constants.SCORING_STATE.SETPOINT_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH || scoringState == Constants.SCORING_STATE.SETPOINT_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
 
