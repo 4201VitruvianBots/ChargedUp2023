@@ -29,6 +29,7 @@ import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -80,6 +81,7 @@ public class RobotContainer {
 
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
+  
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -459,6 +461,7 @@ public class RobotContainer {
         "SetElevatorLowReverseCubeNode",
         new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
+    
 
     m_autoBuilder =
         new SwerveAutoBuilder(
@@ -499,6 +502,16 @@ public class RobotContainer {
         new OnePiece(
             "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_rotationInput, m_rotationInput, m_rotationInput, m_vision, m_elevator));
 
+
+            m_autoChooser.addOption(
+                "RedOnePiece",
+                new OnePiece(
+                    "RedOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_rotationInput, m_rotationInput, m_rotationInput, m_vision, m_elevator));
+
+                     m_autoChooser.addOption(
+                "AutoLockTest",
+                new AutoLockTest( m_autoBuilder, m_swerveDrive, m_rotationInput, m_rotationInput, m_rotationInput, m_fieldSim, m_wrist));
+         
     m_autoChooser.addOption(
         "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 

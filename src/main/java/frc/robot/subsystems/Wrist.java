@@ -400,15 +400,6 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     updateSmartDashboard();
     updateLog();
-    if (getPositionDegrees() < 45.0) {
-      wristMotor.config_kP(0, WRIST.kP);
-      wristMotor.config_kI(0, WRIST.kI);
-      wristMotor.config_kD(0, WRIST.kD);
-    } else {
-      wristMotor.config_kP(0, WRIST.kP);
-      wristMotor.config_kI(0, 0.0);
-      wristMotor.config_kD(0, WRIST.kD);
-    }
     // This method will be called once per scheduler run
     if (isClosedLoop) {
       switch (m_controlState) {

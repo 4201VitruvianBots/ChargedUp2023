@@ -40,7 +40,7 @@ public class OnePiece extends SequentialCommandGroup {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
 
@@ -49,16 +49,17 @@ public class OnePiece extends SequentialCommandGroup {
         // fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectory),
 
-        // new ParallelCommandGroup(
-        //         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-        //         new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())),
+        new ParallelCommandGroup(
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+                new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
 
-        //     new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
-
+            new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
         autoPath,
-
+        
         new AutoBalance(swerveDrive, throttleInput, strafeInput, rotationInput),
-
+        
+       
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
