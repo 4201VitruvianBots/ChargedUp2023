@@ -29,7 +29,7 @@ public final class SimConstants {
   public static final double fieldHeightMeters = Units.feetToMeters(27);
 
   public static final double cubeWidth = Units.inchesToMeters(9.5);
-  
+
   public static final Pose2d startPositionMeters = new Pose2d();
   private static Controls m_controls;
 

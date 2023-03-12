@@ -5,7 +5,6 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -137,17 +136,19 @@ public class DistanceSensor {
 
         double leftSensorValue = getSensorValue(leftSensorId) / 1000.0;
         double rightSensorValue = getSensorValue(rightSensorId) / 1000.0;
-    
+
         distanceMeters =
             leftSensorValue
-                + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+                + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2)
+                - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
         int sensorId = Constants.INTAKE.cubeSensorId;
 
         double sensorValue = getSensorValue(sensorId) / 1000.0;
 
-        distanceMeters = sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+        distanceMeters =
+            sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       default:
       case NONE:
@@ -160,10 +161,9 @@ public class DistanceSensor {
   // Returns a pose where the center of the gamepiece should be
   public Pose2d getGamepiecePose(INTAKING_STATES intakeState, Pose2d intakePose) {
     return new Pose2d(
-      intakePose.getX(), 
-      intakePose.getY() + getGamepieceDistanceInches(intakeState),
-      intakePose.getRotation()
-    );
+        intakePose.getX(),
+        intakePose.getY() + getGamepieceDistanceInches(intakeState),
+        intakePose.getRotation());
   }
 
   public double getConeDistanceInches() {
