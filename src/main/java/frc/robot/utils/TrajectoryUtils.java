@@ -7,11 +7,19 @@ package frc.robot.utils;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.simulation.SimConstants;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TrajectoryUtils {
   public static List<PathPlannerTrajectory> readTrajectory(
@@ -41,14 +49,7 @@ public class TrajectoryUtils {
 
       var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
 
-      ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-      for (var trajectory : pathGroup) {
-        ppTrajectories.add(
-            PathPlannerTrajectory.transformTrajectoryForAlliance(
-                trajectory, DriverStation.Alliance.Red));
-        return ppTrajectories;
-      }
-      return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+      return flipTrajectory(pathGroup);
     } else {
       try {
         var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
@@ -59,5 +60,29 @@ public class TrajectoryUtils {
         return new ArrayList<>();
       }
     }
+  }
+
+  public static List<PathPlannerTrajectory> flipTrajectory(List<PathPlannerTrajectory> trajectory) {
+    return trajectory.stream()
+        .map(TrajectoryUtils::transformTrajectoryForAlliance)
+        .collect(Collectors.toList());
+  }
+
+  public static PathPlannerTrajectory transformTrajectoryForAlliance(
+      PathPlannerTrajectory trajectory) {
+    List<Trajectory.State> transformedStates = new ArrayList<>();
+
+    for (Trajectory.State s : trajectory.getStates()) {
+      PathPlannerTrajectory.PathPlannerState state = (PathPlannerTrajectory.PathPlannerState) s;
+
+      transformedStates.add(VitruvianTrajectory.VitruvianState.transformStateForAlliance(state));
+    }
+
+    return new VitruvianTrajectory(
+        transformedStates,
+        trajectory.getMarkers(),
+        trajectory.getStartStopEvent(),
+        trajectory.getEndStopEvent(),
+        trajectory.fromGUI);
   }
 }

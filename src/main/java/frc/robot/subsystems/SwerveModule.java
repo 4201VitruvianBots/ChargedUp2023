@@ -125,8 +125,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void initModuleHeading() {
-    if(RobotBase.isReal())
-      Timer.delay(0.2);
+    if (RobotBase.isReal()) Timer.delay(0.2);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     resetAngleToAbsolute();

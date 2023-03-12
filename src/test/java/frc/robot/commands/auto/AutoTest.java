@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("WIP")
+//@Disabled("WIP")
 public class AutoTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
