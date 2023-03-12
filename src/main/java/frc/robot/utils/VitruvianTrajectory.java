@@ -5,10 +5,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.simulation.SimConstants;
-import org.apache.commons.lang3.reflect.FieldUtils;
-
-import java.lang.reflect.Field;
 import java.util.List;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 public class VitruvianTrajectory extends PathPlannerTrajectory {
   private final double m_totalTimeSeconds;
@@ -97,10 +95,10 @@ public class VitruvianTrajectory extends PathPlannerTrajectory {
       VitruvianState transformedState = new VitruvianState();
 
       Translation2d transformedTranslation =
-              new Translation2d(
-                      SimConstants.fieldLength - state.poseMeters.getX(), state.poseMeters.getY());
-      Rotation2d transformedHeading = state.poseMeters.getRotation().times(-1);
-      Rotation2d transformedHolonomicRotation = state.holonomicRotation.times(-1);
+          new Translation2d(
+              SimConstants.fieldLength - state.poseMeters.getX(), state.poseMeters.getY());
+      Rotation2d transformedHeading = new Rotation2d(-state.poseMeters.getRotation().getCos(), state.poseMeters.getRotation().getSin());
+      Rotation2d transformedHolonomicRotation = new Rotation2d(-state.holonomicRotation.getCos(), state.holonomicRotation.getSin());
 
       double stateCurveRadius = 0;
       double stateDeltaPos = 0;

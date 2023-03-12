@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
@@ -40,7 +42,10 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
 import frc.robot.utils.LogManager;
+import frc.robot.utils.TrajectoryUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,6 +66,7 @@ public class RobotContainer implements AutoCloseable {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+  private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
 
   private final StateHandler m_stateHandler =
@@ -550,6 +556,30 @@ public class RobotContainer implements AutoCloseable {
         "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    if (RobotBase.isSimulation()) {
+      autoPlotter = new SendableChooser<>();
+      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+      dummy.add(new PathPlannerTrajectory());
+      autoPlotter.setDefaultOption("None", dummy);
+      String[] autos = {
+        "BlueTopTwoCone",
+        "BlueOnePiece",
+        "RedTopTwoCone",
+        "BlueBottomDriveForward",
+        "RedBottomDriveForward",
+        "BlueDriveForward",
+        "RedDriveForward",
+        "BlueTopDriveForward",
+        "RedTopDriveForward"
+      };
+      for (var auto : autos) {
+        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+        autoPlotter.addOption(auto, trajectory);
+      }
+
+      SmartDashboard.putData("Auto Visualizer", autoPlotter);
+    }
   }
 
   public Command getAutonomousCommand() {
@@ -588,6 +618,7 @@ public class RobotContainer implements AutoCloseable {
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
     m_memorylog.simulationPeriodic();
+    m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   public void disabledPeriodic() {

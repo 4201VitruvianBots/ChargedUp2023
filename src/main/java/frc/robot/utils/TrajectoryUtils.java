@@ -7,7 +7,6 @@ package frc.robot.utils;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,20 +14,23 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.simulation.SimConstants;
+import org.apache.commons.lang3.reflect.FieldUtils;
+
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static frc.robot.utils.VitruvianTrajectory.VitruvianState.transformStateForAlliance;
+
 public class TrajectoryUtils {
   public static List<PathPlannerTrajectory> readTrajectory(
-      String fileName, PathConstraints segmentConstraints) {
+          String fileName, PathConstraints segmentConstraints) {
     return readTrajectory(fileName, segmentConstraints, segmentConstraints);
   }
 
   public static List<PathPlannerTrajectory> readTrajectory(
-      String fileName, PathConstraints pathConstraint, PathConstraints... segmentConstraints) {
+          String fileName, PathConstraints pathConstraint, PathConstraints... segmentConstraints) {
 
     if (pathConstraint.maxVelocity == 0 || pathConstraint.maxAcceleration == 0) {
       DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
@@ -43,7 +45,7 @@ public class TrajectoryUtils {
       var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
       if (!file.exists()) {
         DriverStation.reportWarning(
-            "TrajectoryUtils::readTrajectory failed for " + fileName, false);
+                "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
       }
 
@@ -64,25 +66,61 @@ public class TrajectoryUtils {
 
   public static List<PathPlannerTrajectory> flipTrajectory(List<PathPlannerTrajectory> trajectory) {
     return trajectory.stream()
-        .map(TrajectoryUtils::transformTrajectoryForAlliance)
-        .collect(Collectors.toList());
+            .map(TrajectoryUtils::transformTrajectoryForAlliance)
+            .collect(Collectors.toList());
   }
 
   public static PathPlannerTrajectory transformTrajectoryForAlliance(
-      PathPlannerTrajectory trajectory) {
+          PathPlannerTrajectory trajectory) {
     List<Trajectory.State> transformedStates = new ArrayList<>();
 
     for (Trajectory.State s : trajectory.getStates()) {
       PathPlannerTrajectory.PathPlannerState state = (PathPlannerTrajectory.PathPlannerState) s;
 
-      transformedStates.add(VitruvianTrajectory.VitruvianState.transformStateForAlliance(state));
+      transformedStates.add(transformStateForAlliance(state));
     }
 
-    return new VitruvianTrajectory(
-        transformedStates,
-        trajectory.getMarkers(),
-        trajectory.getStartStopEvent(),
-        trajectory.getEndStopEvent(),
-        trajectory.fromGUI);
+    return new PathPlannerTrajectory(
+            transformedStates,
+            trajectory.getMarkers(),
+            trajectory.getStartStopEvent(),
+            trajectory.getEndStopEvent(),
+            trajectory.fromGUI);
   }
+
+//  public static PathPlannerTrajectory.PathPlannerState transformStateForAlliance(
+//          PathPlannerTrajectory.PathPlannerState state) {
+//    // Create a new state so that we don't overwrite the original
+//    PathPlannerTrajectory.PathPlannerState transformedState = new PathPlannerTrajectory.PathPlannerState();
+//    Translation2d transformedTranslation =
+//            new Translation2d(
+//                    SimConstants.fieldLength - state.poseMeters.getX(), state.poseMeters.getY());
+//    Rotation2d transformedHeading = new Rotation2d(-state.poseMeters.getRotation().getCos(), state.poseMeters.getRotation().getSin());
+//    Rotation2d transformedHolonomicRotation = new Rotation2d(-state.holonomicRotation.getCos(), state.holonomicRotation.getSin());
+//
+//    double stateCurveRadius = 0;
+//    double stateDeltaPos = 0;
+//
+//    try {
+//      // This is probably bad
+//      stateCurveRadius = (double) FieldUtils.readField(state, "curveRadius", true);
+//      stateDeltaPos = (double) FieldUtils.readField(state, "deltaPos", true);
+//    } catch (Exception e) {
+//
+//    }
+//    transformedState.timeSeconds = state.timeSeconds;
+//    transformedState.velocityMetersPerSecond = state.velocityMetersPerSecond;
+//    transformedState.accelerationMetersPerSecondSq = state.accelerationMetersPerSecondSq;
+//    transformedState.poseMeters = new Pose2d(transformedTranslation, transformedHeading);
+//    transformedState.angularVelocityRadPerSec = -state.angularVelocityRadPerSec;
+//    transformedState.holonomicRotation = transformedHolonomicRotation;
+//    transformedState.holonomicAngularVelocityRadPerSec = -state.holonomicAngularVelocityRadPerSec;
+////      transformedState.curveRadius = -state.curveRadius;
+////      transformedState.curveRadius = -state.curveRadius;
+//    transformedState.curvatureRadPerMeter = -state.curvatureRadPerMeter;
+////      transformedState.deltaPos = state.deltaPos;
+//    transformedState.deltaPos = stateDeltaPos;
+//
+//    return transformedState;
+//  }
 }
