@@ -5,7 +5,6 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -15,7 +14,6 @@ import frc.robot.Constants;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.StateHandler.INTAKING_STATES;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.DatagramPacket;
@@ -34,9 +32,6 @@ public class DistanceSensor {
   private DatagramSocket socket;
   private String receivedData;
 
-  private final String mainPath = new File("").getAbsolutePath();
-  private final String testPath = mainPath + "/resources/sensorReading.json";
-
   private Random rand = new Random();
 
   // Shuffleboard setup
@@ -44,9 +39,10 @@ public class DistanceSensor {
   public static ShuffleboardTab distanceSensorTab = Shuffleboard.getTab("DistanceSensor");
 
   public GenericEntry rawStringTab = distanceSensorTab.add("Raw String Data", "None").getEntry();
-  public GenericEntry sensorValue1Tab = distanceSensorTab.add("Sensor Value 1", 0).getEntry();
-  public GenericEntry sensorValue2Tab = distanceSensorTab.add("Sensor Value 2", 0).getEntry();
-  public GenericEntry testParserTab = distanceSensorTab.add("Test Value 1", 0).getEntry();
+  public GenericEntry sensorValue1MMTab = distanceSensorTab.add("Sensor Value 1 Millimeters", 0).getEntry();
+  public GenericEntry sensorValue2MMTab = distanceSensorTab.add("Sensor Value 2 Millimeters", 0).getEntry();
+  public GenericEntry sensorValue1InTab = distanceSensorTab.add("Sensor Value 1 Inches", 0).getEntry();
+  public GenericEntry sensorValue2InTab = distanceSensorTab.add("Sensor Value 2 Inches", 0).getEntry();
   public GenericEntry coneInchesTab = distanceSensorTab.add("Cone Distance Inches", 0).getEntry();
   public GenericEntry cubeInchesTab = distanceSensorTab.add("Cube Distance Inches", 0).getEntry();
 
@@ -65,7 +61,10 @@ public class DistanceSensor {
     return receivedData;
   }
 
-  public int getSensorValue(int sensor) {
+  public double getSensorValueMillimeters(int sensor) {
+    // This is a really stupid band-aid solution but I don't have time for anything else
+    if (sensor == 0)
+      sensor = 1;
     try {
       String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
 
@@ -79,7 +78,7 @@ public class DistanceSensor {
       long sensorValueLong = (long) jo.get(sensorName);
 
       // auto-unboxing does not go from Long to int directly, so
-      int sensorValue = (int) (long) sensorValueLong;
+      double sensorValue = (double) (long) sensorValueLong;
 
       return sensorValue;
     } catch (Exception e) {
@@ -89,28 +88,8 @@ public class DistanceSensor {
     }
   }
 
-  public int testParser() {
-    try {
-      String sensorName = "sensor1.mm";
-
-      // parsing file from resources
-      Object obj = new JSONParser().parse(new FileReader(testPath));
-
-      // typecasting obj to JSONObject
-      JSONObject jo = (JSONObject) obj;
-
-      // getting sensor value
-      long sensorValueLong = (long) jo.get(sensorName);
-
-      // auto-unboxing does not go from Long to int directly, so
-      int sensorValue = (int) (long) sensorValueLong;
-
-      return sensorValue;
-    } catch (Exception e) {
-      System.out.println("Boo hoo I can't read the file :_(");
-      e.printStackTrace();
-      return -1;
-    }
+  public double getSensorValueInches(int sensor) {
+    return Units.metersToInches(getSensorValueMillimeters(sensor) / 1000);
   }
 
   public void simulationPeriodic() {
@@ -124,7 +103,7 @@ public class DistanceSensor {
             + "}";
   }
 
-  // Returns the distance in inches from the center of the intake to the center of the game
+  // Returns the distance in inches from the left of the intake to the center of the game
   // piece. Negative if to the left, positive if to the right
   // Works off 3 sensors, 2 for cone and 1 for cube
   public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
@@ -135,17 +114,17 @@ public class DistanceSensor {
         int leftSensorId = Constants.INTAKE.leftConeSensorId;
         int rightSensorId = Constants.INTAKE.rightConeSensorId;
 
-        double leftSensorValue = getSensorValue(leftSensorId) / 1000.0;
-        double rightSensorValue = getSensorValue(rightSensorId) / 1000.0;
+        double leftSensorValue = getSensorValueMillimeters(leftSensorId) / 1000.0;
+        double rightSensorValue = getSensorValueMillimeters(rightSensorId) / 1000.0;
     
         distanceMeters =
             leftSensorValue
-                + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+                + ((Constants.INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
         int sensorId = Constants.INTAKE.cubeSensorId;
 
-        double sensorValue = getSensorValue(sensorId) / 1000.0;
+        double sensorValue = getSensorValueMillimeters(sensorId) / 1000.0;
 
         distanceMeters = sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
@@ -188,8 +167,10 @@ public class DistanceSensor {
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
       rawStringTab.setString(receivedData);
-      sensorValue1Tab.setInteger(getSensorValue(1));
-      sensorValue2Tab.setInteger(getSensorValue(2));
+      sensorValue1MMTab.setDouble(getSensorValueMillimeters(1));
+      sensorValue2MMTab.setDouble(getSensorValueMillimeters(2));
+      sensorValue1InTab.setDouble(getSensorValueInches(1));
+      sensorValue2InTab.setDouble(getSensorValueInches(2));
       coneInchesTab.setDouble(getConeDistanceInches());
       cubeInchesTab.setDouble(getCubeDistanceInches());
     } catch (SocketTimeoutException ex) {
