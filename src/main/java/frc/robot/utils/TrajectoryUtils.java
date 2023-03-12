@@ -46,7 +46,7 @@ public class TrajectoryUtils {
         ppTrajectories.add(
             PathPlannerTrajectory.transformTrajectoryForAlliance(
                 trajectory, DriverStation.Alliance.Red));
-      return ppTrajectories;
+        return ppTrajectories;
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {

@@ -69,7 +69,7 @@ public class FieldSim extends SubsystemBase {
 
   private DriverStation.Alliance m_currentAlliance = Alliance.Red;
   SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
-  private final boolean testScoringState = false;
+  private boolean testScoringState = false;
 
   public FieldSim(
       SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
@@ -104,7 +104,9 @@ public class FieldSim extends SubsystemBase {
     // Split nodes into separate lists to make it easier to filter
     blueHybridNodes = new ArrayList<>(Arrays.asList(Grids.lowTranslations));
     redHybridNodes =
-            blueHybridNodes.stream().map(SimConstants::allianceFlip).collect(Collectors.toCollection(ArrayList::new));
+        blueHybridNodes.stream()
+            .map(SimConstants::allianceFlip)
+            .collect(Collectors.toCollection(ArrayList::new));
 
     for (int i = 0; i < Grids.nodeRowCount; i++) {
       boolean isCube = i == 1 || i == 4 || i == 7;
@@ -225,10 +227,11 @@ public class FieldSim extends SubsystemBase {
                 .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
                 .collect(Collectors.toList()));
 
-//    var testNodes = Arrays.stream(Grids.lowTranslations).map(t -> new Pose2d(t, Rotation2d.fromDegrees(0))).collect(Collectors.toCollection(ArrayList::new));
-//    testNodes.replaceAll(SimConstants::allianceFlip);
-//
-//    m_field2d.getObject("TestNodes").setPoses(testNodes);
+    //    var testNodes = Arrays.stream(Grids.lowTranslations).map(t -> new Pose2d(t,
+    // Rotation2d.fromDegrees(0))).collect(Collectors.toCollection(ArrayList::new));
+    //    testNodes.replaceAll(SimConstants::allianceFlip);
+    //
+    //    m_field2d.getObject("TestNodes").setPoses(testNodes);
 
     if (RobotBase.isSimulation()) {
       m_field2d
@@ -270,15 +273,15 @@ public class FieldSim extends SubsystemBase {
     }
 
     if (scoringState == SCORING_STATE.LOW || scoringState == SCORING_STATE.LOW_REVERSE) {
-      filteredNodes.retainAll(filterRed? redHybridNodes : blueHybridNodes);
+      filteredNodes.retainAll(filterRed ? redHybridNodes : blueHybridNodes);
     } else if (scoringState == SCORING_STATE.MID_CONE) {
-      filteredNodes.retainAll(filterRed? redMidConeNodes : blueMidConeNodes);
+      filteredNodes.retainAll(filterRed ? redMidConeNodes : blueMidConeNodes);
     } else if (scoringState == SCORING_STATE.MID_CUBE) {
-      filteredNodes.retainAll(filterRed? redMidCubeNodes : blueMidCubeNodes);
+      filteredNodes.retainAll(filterRed ? redMidCubeNodes : blueMidCubeNodes);
     } else if (scoringState == SCORING_STATE.HIGH_CONE) {
-      filteredNodes.retainAll(filterRed? redHighConeNodes : blueHighConeNodes);
+      filteredNodes.retainAll(filterRed ? redHighConeNodes : blueHighConeNodes);
     } else if (scoringState == SCORING_STATE.HIGH_CUBE) {
-      filteredNodes.retainAll(filterRed? redHighCubeNodes : blueHighCubeNodes);
+      filteredNodes.retainAll(filterRed ? redHighCubeNodes : blueHighCubeNodes);
     }
 
     // Remove all nodes that are ignored (e.g. scored)
@@ -311,7 +314,7 @@ public class FieldSim extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
+    if (RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
       m_currentAlliance = Controls.getAllianceColor();
     }
     updateRobotPoses();

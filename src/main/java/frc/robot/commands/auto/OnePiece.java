@@ -17,11 +17,11 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
-
 import java.util.List;
 
 public class OnePiece extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
+
   public OnePiece(
       String pathName,
       SwerveAutoBuilder autoBuilder,
