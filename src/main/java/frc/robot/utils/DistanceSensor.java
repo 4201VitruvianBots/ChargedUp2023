@@ -4,12 +4,14 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.StateHandler.INTAKING_STATES;
 import java.io.File;
 import java.io.FileReader;
@@ -113,43 +115,55 @@ public class DistanceSensor {
   public void simulationPeriodic() {
     receivedData =
         "{\"sensor1.mm\":"
-            + Integer.toString(rand.nextInt(8190))
+            + Integer.toString(rand.nextInt(394))
             + ",\"sensor2.mm\":"
-            + Integer.toString(rand.nextInt(8190))
+            + Integer.toString(rand.nextInt(394))
             + ",\"test\":"
             + Integer.toString(rand.nextInt(100))
             + "}";
   }
 
-  // Returns the distance in inches from the left side of the intake to the center of the game
-  // piece.
+  // Returns the distance in inches from the center of the intake to the center of the game
+  // piece. Negative if to the left, positive if to the right
+  // Works off 3 sensors, 2 for cone and 1 for cube
   public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
-    int leftSensorId;
-    int rightSensorId;
+    double distanceMeters;
 
     switch (intakeState) {
       case CONE:
-        leftSensorId = Constants.INTAKE.leftConeSensorId;
-        rightSensorId = Constants.INTAKE.rightConeSensorId;
+        int leftSensorId = Constants.INTAKE.leftConeSensorId;
+        int rightSensorId = Constants.INTAKE.rightConeSensorId;
+
+        double leftSensorValue = getSensorValue(leftSensorId) / 1000.0;
+        double rightSensorValue = getSensorValue(rightSensorId) / 1000.0;
+
+        distanceMeters =
+            leftSensorValue
+                + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2)
+                - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
-        leftSensorId = Constants.INTAKE.coneSensorId;
-        rightSensorId = Constants.INTAKE.coneSensorId;
+        int sensorId = Constants.INTAKE.cubeSensorId;
+
+        double sensorValue = getSensorValue(sensorId) / 1000.0;
+
+        distanceMeters =
+            sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
-      case INTAKING:
       default:
       case NONE:
         return 0;
     }
 
-    double leftSensorValue = getSensorValue(leftSensorId) / 1000.0;
-    double rightSensorValue = getSensorValue(rightSensorId) / 1000.0;
-
-    double distanceMeters =
-        leftSensorValue
-            + ((Constants.INTAKE.innerIntakeWidth - leftSensorValue - rightSensorValue) / 2);
-
     return Units.metersToInches(distanceMeters);
+  }
+
+  // Returns a pose where the center of the gamepiece should be
+  public Pose2d getGamepiecePose(INTAKING_STATES intakeState, Pose2d intakePose) {
+    return new Pose2d(
+        intakePose.getX(),
+        intakePose.getY() + getGamepieceDistanceInches(intakeState),
+        intakePose.getRotation());
   }
 
   public double getConeDistanceInches() {
