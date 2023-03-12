@@ -30,7 +30,6 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.AutoBalance;
-import frc.robot.commands.swerve.AutoLock;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -250,7 +249,6 @@ public class RobotContainer {
     // Will switch our target node on the field sim to the adjacent node on D-pad press
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
-    leftJoystickTriggers[1].whileTrue(new AutoLock(m_swerveDrive, m_rotationInput, m_rotationInput, m_rotationInput)); 
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
@@ -407,7 +405,7 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait1", new WaitCommand(1.5));
+    m_eventMap.put("wait1", new WaitCommand(0.5));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
@@ -480,7 +478,7 @@ public class RobotContainer {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+            true,
             m_swerveDrive);
   }
 
@@ -519,11 +517,11 @@ public class RobotContainer {
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
-        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
 
     m_autoChooser.addOption(
         "RedBottomDriveForward",
-        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 

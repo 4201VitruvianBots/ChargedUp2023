@@ -123,17 +123,17 @@ public class LED extends SubsystemBase {
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
           break;
-        case INTAKING: // Flashing blue
-          setPattern(0, 0, 255, 0, 0, AnimationTypes.Strobe);
+        case INTAKING: // Solid blue
+          setPattern(0, 0, 255, 0, 0, AnimationTypes.Solid);
           break;
         case CONE_BUTTON: // Solid Yellow
-          setPattern(255, 255, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(150, 120, 0, 0, 0, AnimationTypes.Solid);
           break;
         case CUBE_BUTTON: // Solid purple
           setPattern(128, 0, 128, 0, 0, AnimationTypes.Solid);
           break;
         case ELEVATING:
-          setPattern(0, 0, 0, 0, 0, AnimationTypes.ColorFlow);
+          setPattern(0, 0, 255, 0, 0, AnimationTypes.ColorFlow);
           break;
         case CHARGING_STATION:
           setPattern(125, 125, 125, 125, 0, AnimationTypes.Rainbow);
