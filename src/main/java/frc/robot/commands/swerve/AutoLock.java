@@ -40,10 +40,10 @@ public class AutoLock extends CommandBase {
   public void initialize() {
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
