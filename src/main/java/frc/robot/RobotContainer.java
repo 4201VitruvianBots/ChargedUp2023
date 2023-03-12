@@ -36,7 +36,6 @@ import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
 import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
-import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
 import frc.robot.utils.LogManager;
@@ -63,7 +62,6 @@ public class RobotContainer {
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
 
-  private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();

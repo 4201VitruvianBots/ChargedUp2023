@@ -61,7 +61,7 @@ public class SetpointSolver {
         correctedSolution
             .getRotation()
             .plus(
-                scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
+                scoringState == Constants.SCORING_STATE.LOW_REVERSE
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 

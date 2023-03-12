@@ -12,7 +12,7 @@ public class Controls extends SubsystemBase {
   BooleanPublisher allianceBoolean;
 
   private boolean isInit;
-  private DriverStation.Alliance allianceColor = DriverStation.Alliance.Invalid;
+  private static DriverStation.Alliance allianceColor = DriverStation.Alliance.Red;
 
   public Controls() {
     initSmartDashboard();
@@ -24,7 +24,7 @@ public class Controls extends SubsystemBase {
    *
    * @return Returns the current alliance color.
    */
-  public DriverStation.Alliance getAllianceColor() {
+  public static DriverStation.Alliance getAllianceColor() {
     return allianceColor;
   }
 
@@ -33,7 +33,7 @@ public class Controls extends SubsystemBase {
    *
    * @return Returns the current alliance color.
    */
-  public boolean getAllianceColorBoolean() {
+  public static boolean getAllianceColorBoolean() {
     return getAllianceColor() != DriverStation.Alliance.Blue;
   }
 

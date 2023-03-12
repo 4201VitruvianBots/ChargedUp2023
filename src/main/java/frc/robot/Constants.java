@@ -367,14 +367,12 @@ public final class Constants {
   public enum SCORING_STATE {
     STOWED,
     AUTO_BALANCE,
-    SETPOINT_LOW_INTAKE,
-    SETPOINT_LOW,
-    SETPOINT_MEDIUM,
-    SETPOINT_HIGH,
-    SMART_LOW_REVERSE,
-    SMART_LOW,
-    SMART_MEDIUM,
-    SMART_HIGH,
+    LOW_REVERSE,
+    LOW,
+    MID_CONE,
+    MID_CUBE,
+    HIGH_CONE,
+    HIGH_CUBE,
   }
 
   private static void initBeta() {

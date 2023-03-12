@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -73,10 +74,10 @@ public class StateHandler extends SubsystemBase {
     MID_TO_HIGH,
     HIGH_TO_MID,
     HIGH_TO_EXTENDED,
-    EXTENDED_TO_HIGH
+    EXTENDED_TO_HIGH,
   }
 
-  public SCORING_STATE scoringState = SCORING_STATE.STOWED;
+  public SCORING_STATE m_currentScoringState = SCORING_STATE.STOWED;
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
   public SUPERSTRUCTURE_STATE m_currentZone = SUPERSTRUCTURE_STATE.STOWED;
@@ -134,6 +135,10 @@ public class StateHandler extends SubsystemBase {
 
   public ZONE_TRANSITIONS getNextZone() {
     return m_nextZone;
+  }
+
+  public void setCurrentScoringState(SCORING_STATE state) {
+    m_currentScoringState = state;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -229,6 +234,8 @@ public class StateHandler extends SubsystemBase {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
     // zones, otherwise don't set a transition limit
     if (m_currentZone.getZone() != m_desiredZone.getZone()) {
+      // SpecialCases
+
       switch (m_currentZone.getZone()) {
         case 1: // LOW
           if (m_desiredZone.getZone() > m_currentZone.getZone())
@@ -305,7 +312,9 @@ public class StateHandler extends SubsystemBase {
           m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
           m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
           m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
-          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          // Modified to avoid wrist hitting elevator
+          //          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
           break;
         }
       default:
@@ -387,7 +396,9 @@ public class StateHandler extends SubsystemBase {
       case 4: // EXTENDED
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
           // EXTENDED -> HIGH
-          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
+          // Modified to avoid wrist hitting the elevator going down
+          //            if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           }
@@ -450,9 +461,9 @@ public class StateHandler extends SubsystemBase {
     m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
-  public void switchTargetNode(boolean left, boolean sameTypeOnly) {
-    ArrayList<Pose2d> possibleNodes = m_fieldSim.getPossibleNodes(scoringState, m_currentZone);
-    targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
+  public void switchTargetNode(boolean left) {
+    ArrayList<Translation2d> possibleNodes = m_fieldSim.getValidNodes();
+    targetNode = m_fieldSim.getAdjacentNode(targetNode, possibleNodes, left);
   }
 
   @Override
@@ -507,15 +518,16 @@ public class StateHandler extends SubsystemBase {
       case NONE:
         break;
     }
+    m_fieldSim.updateValidNodes(m_currentScoringState);
 
     if (m_smartScoringEnabled) {
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(scoringState, m_currentZone),
+          m_fieldSim.getTargetNode(),
           m_wrist.getHorizontalTranslation().getX(),
-          scoringState);
+          m_currentScoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive

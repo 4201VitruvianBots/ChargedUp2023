@@ -29,11 +29,6 @@ public final class SimConstants {
   public static final double fieldHeightMeters = Units.feetToMeters(27);
 
   public static final Pose2d startPositionMeters = new Pose2d();
-  private static Controls m_controls;
-
-  public SimConstants(Controls controls) {
-    m_controls = controls;
-  }
 
   // Everything above here is our code, everything below is 6328's field constants
 
@@ -269,11 +264,15 @@ public final class SimConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Translation2d allianceFlip(Translation2d translation) {
-    if (m_controls.getAllianceColor() == DriverStation.Alliance.Red) {
+    if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       return new Translation2d(fieldLength - translation.getX(), translation.getY());
     } else {
       return translation;
     }
+  }
+
+  public static Translation2d absoluteFlip(Translation2d translation) {
+    return new Translation2d(fieldLength - translation.getX(), translation.getY());
   }
 
   /**
@@ -282,7 +281,7 @@ public final class SimConstants {
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Pose2d allianceFlip(Pose2d pose) {
-    if (m_controls.getAllianceColor() == DriverStation.Alliance.Red) {
+    if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       return new Pose2d(
           fieldLength - pose.getX(),
           pose.getY(),
