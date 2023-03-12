@@ -106,8 +106,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
 
-    Timer.delay(1);
-    if (RobotBase.isReal()) resetModulesToAbsolute();
+    if (RobotBase.isReal()) {
+      Timer.delay(1);
+      resetModulesToAbsolute();
+    }
     initSmartDashboard();
   }
 

@@ -125,15 +125,16 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void initModuleHeading() {
-    Timer.delay(0.2);
+    if(RobotBase.isReal())
+      Timer.delay(0.2);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
     resetAngleToAbsolute();
 
     // Check if the offset was applied properly. Delay to give it some time to set
-    Timer.delay(0.1);
     // TODO: This doesn't cover all edge cases
     if (RobotBase.isReal()) {
+      Timer.delay(0.1);
       m_initSuccess =
           Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition())
               < 1.0;
