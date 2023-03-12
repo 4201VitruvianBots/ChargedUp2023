@@ -15,69 +15,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
+import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
-public class StateHandler extends SubsystemBase {
+public class StateHandler extends SubsystemBase implements AutoCloseable {
   /** Creates a new StateHandler. */
-  public enum INTAKING_STATES {
-    NONE,
-    INTAKING,
-    CONE,
-    CUBE
-  }
-
-  public enum SUPERSTRUCTURE_STATE {
-    // UNDEFINED
-    DANGER_ZONE(0),
-    // LOW
-    STOWED(1),
-    INTAKE_LOW(1),
-    SCORE_LOW_REVERSE(1),
-    SCORE_LOW(1),
-    SCORE_LOW_CONE(1),
-    SCORE_LOW_CUBE(1),
-    LOW_ZONE(1),
-    // MID
-    MID_ZONE(2),
-    // HIGH
-    HIGH_ZONE(3),
-    // EXTENDED
-    EXTENDED_ZONE(4),
-    INTAKE_EXTENDED(4),
-    SCORE_MID(4),
-    SCORE_HIGH(4),
-    SCORE_MID_CONE(4),
-    SCORE_MID_CUBE(4),
-    SCORE_HIGH_CONE(4),
-    SCORE_HIGH_CUBE(4);
-
-    // State Zone is determined by elevator setpoints
-    private final int zone;
-
-    SUPERSTRUCTURE_STATE(final int zone) {
-      this.zone = zone;
-    }
-
-    public int getZone() {
-      return zone;
-    }
-  }
-
-  public enum ZONE_TRANSITIONS {
-    NONE,
-    LOW_TO_MID,
-    MID_TO_LOW,
-    MID_TO_HIGH,
-    HIGH_TO_MID,
-    HIGH_TO_EXTENDED,
-    EXTENDED_TO_HIGH,
-  }
-
   public SCORING_STATE m_currentScoringState = SCORING_STATE.STOWED;
+
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
   public SUPERSTRUCTURE_STATE m_currentZone = SUPERSTRUCTURE_STATE.STOWED;
@@ -94,7 +42,7 @@ public class StateHandler extends SubsystemBase {
   private final SwerveDrive m_drive;
   private final FieldSim m_fieldSim;
   private final Elevator m_elevator;
-  private final LED m_led;
+  private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
 
@@ -112,7 +60,7 @@ public class StateHandler extends SubsystemBase {
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Elevator elevator,
-      LED led,
+      LEDSubsystem led,
       Vision vision) {
     m_intake = intake;
     m_drive = swerveDrive;
@@ -534,4 +482,7 @@ public class StateHandler extends SubsystemBase {
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
   }
+
+  @Override
+  public void close() throws Exception {}
 }

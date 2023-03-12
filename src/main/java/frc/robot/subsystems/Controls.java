@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Controls extends SubsystemBase {
+public class Controls extends SubsystemBase implements AutoCloseable {
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
@@ -91,4 +91,7 @@ public class Controls extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     //    System.out.println("Test2");
   }
+
+  @Override
+  public void close() throws Exception {}
 }

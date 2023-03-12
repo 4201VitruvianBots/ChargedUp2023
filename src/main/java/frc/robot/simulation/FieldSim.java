@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FieldSim extends SubsystemBase {
+public class FieldSim extends SubsystemBase implements AutoCloseable {
   private final SwerveDrive m_swerveDrive;
   private final Vision m_vision;
   private final Elevator m_elevator;
@@ -325,4 +325,7 @@ public class FieldSim extends SubsystemBase {
   }
 
   public void simulationPeriodic() {}
+
+  @Override
+  public void close() throws Exception {}
 }

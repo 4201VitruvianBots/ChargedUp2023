@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
@@ -37,7 +39,6 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LED.PieceType;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
 
@@ -47,7 +48,7 @@ import java.util.HashMap;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements AutoCloseable {
   private final DataLog m_logger = DataLogManager.getLog();
 
   // The robot's subsystems and commands are defined here...
@@ -60,7 +61,7 @@ public class RobotContainer {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final LED m_led = new LED(m_controls);
+  private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
 
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
@@ -221,13 +222,13 @@ public class RobotContainer {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .rightBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .leftBumper()
         .whileTrue(
@@ -261,7 +262,7 @@ public class RobotContainer {
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
                       m_stateHandler.getCurrentZone().getZone()
-                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
       testController
@@ -274,7 +275,7 @@ public class RobotContainer {
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
                       m_stateHandler.getCurrentZone().getZone()
-                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       // Score button Bindings
 
@@ -602,5 +603,20 @@ public class RobotContainer {
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
     // m_logManager.periodic();
+  }
+
+  @Override
+  public void close() throws Exception {
+    m_fieldSim.close();
+    m_stateHandler.close();
+    m_vision.close();
+    m_led.close();
+    m_wrist.close();
+    m_swerveDrive.close();
+    m_elevator.close();
+    m_intake.close();
+    m_controls.close();
+
+    m_logger.close();
   }
 }

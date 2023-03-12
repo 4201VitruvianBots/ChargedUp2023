@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
-import frc.robot.subsystems.StateHandler.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;

@@ -5,18 +5,18 @@
 package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LED.PieceType;
 
 /** Sets the LED based on the subsystems' statuses */
 public class SetPieceTypeIntent extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final LED m_led;
+  private final LEDSubsystem m_led;
 
-  private final PieceType m_pieceType;
+  private final INTAKING_STATES m_pieceType;
 
   /** Sets the LED based on the subsystems' statuses */
-  public SetPieceTypeIntent(LED led, PieceType piecetype) {
+  public SetPieceTypeIntent(LEDSubsystem led, INTAKING_STATES piecetype) {
     m_led = led;
     m_pieceType = piecetype;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -36,7 +36,7 @@ public class SetPieceTypeIntent extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_led.setPieceIntent(PieceType.NONE);
+    m_led.setPieceIntent(INTAKING_STATES.NONE);
   }
 
   // Returns true when the command should end.

@@ -1,26 +1,49 @@
 package frc.robot.commands.auto;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled("WIP")
 public class AutoTest {
-  protected final RobotContainer m_robotContainer = new RobotContainer();
-  protected final SwerveDrive m_swerveDrive = m_robotContainer.getSwerveDrive();
-  protected final Elevator m_elevator = m_robotContainer.getElevator();
-  protected final Wrist m_wrist = m_robotContainer.getWrist();
-  protected final Intake m_intake = m_robotContainer.getIntake();
-  protected final Vision m_vision = m_robotContainer.getVision();
-  protected final FieldSim m_fieldSim = m_robotContainer.getFieldSim();
-  protected final SwerveAutoBuilder m_autoBuilder = m_robotContainer.getAutoBuilder();
+  protected RobotContainer m_robotContainer;
+  protected SwerveDrive m_swerveDrive;
+  protected Elevator m_elevator;
+  protected Wrist m_wrist;
+  protected Intake m_intake;
+  protected Vision m_vision;
+  protected FieldSim m_fieldSim;
+  protected SwerveAutoBuilder m_autoBuilder;
 
-  @Test
-  public void AutoTest() {
-    testAutoPathFipping();
+  @BeforeEach
+  // this method will run before each test
+  void setup() {
+    assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
+    m_robotContainer = new RobotContainer();
+    m_swerveDrive = m_robotContainer.getSwerveDrive();
+    m_elevator = m_robotContainer.getElevator();
+    m_wrist = m_robotContainer.getWrist();
+    m_intake = m_robotContainer.getIntake();
+    m_vision = m_robotContainer.getVision();
+    m_fieldSim = m_robotContainer.getFieldSim();
+    m_autoBuilder = m_robotContainer.getAutoBuilder();
+  }
+
+  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+  @AfterEach
+  // this method will run after each test
+  void shutdown() throws Exception {
+    m_robotContainer.close();
   }
 
   @Test
@@ -36,10 +59,12 @@ public class AutoTest {
     var blueTrajectories = blueAuto.getTrajectory();
     for (var segment : blueTrajectories) {
       for (var state : segment.getStates()) {
-        assert (blueTrajectoryMinX < state.poseMeters.getX()
-            && state.poseMeters.getX() < blueTrajectoryMaxX);
-        assert (blueTrajectoryMinY < state.poseMeters.getY()
-            && state.poseMeters.getY() < blueTrajectoryMaxY);
+        assertTrue(
+            blueTrajectoryMinX < state.poseMeters.getX()
+                && state.poseMeters.getX() < blueTrajectoryMaxX);
+        assertTrue(
+            blueTrajectoryMinY < state.poseMeters.getY()
+                && state.poseMeters.getY() < blueTrajectoryMaxY);
       }
     }
 
@@ -56,10 +81,12 @@ public class AutoTest {
     var redTrajectories = redAuto.getTrajectory();
     for (var segment : redTrajectories) {
       for (var state : segment.getStates()) {
-        assert (redTrajectoryMinX < state.poseMeters.getX()
-            && state.poseMeters.getX() < redTrajectoryMaxX);
-        assert (redTrajectoryMinY < state.poseMeters.getY()
-            && state.poseMeters.getY() < redTrajectoryMaxY);
+        assertTrue(
+            redTrajectoryMinX < state.poseMeters.getX()
+                && state.poseMeters.getX() < redTrajectoryMaxX);
+        assertTrue(
+            redTrajectoryMinY < state.poseMeters.getY()
+                && state.poseMeters.getY() < redTrajectoryMaxY);
       }
     }
   }

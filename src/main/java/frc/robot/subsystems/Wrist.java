@@ -27,7 +27,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
-public class Wrist extends SubsystemBase {
+public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_desiredSetpointRadians;
   private double m_commandedAngleRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
@@ -480,5 +480,10 @@ public class Wrist extends SubsystemBase {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
+  }
+
+  @Override
+  public void close() throws Exception {
+    lowerSwitch.close();
   }
 }

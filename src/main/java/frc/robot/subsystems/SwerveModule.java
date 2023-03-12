@@ -33,7 +33,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private final SWERVE_MODULE_POSITION m_modulePosition;
   private final int m_moduleNumber;
   private final TalonFX m_turnMotor;
@@ -315,4 +315,7 @@ public class SwerveModule extends SubsystemBase {
                     * m_driveMotorSim.getAngularVelocityRadPerSec()
                     / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10)));
   }
+
+  @Override
+  public void close() throws Exception {}
 }

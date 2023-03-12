@@ -34,7 +34,7 @@ import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SwerveDrive extends SubsystemBase {
+public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final HashMap<SWERVE_MODULE_POSITION, SwerveModule> m_swerveModules =
       new HashMap<>(
@@ -351,5 +351,11 @@ public class SwerveDrive extends SubsystemBase {
 
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
+  }
+
+  @Override
+  public void close() throws Exception {
+
+    for (var module : ModuleMap.orderedValuesList(m_swerveModules)) module.close();
   }
 }
