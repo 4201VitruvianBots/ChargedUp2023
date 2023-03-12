@@ -53,35 +53,31 @@ public class AutoLock extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      
+
     double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
-    //TODO; set a way to initiallze pitch to 0
-    
+    // TODO; set a way to initiallze pitch to 0
+
     states =
         new SwerveModuleState[] {
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
-      
-      
-        SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
-        System.out.print("yay");
-        states =
+
+    SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
+    System.out.print("yay");
+    states =
         new SwerveModuleState[] {
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-           };
-
+        };
 
     m_swerveDrive.setSwerveModuleStates(states, false);
-      }
-  
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -92,7 +88,6 @@ public class AutoLock extends CommandBase {
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
   }

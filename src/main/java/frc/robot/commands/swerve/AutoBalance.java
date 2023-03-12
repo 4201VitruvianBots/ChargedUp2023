@@ -53,36 +53,32 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if((m_swerveDrive.getPitchDegrees() + 2.460938) > 3) {
-      
-    double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
-    //TODO; set a way to initiallze pitch to 0
-    
-    states =
-        new SwerveModuleState[] {
-          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(output*1.1, Rotation2d.fromDegrees(0)),
-        };
-    m_swerveDrive.setSwerveModuleStates(states, false);
-      }
-      
-      else if ((m_swerveDrive.getPitchDegrees() + 2.460938) <= 3){    
-        SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
-        System.out.print("yay");
-        states =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          
-        };
+    if ((m_swerveDrive.getPitchDegrees() + 2.460938) > 3) {
 
+      double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
+      // TODO; set a way to initiallze pitch to 0
 
-    m_swerveDrive.setSwerveModuleStates(states, false);
-      }
+      states =
+          new SwerveModuleState[] {
+            new SwerveModuleState(output * 1.1, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(output * 1.1, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(output * 1.1, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(output * 1.1, Rotation2d.fromDegrees(0)),
+          };
+      m_swerveDrive.setSwerveModuleStates(states, false);
+    } else if ((m_swerveDrive.getPitchDegrees() + 2.460938) <= 3) {
+      SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
+      System.out.print("yay");
+      states =
+          new SwerveModuleState[] {
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+            new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          };
+
+      m_swerveDrive.setSwerveModuleStates(states, false);
+    }
   }
 
   // Called once the command ends or is interrupted.
