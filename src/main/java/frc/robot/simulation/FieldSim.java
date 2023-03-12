@@ -207,7 +207,7 @@ public class FieldSim extends SubsystemBase {
 
     m_field2d.getObject("Grid Node").setPoses(m_displayedNodes);
     m_field2d.getObject("Target Node").setPose(m_highlightedNode);
-    
+
     try {
       if (RobotBase.isSimulation()) {
         m_field2d
@@ -237,7 +237,8 @@ public class FieldSim extends SubsystemBase {
     // nearestNodes.add(robotPose.nearest(blueNodes));
     // Pose2d closestAllianceNode = robotPose.nearest(nearestNodes);
 
-    // if (redNodes.contains(closestAllianceNode) && m_controls.getAllianceColor() == Alliance.Blue) {
+    // if (redNodes.contains(closestAllianceNode) && m_controls.getAllianceColor() == Alliance.Blue)
+    // {
     //   possibleNodes.retainAll(coopertitionNodes);
     // } else if (blueNodes.contains(closestAllianceNode)
     //     && m_controls.getAllianceColor() == Alliance.Red) {
@@ -249,9 +250,8 @@ public class FieldSim extends SubsystemBase {
       possibleNodes.retainAll(blueNodes);
     }
 
-    if (scoreCoopertition)
-      possibleNodes.addAll(coopertitionNodes);
-    //}
+    if (scoreCoopertition) possibleNodes.addAll(coopertitionNodes);
+    // }
 
     if (mainState == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE
         || mainState == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
@@ -264,14 +264,15 @@ public class FieldSim extends SubsystemBase {
     }
 
     if (scoringState == Constants.SCORING_STATE.SMART_LOW
-      || scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
-      || scoringState == Constants.SCORING_STATE.SETPOINT_LOW
-      || scoringState == Constants.SCORING_STATE.SETPOINT_LOW_INTAKE
-    ) {
+        || scoringState == Constants.SCORING_STATE.SMART_LOW_REVERSE
+        || scoringState == Constants.SCORING_STATE.SETPOINT_LOW
+        || scoringState == Constants.SCORING_STATE.SETPOINT_LOW_INTAKE) {
       possibleNodes.retainAll(lowNodes);
-    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM || scoringState == Constants.SCORING_STATE.SETPOINT_MEDIUM) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_MEDIUM
+        || scoringState == Constants.SCORING_STATE.SETPOINT_MEDIUM) {
       possibleNodes.retainAll(midNodes);
-    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH || scoringState == Constants.SCORING_STATE.SETPOINT_HIGH) {
+    } else if (scoringState == Constants.SCORING_STATE.SMART_HIGH
+        || scoringState == Constants.SCORING_STATE.SETPOINT_HIGH) {
       possibleNodes.retainAll(highNodes);
     }
 
@@ -279,7 +280,9 @@ public class FieldSim extends SubsystemBase {
   }
 
   public Pose2d getTargetNode(
-      Constants.SCORING_STATE scoringState, SUPERSTRUCTURE_STATE mainState, boolean scoreCoopertition) {
+      Constants.SCORING_STATE scoringState,
+      SUPERSTRUCTURE_STATE mainState,
+      boolean scoreCoopertition) {
     ArrayList<Pose2d> possibleNodes = getPossibleNodes(scoringState, mainState, scoreCoopertition);
 
     // Only works on WPILIB version 2023.3.2 and above

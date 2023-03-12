@@ -10,8 +10,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -461,7 +459,8 @@ public class StateHandler extends SubsystemBase {
   }
 
   public void switchTargetNode(boolean left, boolean sameTypeOnly) {
-    ArrayList<Pose2d> possibleNodes = m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false);
+    ArrayList<Pose2d> possibleNodes =
+        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false);
     targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
   }
 
@@ -536,6 +535,8 @@ public class StateHandler extends SubsystemBase {
   public void testPeriodic() {
     scoringState = m_scoringChooser.getSelected();
     m_currentZone = m_mainStateChooser.getSelected();
-    m_fieldSim.setDisplayedNodes(m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false), m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
+    m_fieldSim.setDisplayedNodes(
+        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
+        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
   }
 }

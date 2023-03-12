@@ -62,13 +62,24 @@ public class RobotContainer {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
-  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
+  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser =
+      new SendableChooser<>();
+  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
+      new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
 
   private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision, m_scoringStateChooser, m_mainStateChooser);
+      new StateHandler(
+          m_intake,
+          m_wrist,
+          m_swerveDrive,
+          m_fieldSim,
+          m_elevator,
+          m_led,
+          m_vision,
+          m_scoringStateChooser,
+          m_mainStateChooser);
 
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
@@ -559,7 +570,7 @@ public class RobotContainer {
 
   public void initializeScoringChooser() {
     for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
-        m_scoringStateChooser.addOption(state.toString(), state);
+      m_scoringStateChooser.addOption(state.toString(), state);
     }
 
     m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
@@ -569,7 +580,7 @@ public class RobotContainer {
 
   public void initializeMainStateChooser() {
     for (SUPERSTRUCTURE_STATE state : SUPERSTRUCTURE_STATE.values()) {
-        m_mainStateChooser.addOption(state.toString(), state);
+      m_mainStateChooser.addOption(state.toString(), state);
     }
     m_mainStateChooser.setDefaultOption("STOWED", SUPERSTRUCTURE_STATE.STOWED);
 
@@ -587,7 +598,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    //m_memorylog.simulationPeriodic();
+    // m_memorylog.simulationPeriodic();
   }
 
   public void disabledPeriodic() {
