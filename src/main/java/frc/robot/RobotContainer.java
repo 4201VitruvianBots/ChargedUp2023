@@ -39,8 +39,8 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
-import frc.robot.utils.DistanceSensor;
 import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
+import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
 
