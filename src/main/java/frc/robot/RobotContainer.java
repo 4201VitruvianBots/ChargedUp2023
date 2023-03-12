@@ -492,10 +492,10 @@ public class RobotContainer {
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "ReallyOldBlueTopTwoCone",
-        new ReallyOldTopTwoCone(
-            "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "ReallyOldBlueTopTwoCone",
+    //     new ReallyOldTopTwoCone(
+    //         "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
@@ -512,8 +512,8 @@ public class RobotContainer {
                 // "AutoLockTest",
                 // new AutoLockTest( m_autoBuilder, m_swerveDrive, m_rotationInput, m_rotationInput, m_rotationInput, m_fieldSim, m_wrist));
          
-    m_autoChooser.addOption(
-        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
@@ -525,57 +525,57 @@ public class RobotContainer {
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueDriveForward",
-        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueDriveForward",
+    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
-        "RedDriveForward",
-        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "RedDriveForward",
+    //     new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.setDefaultOption(
-        "BlueTopDriveForward",
-        new TopDriveForward(
-            "BlueTopDriveForward",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_elevator,
-            m_intake,
-            m_vision));
+    // m_autoChooser.setDefaultOption(
+    //     "BlueTopDriveForward",
+    //     new TopDriveForward(
+    //         "BlueTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "RedTopDriveForward",
-        new TopDriveForward(
-            "RedTopDriveForward",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_elevator,
-            m_intake,
-            m_vision));
+    // m_autoChooser.addOption(
+    //     "RedTopDriveForward",
+    //     new TopDriveForward(
+    //         "RedTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
+    // m_autoChooser.addOption(
+    //     "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
 
-    m_autoChooser.addOption(
-        "Balancetest",
-        new Balancetest(
-            "BalanceTest",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
-            m_fieldSim,
-            m_wrist));
+    // m_autoChooser.addOption(
+        // "Balancetest",
+        // new Balancetest(
+        //     "BalanceTest",
+        //     m_autoBuilder,
+        //     m_swerveDrive,
+        //     m_rotationInput,
+        //     m_rotationInput,
+        //     m_rotationInput,
+        //     m_fieldSim,
+        //     m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }

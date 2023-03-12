@@ -38,7 +38,7 @@ public class LED extends SubsystemBase {
     configAll.disableWhenLOS = false; // disables LEDs when robot is off(?)
     configAll.stripType = LEDStripType.GRB;
     configAll.brightnessScalar =
-        1; // 1 is highest we can go we don't want to blind everyone at the event
+        0.75; // 1 is highest we can go we don't want to blind everyone at the event
     configAll.vBatOutputMode = VBatOutputMode.Modulated; // Modulate
     m_candle.configAllSettings(configAll, 100);
 
