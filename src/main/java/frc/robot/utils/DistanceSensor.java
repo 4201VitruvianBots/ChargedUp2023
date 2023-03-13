@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.StateHandler.INTAKING_STATES;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.DatagramPacket;
@@ -39,10 +38,14 @@ public class DistanceSensor {
   public static ShuffleboardTab distanceSensorTab = Shuffleboard.getTab("DistanceSensor");
 
   public GenericEntry rawStringTab = distanceSensorTab.add("Raw String Data", "None").getEntry();
-  public GenericEntry sensorValue1MMTab = distanceSensorTab.add("Sensor Value 1 Millimeters", 0).getEntry();
-  public GenericEntry sensorValue2MMTab = distanceSensorTab.add("Sensor Value 2 Millimeters", 0).getEntry();
-  public GenericEntry sensorValue1InTab = distanceSensorTab.add("Sensor Value 1 Inches", 0).getEntry();
-  public GenericEntry sensorValue2InTab = distanceSensorTab.add("Sensor Value 2 Inches", 0).getEntry();
+  public GenericEntry sensorValue1MMTab =
+      distanceSensorTab.add("Sensor Value 1 Millimeters", 0).getEntry();
+  public GenericEntry sensorValue2MMTab =
+      distanceSensorTab.add("Sensor Value 2 Millimeters", 0).getEntry();
+  public GenericEntry sensorValue1InTab =
+      distanceSensorTab.add("Sensor Value 1 Inches", 0).getEntry();
+  public GenericEntry sensorValue2InTab =
+      distanceSensorTab.add("Sensor Value 2 Inches", 0).getEntry();
   public GenericEntry coneInchesTab = distanceSensorTab.add("Cone Distance Inches", 0).getEntry();
   public GenericEntry cubeInchesTab = distanceSensorTab.add("Cube Distance Inches", 0).getEntry();
 
@@ -63,8 +66,7 @@ public class DistanceSensor {
 
   public double getSensorValueMillimeters(int sensor) {
     // This is a really stupid band-aid solution but I don't have time for anything else
-    if (sensor == 0)
-      sensor = 1;
+    if (sensor == 0) sensor = 1;
     try {
       String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
 
@@ -116,10 +118,11 @@ public class DistanceSensor {
 
         double leftSensorValue = getSensorValueMillimeters(leftSensorId) / 1000.0;
         double rightSensorValue = getSensorValueMillimeters(rightSensorId) / 1000.0;
-    
+
         distanceMeters =
             leftSensorValue
-                + ((Constants.INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+                + ((Constants.INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2)
+                - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
         int sensorId = Constants.INTAKE.cubeSensorId;
