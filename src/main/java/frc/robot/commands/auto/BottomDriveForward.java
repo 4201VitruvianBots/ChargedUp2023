@@ -22,14 +22,14 @@ import frc.robot.utils.TrajectoryUtils;
 
 public class BottomDriveForward extends SequentialCommandGroup {
   public BottomDriveForward(
-    String pathName,
-    SwerveAutoBuilder autoBuilder,
-    SwerveDrive swerveDrive,
-    FieldSim fieldSim,
-    Wrist wrist,
-    Intake intake,
-    Vision vision,
-    Elevator elevator) {
+      String pathName,
+      SwerveAutoBuilder autoBuilder,
+      SwerveDrive swerveDrive,
+      FieldSim fieldSim,
+      Wrist wrist,
+      Intake intake,
+      Vision vision,
+      Elevator elevator) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
@@ -42,11 +42,10 @@ public class BottomDriveForward extends SequentialCommandGroup {
         // fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectory),
         new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-                new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
-
-            new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
+        new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

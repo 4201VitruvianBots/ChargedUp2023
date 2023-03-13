@@ -41,10 +41,10 @@ public class AutoLock extends CommandBase {
   public void initialize() {
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
@@ -60,16 +60,14 @@ public class AutoLock extends CommandBase {
 
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(Units.inchesToMeters(0.0000001), Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(Units.inchesToMeters(0.0000001), Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(Units.inchesToMeters(0.0000001), Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(Units.inchesToMeters(0.0000001), Rotation2d.fromDegrees(45)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
 
     SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
-    System.out.print("yay");
-
   }
 
   // Called once the command ends or is interrupted.

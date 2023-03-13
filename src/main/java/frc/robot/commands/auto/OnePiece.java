@@ -11,6 +11,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
+import frc.robot.commands.swerve.AutoLock;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
@@ -45,15 +46,18 @@ public class OnePiece extends SequentialCommandGroup {
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
-        new PlotAutoTrajectory(fieldSim, pathName, trajectory),
-        new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-                new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
-
-            new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
-        autoPath,
-        new AutoBalance(swerveDrive, throttleInput, strafeInput, rotationInput),
+        new SequentialCommandGroup(
+                new PlotAutoTrajectory(fieldSim, pathName, trajectory),
+                new ParallelCommandGroup(
+                    new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+                    new AutoSetElevatorDesiredSetpoint(
+                        elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+                    new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
+                new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
+                autoPath,
+                new AutoBalance(swerveDrive, throttleInput, strafeInput, rotationInput))
+            .withTimeout(14.80),
+        new AutoLock(swerveDrive, throttleInput, strafeInput, rotationInput).withTimeout(0.1),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
