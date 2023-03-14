@@ -679,7 +679,7 @@ public class RobotContainer {
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
     // m_logManager.periodic();
-    m_distanceSensor.pollDistanceSensors();
+    // m_distanceSensor.pollDistanceSensors();
   }
 
   public void testPeriodic() {
