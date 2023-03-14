@@ -67,16 +67,16 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 10.0;
+    public static final double gearRatio = 15.7;
     public static final double massKg = 4.0;
-    public static final double drumRadiusMeters = Units.inchesToMeters(0.5625);
+    public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(60);
-    public static double kMaxAccel = Units.inchesToMeters(45);
+    public static double kMaxVel = Units.inchesToMeters(25);
+    public static double kMaxAccel = Units.inchesToMeters(20);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -84,11 +84,11 @@ public final class Constants {
     public static final double encoderCountsToMeters =
         (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
 
-    public static final double kS = 0.15;
-    public static final double kV = 12.57;
-    public static final double kA = 0.04;
+    public static final double kS = 0.15956;
+    public static final double kV = 8.4689; //12.57;
+    public static final double kA = 0.23382; //0.04;
 
-    public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
@@ -103,9 +103,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(13.62)),
+      SCORE_MID_CONE(Units.inchesToMeters(21)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(25.75)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(40)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -126,12 +126,12 @@ public final class Constants {
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(6)),
-      MID_MIN(Units.inchesToMeters(4)),
-      MID_MAX(Units.inchesToMeters(9)),
-      HIGH_MIN(Units.inchesToMeters(7)),
-      HIGH_MAX(Units.inchesToMeters(13)),
-      EXTENDED_MIN(Units.inchesToMeters(11)),
+      LOW_MAX(Units.inchesToMeters(11)),
+      MID_MIN(Units.inchesToMeters(9)),
+      MID_MAX(Units.inchesToMeters(14)),
+      HIGH_MIN(Units.inchesToMeters(12)),
+      HIGH_MAX(Units.inchesToMeters(18)),
+      EXTENDED_MIN(Units.inchesToMeters(16)),
       EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
@@ -180,11 +180,11 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 126.914;
-    public static double frontRightCANCoderOffset = 222.9785;
-    public static double backLeftCANCoderOffset = 191.25;
-    public static double backRightCANCoderOffset = 34.7605;
-
+    public static double frontLeftCANCoderOffset =  125.8985;
+    public static double frontRightCANCoderOffset = 229.351;
+    public static double backLeftCANCoderOffset =  190.591;
+    public static double backRightCANCoderOffset = 31.6845;
+    
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
@@ -283,8 +283,8 @@ public final class Constants {
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined
-    public static final double kMaxSlowVel = Units.degreesToRadians(360);
-    public static final double kMaxSlowAccel = Units.degreesToRadians(250);
+    public static final double kMaxSlowVel = Units.degreesToRadians(400);
+    public static final double kMaxSlowAccel = Units.degreesToRadians(290);
     public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.35);
     public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.35);
     public static final double FFkS = 0.1;
@@ -292,7 +292,7 @@ public final class Constants {
     public static final double FFkV = 1.95;
     public static final double kA = 0.16;
 
-    public static final double kP = 0.1;
+    public static final double kP = 0.15;
     public static double kI = 0.0001;
     public static final double kD = 0.0;
 
@@ -310,9 +310,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(138.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(143.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(111.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 

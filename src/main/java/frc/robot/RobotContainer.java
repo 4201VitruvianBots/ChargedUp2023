@@ -96,7 +96,6 @@ public class RobotContainer {
 
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -160,8 +159,8 @@ public class RobotContainer {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.63));
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.63));
 
     // Score button Bindings
 
@@ -277,7 +276,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -290,7 +289,7 @@ public class RobotContainer {
                       m_stateHandler.getCurrentZone().getZone()
                           == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
@@ -422,7 +421,7 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait1", new WaitCommand(1.5));
+    m_eventMap.put("wait1", new WaitCommand(0.5));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
@@ -494,7 +493,7 @@ public class RobotContainer {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+            true,
             m_swerveDrive);
   }
 
@@ -508,10 +507,10 @@ public class RobotContainer {
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "ReallyOldBlueTopTwoCone",
-        new ReallyOldTopTwoCone(
-            "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "ReallyOldBlueTopTwoCone",
+    //     new ReallyOldTopTwoCone(
+    //         "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
@@ -543,81 +542,93 @@ public class RobotContainer {
             m_vision,
             m_elevator));
 
-    m_autoChooser.addOption(
-        "AutoLockTest",
-        new AutoLockTest(
-            m_autoBuilder,
-            m_swerveDrive,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
-            m_fieldSim,
-            m_wrist));
+    //      m_autoChooser.addOption(
+    // "AutoLockTest",
+    // new AutoLockTest( m_autoBuilder, m_swerveDrive, m_rotationInput, m_rotationInput,
+    // m_rotationInput, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
-        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive,
+    // m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
-        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward(
+            "BlueBottomDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
 
     m_autoChooser.addOption(
         "RedBottomDriveForward",
-        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward(
+            "RedBottomDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueDriveForward",
-        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueDriveForward",
+    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
-        "RedDriveForward",
-        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "RedDriveForward",
+    //     new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.setDefaultOption(
-        "BlueTopDriveForward",
-        new TopDriveForward(
-            "BlueTopDriveForward",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_elevator,
-            m_intake,
-            m_vision));
+    // m_autoChooser.setDefaultOption(
+    //     "BlueTopDriveForward",
+    //     new TopDriveForward(
+    //         "BlueTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "RedTopDriveForward",
-        new TopDriveForward(
-            "RedTopDriveForward",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_elevator,
-            m_intake,
-            m_vision));
+    // m_autoChooser.addOption(
+    //     "RedTopDriveForward",
+    //     new TopDriveForward(
+    //         "RedTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
+    // m_autoChooser.addOption(
+    //     "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator,
+    // m_swerveDrive));
 
-    m_autoChooser.addOption(
-        "Balancetest",
-        new Balancetest(
-            "BalanceTest",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
-            m_fieldSim,
-            m_wrist));
+    // m_autoChooser.addOption(
+    // "Balancetest",
+    // new Balancetest(
+    //     "BalanceTest",
+    //     m_autoBuilder,
+    //     m_swerveDrive,
+    //     m_rotationInput,
+    //     m_rotationInput,
+    //     m_rotationInput,
+    //     m_fieldSim,
+    //     m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
   }

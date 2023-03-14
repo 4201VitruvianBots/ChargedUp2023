@@ -3,6 +3,7 @@ package frc.robot.commands.swerve;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
@@ -40,10 +41,10 @@ public class AutoLock extends CommandBase {
   public void initialize() {
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
@@ -59,24 +60,15 @@ public class AutoLock extends CommandBase {
 
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(45)),
+          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(-45)),
+          new SwerveModuleState(Units.feetToMeters(0), Rotation2d.fromDegrees(45)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
 
     SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
     System.out.print("yay");
-    states =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-        };
-
-    m_swerveDrive.setSwerveModuleStates(states, false);
   }
 
   // Called once the command ends or is interrupted.
