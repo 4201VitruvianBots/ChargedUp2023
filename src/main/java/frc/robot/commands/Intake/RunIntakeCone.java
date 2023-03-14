@@ -49,7 +49,7 @@ public class RunIntakeCone extends CommandBase {
     m_intake.setPercentOutput(0);
     m_intake.setIntakeStateCone(false);
     // m_swerve.enableHeadingTarget(false);
-    m_intake.setIntakeStateCone(false);
+    m_intake.setBooleanState(false);
   }
 
   // Returns true when the command should end.
