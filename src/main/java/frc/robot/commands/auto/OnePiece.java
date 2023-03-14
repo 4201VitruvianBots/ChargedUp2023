@@ -20,7 +20,6 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
-import java.util.function.DoubleSupplier;
 
 public class OnePiece extends SequentialCommandGroup {
   public OnePiece(
@@ -30,9 +29,6 @@ public class OnePiece extends SequentialCommandGroup {
       FieldSim fieldSim,
       Wrist wrist,
       Intake intake,
-      DoubleSupplier throttleInput,
-      DoubleSupplier strafeInput,
-      DoubleSupplier rotationInput,
       Vision vision,
       Elevator elevator) {
 
@@ -52,7 +48,7 @@ public class OnePiece extends SequentialCommandGroup {
             new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
         new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
         autoPath,
-        new AutoBalance(swerveDrive, throttleInput, strafeInput, rotationInput),
+        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

@@ -36,13 +36,11 @@ import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
 import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
-import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
 import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
-import java.util.function.DoubleSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -68,11 +66,7 @@ public class RobotContainer {
   private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
       new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
-  DoubleSupplier m_throttleInput;
-  DoubleSupplier m_strafeInput;
-  DoubleSupplier m_rotationInput;
 
-  private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
       new StateHandler(
           m_intake,
@@ -520,9 +514,6 @@ public class RobotContainer {
             m_fieldSim,
             m_wrist,
             m_intake,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
             m_vision,
             m_elevator));
 
@@ -535,9 +526,6 @@ public class RobotContainer {
             m_fieldSim,
             m_wrist,
             m_intake,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
             m_vision,
             m_elevator));
 
@@ -623,9 +611,6 @@ public class RobotContainer {
     //     "BalanceTest",
     //     m_autoBuilder,
     //     m_swerveDrive,
-    //     m_rotationInput,
-    //     m_rotationInput,
-    //     m_rotationInput,
     //     m_fieldSim,
     //     m_wrist));
 

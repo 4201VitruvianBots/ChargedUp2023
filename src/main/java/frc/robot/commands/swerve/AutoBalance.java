@@ -6,13 +6,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
-import java.util.function.DoubleSupplier;
 
 public class AutoBalance extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
 
-  private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
   SwerveModuleState[] states;
 
   PIDController outputCalculator = new PIDController(0.02, 0, 0);
@@ -22,15 +20,8 @@ public class AutoBalance extends CommandBase {
    *
    * @param swerveDriveSubsystem The subsystem used by this command.
    */
-  public AutoBalance(
-      SwerveDrive swerveDriveSubsystem,
-      DoubleSupplier throttleInput,
-      DoubleSupplier strafeInput,
-      DoubleSupplier rotationInput) {
+  public AutoBalance(SwerveDrive swerveDriveSubsystem) {
     m_swerveDrive = swerveDriveSubsystem;
-    m_throttleInput = throttleInput;
-    m_strafeInput = strafeInput;
-    m_rotationInput = rotationInput;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDriveSubsystem);
   }
