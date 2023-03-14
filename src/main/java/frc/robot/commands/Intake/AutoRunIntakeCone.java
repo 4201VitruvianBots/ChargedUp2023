@@ -54,6 +54,7 @@ public class AutoRunIntakeCone extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakeStateCone(false);
     m_intake.setPercentOutput(0);
+    m_intake.setBooleanState(false);
     // m_swerve.enableHeadingTarget(false);
   }
 
