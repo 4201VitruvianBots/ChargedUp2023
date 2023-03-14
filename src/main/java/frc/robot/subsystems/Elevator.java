@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
   // Limit switch at bottom of elevator
   private final DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.DIO.elevatorLowerSwitch);
-  
+
   public enum ELEVATOR_SPEED {
     NORMAL,
     LIMITED
