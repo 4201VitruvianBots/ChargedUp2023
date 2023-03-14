@@ -43,7 +43,7 @@ public class Vision extends SubsystemBase {
   private final double searchPipelineWindow = 0.4;
 
   private final Timer searchTimer = new Timer();
-  
+
   private double startTime, timestamp;
   private boolean timerStart;
 
@@ -241,21 +241,19 @@ public class Vision extends SubsystemBase {
     }
   }
 
-  //false == cube, true == cone
+  // false == cube, true == cone
   public boolean getGamePieceType(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         if (getPipeline(location) == 2.0 && searchLimelightTarget(location)) {
-          return true; //cone
+          return true; // cone
         } else if (getPipeline(location) == 1.0 && searchLimelightTarget(location)) {
-          return false; //cube
-        } 
+          return false; // cube
+        }
       default:
         return false;
     }
   }
-
-
 
   /*
    * resets timer for pipeline reconnection
@@ -288,14 +286,14 @@ public class Vision extends SubsystemBase {
     return false;
   }
 
-   /*
+  /*
    * Attempts to reconnect with pipeline within a timespan once target is lost
    */
   public void reconnectLimelightPipeline(CAMERA_SERVER location) {
     resetSearch();
     startTime = searchTimer.get();
 
-    if (!timerStart && !searchLimelightTarget(location)) { 
+    if (!timerStart && !searchLimelightTarget(location)) {
       timerStart = true;
       timestamp = searchTimer.get();
     } else if (timerStart && searchLimelightTarget(location)) {
@@ -332,13 +330,13 @@ public class Vision extends SubsystemBase {
       if (targetFound == targetType.CUBE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          //targetFound = targetType.NONE;
+          // targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          //targetFound = targetType.NONE;
+          // targetFound = targetType.NONE;
         }
       }
     }

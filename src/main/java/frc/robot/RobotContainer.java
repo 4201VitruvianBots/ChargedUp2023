@@ -23,8 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.Constants.VISION.CAMERA_SERVER;
-import frc.robot.Constants.VISION.CAMERA_TYPE;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
@@ -203,7 +201,7 @@ public class RobotContainer {
                     m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get(), xboxController::getRightY),
                 new SetWristDesiredSetpoint(
                     m_wrist, WRIST.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getRightY),
-                    () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
+                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
 
     // Stowed
     xboxController
@@ -226,7 +224,7 @@ public class RobotContainer {
                     m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getLeftY),
                 new SetElevatorDesiredSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getLeftY),
-                    () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
+                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
     xboxController
         .y()
         .whileTrue(
