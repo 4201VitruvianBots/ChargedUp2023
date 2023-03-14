@@ -10,14 +10,17 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
+import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase {
   /** Creates a new StateHandler. */
@@ -95,6 +98,8 @@ public class StateHandler extends SubsystemBase {
   private final LED m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
+  private final SendableChooser<SCORING_STATE> m_scoringChooser;
+  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser;
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
   private DoublePublisher m_elevatorHeightPub,
@@ -111,7 +116,9 @@ public class StateHandler extends SubsystemBase {
       FieldSim fieldSim,
       Elevator elevator,
       LED led,
-      Vision vision) {
+      Vision vision,
+      SendableChooser<Constants.SCORING_STATE> scoringStateChooser,
+      SendableChooser<SUPERSTRUCTURE_STATE> mainStateChooser) {
     m_intake = intake;
     m_drive = swerveDrive;
     m_fieldSim = fieldSim;
@@ -119,6 +126,8 @@ public class StateHandler extends SubsystemBase {
     m_led = led;
     m_vision = vision;
     m_wrist = wrist;
+    m_scoringChooser = scoringStateChooser;
+    m_mainStateChooser = mainStateChooser;
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
   }
@@ -449,6 +458,12 @@ public class StateHandler extends SubsystemBase {
     m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
+  public void switchTargetNode(boolean left, boolean sameTypeOnly) {
+    ArrayList<Pose2d> possibleNodes =
+        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false);
+    targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
+  }
+
   @Override
   public void periodic() {
     updateSmartDashboard();
@@ -507,7 +522,7 @@ public class StateHandler extends SubsystemBase {
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(currentIntakeState, scoringState),
+          m_fieldSim.getTargetNode(scoringState, m_currentZone, false),
           m_wrist.getHorizontalTranslation().getX(),
           scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
@@ -515,5 +530,13 @@ public class StateHandler extends SubsystemBase {
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
+  }
+
+  public void testPeriodic() {
+    scoringState = m_scoringChooser.getSelected();
+    m_currentZone = m_mainStateChooser.getSelected();
+    m_fieldSim.setDisplayedNodes(
+        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
+        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
   }
 }

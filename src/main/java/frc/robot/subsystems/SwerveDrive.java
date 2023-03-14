@@ -321,7 +321,7 @@ public class SwerveDrive extends SubsystemBase {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
-    pitchPub.set(getPitchDegrees());
+    pitchPub.set(getPitchDegrees() + 2.460938);
     rollPub.set(getRollDegrees());
     yawPub.set(getHeadingDegrees());
     odometryXPub.set(getOdometry().getEstimatedPosition().getX());

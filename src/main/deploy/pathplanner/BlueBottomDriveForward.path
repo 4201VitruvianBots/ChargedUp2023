@@ -17,9 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "SetElevatorHighConeNode",
-          "SetWristHighConeNode",
-          "RunIntakeConeReverse"
+          "SetWristStowed",
+          "SetElevatorStowed"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -78,11 +77,11 @@
     },
     {
       "anchorPoint": {
-        "x": 6.692378647915191,
+        "x": 6.99,
         "y": 0.9158500773141907
       },
       "prevControl": {
-        "x": 6.406933518077421,
+        "x": 6.70455487016223,
         "y": 0.9158500773141907
       },
       "nextControl": null,
@@ -93,8 +92,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "SetWristIntaking",
-          "SetElevatorIntaking",
+          "SetWristStowed",
+          "SetElevatorStowed",
           "RunIntakeCone"
         ],
         "executionBehavior": "parallel",
@@ -105,11 +104,11 @@
   ],
   "markers": [
     {
-      "position": 0.3545454545454546,
+      "position": 2.2909090909090915,
       "names": [
-        "SetWristStowed",
-        "SetElevatorStowed",
-        "StopIntake"
+        "SetWristIntaking",
+        "SetElevatorIntaking",
+        "RunIntakeCone"
       ]
     }
   ]

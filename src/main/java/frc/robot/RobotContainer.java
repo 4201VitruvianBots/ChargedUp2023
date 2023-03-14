@@ -28,6 +28,7 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
+import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -38,8 +39,11 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.LED.PieceType;
+import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
+import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import java.util.HashMap;
+import java.util.function.DoubleSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -60,11 +64,28 @@ public class RobotContainer {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
+  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser =
+      new SendableChooser<>();
+  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
+      new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
+  DoubleSupplier m_throttleInput;
+  DoubleSupplier m_strafeInput;
+  DoubleSupplier m_rotationInput;
 
   private final SimConstants m_simConstants = new SimConstants(m_controls);
   private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+      new StateHandler(
+          m_intake,
+          m_wrist,
+          m_swerveDrive,
+          m_fieldSim,
+          m_elevator,
+          m_led,
+          m_vision,
+          m_scoringStateChooser,
+          m_mainStateChooser);
+
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
@@ -92,6 +113,8 @@ public class RobotContainer {
 
     initAutoBuilder();
     initializeAutoChooser();
+    initializeScoringChooser();
+    initializeMainStateChooser();
   }
 
   public void initializeSubsystems() {
@@ -136,8 +159,8 @@ public class RobotContainer {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.63));
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.63));
 
     // Score button Bindings
 
@@ -239,6 +262,10 @@ public class RobotContainer {
                 Units.degreesToRadians(-11.0),
                 xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
+    // Will switch our target node on the field sim to the adjacent node on D-pad press
+    xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
+    xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
+
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
 
@@ -249,7 +276,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -262,7 +289,7 @@ public class RobotContainer {
                       m_stateHandler.getCurrentZone().getZone()
                           == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
@@ -394,7 +421,7 @@ public class RobotContainer {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(2));
+    m_eventMap.put("wait1", new WaitCommand(0.5));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
@@ -466,13 +493,13 @@ public class RobotContainer {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+            true,
             m_swerveDrive);
   }
 
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
-    m_autoChooser.addOption("Do Nothing", new WaitCommand(0));
+    m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
     //   m_autoChooser.addOption("MiddleOneConeBalance", new
     // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
@@ -480,54 +507,149 @@ public class RobotContainer {
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "ReallyOldBlueTopTwoCone",
-        new ReallyOldTopTwoCone(
-            "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "ReallyOldBlueTopTwoCone",
+    //     new ReallyOldTopTwoCone(
+    //         "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
         new OnePiece(
-            "BlueOnePiece", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision));
+            "BlueOnePiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_rotationInput,
+            m_rotationInput,
+            m_rotationInput,
+            m_vision,
+            m_elevator));
 
     m_autoChooser.addOption(
-        "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        "RedOnePiece",
+        new OnePiece(
+            "RedOnePiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_rotationInput,
+            m_rotationInput,
+            m_rotationInput,
+            m_vision,
+            m_elevator));
+
+    //      m_autoChooser.addOption(
+    // "AutoLockTest",
+    // new AutoLockTest( m_autoBuilder, m_swerveDrive, m_rotationInput, m_rotationInput,
+    // m_rotationInput, m_fieldSim, m_wrist));
+
+    // m_autoChooser.addOption(
+    //     "RedTopTwoCone", new TopTwoCone("RedTopTwoCone", m_autoBuilder, m_swerveDrive,
+    // m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
-        new BottomDriveForward("BlueBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward(
+            "BlueBottomDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
 
     m_autoChooser.addOption(
         "RedBottomDriveForward",
-        new BottomDriveForward("RedBottomDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+        new BottomDriveForward(
+            "RedBottomDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.addOption(
-        "BlueDriveForward",
-        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueDriveForward",
+    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
-        "RedDriveForward",
-        new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "RedDriveForward",
+    //     new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption(
-        "BlueTopDriveForward",
-        new TopDriveForward("BlueTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.setDefaultOption(
+    //     "BlueTopDriveForward",
+    //     new TopDriveForward(
+    //         "BlueTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "RedTopDriveForward",
-        new TopDriveForward("RedTopDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption(
+    //     "RedTopDriveForward",
+    //     new TopDriveForward(
+    //         "RedTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
 
-    m_autoChooser.addOption(
-        "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    // m_autoChooser.addOption(
+    //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    m_autoChooser.setDefaultOption(
-        "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator, m_swerveDrive));
+    // m_autoChooser.addOption(
+    //     "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator,
+    // m_swerveDrive));
+
+    // m_autoChooser.addOption(
+    // "Balancetest",
+    // new Balancetest(
+    //     "BalanceTest",
+    //     m_autoBuilder,
+    //     m_swerveDrive,
+    //     m_rotationInput,
+    //     m_rotationInput,
+    //     m_rotationInput,
+    //     m_fieldSim,
+    //     m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
+  }
+
+  public void initializeScoringChooser() {
+    for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
+      m_scoringStateChooser.addOption(state.toString(), state);
+    }
+
+    m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
+
+    SmartDashboard.putData("Scoring State Selector", m_scoringStateChooser);
+  }
+
+  public void initializeMainStateChooser() {
+    for (SUPERSTRUCTURE_STATE state : SUPERSTRUCTURE_STATE.values()) {
+      m_mainStateChooser.addOption(state.toString(), state);
+    }
+    m_mainStateChooser.setDefaultOption("STOWED", SUPERSTRUCTURE_STATE.STOWED);
+
+    SmartDashboard.putData("Main State Selector", m_mainStateChooser);
   }
 
   public Command getAutonomousCommand() {
@@ -541,7 +663,7 @@ public class RobotContainer {
 
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    m_memorylog.simulationPeriodic();
+    // m_memorylog.simulationPeriodic();
   }
 
   public void disabledPeriodic() {
@@ -557,5 +679,11 @@ public class RobotContainer {
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
     // m_logManager.periodic();
+    // m_distanceSensor.pollDistanceSensors();
+  }
+
+  public void testPeriodic() {
+    m_stateHandler.testPeriodic();
+    m_fieldSim.periodic();
   }
 }

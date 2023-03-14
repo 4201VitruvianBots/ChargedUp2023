@@ -46,8 +46,8 @@ public class RunIntakeCube extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setPercentOutput(0.3);
-    m_intake.setBooleanState(false);
+    m_intake.setPercentOutput(0);
+    m_intake.setIntakeStateCube(false);
     // m_swerve.enableHeadingTarget(false);
     m_intake.setIntakeStateCube(false);
   }
