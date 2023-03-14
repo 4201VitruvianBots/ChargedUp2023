@@ -69,7 +69,6 @@ public class AutoLock extends CommandBase {
 
     SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
     System.out.print("yay");
-
   }
 
   // Called once the command ends or is interrupted.

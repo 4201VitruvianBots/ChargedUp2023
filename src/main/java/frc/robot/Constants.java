@@ -69,7 +69,7 @@ public final class Constants {
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
     public static final double gearRatio = 10.0;
     public static final double massKg = 4.0;
-    public static final double drumRadiusMeters = Units.inchesToMeters(0.5625);
+    public static final double drumRadiusMeters = Units.inchesToMeters(0.0381);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
 
@@ -88,7 +88,7 @@ public final class Constants {
     public static final double kV = 12.57;
     public static final double kA = 0.04;
 
-    public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
@@ -180,11 +180,11 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 126.914;
-    public static double frontRightCANCoderOffset = 222.9785;
-    public static double backLeftCANCoderOffset = 191.25;
-    public static double backRightCANCoderOffset = 34.7605;
-
+    public static double frontLeftCANCoderOffset =  125.8985;
+    public static double frontRightCANCoderOffset = 229.351;
+    public static double backLeftCANCoderOffset =  190.591;
+    public static double backRightCANCoderOffset = 31.6845;
+    
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
@@ -280,7 +280,7 @@ public final class Constants {
     public static final double length = Units.inchesToMeters(22);
     public static int kTimeoutMs = 0;
 
-    public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
+    public static TalonFXInvertType motorInversionType = TalonFXInvertType.CounterClockwise;
 
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(360);
