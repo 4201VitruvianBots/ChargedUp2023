@@ -14,8 +14,10 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
@@ -37,8 +39,13 @@ public class Vision extends SubsystemBase {
   private final DoubleLogEntry limelightTargetValid;
   private final DoubleLogEntry leftLocalizerTargetValid;
 
+  private final Timer searchPipelineTimer = new Timer();
+  private final double searchPipelineWindow = 0.4;
+
   private final Timer searchTimer = new Timer();
-  private final double searchWindow = 0.4;
+  
+  private double startTime, timestamp;
+  private boolean timerStart;
 
   private enum targetType {
     INTAKING,
@@ -99,6 +106,8 @@ public class Vision extends SubsystemBase {
             .publish();
 
     resetSearch();
+    resetPipelineSearch();
+    initSmartDashboard();
   }
 
   /**
@@ -228,17 +237,25 @@ public class Vision extends SubsystemBase {
       case INTAKE:
         return m_intakeNet.getEntry("pipeline").getDouble(0);
       default:
-        return 0;
+        return 0.0;
     }
+  }
+
+  /*
+   * resets timer for pipeline reconnection
+   */
+  public void resetSearch() {
+    searchTimer.reset();
+    searchTimer.start();
   }
 
   /*
    * resets timer for pipeline finder
    */
-  public void resetSearch() {
+  public void resetPipelineSearch() {
     targetFound = targetType.NONE;
-    searchTimer.reset();
-    searchTimer.start();
+    searchPipelineTimer.reset();
+    searchPipelineTimer.start();
   }
 
   /*
@@ -255,12 +272,35 @@ public class Vision extends SubsystemBase {
     return false;
   }
 
+   /*
+   * Attempts to reconnect with pipeline within a timespan once target is lost
+   */
+  public void reconnectLimelightPipeline(CAMERA_SERVER location) {
+    resetSearch();
+    startTime = searchTimer.get();
+
+    if (!timerStart && !searchLimelightTarget(location)) { 
+      timerStart = true;
+      timestamp = searchTimer.get();
+    } else if (timerStart && searchLimelightTarget(location)) {
+      timestamp = 0;
+      timerStart = false;
+    }
+
+    if (timestamp != 0 || searchTimer.get() - startTime > 3) {
+      if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
+        targetFound = targetType.NONE;
+        searchLimelightPipeline(location);
+      }
+    }
+  }
+
   /*
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     if (m_intakeSub.getIntakeState()) {
-      int pipeline = (int) (Math.floor(searchTimer.get() / searchWindow) % 2) + 1;
+      int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
       if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
@@ -275,12 +315,14 @@ public class Vision extends SubsystemBase {
       // threshold to lose game object once it's found
       if (targetFound == targetType.CUBE) {
         if (getTargetArea(location) < 2.0) {
-          targetFound = targetType.NONE;
+          reconnectLimelightPipeline(location);
+          //targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
         if (getTargetArea(location) < 2.0) {
-          targetFound = targetType.NONE;
+          reconnectLimelightPipeline(location);
+          //targetFound = targetType.NONE;
         }
       }
     }
@@ -453,6 +495,14 @@ public class Vision extends SubsystemBase {
     leftLocalizerTargetValid.append(getValidTargetType(CAMERA_SERVER.OUTTAKE));
   }
 
+  public void initSmartDashboard() {
+    SmartDashboard.putData(this);
+  }
+
+  public void updateSmartDashboard() {
+    SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
+  }
+
   @Override
   public void periodic() {
     m_leftLocalizerPositionPub.set(
@@ -475,6 +525,7 @@ public class Vision extends SubsystemBase {
         });
     //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
+    updateSmartDashboard();
     updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
     searchLimelightPipeline(CAMERA_SERVER.INTAKE);
     logData();
