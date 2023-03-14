@@ -36,7 +36,10 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   private final Field2d m_field2d = new Field2d();
 
-  private Pose2d robotPose;
+  private ArrayList<Pose2d> m_displayedNodes = new ArrayList<>();
+  private Pose2d m_highlightedNode = new Pose2d(0, 0, new Rotation2d(0));
+
+  private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
   /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
@@ -45,6 +48,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     - Low, mid and high positions
     - And coopertition grids
   */
+  private ArrayList<Pose2d> allNodes = new ArrayList<>();
   private ArrayList<Translation2d> validNodes = new ArrayList<>();
 
   private ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
@@ -82,6 +86,23 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     initSim();
   }
 
+    for (int i = 0; i < Grids.nodeRowCount; i++) {
+      // Adds a new row of poses to the list using sim constants
+      allNodes.add(
+          new Pose2d(
+              Grids.outerX / 2 + Grids.lowX,
+              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
+              new Rotation2d(0)));
+      allNodes.add(
+          new Pose2d(
+              Grids.outerX / 2 + Grids.midX,
+              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
+              new Rotation2d(0)));
+      allNodes.add(
+          new Pose2d(
+              Grids.outerX / 2 + Grids.highX,
+              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
+              new Rotation2d(0)));
   public void initSim() {
     initializeScoringNodes();
 
@@ -242,7 +263,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   /*
    * Priority list:
-   * 1 - Node is on our alliance
+   * 1 - Node is on our alliance or coopertition grid
    * 2 - Node takes our current game piece
    * 3 - Node is on the same level as our elevator
    * 4 - Node is closest to our robot
@@ -312,6 +333,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     return new Pose2d(possibleNodes.get(newIndex), Rotation2d.fromDegrees(0));
   }
 
+  public void setDisplayedNodes(ArrayList<Pose2d> displayedNodes, Pose2d highlightedNode) {
+    m_displayedNodes = displayedNodes;
+    m_highlightedNode = highlightedNode;
+  }
+
   @Override
   public void periodic() {
     if (RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
@@ -321,7 +347,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
     if (RobotBase.isSimulation()) simulationPeriodic();
 
-    SmartDashboard.putData("Field2d", m_field2d);
+    try {
+      SmartDashboard.putData("Field2d", m_field2d);
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
   }
 
   public void simulationPeriodic() {}

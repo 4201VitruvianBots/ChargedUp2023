@@ -154,10 +154,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   /*
-   * Uses trapezoidal profile to set robot heading to a clear target
+   * Set robot heading to a clear target
    */
 
-  public void setHeadingTargetRadians(double radians) {
+  public void setRobotHeadingRadians(double radians) {
     m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
   }
 
@@ -323,7 +323,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
-    pitchPub.set(getPitchDegrees());
+    pitchPub.set(getPitchDegrees() + 2.460938);
     rollPub.set(getRollDegrees());
     yawPub.set(getHeadingDegrees());
     odometryXPub.set(getOdometry().getEstimatedPosition().getX());

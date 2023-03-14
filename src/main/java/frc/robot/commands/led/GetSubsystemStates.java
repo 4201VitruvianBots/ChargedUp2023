@@ -55,12 +55,14 @@ public class GetSubsystemStates extends CommandBase {
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
     var desiredState = m_stateHandler.getDesiredZone();
-
+    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
+    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
+    intaking = m_intake.getIntakeState();
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {
       if (m_controls.getInitState()) {
-        m_led.expressState(LED_STATE.INITIALIZED);
+        // m_led.expressState(LED.robotState.INITIALIZED);
       } else {
         m_led.expressState(LED_STATE.DISABLED);
       }
@@ -81,18 +83,12 @@ public class GetSubsystemStates extends CommandBase {
           } else {
             m_led.expressState(LED_STATE.ELEVATING);
           }
-          break;
-          // TODO: Tie this to Intake Vision Code
-          //        case CUBE_BUTTON:
-          //          m_led.expressState(LED.robotState.CUBE_BUTTON);
-          //          break;
-          //        case CONE_BUTTON:
-          //          m_led.expressState(LED.robotState.CONE_BUTTON);
-          //          break;
         default:
-          m_led.expressState(LED_STATE.ENABLED);
           break;
       }
+    }
+    if (enabled) {
+      m_led.expressState(LED.robotState.ENABLED);
     }
   }
 

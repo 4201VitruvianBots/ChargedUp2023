@@ -38,7 +38,7 @@ public class AutoRunIntakeCone extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setPercentOutput(-m_PercentOutput);
+    m_intake.setPercentOutput(m_PercentOutput);
     // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
     //   m_swerve.enableHeadingTarget(true);
     //   m_swerve.setRobotHeading(
@@ -53,6 +53,7 @@ public class AutoRunIntakeCone extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_intake.setIntakeStateCone(false);
+    m_intake.setPercentOutput(0);
     // m_swerve.enableHeadingTarget(false);
   }
 
