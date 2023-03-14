@@ -241,6 +241,22 @@ public class Vision extends SubsystemBase {
     }
   }
 
+  //false == cube, true == cone
+  public boolean getGamePieceType(CAMERA_SERVER location) {
+    switch (location) {
+      case INTAKE:
+        if (getPipeline(location) == 2.0 && searchLimelightTarget(location)) {
+          return true; //cone
+        } else if (getPipeline(location) == 1.0 && searchLimelightTarget(location)) {
+          return false; //cube
+        } 
+      default:
+        return false;
+    }
+  }
+
+
+
   /*
    * resets timer for pipeline reconnection
    */
