@@ -47,8 +47,6 @@ import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.DoubleSupplier;
-import java.util.List;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -74,9 +72,6 @@ public class RobotContainer implements AutoCloseable {
   private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
       new SendableChooser<>();
   private final LED m_led = new LED(m_controls);
-  DoubleSupplier m_throttleInput;
-  DoubleSupplier m_strafeInput;
-  DoubleSupplier m_rotationInput;
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
   private final StateHandler m_stateHandler =
@@ -528,9 +523,6 @@ public class RobotContainer implements AutoCloseable {
             m_fieldSim,
             m_wrist,
             m_intake,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
             m_vision,
             m_elevator));
 
@@ -543,9 +535,6 @@ public class RobotContainer implements AutoCloseable {
             m_fieldSim,
             m_wrist,
             m_intake,
-            m_rotationInput,
-            m_rotationInput,
-            m_rotationInput,
             m_vision,
             m_elevator));
 
@@ -631,9 +620,6 @@ public class RobotContainer implements AutoCloseable {
     //     "BalanceTest",
     //     m_autoBuilder,
     //     m_swerveDrive,
-    //     m_rotationInput,
-    //     m_rotationInput,
-    //     m_rotationInput,
     //     m_fieldSim,
     //     m_wrist));
 

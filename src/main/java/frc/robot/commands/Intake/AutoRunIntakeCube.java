@@ -54,6 +54,7 @@ public class AutoRunIntakeCube extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setIntakeStateCube(false);
     // m_swerve.enableHeadingTarget(false);
+    m_intake.setBooleanState(false);
   }
 
   // Returns true when the command should end.

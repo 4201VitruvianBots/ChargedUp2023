@@ -39,6 +39,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final DigitalInput elevatorLowerSwitch =
       new DigitalInput(Constants.DIO.elevatorLowerSwitch);
 
+  public enum ELEVATOR_SPEED {
+    NORMAL,
+    LIMITED
+  }
+
   private double
       m_desiredPositionMeters; // The height in encoder units our robot is trying to reach
   private double
@@ -91,7 +96,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final double maxForwardOutput = 0.5;
   private final double maxReverseOutput = -0.4;
   private final double percentOutputMultiplier = 0.75;
-  public final double setpointMultiplier = 0.50;
+  public final double setpointMultiplier = 0.25;
 
   // Simulation setup
 
@@ -410,6 +415,15 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     positionMetersEntry.append(heightMeters);
   }
 
+  // Limits the speed of the elevator when we are close to the bottom (a.k.a. STOWED position)
+  public void updateElevatorReverseOutput() {
+    if (Units.metersToInches(getHeightMeters()) < 4.0) {
+      elevatorMotors[0].configPeakOutputReverse(-0.2);
+    } else {
+      elevatorMotors[0].configPeakOutputReverse(maxReverseOutput);
+    }
+  }
+
   @Override
   public void simulationPeriodic() {
     elevatorSim.setInput(getPercentOutput() * 12);
@@ -452,6 +466,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateHeightMeters();
+    updateElevatorReverseOutput();
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:

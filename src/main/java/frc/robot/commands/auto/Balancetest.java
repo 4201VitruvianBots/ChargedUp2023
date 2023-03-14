@@ -14,16 +14,12 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
-import java.util.function.DoubleSupplier;
 
 public class Balancetest extends SequentialCommandGroup {
   public Balancetest(
       String pathName,
       SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
-      DoubleSupplier throttleInput,
-      DoubleSupplier strafeInput,
-      DoubleSupplier rotationInput,
       FieldSim fieldSim,
       Wrist wrist) {
 
@@ -36,7 +32,7 @@ public class Balancetest extends SequentialCommandGroup {
         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         autoPath,
-        new AutoBalance(swerveDrive, throttleInput, strafeInput, rotationInput),
+        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
