@@ -85,8 +85,8 @@ public final class Constants {
         (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
 
     public static final double kS = 0.15956;
-    public static final double kV = 8.4689; //12.57;
-    public static final double kA = 0.23382; //0.04;
+    public static final double kV = 8.4689; // 12.57;
+    public static final double kA = 0.23382; // 0.04;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
@@ -180,11 +180,11 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset =  125.8985;
+    public static double frontLeftCANCoderOffset = 125.8985;
     public static double frontRightCANCoderOffset = 229.351;
-    public static double backLeftCANCoderOffset =  190.591;
+    public static double backLeftCANCoderOffset = 190.591;
     public static double backRightCANCoderOffset = 31.6845;
-    
+
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
