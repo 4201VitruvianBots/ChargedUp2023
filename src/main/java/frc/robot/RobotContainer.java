@@ -141,8 +141,8 @@ public class RobotContainer {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.63));
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.63));
 
     // Score button Bindings
 
@@ -258,7 +258,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.5));
+      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -271,7 +271,7 @@ public class RobotContainer {
                       m_stateHandler.getCurrentZone().getZone()
                           == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.5));
+      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(

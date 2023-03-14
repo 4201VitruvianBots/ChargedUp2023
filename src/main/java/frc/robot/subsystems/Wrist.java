@@ -124,7 +124,7 @@ public class Wrist extends SubsystemBase {
     wristMotor.config_kD(0, WRIST.kD);
     wristMotor.config_kI(0, WRIST.kI);
     wristMotor.configPeakOutputForward(maxPercentOutput, WRIST.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(-maxPercentOutput, WRIST.kTimeoutMs);
+    wristMotor.configPeakOutputReverse(-0.5, WRIST.kTimeoutMs);
 
     wristMotor.setInverted(WRIST.motorInversionType);
 

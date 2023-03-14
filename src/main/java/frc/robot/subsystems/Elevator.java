@@ -88,8 +88,8 @@ public class Elevator extends SubsystemBase {
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
-  private final double maxForwardOutput = 0.43;
-  private final double maxReverseOutput = -0.3;
+  private final double maxForwardOutput = 0.5;
+  private final double maxReverseOutput = -0.4;
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.50;
 
