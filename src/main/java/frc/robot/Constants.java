@@ -60,7 +60,7 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int elevatorLowerSwitch = 8;
+    public static final int elevatorLowerLimitSwitch = 1;
     public static final int wristLowerSwitch = 0;
   }
 

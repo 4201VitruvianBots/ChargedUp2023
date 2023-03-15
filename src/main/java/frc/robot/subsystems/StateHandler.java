@@ -404,9 +404,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator
-                        .getElevatorField2dTranslation()
-                        .plus(m_wrist.getHorizontalTranslation()),
+                    m_elevator.getField2dTranslation().plus(m_wrist.getHorizontalTranslation()),
                     m_drive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
