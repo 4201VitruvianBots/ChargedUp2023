@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.util.Units;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INTAKE;
+import frc.robot.utils.CtreUtils;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -42,6 +44,9 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.setInverted(false);
 
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+
+    //set current limit on talonfx motors
+    intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.1));
 
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
@@ -123,7 +128,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run
     updateSmartDashboard();
     updateLog();
-    // TODO: If the cube or cone distance sensors see a game object, run the intake motor to hold
+    // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to hold
     // the game piece in.
     if (!isIntaking) {
       if (getConeDistance() > 0) {
