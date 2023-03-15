@@ -6,10 +6,8 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
@@ -25,38 +23,36 @@ import java.util.Random;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class DistanceSensor {
+public class DistanceSensor implements AutoCloseable {
   private final int socketPort = 25000;
 
   private DatagramSocket socket;
   private String receivedData;
+  private double sensor1DistanceMeters;
+  private double sensor2DistanceMeters;
+  private double sensor3DistanceMeters;
 
   private Random rand = new Random();
 
   // Shuffleboard setup
-
-  public static ShuffleboardTab distanceSensorTab = Shuffleboard.getTab("DistanceSensor");
-
-  public GenericEntry rawStringTab = distanceSensorTab.add("Raw String Data", "None").getEntry();
-  public GenericEntry sensorValue1MMTab =
-      distanceSensorTab.add("Sensor Value 1 Millimeters", 0).getEntry();
-  public GenericEntry sensorValue2MMTab =
-      distanceSensorTab.add("Sensor Value 2 Millimeters", 0).getEntry();
-  public GenericEntry sensorValue1InTab =
-      distanceSensorTab.add("Sensor Value 1 Inches", 0).getEntry();
-  public GenericEntry sensorValue2InTab =
-      distanceSensorTab.add("Sensor Value 2 Inches", 0).getEntry();
-  public GenericEntry coneInchesTab = distanceSensorTab.add("Cone Distance Inches", 0).getEntry();
-  public GenericEntry cubeInchesTab = distanceSensorTab.add("Cube Distance Inches", 0).getEntry();
+  StringPublisher rawStringPub;
+  DoublePublisher sensor1InchPub,
+      sensor2InchPub,
+      sensor1MMPub,
+      sensor2MMPub,
+      coneInchesPub,
+      cubeInchesPub;
 
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
-    try {
-      InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
-      socket = new DatagramSocket(socketPort, address);
-      socket.setSoTimeout(1000);
-    } catch (SocketException | UnknownHostException socketFail) {
-      socketFail.printStackTrace();
+    if (RobotBase.isReal()) {
+      try {
+        InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
+        socket = new DatagramSocket(socketPort, address);
+        socket.setSoTimeout(1000);
+      } catch (SocketException | UnknownHostException socketFail) {
+        socketFail.printStackTrace();
+      }
     }
   }
 
@@ -156,6 +152,18 @@ public class DistanceSensor {
     return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
   }
 
+  private void initSmartDashboard() {
+    var distanceSensorTab =
+        NetworkTableInstance.getDefault().getTable("Suffleboard").getSubTable("Distance Sensor");
+    rawStringPub = distanceSensorTab.getStringTopic("Raw String Data").publish();
+    sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 MM").publish();
+    sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 MM").publish();
+    sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 Inches").publish();
+    sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 Inches").publish();
+    coneInchesPub = distanceSensorTab.getDoubleTopic("Cone Distance Inches").publish();
+    cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
+  }
+
   public void pollDistanceSensors() {
     // This method will be called once per scheduler run
     // testParserTab.setInteger(testParser());
@@ -169,13 +177,13 @@ public class DistanceSensor {
 
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
-      rawStringTab.setString(receivedData);
-      sensorValue1MMTab.setDouble(getSensorValueMillimeters(1));
-      sensorValue2MMTab.setDouble(getSensorValueMillimeters(2));
-      sensorValue1InTab.setDouble(getSensorValueInches(1));
-      sensorValue2InTab.setDouble(getSensorValueInches(2));
-      coneInchesTab.setDouble(getConeDistanceInches());
-      cubeInchesTab.setDouble(getCubeDistanceInches());
+      rawStringPub.set(receivedData);
+      sensor1MMPub.set(getSensorValueMillimeters(1));
+      sensor2MMPub.set(getSensorValueMillimeters(2));
+      sensor1InchPub.set(getSensorValueInches(1));
+      sensor2InchPub.set(getSensorValueInches(2));
+      coneInchesPub.set(getConeDistanceInches());
+      cubeInchesPub.set(getCubeDistanceInches());
     } catch (SocketTimeoutException ex) {
       System.out.println("error: " + ex.getMessage());
       ex.printStackTrace();
@@ -185,5 +193,10 @@ public class DistanceSensor {
     } catch (Exception ex) {
       ex.printStackTrace();
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (socket != null) socket.close();
   }
 }

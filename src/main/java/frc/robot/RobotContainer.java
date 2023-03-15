@@ -41,6 +41,7 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
@@ -83,10 +84,10 @@ public class RobotContainer implements AutoCloseable {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
-  // Initalize used utils
+  // Initialize used utils
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
-  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -701,9 +702,9 @@ public class RobotContainer implements AutoCloseable {
     m_swerveDrive.disabledPeriodic();
   }
 
-  //  public DistanceSensor getDistanceSensor() {
-  //    return m_distanceSensor;
-  //  }
+  public DistanceSensor getDistanceSensor() {
+    return m_distanceSensor;
+  }
 
   public void periodic() {
     m_fieldSim.periodic();
@@ -729,6 +730,7 @@ public class RobotContainer implements AutoCloseable {
     m_intake.close();
     m_controls.close();
 
+    m_distanceSensor.close();
     m_logger.close();
   }
 }
