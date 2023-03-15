@@ -11,8 +11,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER.*;
@@ -24,7 +27,7 @@ import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase implements AutoCloseable {
   /** Creates a new StateHandler. */
-  public SCORING_STATE m_currentScoringState = SCORING_STATE.STOWED;
+  public SCORING_STATE m_scoringState = SCORING_STATE.STOWED;
 
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
@@ -45,6 +48,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
+
+  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
+  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
+      new SendableChooser<>();
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
   private DoublePublisher m_elevatorHeightPub,
@@ -71,6 +78,30 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wrist = wrist;
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
+
+    if (RobotBase.isSimulation()) {
+      initializeScoringChooser();
+      initializeMainStateChooser();
+    }
+  }
+
+  public void initializeScoringChooser() {
+    for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
+      m_scoringStateChooser.addOption(state.toString(), state);
+    }
+
+    m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
+
+    SmartDashboard.putData("Scoring State Selector", m_scoringStateChooser);
+  }
+
+  public void initializeMainStateChooser() {
+    for (SUPERSTRUCTURE_STATE state : SUPERSTRUCTURE_STATE.values()) {
+      m_mainStateChooser.addOption(state.toString(), state);
+    }
+    m_mainStateChooser.setDefaultOption("STOWED", SUPERSTRUCTURE_STATE.STOWED);
+
+    SmartDashboard.putData("Main State Selector", m_mainStateChooser);
   }
 
   public SUPERSTRUCTURE_STATE getCurrentZone() {
@@ -86,7 +117,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void setCurrentScoringState(SCORING_STATE state) {
-    m_currentScoringState = state;
+    m_scoringState = state;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -466,7 +497,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       case NONE:
         break;
     }
-    m_fieldSim.updateValidNodes(m_currentScoringState);
+    m_fieldSim.updateValidNodes(m_scoringState);
 
     if (m_smartScoringEnabled) {
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
@@ -475,7 +506,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           m_drive.getPoseMeters(),
           m_fieldSim.getTargetNode(),
           m_wrist.getHorizontalTranslation().getX(),
-          m_currentScoringState);
+          m_scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
@@ -484,11 +515,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void testPeriodic() {
-    //    scoringState = m_scoringChooser.getSelected();
-    //    m_currentZone = m_mainStateChooser.getSelected();
-    //    m_fieldSim.setDisplayedNodes(
-    //        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
-    //        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
+    m_scoringState = m_scoringStateChooser.getSelected();
+    m_currentZone = m_mainStateChooser.getSelected();
+    m_fieldSim.getValidNodes();
+    m_fieldSim.getTargetNode();
   }
 
   @Override

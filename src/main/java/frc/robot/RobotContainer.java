@@ -67,9 +67,6 @@ public class RobotContainer implements AutoCloseable {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
-  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
-      new SendableChooser<>();
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
@@ -105,8 +102,6 @@ public class RobotContainer implements AutoCloseable {
 
     initAutoBuilder();
     initializeAutoChooser();
-    initializeScoringChooser();
-    initializeMainStateChooser();
   }
 
   public void initializeSubsystems() {
@@ -494,17 +489,10 @@ public class RobotContainer implements AutoCloseable {
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-    //   m_autoChooser.addOption("MiddleOneConeBalance", new
-    // RedMiddleOneConeBalance(m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueTopTwoCone",
         new TopTwoCone("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
-
-    // m_autoChooser.addOption(
-    //     "ReallyOldBlueTopTwoCone",
-    //     new ReallyOldTopTwoCone(
-    //         "ReallyOldBlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
@@ -600,21 +588,6 @@ public class RobotContainer implements AutoCloseable {
     // m_autoChooser.addOption(
     //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
-    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
-
-    // m_autoChooser.addOption(
-    //     "RealDoNothing", new RealDoNothing(m_wrist, m_intake, m_vision, m_elevator,
-    // m_swerveDrive));
-
-    // m_autoChooser.addOption(
-    // "Balancetest",
-    // new Balancetest(
-    //     "BalanceTest",
-    //     m_autoBuilder,
-    //     m_swerveDrive,
-    //     m_fieldSim,
-    //     m_wrist));
-
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     if (RobotBase.isSimulation()) {
@@ -638,25 +611,6 @@ public class RobotContainer implements AutoCloseable {
 
       SmartDashboard.putData("Auto Visualizer", autoPlotter);
     }
-  }
-
-  public void initializeScoringChooser() {
-    for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
-      m_scoringStateChooser.addOption(state.toString(), state);
-    }
-
-    m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
-
-    SmartDashboard.putData("Scoring State Selector", m_scoringStateChooser);
-  }
-
-  public void initializeMainStateChooser() {
-    for (SUPERSTRUCTURE_STATE state : SUPERSTRUCTURE_STATE.values()) {
-      m_mainStateChooser.addOption(state.toString(), state);
-    }
-    m_mainStateChooser.setDefaultOption("STOWED", SUPERSTRUCTURE_STATE.STOWED);
-
-    SmartDashboard.putData("Main State Selector", m_mainStateChooser);
   }
 
   public Command getAutonomousCommand() {
@@ -692,16 +646,6 @@ public class RobotContainer implements AutoCloseable {
     return m_fieldSim;
   }
 
-  public void simulationPeriodic() {
-    m_elevator.simulationPeriodic();
-    m_memorylog.simulationPeriodic();
-    m_fieldSim.setTrajectory(autoPlotter.getSelected());
-  }
-
-  public void disabledPeriodic() {
-    m_swerveDrive.disabledPeriodic();
-  }
-
   public DistanceSensor getDistanceSensor() {
     return m_distanceSensor;
   }
@@ -713,9 +657,19 @@ public class RobotContainer implements AutoCloseable {
     // m_logManager.periodic();
   }
 
+  public void disabledPeriodic() {
+    m_swerveDrive.disabledPeriodic();
+  }
+
   public void testPeriodic() {
     m_stateHandler.testPeriodic();
     m_fieldSim.periodic();
+  }
+
+  public void simulationPeriodic() {
+    m_elevator.simulationPeriodic();
+    m_memorylog.simulationPeriodic();
+    m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   @Override
