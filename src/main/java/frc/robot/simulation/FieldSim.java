@@ -218,9 +218,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
-                    m_elevator
-                        .getElevatorField2dTranslation()
-                        .plus(m_wrist.getHorizontalTranslation()),
+                    m_elevator.getField2dTranslation().plus(m_wrist.getHorizontalTranslation()),
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
 

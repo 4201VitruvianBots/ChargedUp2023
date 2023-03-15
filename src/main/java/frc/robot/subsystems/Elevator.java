@@ -36,8 +36,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   };
 
   // Initializing hall effect sensor at bottom of elevator
-  private final DigitalInput elevatorHallEffectSensor =
-      new DigitalInput(Constants.DIO.elevatorHallEffectSensor);
+  private final DigitalInput lowerLimitSwitch =
+      new DigitalInput(Constants.DIO.elevatorLowerLimitSwitch);
 
   public enum ELEVATOR_SPEED {
     NORMAL,
@@ -175,8 +175,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void setPercentOutput(double output) {
-    if (getHallEffectSensor() && output < 0)
-      output = MathUtil.clamp(output, 0, 1);
+    if (getLimitSwitch() && output < 0) output = Math.max(output, 0);
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
@@ -206,11 +205,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
    * Elevator's height position
    */
   public double getHeightMeters() {
-    if (getHallEffectSensor()) {
-      return 0.0;
-    } else {
-      return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
-    }
+    return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
   }
 
   public double getVelocityMps() {
@@ -235,8 +230,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return isElevatorElevatingElevatando = state;
   }
 
-  public boolean getHallEffectSensor() {
-    return !elevatorHallEffectSensor.get();
+  public boolean getLimitSwitch() {
+    return !lowerLimitSwitch.get();
   }
 
   public void setSensorPosition(double meters) {
@@ -321,13 +316,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    // if (getElevatorLowerSwitch()) {
-    //   setElevatorSensorPosition(0.0);
-    // }
+    if (getLimitSwitch()) setSensorPosition(0.0);
     heightMeters = getHeightMeters();
   }
 
-  public Translation2d getElevatorField2dTranslation() {
+  public Translation2d getField2dTranslation() {
     return new Translation2d(
         -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
             + centerOffset,
@@ -528,6 +521,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    elevatorHallEffectSensor.close();
+    lowerLimitSwitch.close();
   }
 }
