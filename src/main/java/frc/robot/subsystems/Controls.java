@@ -4,15 +4,16 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Controls extends SubsystemBase {
+public class Controls extends SubsystemBase implements AutoCloseable {
   StringPublisher allianceString;
   BooleanPublisher allianceBoolean;
 
   private boolean isInit;
-  private DriverStation.Alliance allianceColor = DriverStation.Alliance.Invalid;
+  private static DriverStation.Alliance allianceColor = DriverStation.Alliance.Red;
 
   public Controls() {
     initSmartDashboard();
@@ -24,7 +25,7 @@ public class Controls extends SubsystemBase {
    *
    * @return Returns the current alliance color.
    */
-  public DriverStation.Alliance getAllianceColor() {
+  public static DriverStation.Alliance getAllianceColor() {
     return allianceColor;
   }
 
@@ -33,7 +34,7 @@ public class Controls extends SubsystemBase {
    *
    * @return Returns the current alliance color.
    */
-  public boolean getAllianceColorBoolean() {
+  public static boolean getAllianceColorBoolean() {
     return getAllianceColor() != DriverStation.Alliance.Blue;
   }
 
@@ -77,7 +78,7 @@ public class Controls extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled()) {
+    if (RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
       updateAllianceColor();
     }
     // This method will be called once per scheduler run
@@ -90,4 +91,7 @@ public class Controls extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
     //    System.out.println("Test2");
   }
+
+  @Override
+  public void close() throws Exception {}
 }

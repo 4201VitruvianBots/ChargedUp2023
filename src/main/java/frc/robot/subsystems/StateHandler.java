@@ -6,79 +6,26 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
+import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
-public class StateHandler extends SubsystemBase {
+public class StateHandler extends SubsystemBase implements AutoCloseable {
   /** Creates a new StateHandler. */
-  public enum INTAKING_STATES {
-    NONE,
-    INTAKING,
-    CONE,
-    CUBE
-  }
+  public SCORING_STATE m_currentScoringState = SCORING_STATE.STOWED;
 
-  public enum SUPERSTRUCTURE_STATE {
-    // UNDEFINED
-    DANGER_ZONE(0),
-    // LOW
-    STOWED(1),
-    INTAKE_LOW(1),
-    SCORE_LOW_REVERSE(1),
-    SCORE_LOW(1),
-    SCORE_LOW_CONE(1),
-    SCORE_LOW_CUBE(1),
-    LOW_ZONE(1),
-    // MID
-    MID_ZONE(2),
-    // HIGH
-    HIGH_ZONE(3),
-    // EXTENDED
-    EXTENDED_ZONE(4),
-    INTAKE_EXTENDED(4),
-    SCORE_MID(4),
-    SCORE_HIGH(4),
-    SCORE_MID_CONE(4),
-    SCORE_MID_CUBE(4),
-    SCORE_HIGH_CONE(4),
-    SCORE_HIGH_CUBE(4);
-
-    // State Zone is determined by elevator setpoints
-    private final int zone;
-
-    SUPERSTRUCTURE_STATE(final int zone) {
-      this.zone = zone;
-    }
-
-    public int getZone() {
-      return zone;
-    }
-  }
-
-  public enum ZONE_TRANSITIONS {
-    NONE,
-    LOW_TO_MID,
-    MID_TO_LOW,
-    MID_TO_HIGH,
-    HIGH_TO_MID,
-    HIGH_TO_EXTENDED,
-    EXTENDED_TO_HIGH
-  }
-
-  public SCORING_STATE scoringState = SCORING_STATE.STOWED;
   public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
   public SUPERSTRUCTURE_STATE m_currentZone = SUPERSTRUCTURE_STATE.STOWED;
@@ -95,11 +42,9 @@ public class StateHandler extends SubsystemBase {
   private final SwerveDrive m_drive;
   private final FieldSim m_fieldSim;
   private final Elevator m_elevator;
-  private final LED m_led;
+  private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private final SendableChooser<SCORING_STATE> m_scoringChooser;
-  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser;
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
   private DoublePublisher m_elevatorHeightPub,
@@ -115,10 +60,8 @@ public class StateHandler extends SubsystemBase {
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Elevator elevator,
-      LED led,
-      Vision vision,
-      SendableChooser<Constants.SCORING_STATE> scoringStateChooser,
-      SendableChooser<SUPERSTRUCTURE_STATE> mainStateChooser) {
+      LEDSubsystem led,
+      Vision vision) {
     m_intake = intake;
     m_drive = swerveDrive;
     m_fieldSim = fieldSim;
@@ -126,8 +69,6 @@ public class StateHandler extends SubsystemBase {
     m_led = led;
     m_vision = vision;
     m_wrist = wrist;
-    m_scoringChooser = scoringStateChooser;
-    m_mainStateChooser = mainStateChooser;
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
   }
@@ -142,6 +83,10 @@ public class StateHandler extends SubsystemBase {
 
   public ZONE_TRANSITIONS getNextZone() {
     return m_nextZone;
+  }
+
+  public void setCurrentScoringState(SCORING_STATE state) {
+    m_currentScoringState = state;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -237,6 +182,8 @@ public class StateHandler extends SubsystemBase {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
     // zones, otherwise don't set a transition limit
     if (m_currentZone.getZone() != m_desiredZone.getZone()) {
+      // SpecialCases
+
       switch (m_currentZone.getZone()) {
         case 1: // LOW
           if (m_desiredZone.getZone() > m_currentZone.getZone())
@@ -313,7 +260,9 @@ public class StateHandler extends SubsystemBase {
           m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.HIGH_MIN.get());
           m_elevator.setUpperLimitMeters(ELEVATOR.THRESHOLD.EXTENDED_MAX.get());
           m_wrist.setLowerLimit(WRIST.THRESHOLD.EXTENDED_MIN.get());
-          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          // Modified to avoid wrist hitting elevator
+          //          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+          m_wrist.setUpperLimit(WRIST.THRESHOLD.MID_MAX.get());
           break;
         }
       default:
@@ -395,7 +344,9 @@ public class StateHandler extends SubsystemBase {
       case 4: // EXTENDED
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.HIGH_MAX.get()) {
           // EXTENDED -> HIGH
-          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
+          // Modified to avoid wrist hitting the elevator going down
+          //            if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           }
@@ -458,10 +409,9 @@ public class StateHandler extends SubsystemBase {
     m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
   }
 
-  public void switchTargetNode(boolean left, boolean sameTypeOnly) {
-    ArrayList<Pose2d> possibleNodes =
-        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false);
-    targetNode = m_fieldSim.getAdjacentNode(targetNode, left, possibleNodes, sameTypeOnly);
+  public void switchTargetNode(boolean left) {
+    ArrayList<Translation2d> possibleNodes = m_fieldSim.getValidNodes();
+    targetNode = m_fieldSim.getAdjacentNode(targetNode, possibleNodes, left);
   }
 
   @Override
@@ -516,15 +466,16 @@ public class StateHandler extends SubsystemBase {
       case NONE:
         break;
     }
+    m_fieldSim.updateValidNodes(m_currentScoringState);
 
     if (m_smartScoringEnabled) {
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(scoringState, m_currentZone, false),
+          m_fieldSim.getTargetNode(),
           m_wrist.getHorizontalTranslation().getX(),
-          scoringState);
+          m_currentScoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
@@ -533,10 +484,13 @@ public class StateHandler extends SubsystemBase {
   }
 
   public void testPeriodic() {
-    scoringState = m_scoringChooser.getSelected();
-    m_currentZone = m_mainStateChooser.getSelected();
-    m_fieldSim.setDisplayedNodes(
-        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
-        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
+    //    scoringState = m_scoringChooser.getSelected();
+    //    m_currentZone = m_mainStateChooser.getSelected();
+    //    m_fieldSim.setDisplayedNodes(
+    //        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
+    //        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
   }
+
+  @Override
+  public void close() throws Exception {}
 }

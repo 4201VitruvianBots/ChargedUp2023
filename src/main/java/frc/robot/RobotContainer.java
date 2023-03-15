@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
@@ -21,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
@@ -37,11 +41,11 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LED.PieceType;
-import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
-import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
+import frc.robot.utils.TrajectoryUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,7 +53,7 @@ import java.util.HashMap;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-public class RobotContainer {
+public class RobotContainer implements AutoCloseable {
   private final DataLog m_logger = DataLogManager.getLog();
 
   // The robot's subsystems and commands are defined here...
@@ -62,23 +66,14 @@ public class RobotContainer {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser =
-      new SendableChooser<>();
+  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
   private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
       new SendableChooser<>();
-  private final LED m_led = new LED(m_controls);
+  private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
+  private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
   private final StateHandler m_stateHandler =
-      new StateHandler(
-          m_intake,
-          m_wrist,
-          m_swerveDrive,
-          m_fieldSim,
-          m_elevator,
-          m_led,
-          m_vision,
-          m_scoringStateChooser,
-          m_mainStateChooser);
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
 
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
@@ -91,7 +86,7 @@ public class RobotContainer {
   // Initalize used utils
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
@@ -128,8 +123,6 @@ public class RobotContainer {
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
-
-    m_fieldSim.initSim();
   }
 
   /**
@@ -243,13 +236,13 @@ public class RobotContainer {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CUBE));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .rightBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, PieceType.CONE));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .leftBumper()
         .whileTrue(
@@ -283,7 +276,7 @@ public class RobotContainer {
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
                       m_stateHandler.getCurrentZone().getZone()
-                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
@@ -296,7 +289,7 @@ public class RobotContainer {
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
                       m_stateHandler.getCurrentZone().getZone()
-                          == StateHandler.SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
 
       // Score button Bindings
 
@@ -493,6 +486,10 @@ public class RobotContainer {
             m_swerveDrive);
   }
 
+  public SwerveAutoBuilder getAutoBuilder() {
+    return m_autoBuilder;
+  }
+
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
@@ -618,6 +615,28 @@ public class RobotContainer {
     //     m_wrist));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
+
+    if (RobotBase.isSimulation()) {
+      autoPlotter = new SendableChooser<>();
+      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+      dummy.add(new PathPlannerTrajectory());
+      autoPlotter.setDefaultOption("None", dummy);
+      String[] autos = {
+        "BlueTopTwoCone",
+        "BlueOnePiece",
+        "RedTopTwoCone",
+        "BlueBottomDriveForward",
+        "RedBottomDriveForward",
+        "BlueDriveForward",
+        "RedDriveForward"
+      };
+      for (var auto : autos) {
+        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+        autoPlotter.addOption(auto, trajectory);
+      }
+
+      SmartDashboard.putData("Auto Visualizer", autoPlotter);
+    }
   }
 
   public void initializeScoringChooser() {
@@ -644,22 +663,47 @@ public class RobotContainer {
     return m_autoChooser.getSelected();
   }
 
+  public SwerveDrive getSwerveDrive() {
+    return m_swerveDrive;
+  }
+
+  public Elevator getElevator() {
+    return m_elevator;
+  }
+
   public Wrist getWrist() {
     return m_wrist;
   }
 
+  public Intake getIntake() {
+    return m_intake;
+  }
+
+  public Vision getVision() {
+    return m_vision;
+  }
+
+  public Controls getControls() {
+    return m_controls;
+  }
+
+  public FieldSim getFieldSim() {
+    return m_fieldSim;
+  }
+
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
-    // m_memorylog.simulationPeriodic();
+    m_memorylog.simulationPeriodic();
+    m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   public void disabledPeriodic() {
     m_swerveDrive.disabledPeriodic();
   }
 
-  public DistanceSensor getDistanceSensor() {
-    return m_distanceSensor;
-  }
+  //  public DistanceSensor getDistanceSensor() {
+  //    return m_distanceSensor;
+  //  }
 
   public void periodic() {
     m_fieldSim.periodic();
@@ -671,5 +715,20 @@ public class RobotContainer {
   public void testPeriodic() {
     m_stateHandler.testPeriodic();
     m_fieldSim.periodic();
+  }
+
+  @Override
+  public void close() throws Exception {
+    m_fieldSim.close();
+    m_stateHandler.close();
+    m_vision.close();
+    m_led.close();
+    m_wrist.close();
+    m_swerveDrive.close();
+    m_elevator.close();
+    m_intake.close();
+    m_controls.close();
+
+    m_logger.close();
   }
 }

@@ -6,6 +6,8 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.LED.LED_STATE;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.subsystems.*;
 
 /*scoring = flashing white, intakingcube = blue,
@@ -16,7 +18,7 @@ cubebutton = purple, conebutton = yellow */
 /** Sets the LED based on the subsystems' statuses */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final LED m_led;
+  private final LEDSubsystem m_led;
 
   private final Intake m_intake;
   private final Controls m_controls;
@@ -30,7 +32,8 @@ public class GetSubsystemStates extends CommandBase {
   private boolean coneButton;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LED led, Controls controls, StateHandler stateHandler, Intake intake) {
+  public GetSubsystemStates(
+      LEDSubsystem led, Controls controls, StateHandler stateHandler, Intake intake) {
     m_led = led;
     m_stateHandler = stateHandler;
     m_intake = intake;
@@ -43,7 +46,7 @@ public class GetSubsystemStates extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_led.expressState(LED.robotState.DISABLED);
+    m_led.expressState(LED_STATE.DISABLED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -53,8 +56,8 @@ public class GetSubsystemStates extends CommandBase {
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
     var desiredState = m_stateHandler.getDesiredZone();
-    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
-    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
+    coneButton = m_led.getPieceIntent() == INTAKING_STATES.CONE;
+    cubeButton = m_led.getPieceIntent() == INTAKING_STATES.CUBE;
     intaking = m_intake.getIntakeState();
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -62,13 +65,13 @@ public class GetSubsystemStates extends CommandBase {
       if (m_controls.getInitState()) {
         // m_led.expressState(LED.robotState.INITIALIZED);
       } else {
-        m_led.expressState(LED.robotState.DISABLED);
+        m_led.expressState(LED_STATE.DISABLED);
       }
     } else {
       switch (desiredState) {
         case INTAKE_LOW:
         case INTAKE_EXTENDED:
-          m_led.expressState(LED.robotState.INTAKING);
+          m_led.expressState(LED_STATE.INTAKING);
           break;
         case SCORE_LOW_CONE:
         case SCORE_LOW_CUBE:
@@ -77,16 +80,16 @@ public class GetSubsystemStates extends CommandBase {
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
           if (m_stateHandler.isOnTarget()) {
-            m_led.expressState(LED.robotState.LOCKED_ON);
+            m_led.expressState(LED_STATE.LOCKED_ON);
           } else {
-            m_led.expressState(LED.robotState.ELEVATING);
+            m_led.expressState(LED_STATE.ELEVATING);
           }
         default:
           break;
       }
     }
     if (enabled) {
-      m_led.expressState(LED.robotState.ENABLED);
+      m_led.expressState(LED_STATE.ENABLED);
     }
   }
 

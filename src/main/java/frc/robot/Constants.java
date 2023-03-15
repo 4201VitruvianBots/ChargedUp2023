@@ -159,7 +159,37 @@ public final class Constants {
     }
   }
 
-  public static final class LED {}
+  public static final class LED {
+
+    /** Different LED animation types */
+    public enum ANIMATION_TYPE {
+      ColorFlow,
+      Fire,
+      Larson,
+      Rainbow,
+      RgbFade,
+      SingleFade,
+      Strobe,
+      Twinkle,
+      TwinkleOff,
+      Solid
+    }
+
+    /** Different robot states */
+    public enum LED_STATE {
+      DISABLED,
+      INITIALIZED,
+      ENABLED,
+      INTAKING,
+      ELEVATING,
+      WRIST,
+      CONE_BUTTON,
+      CUBE_BUTTON,
+      CHARGING_STATION,
+      SCORING,
+      LOCKED_ON
+    }
+  }
 
   public static final class SWERVEDRIVE {
     public static final double kTrackWidth = Units.inchesToMeters(24);
@@ -362,19 +392,72 @@ public final class Constants {
     }
   }
 
-  public static class STATEHANDLER {}
+  public static class STATEHANDLER {
+
+    public enum INTAKING_STATES {
+      NONE,
+      INTAKING,
+      CONE,
+      CUBE
+    }
+
+    public enum SUPERSTRUCTURE_STATE {
+      // UNDEFINED
+      DANGER_ZONE(0),
+      // LOW
+      STOWED(1),
+      INTAKE_LOW(1),
+      SCORE_LOW_REVERSE(1),
+      SCORE_LOW(1),
+      SCORE_LOW_CONE(1),
+      SCORE_LOW_CUBE(1),
+      LOW_ZONE(1),
+      // MID
+      MID_ZONE(2),
+      // HIGH
+      HIGH_ZONE(3),
+      // EXTENDED
+      EXTENDED_ZONE(4),
+      INTAKE_EXTENDED(4),
+      SCORE_MID(4),
+      SCORE_HIGH(4),
+      SCORE_MID_CONE(4),
+      SCORE_MID_CUBE(4),
+      SCORE_HIGH_CONE(4),
+      SCORE_HIGH_CUBE(4);
+
+      // State Zone is determined by elevator setpoints
+      private final int zone;
+
+      SUPERSTRUCTURE_STATE(final int zone) {
+        this.zone = zone;
+      }
+
+      public int getZone() {
+        return zone;
+      }
+    }
+
+    public enum ZONE_TRANSITIONS {
+      NONE,
+      LOW_TO_MID,
+      MID_TO_LOW,
+      MID_TO_HIGH,
+      HIGH_TO_MID,
+      HIGH_TO_EXTENDED,
+      EXTENDED_TO_HIGH,
+    }
+  }
 
   public enum SCORING_STATE {
     STOWED,
     AUTO_BALANCE,
-    SETPOINT_LOW_INTAKE,
-    SETPOINT_LOW,
-    SETPOINT_MEDIUM,
-    SETPOINT_HIGH,
-    SMART_LOW_REVERSE,
-    SMART_LOW,
-    SMART_MEDIUM,
-    SMART_HIGH,
+    LOW_REVERSE,
+    LOW,
+    MID_CONE,
+    MID_CUBE,
+    HIGH_CONE,
+    HIGH_CUBE,
   }
 
   private static void initBeta() {

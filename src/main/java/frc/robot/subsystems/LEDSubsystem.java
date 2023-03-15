@@ -14,15 +14,17 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.LED.*;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 
 // creates LED subsystem
-public class LED extends SubsystemBase {
-  private PieceType pieceIntent = PieceType.NONE;
+public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
+  private INTAKING_STATES pieceIntent = INTAKING_STATES.NONE;
   private final CANdle m_candle = new CANdle(Constants.CAN.CANdle); // LED In constants)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
-  private robotState currentRobotState = robotState.DISABLED;
+  private LED_STATE currentRobotState = LED_STATE.DISABLED;
   private Animation m_toAnimate = null;
 
   private final Controls m_controls; // figure out during robotics class
@@ -31,7 +33,7 @@ public class LED extends SubsystemBase {
 
   private final StringPublisher ledStatePub;
   // Create LED strip
-  public LED(Controls controls) {
+  public LEDSubsystem(Controls controls) {
     // sets up LED strip
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true; // sets lights of when the LEDs are activated
@@ -61,7 +63,7 @@ public class LED extends SubsystemBase {
 
   // will create LED patterns
   public void setPattern(
-      int red, int green, int blue, int white, double speed, AnimationTypes toChange) {
+      int red, int green, int blue, int white, double speed, ANIMATION_TYPE toChange) {
 
     switch (toChange) {
       case ColorFlow: // stripe of color flowing through the led strip
@@ -111,38 +113,38 @@ public class LED extends SubsystemBase {
    * @param state the dominant robot state that LEDs will express
    */
   // will set LEDs a coordinated color for an action !TBD!
-  public void expressState(robotState state) {
+  public void expressState(LED_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
         case DISABLED: // Solid red
-          setPattern(255, 0, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case INITIALIZED:
-          setPattern(0, 255, 0, 0, 0, AnimationTypes.Twinkle);
+          setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Twinkle);
           break;
         case ENABLED: // Solid green
-          setPattern(0, 255, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case INTAKING: // Solid blue
-          setPattern(0, 0, 255, 0, 0, AnimationTypes.Solid);
+          setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case CONE_BUTTON: // Solid Yellow
-          setPattern(150, 120, 0, 0, 0, AnimationTypes.Solid);
+          setPattern(150, 120, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case CUBE_BUTTON: // Solid purple
-          setPattern(128, 0, 128, 0, 0, AnimationTypes.Solid);
+          setPattern(128, 0, 128, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case ELEVATING:
-          setPattern(0, 0, 255, 0, 0, AnimationTypes.ColorFlow);
+          setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.ColorFlow);
           break;
         case CHARGING_STATION:
-          setPattern(125, 125, 125, 125, 0, AnimationTypes.Rainbow);
+          setPattern(125, 125, 125, 125, 0, ANIMATION_TYPE.Rainbow);
           break;
         case SCORING: // Flashing white
-          setPattern(0, 0, 0, 255, 1, AnimationTypes.Strobe);
+          setPattern(0, 0, 0, 255, 1, ANIMATION_TYPE.Strobe);
           break;
         case LOCKED_ON: // Flashing Green
-          setPattern(0, 255, 0, 0, 1, AnimationTypes.Strobe);
+          setPattern(0, 255, 0, 0, 1, ANIMATION_TYPE.Strobe);
           break;
         default:
           break;
@@ -177,46 +179,14 @@ public class LED extends SubsystemBase {
 
   }
 
-  public PieceType getPieceIntent() {
+  public INTAKING_STATES getPieceIntent() {
     return pieceIntent;
   }
 
-  public void setPieceIntent(PieceType type) {
+  public void setPieceIntent(INTAKING_STATES type) {
     pieceIntent = type;
   }
 
-  /** Different LED animation types */
-  public enum AnimationTypes {
-    ColorFlow,
-    Fire,
-    Larson,
-    Rainbow,
-    RgbFade,
-    SingleFade,
-    Strobe,
-    Twinkle,
-    TwinkleOff,
-    Solid
-  }
-
-  /** Different robot states */
-  public enum robotState {
-    DISABLED,
-    INITIALIZED,
-    ENABLED,
-    INTAKING,
-    ELEVATING,
-    WRIST,
-    CONE_BUTTON,
-    CUBE_BUTTON,
-    CHARGING_STATION,
-    SCORING,
-    LOCKED_ON
-  }
-
-  public enum PieceType {
-    CONE,
-    CUBE,
-    NONE,
-  }
+  @Override
+  public void close() throws Exception {}
 }

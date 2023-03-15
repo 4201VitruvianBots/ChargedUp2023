@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INTAKE;
 
-public class Intake extends SubsystemBase {
+public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private static boolean isIntaking = false;
 
@@ -136,4 +136,7 @@ public class Intake extends SubsystemBase {
       setPercentOutput(m_percentOutput);
     }
   }
+
+  @Override
+  public void close() throws Exception {}
 }

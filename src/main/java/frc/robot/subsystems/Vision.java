@@ -21,7 +21,7 @@ import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
-public class Vision extends SubsystemBase {
+public class Vision extends SubsystemBase implements AutoCloseable {
 
   private final SwerveDrive m_swerveDrive;
   private final Controls m_controls;
@@ -549,4 +549,7 @@ public class Vision extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
+
+  @Override
+  public void close() throws Exception {}
 }

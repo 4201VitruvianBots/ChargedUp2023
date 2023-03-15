@@ -28,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Initializing both motors
   public final TalonFX[] elevatorMotors = {
@@ -521,5 +521,10 @@ public class Elevator extends SubsystemBase {
       }
       setPercentOutput(percentOutput);
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    elevatorLowerSwitch.close();
   }
 }
