@@ -495,7 +495,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       case NONE:
         break;
     }
-    m_fieldSim.updateValidNodes(m_scoringState);
+    // m_fieldSim.updateValidNodes(m_scoringState);
 
     if (m_smartScoringEnabled) {
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);

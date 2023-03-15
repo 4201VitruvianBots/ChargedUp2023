@@ -651,12 +651,14 @@ public class RobotContainer implements AutoCloseable {
   }
 
   public void periodic() {
-    m_distanceSensor.updateSmartDashboard();
-    m_fieldSim.periodic();
+//    m_distanceSensor.updateSmartDashboard();
+//    m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
     // m_logManager.periodic();
   }
+
+  
 
   public void disabledPeriodic() {
     m_swerveDrive.disabledPeriodic();
@@ -664,7 +666,6 @@ public class RobotContainer implements AutoCloseable {
 
   public void testPeriodic() {
     m_stateHandler.testPeriodic();
-    m_fieldSim.periodic();
   }
 
   public void simulationPeriodic() {

@@ -190,24 +190,27 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private void updateRobotPoses() {
     robotPose = m_swerveDrive.getPoseMeters();
     m_field2d.setRobotPose(robotPose);
-    m_field2d
-        .getObject("lLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
-    m_field2d
-        .getObject("lLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
-    m_field2d
-        .getObject("lLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
-    m_field2d
-        .getObject("rLocalizerTagPoses")
-        .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
-    m_field2d
-        .getObject("rLocalizerPoses")
-        .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
-    m_field2d
-        .getObject("rLocalizerPose")
-        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+
+    if(false) {
+      m_field2d
+              .getObject("lLocalizerTagPoses")
+              .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
+      m_field2d
+              .getObject("lLocalizerPoses")
+              .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
+      m_field2d
+              .getObject("lLocalizerPose")
+              .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
+      m_field2d
+              .getObject("rLocalizerTagPoses")
+              .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+      m_field2d
+              .getObject("rLocalizerPoses")
+              .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+      m_field2d
+              .getObject("rLocalizerPose")
+              .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+    }
 
     m_field2d
         .getObject("fLocalizerPose")
@@ -222,18 +225,12 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
 
-    m_field2d
-        .getObject("Grid Node")
-        .setPoses(
-            validNodes.stream()
-                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
-                .collect(Collectors.toList()));
-
-    //    var testNodes = Arrays.stream(Grids.lowTranslations).map(t -> new Pose2d(t,
-    // Rotation2d.fromDegrees(0))).collect(Collectors.toCollection(ArrayList::new));
-    //    testNodes.replaceAll(SimConstants::allianceFlip);
-    //
-    //    m_field2d.getObject("TestNodes").setPoses(testNodes);
+//    m_field2d
+//        .getObject("Grid Node")
+//        .setPoses(
+//            validNodes.stream()
+//                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
+//                .collect(Collectors.toList()));
 
     if (RobotBase.isSimulation()) {
       m_field2d
