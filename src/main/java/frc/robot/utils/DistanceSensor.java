@@ -26,6 +26,7 @@ import org.json.simple.parser.JSONParser;
 public class DistanceSensor implements AutoCloseable {
   private final int socketPort = 25000;
 
+  private byte[] buffer = new byte[512];
   private DatagramSocket socket;
   private String receivedData = "";
   private double sensor1DistanceMeters;
@@ -33,6 +34,7 @@ public class DistanceSensor implements AutoCloseable {
   private double sensor3DistanceMeters;
 
   private Random rand = new Random();
+  private Object obj;
 
   // Shuffleboard setup
   StringPublisher rawStringPub;
@@ -49,7 +51,7 @@ public class DistanceSensor implements AutoCloseable {
       try {
         InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
         socket = new DatagramSocket(socketPort, address);
-        socket.setSoTimeout(20);
+        socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
         socketFail.printStackTrace();
       }
@@ -68,7 +70,7 @@ public class DistanceSensor implements AutoCloseable {
       String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
 
       // parsing string from recieved data
-      Object obj = new JSONParser().parse(new StringReader(receivedData));
+       obj = new JSONParser().parse(new StringReader(receivedData));
 
       // typecasting obj to JSONObject
       JSONObject jo = (JSONObject) obj;
@@ -94,11 +96,11 @@ public class DistanceSensor implements AutoCloseable {
   public void simulationPeriodic() {
     receivedData =
         "{\"sensor1.mm\":"
-            + Integer.toString(rand.nextInt(394))
+            + rand.nextInt(394)
             + ",\"sensor2.mm\":"
-            + Integer.toString(rand.nextInt(394))
+            + rand.nextInt(394)
             + ",\"test\":"
-            + Integer.toString(rand.nextInt(100))
+            + rand.nextInt(100)
             + "}";
   }
 
@@ -182,7 +184,7 @@ public class DistanceSensor implements AutoCloseable {
       if (RobotBase.isSimulation()) {
         simulationPeriodic();
       } else {
-        byte[] buffer = new byte[512];
+        buffer = new byte[512];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
         socket.receive(packet);
 
