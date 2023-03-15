@@ -51,6 +51,7 @@ public class DistanceSensor implements AutoCloseable {
       try {
         InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
         socket = new DatagramSocket(socketPort, address);
+        socket.setReceiveBufferSize(512);
         socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
         socketFail.printStackTrace();
@@ -67,7 +68,7 @@ public class DistanceSensor implements AutoCloseable {
     // This is a really stupid band-aid solution but I don't have time for anything else
     if (sensor == 0) sensor = 1;
     try {
-      String sensorName = "sensor" + Integer.toString(sensor) + ".mm";
+      String sensorName = "sensor" + sensor + ".mm";
 
       // parsing string from recieved data
        obj = new JSONParser().parse(new StringReader(receivedData));
@@ -79,7 +80,7 @@ public class DistanceSensor implements AutoCloseable {
       long sensorValueLong = (long) jo.get(sensorName);
 
       // auto-unboxing does not go from Long to int directly, so
-      double sensorValue = (double) (long) sensorValueLong;
+      double sensorValue = (double) sensorValueLong;
 
       return sensorValue;
     } catch (Exception e) {
