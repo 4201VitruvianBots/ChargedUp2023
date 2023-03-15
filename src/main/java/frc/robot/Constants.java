@@ -210,10 +210,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 125.8985;
-    public static double frontRightCANCoderOffset = 229.351;
+    public static double frontLeftCANCoderOffset = 125.7715;
+    public static double frontRightCANCoderOffset = 218.76;
     public static double backLeftCANCoderOffset = 190.591;
-    public static double backRightCANCoderOffset = 31.6845;
+    public static double backRightCANCoderOffset = 32.915;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
@@ -466,10 +466,10 @@ public final class Constants {
     // SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
     // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVEDRIVE.frontLeftCANCoderOffset = 125.8985; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 229.351; // 41.748;
+    SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
+    SWERVEDRIVE.frontRightCANCoderOffset = 218.76; // 41.748;
     SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 31.6845;
+    SWERVEDRIVE.backRightCANCoderOffset = 32.915;
   }
 
   private static void initAlpha() {
