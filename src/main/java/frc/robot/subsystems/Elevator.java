@@ -528,6 +528,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-    elevatorLowerSwitch.close();
+    elevatorHallEffectSensor.close();
   }
 }
