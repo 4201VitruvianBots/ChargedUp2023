@@ -86,23 +86,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     initSim();
   }
 
-    for (int i = 0; i < Grids.nodeRowCount; i++) {
-      // Adds a new row of poses to the list using sim constants
-      allNodes.add(
-          new Pose2d(
-              Grids.outerX / 2 + Grids.lowX,
-              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
-              new Rotation2d(0)));
-      allNodes.add(
-          new Pose2d(
-              Grids.outerX / 2 + Grids.midX,
-              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
-              new Rotation2d(0)));
-      allNodes.add(
-          new Pose2d(
-              Grids.outerX / 2 + Grids.highX,
-              Grids.nodeFirstY + (Grids.nodeSeparationY * i),
-              new Rotation2d(0)));
   public void initSim() {
     initializeScoringNodes();
 

@@ -11,10 +11,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER.*;
@@ -47,8 +45,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private final SendableChooser<SCORING_STATE> m_scoringChooser;
-  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser;
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
   private DoublePublisher m_elevatorHeightPub,
@@ -73,8 +69,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_led = led;
     m_vision = vision;
     m_wrist = wrist;
-    m_scoringChooser = scoringStateChooser;
-    m_mainStateChooser = mainStateChooser;
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
   }
@@ -490,11 +484,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void testPeriodic() {
-    scoringState = m_scoringChooser.getSelected();
-    m_currentZone = m_mainStateChooser.getSelected();
-    m_fieldSim.setDisplayedNodes(
-        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
-        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
+    //    scoringState = m_scoringChooser.getSelected();
+    //    m_currentZone = m_mainStateChooser.getSelected();
+    //    m_fieldSim.setDisplayedNodes(
+    //        m_fieldSim.getPossibleNodes(scoringState, m_currentZone, false),
+    //        m_fieldSim.getTargetNode(scoringState, m_currentZone, false));
   }
 
   @Override

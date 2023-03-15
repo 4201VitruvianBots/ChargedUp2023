@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
-import java.io.File;
-import java.io.FileReader;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;

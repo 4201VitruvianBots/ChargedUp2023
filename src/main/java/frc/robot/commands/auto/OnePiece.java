@@ -21,6 +21,7 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
+import java.util.List;
 
 public class OnePiece extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
@@ -44,7 +45,7 @@ public class OnePiece extends SequentialCommandGroup {
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
-        new PlotAutoTrajectory(fieldSim, pathName, trajectory),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         new ParallelCommandGroup(
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),

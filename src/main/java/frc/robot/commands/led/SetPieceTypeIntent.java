@@ -5,6 +5,7 @@
 package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.LED.LED_STATE;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.subsystems.*;
 
@@ -30,10 +31,10 @@ public class SetPieceTypeIntent extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_pieceType == PieceType.CONE) {
-      m_led.expressState(LED.robotState.CONE_BUTTON);
-    } else if (m_pieceType == PieceType.CUBE) {
-      m_led.expressState(LED.robotState.CUBE_BUTTON);
+    if (m_pieceType == INTAKING_STATES.CONE) {
+      m_led.expressState(LED_STATE.CONE_BUTTON);
+    } else if (m_pieceType == INTAKING_STATES.CUBE) {
+      m_led.expressState(LED_STATE.CUBE_BUTTON);
     }
   }
 

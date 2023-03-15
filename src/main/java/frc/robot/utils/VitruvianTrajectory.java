@@ -97,8 +97,11 @@ public class VitruvianTrajectory extends PathPlannerTrajectory {
       Translation2d transformedTranslation =
           new Translation2d(
               SimConstants.fieldLength - state.poseMeters.getX(), state.poseMeters.getY());
-      Rotation2d transformedHeading = new Rotation2d(-state.poseMeters.getRotation().getCos(), state.poseMeters.getRotation().getSin());
-      Rotation2d transformedHolonomicRotation = new Rotation2d(-state.holonomicRotation.getCos(), state.holonomicRotation.getSin());
+      Rotation2d transformedHeading =
+          new Rotation2d(
+              -state.poseMeters.getRotation().getCos(), state.poseMeters.getRotation().getSin());
+      Rotation2d transformedHolonomicRotation =
+          new Rotation2d(-state.holonomicRotation.getCos(), state.holonomicRotation.getSin());
 
       double stateCurveRadius = 0;
       double stateDeltaPos = 0;

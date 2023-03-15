@@ -41,12 +41,11 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LED.PieceType;
-import frc.robot.subsystems.StateHandler.SUPERSTRUCTURE_STATE;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -67,24 +66,14 @@ public class RobotContainer implements AutoCloseable {
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final SendableChooser<StateHandler.SUPERSTRUCTURE_STATE> m_mainStateChooser =
-      new SendableChooser<>();
+  private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
   private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
       new SendableChooser<>();
-  private final LED m_led = new LED(m_controls);
+  private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
   private final StateHandler m_stateHandler =
-      new StateHandler(
-          m_intake,
-          m_wrist,
-          m_swerveDrive,
-          m_fieldSim,
-          m_elevator,
-          m_led,
-          m_vision,
-          m_scoringStateChooser,
-          m_mainStateChooser);
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
 
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
@@ -637,9 +626,7 @@ public class RobotContainer implements AutoCloseable {
         "BlueBottomDriveForward",
         "RedBottomDriveForward",
         "BlueDriveForward",
-        "RedDriveForward",
-        "BlueTopDriveForward",
-        "RedTopDriveForward"
+        "RedDriveForward"
       };
       for (var auto : autos) {
         var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));

@@ -7,6 +7,7 @@ package frc.robot.commands.led;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LED.LED_STATE;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.subsystems.*;
 
 /*scoring = flashing white, intakingcube = blue,
@@ -55,8 +56,8 @@ public class GetSubsystemStates extends CommandBase {
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
     var desiredState = m_stateHandler.getDesiredZone();
-    coneButton = m_led.getPieceIntent() == LED.PieceType.CONE;
-    cubeButton = m_led.getPieceIntent() == LED.PieceType.CUBE;
+    coneButton = m_led.getPieceIntent() == INTAKING_STATES.CONE;
+    cubeButton = m_led.getPieceIntent() == INTAKING_STATES.CUBE;
     intaking = m_intake.getIntakeState();
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -88,7 +89,7 @@ public class GetSubsystemStates extends CommandBase {
       }
     }
     if (enabled) {
-      m_led.expressState(LED.robotState.ENABLED);
+      m_led.expressState(LED_STATE.ENABLED);
     }
   }
 
