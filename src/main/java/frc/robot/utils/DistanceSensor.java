@@ -71,7 +71,7 @@ public class DistanceSensor implements AutoCloseable {
       String sensorName = "sensor" + sensor + ".mm";
 
       // parsing string from recieved data
-       obj = new JSONParser().parse(new StringReader(receivedData));
+      obj = new JSONParser().parse(new StringReader(receivedData));
 
       // typecasting obj to JSONObject
       JSONObject jo = (JSONObject) obj;
