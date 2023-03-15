@@ -27,7 +27,7 @@ public class DistanceSensor implements AutoCloseable {
   private final int socketPort = 25000;
 
   private DatagramSocket socket;
-  private String receivedData;
+  private String receivedData = "";
   private double sensor1DistanceMeters;
   private double sensor2DistanceMeters;
   private double sensor3DistanceMeters;
@@ -49,11 +49,12 @@ public class DistanceSensor implements AutoCloseable {
       try {
         InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
         socket = new DatagramSocket(socketPort, address);
-        socket.setSoTimeout(1000);
+        socket.setSoTimeout(20);
       } catch (SocketException | UnknownHostException socketFail) {
         socketFail.printStackTrace();
       }
     }
+    initSmartDashboard();
   }
 
   public String getRawSensorData() {
@@ -158,10 +159,20 @@ public class DistanceSensor implements AutoCloseable {
     rawStringPub = distanceSensorTab.getStringTopic("Raw String Data").publish();
     sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 MM").publish();
     sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 MM").publish();
-    sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 Inches").publish();
-    sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 Inches").publish();
+    sensor1InchPub = distanceSensorTab.getDoubleTopic("Sensor 1 Inches").publish();
+    sensor2InchPub = distanceSensorTab.getDoubleTopic("Sensor 2 Inches").publish();
     coneInchesPub = distanceSensorTab.getDoubleTopic("Cone Distance Inches").publish();
     cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
+  }
+
+  public void updateSmartDashboard() {
+    sensor1MMPub.set(getSensorValueMillimeters(1));
+    sensor2MMPub.set(getSensorValueMillimeters(2));
+    sensor1InchPub.set(getSensorValueInches(1));
+    sensor2InchPub.set(getSensorValueInches(2));
+    coneInchesPub.set(getConeDistanceInches());
+    cubeInchesPub.set(getCubeDistanceInches());
+    rawStringPub.set(receivedData);
   }
 
   public void pollDistanceSensors() {
@@ -177,13 +188,6 @@ public class DistanceSensor implements AutoCloseable {
 
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
-      rawStringPub.set(receivedData);
-      sensor1MMPub.set(getSensorValueMillimeters(1));
-      sensor2MMPub.set(getSensorValueMillimeters(2));
-      sensor1InchPub.set(getSensorValueInches(1));
-      sensor2InchPub.set(getSensorValueInches(2));
-      coneInchesPub.set(getConeDistanceInches());
-      cubeInchesPub.set(getCubeDistanceInches());
     } catch (SocketTimeoutException ex) {
       System.out.println("error: " + ex.getMessage());
       ex.printStackTrace();
