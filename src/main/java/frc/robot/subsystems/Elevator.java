@@ -35,9 +35,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
   };
 
-  // Limit switch at bottom of elevator
-  private final DigitalInput elevatorLowerSwitch =
-      new DigitalInput(Constants.DIO.elevatorLowerSwitch);
+  // Initializing hall effect sensor at bottom of elevator
+  private final DigitalInput elevatorHallEffectSensor =
+      new DigitalInput(Constants.DIO.elevatorHallEffectSensor);
 
   public enum ELEVATOR_SPEED {
     NORMAL,
@@ -175,8 +175,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void setPercentOutput(double output) {
-    // if (getElevatorLowerSwitch())
-    //   MathUtil.clamp(output, 0, 1);
+    if (getHallEffectSensor() && output < 0)
+      output = MathUtil.clamp(output, 0, 1);
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
@@ -206,7 +206,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
    * Elevator's height position
    */
   public double getHeightMeters() {
-    return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
+    if (getHallEffectSensor()) {
+      return 0.0;
+    } else {
+      return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
+    }
   }
 
   public double getVelocityMps() {
@@ -231,9 +235,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return isElevatorElevatingElevatando = state;
   }
 
-  // public boolean getElevatorLowerSwitch() {
-  //   // return !elevatorLowerSwitch.get();
-  // }
+  public boolean getHallEffectSensor() {
+    return !elevatorHallEffectSensor.get();
+  }
 
   public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
@@ -416,7 +420,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Limits the speed of the elevator when we are close to the bottom (a.k.a. STOWED position)
-  public void updateElevatorReverseOutput() {
+  public void updateReverseOutput() {
     if (Units.metersToInches(getHeightMeters()) < 4.0) {
       elevatorMotors[0].configPeakOutputReverse(-0.2);
     } else {
@@ -466,7 +470,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateShuffleboard();
     updateHeightMeters();
-    updateElevatorReverseOutput();
+    updateReverseOutput();
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
@@ -511,7 +515,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         setSetpointTrapezoidState(commandedSetpoint);
       }
     } else {
-      // TODO: If targetElevatorLowerSwitch() is triggered, do not set a negative percent output
       double percentOutput = joystickInput * percentOutputMultiplier;
       if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
         percentOutput = Math.min(percentOutput, 0);
