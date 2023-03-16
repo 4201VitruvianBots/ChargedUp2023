@@ -55,8 +55,8 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   public void end(boolean interrupted) {
     m_elevator.setUserSetpoint(false);
     m_elevator.setRunningBool(false);
-//    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
-//    m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+    //    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+    //    m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
   }
 
   // Returns true when the command should end.

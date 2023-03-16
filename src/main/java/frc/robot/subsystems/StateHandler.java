@@ -485,15 +485,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     } else {
       inactiveTimerEnabled = false;
     }
-    if(inactiveTimerEnabled) {
-      if(m_inactiveTimer.get() - timestamp > 1) {
+    if (inactiveTimerEnabled) {
+      if (m_inactiveTimer.get() - timestamp > 1) {
         m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
         m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
         m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
         m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
       }
     }
-
 
     if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
