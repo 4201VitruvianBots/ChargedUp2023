@@ -292,6 +292,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  private void updateIValue() {
+    if (getPositionRadians() < Units.degreesToRadians(30)) {
+      wristMotor.config_kI(0, 0.00001);
+    } else {
+      wristMotor.config_kI(0, 0);
+      wristMotor.setIntegralAccumulator(0);
+    }
+  }
+
   public enum WRIST_SPEED {
     SLOW,
     FAST
@@ -411,6 +420,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateSmartDashboard();
     updateLog();
+
+    updateIValue();
     // This method will be called once per scheduler run
     if (isClosedLoop) {
       switch (m_controlState) {

@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -46,7 +47,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     // set current limit on talonfx motors
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 20, 30, 0.1));
-
+    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);

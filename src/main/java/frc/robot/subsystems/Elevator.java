@@ -94,8 +94,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
-  private final double maxForwardOutput = 0.4;
-  private final double maxReverseOutput = -0.4;
+  private final double maxForwardOutput = 0.6;
+  private final double maxReverseOutput = -0.45;
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.25;
 
@@ -127,6 +127,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kPercentOutputPub,
       kClosedLoopModePub,
       currentCommandStatePub;
+  private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
   public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 50, maxHeightMeters * 50);
@@ -353,6 +354,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kPercentOutputPub = elevatorNtTab.getStringTopic("Percent Output").publish();
     kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
+    lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
     elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
@@ -390,6 +392,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kDesiredStatePub.set(desiredHeightState.name());
     kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
+    lowerLimitSwitchPub.set(getLimitSwitch());
 
     currentCommandStatePub.set(getControlState().toString());
 

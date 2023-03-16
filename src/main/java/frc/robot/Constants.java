@@ -60,14 +60,14 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int elevatorLowerLimitSwitch = 1;
+    public static final int elevatorLowerLimitSwitch = 9;
     public static final int wristLowerSwitch = 0;
   }
 
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 12.211;
+    public static final double gearRatio = 12.211; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -103,9 +103,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(25)),
+      SCORE_MID_CONE(Units.inchesToMeters(25.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(43.5)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(48)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -122,8 +122,11 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
-      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
-      ABSOLUTE_MAX(Units.inchesToMeters(45.0)),
+      ABSOLUTE_MIN(
+          Units.inchesToMeters(
+              -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
+      // switch to reset it
+      ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(4)),
@@ -322,8 +325,8 @@ public final class Constants {
     public static final double FFkV = 1.95;
     public static final double kA = 0.16;
 
-    public static final double kP = 0.15;
-    public static double kI = 0.0001;
+    public static final double kP = 0.075;
+    public static double kI = 0.00005;
     public static final double kD = 0.0;
 
     public enum STATE {
@@ -336,11 +339,11 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-14.0)),
-      SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
+      INTAKING_LOW(Units.degreesToRadians(-14.5)),
+      SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(162.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(147.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
@@ -359,7 +362,7 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in radians
-      ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
+      ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.degreesToRadians(100.0)),

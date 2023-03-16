@@ -144,8 +144,8 @@ public class RobotContainer implements AutoCloseable {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.63));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.63));
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.74));
+    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
 
     // Score button Bindings
 
@@ -232,20 +232,18 @@ public class RobotContainer implements AutoCloseable {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .rightBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
-                m_wrist,
-                Units.degreesToRadians(-14.0),
-                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad press
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
@@ -474,7 +472,7 @@ public class RobotContainer implements AutoCloseable {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            true,
+        true,
             m_swerveDrive);
   }
 
