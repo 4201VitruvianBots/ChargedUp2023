@@ -103,9 +103,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(25.5)),
+      SCORE_MID_CONE(Units.inchesToMeters(26.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(48)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(47)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -343,7 +343,7 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(147.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(160.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),

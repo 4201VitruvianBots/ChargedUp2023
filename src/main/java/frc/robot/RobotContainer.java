@@ -144,7 +144,8 @@ public class RobotContainer implements AutoCloseable {
             () -> leftJoystick.getRawAxis(1),
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.74));
+
+    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
 
     // Score button Bindings
@@ -403,7 +404,7 @@ public class RobotContainer implements AutoCloseable {
 
   private void initAutoBuilder() {
     m_eventMap.put("wait1", new WaitCommand(0.5));
-    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
         "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
