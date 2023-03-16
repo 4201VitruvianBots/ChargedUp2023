@@ -34,7 +34,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
   private boolean isClosedLoop = true;
   private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
+
   private double m_joystickInput;
+  private boolean m_userSetpoint;
 
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
@@ -144,6 +146,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public void setUserInput(double input) {
     m_joystickInput = input;
+  }
+
+
+  public void setUserSetpoint(boolean bool) {
+    m_userSetpoint = bool;
+  }
+
+  public boolean isUserControlled() {
+    return m_joystickInput != 0 && m_userSetpoint == false;
   }
 
   public void setControlState(WRIST.STATE state) {

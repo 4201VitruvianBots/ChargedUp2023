@@ -5,6 +5,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
@@ -40,10 +41,7 @@ public class IncrementElevatorHeight extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-      //      m_elevator.setControlState(
-      //          m_elevator.getControlMode()
-      //              ? ELEVATOR.STATE.CLOSED_LOOP_MANUAL
-      //              : ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+
       if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
         m_elevator.setJoystickY(-joystickYDeadbandOutput);
       } else {
@@ -53,7 +51,6 @@ public class IncrementElevatorHeight extends CommandBase {
     }
     if (joystickYDeadbandOutput == 0
         && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-      m_elevator.setJoystickY(-joystickYDeadbandOutput);
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.resetState();
     }

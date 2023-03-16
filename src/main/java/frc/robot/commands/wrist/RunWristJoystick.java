@@ -45,8 +45,6 @@ public class RunWristJoystick extends CommandBase {
       }
     }
     if (joystickYDeadbandOutput == 0 && m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL) {
-      m_wrist.setUserInput(-joystickYDeadbandOutput);
-      m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
       m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
       m_wrist.resetState();
     }
