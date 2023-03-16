@@ -482,12 +482,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled()) && !inactiveTimerEnabled) {
       inactiveTimerEnabled = true;
       timestamp = m_inactiveTimer.get();
-    } else if(inactiveTimerEnabled && (m_elevator.isUserControlled() || m_wrist.isUserControlled())){
+    } else if (inactiveTimerEnabled
+        && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
       inactiveTimerEnabled = false;
       timestamp = 0;
     }
-    if(inactiveTimerEnabled) {
-      if(m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
+    if (inactiveTimerEnabled) {
+      if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
         m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
         m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
         m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
