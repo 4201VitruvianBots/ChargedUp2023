@@ -55,6 +55,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   private double joystickInput;
+  private boolean m_userSetpoint;
 
   private final double kP = 0.3;
   private final double kI = 0;
@@ -280,6 +281,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public void setJoystickY(double m_joystickY) {
     joystickInput = m_joystickY;
+  }
+
+  public void setUserSetpoint(boolean bool) {
+    m_userSetpoint = bool;
+  }
+
+  public boolean isUserControlled() {
+    return joystickInput != 0 && m_userSetpoint == false;
   }
 
   /*

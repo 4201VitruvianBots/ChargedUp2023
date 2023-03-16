@@ -34,6 +34,7 @@ public class SetWristDesiredSetpoint extends CommandBase {
   public void initialize() {
     // m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
     // m_wrist.setDesiredPositionRadians(m_setpoint);
+    m_wrist.setUserSetpoint(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,8 +50,9 @@ public class SetWristDesiredSetpoint extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+    m_wrist.setUserSetpoint(false);
+//    m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+//    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
   }
 
   // Returns true when the command should end.

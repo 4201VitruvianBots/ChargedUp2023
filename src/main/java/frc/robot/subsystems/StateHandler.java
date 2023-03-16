@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,6 +40,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private boolean m_zoneEnforcement = true;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
+
+  private Timer m_inactiveTimer = new Timer();
+  private boolean inactiveTimerEnabled = false;
+  private double timestamp;
 
   private final Intake m_intake;
   private final Wrist m_wrist;
@@ -78,6 +83,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wrist = wrist;
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
+
+    m_inactiveTimer.reset();
+    m_inactiveTimer.start();
 
     if (RobotBase.isSimulation()) {
       initializeScoringChooser();
@@ -469,6 +477,23 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (m_zoneEnforcement) {
       zoneAdvancement();
     }
+
+    // If no user input for more than one second, then reset elevator to stowed
+    if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled()) && !inactiveTimerEnabled) {
+      inactiveTimerEnabled = true;
+      timestamp = m_inactiveTimer.get();
+    } else {
+      inactiveTimerEnabled = false;
+    }
+    if(inactiveTimerEnabled) {
+      if(m_inactiveTimer.get() - timestamp > 1) {
+        m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+        m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+        m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+        m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+      }
+    }
+
 
     if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
