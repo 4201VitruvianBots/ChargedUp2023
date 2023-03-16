@@ -47,7 +47,6 @@ public class TopTwoBalance extends SequentialCommandGroup {
         //     new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
         // new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
         autoPath,
-        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

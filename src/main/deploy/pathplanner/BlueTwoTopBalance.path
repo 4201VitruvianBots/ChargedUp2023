@@ -16,11 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "SetElevatorHighConeNode",
-          "SetWristHighConeNode",
-          "RunIntakeConeReverse"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "deadline",
         "waitTime": 1.0
@@ -45,11 +41,7 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [
-          "SetElevatorIntaking",
-          "SetWristIntaking",
-          "RunIntakeCube"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "deadline",
         "waitTime": 0.25
@@ -99,9 +91,7 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [
-          "RunIntakeCubeReverse"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "deadline",
         "waitTime": 1.0
@@ -124,7 +114,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "RunIntakeConeReverse"
+          "AutoBalance"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "deadline",

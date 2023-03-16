@@ -28,7 +28,7 @@ import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.*;
 import frc.robot.commands.auto.*;
-import frc.robot.commands.auto.RedTopTwoBalance;
+// import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
@@ -485,8 +485,9 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
     m_autoChooser.addOption(
-        "BlueTopTwoCone",
-        new TopTwoBalance("BlueTopTwoCone", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
+        "BlueTwoTopBalance",
+        new TopTwoBalance("BlueTwoTopBalance", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
+
 
     m_autoChooser.addOption(
         "BlueOnePiece",
