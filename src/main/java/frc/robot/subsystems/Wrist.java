@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetAngleDegrees;
+import frc.robot.utils.DistanceSensor;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_desiredSetpointRadians;
@@ -42,6 +43,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
   private final Intake m_intake;
+  private final DistanceSensor m_distanceSensor;
 
   private static final DigitalInput lowerSwitch = new DigitalInput(Constants.DIO.wristLowerSwitch);
   /** Creates a new Wrist. */
@@ -106,8 +108,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private DoublePublisher currentTrapezoidAcceleration;
   private StringPublisher currentCommandStatePub;
 
-  public Wrist(Intake intake) {
+  public Wrist(Intake intake, DistanceSensor distanceSensor) {
     m_intake = intake;
+    m_distanceSensor = distanceSensor;
     // One motor for the wrist
 
     // factory default configs
@@ -380,13 +383,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
     // Cone: f(x)=-0.270347*t+16.8574;
     double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
+    if (m_distanceSensor.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
       horizontalDistance =
           0.00000913468 * Math.pow(getPositionDegrees(), 3)
               - 0.00232508 * Math.pow(getPositionDegrees(), 2)
               - 0.0894341 * getPositionDegrees()
               + 16.1239;
-    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
+    else if (m_distanceSensor.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
       horizontalDistance =
           //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;
