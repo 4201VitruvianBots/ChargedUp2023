@@ -103,9 +103,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(25)),
+      SCORE_MID_CONE(Units.inchesToMeters(25.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(43.5)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(45)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -339,8 +339,8 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-14.0)),
-      SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
+      INTAKING_LOW(Units.degreesToRadians(-14.5)),
+      SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.degreesToRadians(147.0)),
@@ -362,7 +362,7 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in radians
-      ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
+      ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.degreesToRadians(100.0)),
