@@ -388,6 +388,7 @@ public class RobotContainer implements AutoCloseable {
     m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
+    m_stateHandler.init();
   }
 
   public void autonomousInit() {
@@ -397,6 +398,7 @@ public class RobotContainer implements AutoCloseable {
     m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
+    m_stateHandler.init();
   }
 
   private void initAutoBuilder() {
