@@ -87,7 +87,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_inactiveTimer.reset();
     m_inactiveTimer.start();
 
-
     if (RobotBase.isSimulation()) {
       initializeScoringChooser();
       initializeMainStateChooser();
@@ -96,7 +95,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void init() {
     m_currentZone =
-            determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+        determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
   }
 
   public void initializeScoringChooser() {

@@ -488,8 +488,15 @@ public class RobotContainer implements AutoCloseable {
 
     m_autoChooser.addOption(
         "BlueTwoTopBalance",
-        new TopTwoBalance("BlueTwoTopBalance", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
-
+        new TopTwoBalance(
+            "BlueTwoTopBalance",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
 
     m_autoChooser.addOption(
         "BlueOnePiece",
