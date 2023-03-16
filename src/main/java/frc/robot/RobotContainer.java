@@ -474,7 +474,7 @@ public class RobotContainer implements AutoCloseable {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            true,
+            false,
             m_swerveDrive);
   }
 

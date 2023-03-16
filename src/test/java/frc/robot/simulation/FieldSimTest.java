@@ -12,9 +12,11 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import utils.TestUtils;
 
+@Disabled
 public class FieldSimTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;

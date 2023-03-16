@@ -67,7 +67,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 12.211;
+    public static final double gearRatio = 12.211; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -122,8 +122,11 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
-      ABSOLUTE_MIN(Units.inchesToMeters(-10.0)),
-      ABSOLUTE_MAX(Units.inchesToMeters(45.0)),
+      ABSOLUTE_MIN(
+          Units.inchesToMeters(
+              -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
+      // switch to reset it
+      ABSOLUTE_MAX(Units.inchesToMeters(47.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(4)),
