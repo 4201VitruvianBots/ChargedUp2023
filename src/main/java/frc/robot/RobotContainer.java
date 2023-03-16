@@ -243,9 +243,7 @@ public class RobotContainer implements AutoCloseable {
         .leftBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
-                m_wrist,
-                Units.degreesToRadians(-15.0),
-                xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
+                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad press
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
@@ -474,7 +472,7 @@ public class RobotContainer implements AutoCloseable {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-            false,
+        true,
             m_swerveDrive);
   }
 

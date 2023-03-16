@@ -105,7 +105,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(25.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(45)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(48)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -126,7 +126,7 @@ public final class Constants {
           Units.inchesToMeters(
               -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
       // switch to reset it
-      ABSOLUTE_MAX(Units.inchesToMeters(47.0)),
+      ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(4)),
