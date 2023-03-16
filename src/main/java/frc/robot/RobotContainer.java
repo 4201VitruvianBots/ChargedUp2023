@@ -376,10 +376,6 @@ public class RobotContainer implements AutoCloseable {
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
       testController.options().onTrue(new ToggleWristControlMode(m_wrist));
-
-      m_elevator.setDefaultCommand(
-          new IncrementElevatorHeight(m_elevator, testController::getLeftY));
-      m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, testController::getRightY));
     }
   }
 
