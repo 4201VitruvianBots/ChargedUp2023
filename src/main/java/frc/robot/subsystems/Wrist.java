@@ -148,7 +148,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_joystickInput = input;
   }
 
-
   public void setUserSetpoint(boolean bool) {
     m_userSetpoint = bool;
   }
