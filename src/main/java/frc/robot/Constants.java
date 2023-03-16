@@ -75,7 +75,7 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(25);
+    public static double kMaxVel = Units.inchesToMeters(60);
     public static double kMaxAccel = Units.inchesToMeters(20);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
@@ -103,9 +103,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(21)),
+      SCORE_MID_CONE(Units.inchesToMeters(25)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(40)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(43.5)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -123,15 +123,15 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
-      ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
+      ABSOLUTE_MAX(Units.inchesToMeters(45.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(11)),
-      MID_MIN(Units.inchesToMeters(9)),
-      MID_MAX(Units.inchesToMeters(14)),
-      HIGH_MIN(Units.inchesToMeters(12)),
-      HIGH_MAX(Units.inchesToMeters(18)),
-      EXTENDED_MIN(Units.inchesToMeters(16)),
+      LOW_MAX(Units.inchesToMeters(4)),
+      MID_MIN(Units.inchesToMeters(3)),
+      MID_MAX(Units.inchesToMeters(8)),
+      HIGH_MIN(Units.inchesToMeters(6)),
+      HIGH_MAX(Units.inchesToMeters(14)),
+      EXTENDED_MIN(Units.inchesToMeters(12)),
       EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
@@ -315,8 +315,8 @@ public final class Constants {
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.35);
-    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.35);
+    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.2);
+    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.2);
     public static final double FFkS = 0.1;
     public static final double kG = 1.75;
     public static final double FFkV = 1.95;
@@ -336,11 +336,11 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-13.0)),
+      INTAKING_LOW(Units.degreesToRadians(-14.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(143.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(162.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
@@ -363,7 +363,7 @@ public final class Constants {
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.degreesToRadians(100.0)),
-      MID_MIN(Units.degreesToRadians(10.0)),
+      MID_MIN(Units.degreesToRadians(25.0)),
       MID_MAX(Units.degreesToRadians(110.0)),
       HIGH_MIN(MID_MIN.get()),
       HIGH_MAX(Units.degreesToRadians(120.0)),

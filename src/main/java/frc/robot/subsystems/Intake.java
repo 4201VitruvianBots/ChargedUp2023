@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     // factory default configs
     intakeMotor.configFactoryDefault();
-    intakeMotor.setInverted(false);
+    intakeMotor.setInverted(true);
 
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
