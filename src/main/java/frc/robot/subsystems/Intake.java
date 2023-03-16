@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.INTAKE;
+import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -31,11 +32,15 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
+  private final DistanceSensor m_distanceSensor;
+
   // Log setup
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
-  public Intake() {
+  public Intake(DistanceSensor distanceSensor) {
+    m_distanceSensor = distanceSensor;
+
     // one or two motors
 
     // factory default configs
@@ -58,17 +63,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.config_kP(0, kP);
   }
 
-  // TODO: Need two measurement values: One that averages the two used to measure the cone and
-  // another to measure the
-  //  distance to the cube
-  public double getConeDistance() {
-    return 0;
-  }
-
-  public double getCubeDistance() {
-    return 0;
-  }
-
   // control mode function
   public boolean getIntakeState() {
     return isIntaking;
@@ -88,16 +82,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public void setIntakeStateCube(boolean state) {
     isIntakingCube = state;
-  }
-
-  // True if Cube is detected, otherwise assume Cone
-  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
-    if (getConeDistance() > Units.inchesToMeters(15)
-        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.HELD_GAMEPIECE.NONE;
-    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.HELD_GAMEPIECE.CONE;
-    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.HELD_GAMEPIECE.CUBE;
-
-    return INTAKE.HELD_GAMEPIECE.NONE;
   }
 
   public double getMotorOutputCurrent() {
@@ -131,9 +115,9 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // hold
     // the game piece in.
     if (!isIntaking) {
-      if (getConeDistance() > 0) {
+      if (m_distanceSensor.getConeDistanceInches() > 0) {
         m_percentOutput = 0;
-      } else if (getCubeDistance() > 0) {
+      } else if (m_distanceSensor.getCubeDistanceInches() > 0) {
         m_percentOutput = 0;
       } else {
         m_percentOutput = 0;

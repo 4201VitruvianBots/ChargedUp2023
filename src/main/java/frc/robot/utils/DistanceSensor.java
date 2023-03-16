@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
@@ -105,32 +106,45 @@ public class DistanceSensor implements AutoCloseable {
             + "}";
   }
 
+  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
+    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
+    double cubeSensorValue = getSensorValueMillimeters(Constants.INTAKE.cubeSensorId) / 1000.0;
+
+    if (leftConeSensorValue + rightConeSensorValue <= Constants.INTAKE.innerIntakeWidth) {
+      return INTAKE.HELD_GAMEPIECE.CONE;
+    }
+    else if (cubeSensorValue <= Constants.INTAKE.innerIntakeWidth - 1) {
+      return INTAKE.HELD_GAMEPIECE.CUBE;
+    }
+    else {
+      return INTAKE.HELD_GAMEPIECE.NONE;
+    }
+
+  }
+
   // Returns the distance in inches from the left of the intake to the center of the game
   // piece. Negative if to the left, positive if to the right
   // Works off 3 sensors, 2 for cone and 1 for cube
-  public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
+  public double getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE gamePiece) {
     double distanceMeters;
 
-    switch (intakeState) {
+    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
+    double cubeSensorValue = getSensorValueMillimeters(Constants.INTAKE.cubeSensorId) / 1000.0;
+    
+    switch(gamePiece) {
       case CONE:
-        int leftSensorId = Constants.INTAKE.leftConeSensorId;
-        int rightSensorId = Constants.INTAKE.rightConeSensorId;
-
-        double leftSensorValue = getSensorValueMillimeters(leftSensorId) / 1000.0;
-        double rightSensorValue = getSensorValueMillimeters(rightSensorId) / 1000.0;
-
+        // Reading cone sensors if cone in intake detected
         distanceMeters =
-            leftSensorValue
-                + ((Constants.INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2)
-                - (Constants.INTAKE.innerIntakeWidth / 2);
+          leftConeSensorValue
+            + ((Constants.INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2)
+            - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
-        int sensorId = Constants.INTAKE.cubeSensorId;
-
-        double sensorValue = getSensorValueMillimeters(sensorId) / 1000.0;
-
+        // Reading cube sensors if cube in intake detected
         distanceMeters =
-            sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+            cubeSensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       default:
       case NONE:
@@ -140,20 +154,24 @@ public class DistanceSensor implements AutoCloseable {
     return Units.metersToInches(distanceMeters);
   }
 
-  // Returns a pose where the center of the gamepiece should be
-  public Pose2d getGamepiecePose(INTAKING_STATES intakeState, Pose2d intakePose) {
-    return new Pose2d(
-        intakePose.getX(),
-        intakePose.getY() + getGamepieceDistanceInches(intakeState),
-        intakePose.getRotation());
+  public double getGamepieceDistanceInches() {
+    return getGamepieceDistanceInches(getHeldGamepiece());
   }
 
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKING_STATES.CONE);
+    return getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE.CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
+    return getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE.CUBE);
+  }
+
+  // Returns a pose where the center of the gamepiece should be
+  public Pose2d getGamepiecePose(Pose2d intakePose) {
+    return new Pose2d(
+        intakePose.getX(),
+        intakePose.getY() + getGamepieceDistanceInches(),
+        intakePose.getRotation());
   }
 
   private void initSmartDashboard() {
