@@ -61,7 +61,7 @@ public class AutoBalance extends CommandBase {
       m_swerveDrive.setSwerveModuleStates(states, false);
     } else if ((m_swerveDrive.getPitchDegrees() + 2.460938) <= 3) {
       SmartDashboard.putNumber("moduleangle", m_swerveDrive.getPitchDegrees());
-      System.out.print("yay");
+      System.out.print("hourrah");
       states =
           new SwerveModuleState[] {
             new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),

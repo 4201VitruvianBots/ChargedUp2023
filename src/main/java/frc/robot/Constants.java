@@ -338,7 +338,7 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(90.0)),
+      STOWED(Units.degreesToRadians(100.0)),
       INTAKING_LOW(Units.degreesToRadians(-14.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
