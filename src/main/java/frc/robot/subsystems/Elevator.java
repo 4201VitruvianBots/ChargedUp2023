@@ -70,7 +70,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
   private final TrapezoidProfile.Constraints m_fastConstraints =
-      new TrapezoidProfile.Constraints(maxVel * 1.5, maxAccel * 1.5);
+      new TrapezoidProfile.Constraints(maxVel * 1.3, maxAccel * 1.3);
   private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
-  private final double maxForwardOutput = 0.55;
+  private final double maxForwardOutput = 0.4;
   private final double maxReverseOutput = -0.4;
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.25;
@@ -430,6 +430,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  public void updateForwardOutput() {
+    if (Units.metersToInches(getHeightMeters()) > 40.0) {
+      elevatorMotors[0].configPeakOutputForward(0.2);
+    } else {
+      elevatorMotors[0].configPeakOutputForward(maxForwardOutput);
+    }
+  }
+
   @Override
   public void simulationPeriodic() {
     elevatorSim.setInput(getPercentOutput() * 12);
@@ -473,6 +481,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateShuffleboard();
     updateHeightMeters();
     updateReverseOutput();
+    updateForwardOutput();
+
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:

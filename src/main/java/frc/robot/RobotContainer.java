@@ -164,9 +164,9 @@ public class RobotContainer implements AutoCloseable {
         .whileTrue(
             new ConditionalCommand(
                 new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getRightY),
+                    m_wrist, WRIST.SETPOINT.SCORE_LOW_REVERSE.get(), xboxController::getRightY),
                 new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getRightY),
+                    m_wrist, WRIST.SETPOINT.SCORE_LOW_REVERSE.get(), xboxController::getRightY),
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
 
     // Score MID Setpoints

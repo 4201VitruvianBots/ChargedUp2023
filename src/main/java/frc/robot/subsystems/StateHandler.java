@@ -482,18 +482,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled()) && !inactiveTimerEnabled) {
       inactiveTimerEnabled = true;
       timestamp = m_inactiveTimer.get();
-    } else {
+    } else if(inactiveTimerEnabled && (m_elevator.isUserControlled() || m_wrist.isUserControlled())){
       inactiveTimerEnabled = false;
+      timestamp = 0;
     }
     if(inactiveTimerEnabled) {
-      if(m_inactiveTimer.get() - timestamp > 1) {
+      if(m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
         m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
         m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
         m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
         m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
       }
     }
-
 
     if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
