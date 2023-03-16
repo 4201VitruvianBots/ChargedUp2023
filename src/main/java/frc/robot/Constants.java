@@ -75,8 +75,8 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(25);
-    public static double kMaxAccel = Units.inchesToMeters(20);
+    public static double kMaxVel = Units.inchesToMeters(60);
+    public static double kMaxAccel = Units.inchesToMeters(40);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -103,7 +103,7 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(21)),
+      SCORE_MID_CONE(Units.inchesToMeters(25)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.inchesToMeters(40)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
@@ -123,7 +123,7 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in meters
       ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
-      ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
+      ABSOLUTE_MAX(Units.inchesToMeters(57.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.inchesToMeters(11)),
@@ -315,8 +315,8 @@ public final class Constants {
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.35);
-    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.35);
+    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.3);
+    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.3);
     public static final double FFkS = 0.1;
     public static final double kG = 1.75;
     public static final double FFkV = 1.95;
@@ -336,11 +336,11 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-13.0)),
+      INTAKING_LOW(Units.degreesToRadians(-14.0)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(143.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(162.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),

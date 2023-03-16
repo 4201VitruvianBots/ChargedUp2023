@@ -244,7 +244,7 @@ public class RobotContainer implements AutoCloseable {
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist,
-                Units.degreesToRadians(-11.0),
+                Units.degreesToRadians(-14.0),
                 xboxController::getRightY)); // Intaking cone is a little bit higher than the wrist
 
     // Will switch our target node on the field sim to the adjacent node on D-pad press
