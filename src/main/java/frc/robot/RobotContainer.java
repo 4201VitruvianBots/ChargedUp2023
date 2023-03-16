@@ -232,13 +232,13 @@ public class RobotContainer implements AutoCloseable {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
+    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .rightBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
+    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));  
     xboxController
         .leftBumper()
         .whileTrue(

@@ -60,7 +60,7 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int elevatorLowerLimitSwitch = 1;
+    public static final int elevatorLowerLimitSwitch = 9;
     public static final int wristLowerSwitch = 0;
   }
 
@@ -122,7 +122,7 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
-      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
+      ABSOLUTE_MIN(Units.inchesToMeters(-10.0)),
       ABSOLUTE_MAX(Units.inchesToMeters(45.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
@@ -322,8 +322,8 @@ public final class Constants {
     public static final double FFkV = 1.95;
     public static final double kA = 0.16;
 
-    public static final double kP = 0.15;
-    public static double kI = 0.0001;
+    public static final double kP = 0.075;
+    public static double kI = 0.00005;
     public static final double kD = 0.0;
 
     public enum STATE {
@@ -340,7 +340,7 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(162.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(147.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.degreesToRadians(146)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
