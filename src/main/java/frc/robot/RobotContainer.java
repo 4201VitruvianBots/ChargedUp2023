@@ -9,7 +9,6 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -472,7 +471,7 @@ public class RobotContainer implements AutoCloseable {
                 Constants.SWERVEDRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
-        true,
+            true,
             m_swerveDrive);
   }
 

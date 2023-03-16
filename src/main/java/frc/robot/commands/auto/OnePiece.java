@@ -5,15 +5,9 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -48,7 +42,8 @@ public class OnePiece extends SequentialCommandGroup {
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         // new ParallelCommandGroup(
         //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-        //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+        //     new AutoSetElevatorDesiredSetpoint(elevator,
+        // ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
         //     new AutoRunIntakeCube(intake, -0.5, vision, swerveDrive).withTimeout(0.3)),
         // new AutoRunIntakeCube(intake, 0.8, vision, swerveDrive).withTimeout(0.3),
         autoPath,
