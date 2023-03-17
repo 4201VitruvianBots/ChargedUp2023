@@ -366,29 +366,30 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
-    // elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-    // elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-    // elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
 
     elevatorNtTab.getDoubleTopic("Max Vel").publish().set(maxVel);
     elevatorNtTab.getDoubleTopic("Max Accel").publish().set(maxAccel);
-    // elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
-    // elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
-    // elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
+    elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
+    elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
+    elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
 
-    // elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
 
-    // kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
-    // kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
-    // kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
+    // Initialize Test Values
+    kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
+    kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
+    kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    // kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
-    // kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
-    // kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
+    kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
+    kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
+    kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
 
-    // kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
+    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
   public void updateShuffleboard(CAN_UTIL_LIMIT limitCan) {
@@ -522,7 +523,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           m_desiredPositionOutputMeters = m_desiredPositionInputMeters + joystickInput * setpointMultiplier;
           break;
         case TEST_SETPOINT:
-          m_desiredPositionOutputMeters = kSetpointSub.get(0);
+          m_desiredPositionOutputMeters = Units.inchesToMeters(kSetpointSub.get(0));
           break;
         default:
         case AUTO_SETPOINT:

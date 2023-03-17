@@ -339,6 +339,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
     wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
+    // Initialize Test Values
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
