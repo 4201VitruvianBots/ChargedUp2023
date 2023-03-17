@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.ELEVATOR.STATE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -172,7 +171,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       motor.configPeakOutputForward(maxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(maxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
-      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 50, 0.1));
+      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -428,7 +427,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         break;
       default:
       case LIMITED:
-      lowerLimitSwitchPub.set(getLimitSwitch());
+        lowerLimitSwitchPub.set(getLimitSwitch());
         break;
     }
 
@@ -470,7 +469,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Limits the speed of the elevator when we are close to the bottom (a.k.a. STOWED position)
   public void updateReverseOutput() {
-    if (Units.metersToInches(getHeightMeters()) < 4.0) newReverseOutput = -0.2;
+    if (Units.metersToInches(getHeightMeters()) < 4.0) newReverseOutput = -0.22;
     else newReverseOutput = maxReverseOutput;
 
     if (currentReverseOutput != newReverseOutput) {

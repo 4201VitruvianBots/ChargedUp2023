@@ -572,9 +572,9 @@ public class RobotContainer implements AutoCloseable {
 
     // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
 
-    // m_autoChooser.addOption(
-    //     "BlueDriveForward",
-    //     new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+    m_autoChooser.addOption(
+        "DriveForward",
+        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
     // m_autoChooser.addOption(
     //     "RedDriveForward",

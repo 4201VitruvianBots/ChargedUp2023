@@ -433,7 +433,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private boolean isTipping() {
     return m_drive.getPitchDegrees() > 12.5;
-    
   }
 
   // Whopper whopper whopper whopper
@@ -540,7 +539,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
-      
+
     } else {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }

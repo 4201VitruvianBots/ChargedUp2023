@@ -51,7 +51,8 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset()) > 2.5) {
+    if (Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset())
+        > 2.5) { // add +2.63 for offset (natural tilt is -2.63 on field)
 
       double output = outputCalculator.calculate(-m_swerveDrive.getRollDegrees());
       // TODO; set a way to initiallze pitch to 0

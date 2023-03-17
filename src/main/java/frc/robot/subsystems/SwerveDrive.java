@@ -213,7 +213,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setRollOffset() {
-    m_rollOffset = -m_pigeon.getRoll();
+    m_rollOffset = -m_pigeon.getRoll(); // -2.63
   }
 
   public double getRollOffset() {
