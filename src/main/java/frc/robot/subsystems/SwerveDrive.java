@@ -338,8 +338,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     switch (limitCan) {
       case NORMAL:
         // Put not required stuff here
-        pitchPub.set(getPitchDegrees() + 2.460938);
-        rollPub.set(getRollDegrees());
+        pitchPub.set(getPitchDegrees());
+        rollPub.set(getRollDegrees() + getRollOffset());
         yawPub.set(getHeadingDegrees());
         odometryXPub.set(getOdometry().getEstimatedPosition().getX());
         odometryYPub.set(getOdometry().getEstimatedPosition().getY());

@@ -111,7 +111,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double newForwardOutput = 0;
   private double newReverseOutput = 0;
 
-  private final double percentOutputMultiplier = 0.75;
+  private final double percentOutputMultiplier = 0.2;
   public final double setpointMultiplier = 0.25;
 
   // Simulation setup

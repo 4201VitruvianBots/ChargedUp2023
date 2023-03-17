@@ -6,6 +6,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
@@ -16,17 +17,22 @@ import frc.robot.utils.TrajectoryUtils;
 
 public class JustBalance extends SequentialCommandGroup {
   public JustBalance(
-      SwerveAutoBuilder autoBuilder, SwerveDrive swerveDrive, FieldSim fieldSim, Wrist wrist) {
+      String pathName,
+      SwerveAutoBuilder autoBuilder,
+      SwerveDrive swerveDrive,
+      FieldSim fieldSim,
+      Wrist wrist) {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            "BlueJustBalance", new PathConstraints(Units.feetToMeters(3), Units.feetToMeters(3)));
+            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
         new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         autoPath,
+        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
