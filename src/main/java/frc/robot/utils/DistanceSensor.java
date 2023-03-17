@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
@@ -32,6 +33,8 @@ public class DistanceSensor implements AutoCloseable {
   private double sensor1DistanceMeters;
   private double sensor2DistanceMeters;
   private double sensor3DistanceMeters;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private Random rand = new Random();
   private Object obj;
@@ -156,6 +159,10 @@ public class DistanceSensor implements AutoCloseable {
     return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
   }
 
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   private void initSmartDashboard() {
     var distanceSensorTab =
         NetworkTableInstance.getDefault().getTable("Suffleboard").getSubTable("Distance Sensor");
@@ -168,14 +175,21 @@ public class DistanceSensor implements AutoCloseable {
     cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
   }
 
-  public void updateSmartDashboard() {
-    sensor1MMPub.set(getSensorValueMillimeters(1));
-    sensor2MMPub.set(getSensorValueMillimeters(2));
-    sensor1InchPub.set(getSensorValueInches(1));
-    sensor2InchPub.set(getSensorValueInches(2));
-    coneInchesPub.set(getConeDistanceInches());
-    cubeInchesPub.set(getCubeDistanceInches());
-    rawStringPub.set(receivedData);
+  public void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
+    switch (limitCan) {
+      case NORMAL:
+        // Put not required stuff here
+        sensor1MMPub.set(getSensorValueMillimeters(1));
+        sensor2MMPub.set(getSensorValueMillimeters(2));
+        sensor1InchPub.set(getSensorValueInches(1));
+        sensor2InchPub.set(getSensorValueInches(2));
+        coneInchesPub.set(getConeDistanceInches());
+        cubeInchesPub.set(getCubeDistanceInches());
+        rawStringPub.set(receivedData);
+      default:
+      case LIMITED:
+        break;
+    }
   }
 
   public void pollDistanceSensors() {

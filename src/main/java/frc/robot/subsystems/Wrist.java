@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.STATE;
 import frc.robot.commands.wrist.ResetAngleDegrees;
@@ -39,6 +40,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private double m_joystickInput;
   private boolean m_userSetpoint;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
@@ -222,6 +225,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public double getPositionDegrees() {
     return getSensorPosition() * WRIST.encoderUnitsToDegrees;
   }
+
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   // this is get current angle
   public double getVelocityDegreesPerSecond() {
     return wristMotor.getSelectedSensorVelocity() * WRIST.encoderUnitsToDegrees * 10;
