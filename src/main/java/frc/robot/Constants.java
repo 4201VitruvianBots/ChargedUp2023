@@ -84,9 +84,13 @@ public final class Constants {
     public static final double encoderCountsToMeters =
         (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
 
-    public static final double kS = 0.15956;
-    public static final double kV = 8.4689; // 12.57;
-    public static final double kA = 0.23382; // 0.04;
+    public static final double kG = 0.02;
+    public static final double kV = 20.0; // 12.57;
+    public static final double kA = 0.02; // 0.04;
+
+    public static final double kP = 0.04;
+    public static final double kI = 0.00;
+    public static final double kD = 0.00;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
@@ -321,14 +325,14 @@ public final class Constants {
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
     public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.2);
     public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.2);
-    public static final double FFkS = 0.0;
-    public static final double kG = 0.78;
-    public static final double FFkV = 1.2;
+    public static final double FFkS = 0.06;
+    public static final double kG = 0.54;
+    public static final double FFkV = 1.6;
     public static final double kA = 0.02;
 
-    public static final double kP = 0.015;
+    public static final double kP = 0.04;
     public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kD = 1.0;
 
     public enum STATE {
       OPEN_LOOP_MANUAL,

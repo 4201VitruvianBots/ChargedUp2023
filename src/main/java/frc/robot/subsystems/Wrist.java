@@ -132,12 +132,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     //    wristMotor.setStatusFramePeriod(1, 0);
     //    wristMotor.setStatusFramePeriod(2, 0);
-    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
+    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.2));
     wristMotor.config_kP(0, WRIST.kP);
-    wristMotor.config_kD(0, WRIST.kD);
     wristMotor.config_kI(0, WRIST.kI);
+    wristMotor.config_kD(0, WRIST.kD);
     wristMotor.configPeakOutputForward(maxPercentOutput, WRIST.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(-0.5, WRIST.kTimeoutMs);
+    wristMotor.configPeakOutputReverse(-maxPercentOutput, WRIST.kTimeoutMs);
 
     wristMotor.setInverted(WRIST.motorInversionType);
 

@@ -62,9 +62,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double joystickInput;
   private boolean m_userSetpoint;
 
-  private final double kP = 0.15;
-  private final double kI = 0;
-  private final double kD = 0;
+  private final double kP = ELEVATOR.kP;
+  private final double kI = ELEVATOR.kI;
+  private final double kD = ELEVATOR.kD;
 
   private double testKP;
   private double testKI;
@@ -72,7 +72,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private double maxVel = ELEVATOR.kMaxVel;
   private double maxAccel = ELEVATOR.kMaxAccel;
-  private double kS = ELEVATOR.kS;
+  private double kG = ELEVATOR.kG;
   private double kV = ELEVATOR.kV;
   private double kA = ELEVATOR.kA;
 
@@ -83,7 +83,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+  private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(kG, kV, kA);
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -104,7 +104,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
-  private final double maxForwardOutput = 0.5;
+  private final double maxForwardOutput = 0.6;
   private final double maxReverseOutput = -0.45;
   private double currentForwardOutput = 0;
   private double currentReverseOutput = 0;
@@ -172,7 +172,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       motor.configPeakOutputForward(maxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(maxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
-      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
+      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 50, 0.1));
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
@@ -351,7 +351,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (getLimitSwitch() && !lowerLimitSwitchTriggeered) {
       setSensorPosition(0.0);
       lowerLimitSwitchTriggeered = true;
-    } else if (lowerLimitSwitchTriggeered && !getLimitSwitch()) {
+    } else if (!getLimitSwitch() && lowerLimitSwitchTriggeered) {
       lowerLimitSwitchTriggeered = false;
     }
     heightMeters = getHeightMeters();
@@ -389,7 +389,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     elevatorNtTab.getDoubleTopic("Max Vel").publish().set(maxVel);
     elevatorNtTab.getDoubleTopic("Max Accel").publish().set(maxAccel);
-    elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
+    elevatorNtTab.getDoubleTopic("kS").publish().set(kG);
     elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
     elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
 
@@ -402,7 +402,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
+    kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kG);
     kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
 
@@ -454,10 +454,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       maxVel = kMaxVelSub.get(0);
       maxAccel = kMaxAccelSub.get(0);
       m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-      kS = kSSub.get(0);
+      kG = kSSub.get(0);
       kV = kVSub.get(0);
       kA = kASub.get(0);
-      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+      m_feedForward = new SimpleMotorFeedforward(kG, kV, kA);
     }
   }
 
