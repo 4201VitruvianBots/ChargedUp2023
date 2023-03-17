@@ -38,6 +38,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private boolean isClosedLoop = true;
   private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
 
+  private double currentKI = 0;
+  private double newKI = 0;
+
+  private double testKP;
+  private double testKI;
+  private double testKD;
+
   private double m_joystickInput;
   private boolean m_userSetpoint;
 
@@ -67,6 +74,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public ArmFeedforward m_feedforward =
       new ArmFeedforward(
           Constants.WRIST.FFkS, Constants.WRIST.kG, Constants.WRIST.FFkV, Constants.WRIST.kA);
+
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -124,8 +132,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     //    wristMotor.setStatusFramePeriod(1, 0);
     //    wristMotor.setStatusFramePeriod(2, 0);
-    wristMotor.configVoltageCompSaturation(10);
-    wristMotor.enableVoltageCompensation(true);
     wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
     wristMotor.config_kP(0, WRIST.kP);
     wristMotor.config_kD(0, WRIST.kD);
@@ -304,10 +310,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private void updateIValue() {
     if (getPositionRadians() < Units.degreesToRadians(30)) {
-      wristMotor.config_kI(0, 0.00001);
-    } else {
-      wristMotor.config_kI(0, 0);
-      wristMotor.setIntegralAccumulator(0);
+      newKI = 0.00001;
+    } else if (getPositionRadians() >= Units.degreesToRadians(30)) {
+      newKI = 0;
+    }
+    if (currentKI != newKI) {
+      wristMotor.config_kI(0, newKI);
+      currentKI = newKI;
     }
   }
 
@@ -384,9 +393,21 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
       m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
 
-      wristMotor.config_kP(0, kPSub.get(0));
-      wristMotor.config_kI(0, kISub.get(0));
-      wristMotor.config_kD(0, kDSub.get(0));
+      var newTestKP = kPSub.get(0);
+      if (testKP != newTestKP) {
+        wristMotor.config_kP(0, newTestKP);
+        testKP = newTestKP;
+      }
+      var newTestKI = kISub.get(0);
+      if (testKI != newTestKI) {
+        wristMotor.config_kI(0, newTestKI);
+        testKI = newTestKI;
+      }
+      var newTestKD = kDSub.get(0);
+      if (testKD != newTestKD) {
+        wristMotor.config_kD(0, newTestKD);
+        testKD = newTestKD;
+      }
     }
   }
 
@@ -437,10 +458,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         case CLOSED_LOOP_MANUAL:
           m_desiredSetpointOutputRadians =
               m_joystickInput * setpointMultiplier + getPositionRadians();
-          MathUtil.clamp(
-              m_joystickInput * setpointMultiplier + getPositionRadians(),
-              WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-              WRIST.THRESHOLD.ABSOLUTE_MAX.get());
+          m_desiredSetpointOutputRadians =
+              MathUtil.clamp(
+                  m_desiredSetpointOutputRadians,
+                  WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
+                  WRIST.THRESHOLD.ABSOLUTE_MAX.get());
           break;
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * percentOutputMultiplier;

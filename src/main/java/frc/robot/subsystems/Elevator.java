@@ -66,6 +66,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final double kI = 0;
   private final double kD = 0;
 
+  private double testKP;
+  private double testKI;
+  private double testKD;
+
   private double maxVel = ELEVATOR.kMaxVel;
   private double maxAccel = ELEVATOR.kMaxAccel;
   private double kS = ELEVATOR.kS;
@@ -102,6 +106,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private final double maxForwardOutput = 0.5;
   private final double maxReverseOutput = -0.45;
+  private double currentForwardOutput = 0;
+  private double currentReverseOutput = 0;
+  private double newForwardOutput = 0;
+  private double newReverseOutput = 0;
+
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.25;
 
@@ -170,6 +179,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     elevatorMotors[0].setInverted(Constants.ELEVATOR.mainMotorInversionType);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
 
     initShuffleboard(limitCanUtil);
     m_timer.reset();
@@ -424,9 +435,21 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     //    setControlState(STATE.TEST_SETPOINT);
     if (m_controlState == STATE.TEST_SETPOINT) {
       DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
-      elevatorMotors[0].config_kP(0, kPSub.get(0));
-      elevatorMotors[0].config_kI(0, kISub.get(0));
-      elevatorMotors[0].config_kD(0, kDSub.get(0));
+      var newTestKP = kPSub.get(0);
+      if (testKP != newTestKP) {
+        elevatorMotors[0].config_kP(0, newTestKP);
+        testKP = newTestKP;
+      }
+      var newTestKI = kISub.get(0);
+      if (testKI != newTestKI) {
+        elevatorMotors[0].config_kI(0, newTestKI);
+        testKI = newTestKI;
+      }
+      var newTestKD = kDSub.get(0);
+      if (testKD != newTestKD) {
+        elevatorMotors[0].config_kD(0, newTestKD);
+        testKD = newTestKD;
+      }
 
       maxVel = kMaxVelSub.get(0);
       maxAccel = kMaxAccelSub.get(0);
@@ -446,18 +469,22 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Limits the speed of the elevator when we are close to the bottom (a.k.a. STOWED position)
   public void updateReverseOutput() {
-    if (Units.metersToInches(getHeightMeters()) < 4.0) {
-      elevatorMotors[0].configPeakOutputReverse(-0.2);
-    } else {
-      elevatorMotors[0].configPeakOutputReverse(maxReverseOutput);
+    if (Units.metersToInches(getHeightMeters()) < 4.0) newReverseOutput = -0.2;
+    else newReverseOutput = maxReverseOutput;
+
+    if (currentReverseOutput != newReverseOutput) {
+      elevatorMotors[0].configPeakOutputReverse(newReverseOutput);
+      currentReverseOutput = newReverseOutput;
     }
   }
 
   public void updateForwardOutput() {
-    if (Units.metersToInches(getHeightMeters()) > 40.0) {
-      elevatorMotors[0].configPeakOutputForward(0.2);
-    } else {
-      elevatorMotors[0].configPeakOutputForward(maxForwardOutput);
+    if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
+    else newForwardOutput = maxForwardOutput;
+
+    if (currentForwardOutput != newForwardOutput) {
+      elevatorMotors[0].configPeakOutputForward(newForwardOutput);
+      currentForwardOutput = newForwardOutput;
     }
   }
 

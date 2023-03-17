@@ -321,13 +321,13 @@ public final class Constants {
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
     public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.2);
     public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.2);
-    public static final double FFkS = 0.1;
-    public static final double kG = 1.75;
-    public static final double FFkV = 1.95;
-    public static final double kA = 0.16;
+    public static final double FFkS = 0.0;
+    public static final double kG = 0.78;
+    public static final double FFkV = 1.2;
+    public static final double kA = 0.02;
 
-    public static final double kP = 0.075;
-    public static final double kI = 0.00005;
+    public static final double kP = 0.015;
+    public static final double kI = 0.0;
     public static final double kD = 0.0;
 
     public enum STATE {

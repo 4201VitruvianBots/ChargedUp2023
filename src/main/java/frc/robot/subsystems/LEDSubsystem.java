@@ -23,6 +23,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
   private LED_STATE currentRobotState = LED_STATE.DISABLED;
+  private boolean setSolid;
   private Animation m_toAnimate = null;
 
   private final Controls m_controls; // figure out during robotics class
@@ -163,9 +164,11 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     // null indicates that the animation is "Solid"
-    if (m_toAnimate == null) {
+    if (m_toAnimate == null && !setSolid) {
+      setSolid = true;
       m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
     } else {
+      setSolid = false;
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
