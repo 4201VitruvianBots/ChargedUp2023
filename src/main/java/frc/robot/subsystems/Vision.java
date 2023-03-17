@@ -332,13 +332,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       if (targetFound == targetType.CUBE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          // targetFound = targetType.NONE;
+          targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          // targetFound = targetType.NONE;
+          targetFound = targetType.NONE;
         }
       }
     }

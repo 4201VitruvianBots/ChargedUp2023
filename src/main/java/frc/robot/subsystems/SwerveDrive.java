@@ -236,6 +236,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
+  public Pigeon2 getPigeon() {
+    return m_pigeon;
+  }
+
   public Pose2d getPoseMeters() {
     return m_odometry.getEstimatedPosition();
   }
@@ -334,6 +338,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
+    SmartDashboard.putNumber("Roll Offset", m_rollOffset);
 
     switch (limitCan) {
       case NORMAL:
@@ -347,6 +352,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
         break;
       default:
       case LIMITED:
+        pitchPub.set(getPitchDegrees());
+        rollPub.set(getRollDegrees() + getRollOffset());
+        yawPub.set(getHeadingDegrees());
         break;
     }
   }

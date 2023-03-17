@@ -428,37 +428,38 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         break;
       default:
       case LIMITED:
+      lowerLimitSwitchPub.set(getLimitSwitch());
         break;
     }
 
     // Elevator PID Tuning Values
     //    setControlState(STATE.TEST_SETPOINT);
-    if (m_controlState == STATE.TEST_SETPOINT) {
-      DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
-      var newTestKP = kPSub.get(0);
-      if (testKP != newTestKP) {
-        elevatorMotors[0].config_kP(0, newTestKP);
-        testKP = newTestKP;
-      }
-      var newTestKI = kISub.get(0);
-      if (testKI != newTestKI) {
-        elevatorMotors[0].config_kI(0, newTestKI);
-        testKI = newTestKI;
-      }
-      var newTestKD = kDSub.get(0);
-      if (testKD != newTestKD) {
-        elevatorMotors[0].config_kD(0, newTestKD);
-        testKD = newTestKD;
-      }
+    // if (m_controlState == STATE.TEST_SETPOINT) {
+    //   DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
+    //   var newTestKP = kPSub.get(0);
+    //   if (testKP != newTestKP) {
+    //     elevatorMotors[0].config_kP(0, newTestKP);
+    //     testKP = newTestKP;
+    //   }
+    //   var newTestKI = kISub.get(0);
+    //   if (testKI != newTestKI) {
+    //     elevatorMotors[0].config_kI(0, newTestKI);
+    //     testKI = newTestKI;
+    //   }
+    //   var newTestKD = kDSub.get(0);
+    //   if (testKD != newTestKD) {
+    //     elevatorMotors[0].config_kD(0, newTestKD);
+    //     testKD = newTestKD;
+    //   }
 
-      maxVel = kMaxVelSub.get(0);
-      maxAccel = kMaxAccelSub.get(0);
-      m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-      kG = kSSub.get(0);
-      kV = kVSub.get(0);
-      kA = kASub.get(0);
-      m_feedForward = new SimpleMotorFeedforward(kG, kV, kA);
-    }
+    //   maxVel = kMaxVelSub.get(0);
+    //   maxAccel = kMaxAccelSub.get(0);
+    //   m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    //   kG = kSSub.get(0);
+    //   kV = kVSub.get(0);
+    //   kA = kASub.get(0);
+    //   m_feedForward = new SimpleMotorFeedforward(kG, kV, kA);
+    // }
   }
 
   public void updateLog() {

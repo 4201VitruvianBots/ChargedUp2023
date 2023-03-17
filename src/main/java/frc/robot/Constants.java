@@ -110,7 +110,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(26.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(46)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -323,8 +323,8 @@ public final class Constants {
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.2);
-    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.2);
+    public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
+    public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
     public static final double FFkS = 0.06;
     public static final double kG = 0.54;
     public static final double FFkV = 1.6;
@@ -349,9 +349,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(160.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(155)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
