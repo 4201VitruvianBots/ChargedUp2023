@@ -57,7 +57,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double joystickInput;
   private boolean m_userSetpoint;
 
-  private final double kP = 0.3;
+  private final double kP = 0.15;
   private final double kI = 0;
   private final double kD = 0;
 
@@ -157,6 +157,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       motor.configPeakOutputForward(maxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(maxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
     }
 
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());

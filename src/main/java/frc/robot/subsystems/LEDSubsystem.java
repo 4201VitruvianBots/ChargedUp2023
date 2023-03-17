@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.*;
-import com.ctre.phoenix.led.Animation;
-import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
@@ -34,6 +32,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final StringPublisher ledStatePub;
   // Create LED strip
   public LEDSubsystem(Controls controls) {
+    m_candle.configFactoryDefault(); // sets up LED strip
     // sets up LED strip
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true; // sets lights of when the LEDs are activated
@@ -43,7 +42,15 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         0.75; // 1 is highest we can go we don't want to blind everyone at the event
     configAll.vBatOutputMode = VBatOutputMode.Modulated; // Modulate
     m_candle.configAllSettings(configAll, 100);
-
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_2_Startup, 255);
+    m_candle.setStatusFramePeriod(
+        CANdleStatusFrame.CANdleStatusFrame_Status_3_FirmwareApiStatus, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_4_ControlTelem, 255);
+    m_candle.setStatusFramePeriod(
+        CANdleStatusFrame.CANdleStatusFrame_Status_5_PixelPulseTrain, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_6_BottomPixels, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_7_TopPixels, 255);
     m_controls = controls;
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
