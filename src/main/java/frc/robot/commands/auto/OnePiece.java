@@ -5,13 +5,11 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
@@ -48,21 +46,22 @@ public class OnePiece extends SequentialCommandGroup {
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-
         new ParallelDeadlineGroup(
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(3),
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(3),
-            new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)
-            ),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
+                .withTimeout(3),
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+                .withTimeout(3),
+            new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
         new ParallelDeadlineGroup(
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(1),
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(1),
-          new AutoRunIntakeCone(intake, -0.5, vision, swerveDrive).withTimeout(1)
-          ),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
+                .withTimeout(1),
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+                .withTimeout(1),
+            new AutoRunIntakeCone(intake, -0.5, vision, swerveDrive).withTimeout(1)),
         new ParallelDeadlineGroup(
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(0.5),
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()).withTimeout(0.5)
-        ),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(0.5),
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())
+                .withTimeout(0.5)),
         autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
