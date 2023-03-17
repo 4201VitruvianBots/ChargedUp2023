@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
@@ -38,6 +39,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_joystickInput;
   private boolean m_userSetpoint;
 
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+  
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
@@ -220,6 +223,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public double getPositionDegrees() {
     return getSensorPosition() * WRIST.encoderUnitsToDegrees;
   }
+
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   // this is get current angle
   public double getVelocityDegreesPerSecond() {
     return wristMotor.getSelectedSensorVelocity() * WRIST.encoderUnitsToDegrees * 10;
@@ -320,13 +328,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
     wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
-    wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
-    wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
-    wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
-    wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
-    wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
-    wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
-    wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
+    // wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
+    // wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
+    // wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
+    // wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
+    // wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
+    // wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
+    // wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
     //    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
@@ -338,13 +346,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
     kMaxAccelSub =
         wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
-    kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
-    kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
-    kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
-    kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
-    kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
-    kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
-    kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
+    // kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
+    // kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
+    // kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
+    // kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
+    // kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
+    // kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
+    // kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
     //    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 

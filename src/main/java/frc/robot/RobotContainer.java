@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
@@ -38,6 +39,7 @@ import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
+import frc.robot.commands.util.ToggleCanUtilization;
 import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
@@ -120,6 +122,7 @@ public class RobotContainer implements AutoCloseable {
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
+    SmartDashboard.putData(new ToggleCanUtilization(m_stateHandler));
   }
 
   /**

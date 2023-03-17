@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
@@ -93,6 +94,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final int simEncoderSign =
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final double maxForwardOutput = 0.5;
   private final double maxReverseOutput = -0.45;
@@ -164,7 +166,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].setInverted(Constants.ELEVATOR.mainMotorInversionType);
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
-    initShuffleboard();
+    initShuffleboard(limitCanUtil);
     m_timer.reset();
     m_timer.start();
   }
@@ -256,6 +258,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_desiredPositionMeters = meters;
   }
 
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   public double getDesiredPositionMeters() {
     return m_desiredPositionMeters;
   }
@@ -337,7 +343,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         0);
   }
 
-  private void initShuffleboard() {
+  private void initShuffleboard(CAN_UTIL_LIMIT limitCan) {
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Sim", mech2d);
     }
@@ -356,45 +362,52 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
-    elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
+    // elevatorNtTab.getDoubleTopic("kP").publish().set(kP);
+    // elevatorNtTab.getDoubleTopic("kI").publish().set(kI);
+    // elevatorNtTab.getDoubleTopic("kD").publish().set(kD);
 
     elevatorNtTab.getDoubleTopic("Max Vel").publish().set(maxVel);
     elevatorNtTab.getDoubleTopic("Max Accel").publish().set(maxAccel);
-    elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
-    elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
-    elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
+    // elevatorNtTab.getDoubleTopic("kS").publish().set(kS);
+    // elevatorNtTab.getDoubleTopic("kV").publish().set(kV);
+    // elevatorNtTab.getDoubleTopic("kA").publish().set(kA);
 
-    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    // elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
 
-    kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
-    kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
-    kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
+    // kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
+    // kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
+    // kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
-    kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
-    kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
+    // kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kS);
+    // kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
+    // kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
 
-    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
+    // kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
-  public void updateShuffleboard() {
+  public void updateShuffleboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putBoolean("Elevator Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
-
-    kHeightPub.set(getHeightMeters());
+    kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
-    kEncoderCountsPub.set(getEncoderCounts());
-    kDesiredStatePub.set(desiredHeightState.name());
-    kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
-    kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
-    lowerLimitSwitchPub.set(getLimitSwitch());
-
-    currentCommandStatePub.set(getControlState().toString());
+    
+    switch (limitCan) {
+      case NORMAL:
+        // Put not required stuff here
+        kEncoderCountsPub.set(getEncoderCounts());
+        kHeightPub.set(getHeightMeters());
+        kDesiredStatePub.set(desiredHeightState.name());
+        kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
+        lowerLimitSwitchPub.set(getLimitSwitch());
+        currentCommandStatePub.set(getControlState().toString());
+        break;
+      default:
+      case LIMITED:
+        break;
+    }
 
     // Elevator PID Tuning Values
     //    if (DriverStation.isTest()) {
@@ -481,7 +494,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateLog();
     // Yes, this needs to be called in the periodic. The simulation does not work without this
-    updateShuffleboard();
+    updateShuffleboard(limitCanUtil);
     updateHeightMeters();
     updateReverseOutput();
     updateForwardOutput();

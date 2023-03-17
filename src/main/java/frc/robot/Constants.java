@@ -463,6 +463,11 @@ public final class Constants {
     HIGH_CUBE,
   }
 
+  public enum CAN_UTIL_LIMIT {
+    NORMAL,
+    LIMITED
+  }
+
   private static void initBeta() {
     robotName = "Beta";
     // SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
