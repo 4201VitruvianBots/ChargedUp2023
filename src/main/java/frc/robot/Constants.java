@@ -93,6 +93,7 @@ public final class Constants {
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
+      TEST_SETPOINT,
       USER_SETPOINT,
       AUTO_SETPOINT
     }
@@ -332,6 +333,7 @@ public final class Constants {
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
+      TEST_SETPOINT,
       USER_SETPOINT,
       AUTO_SETPOINT
     }

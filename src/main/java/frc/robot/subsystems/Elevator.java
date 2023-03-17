@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR.STATE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -45,7 +46,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   private double
-      m_desiredPositionMeters; // The height in encoder units our robot is trying to reach
+          m_desiredPositionInputMeters; // The height in encoder units our robot is trying to reach
+  private double
+          m_desiredPositionOutputMeters; // The height in encoder units our robot is trying to reach
   private double
       m_commandedPositionMeters; // The height in encoder units our robot is trying to reach
   private ELEVATOR.SETPOINT desiredHeightState =
@@ -254,11 +257,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void setDesiredPositionMeters(double meters) {
-    m_desiredPositionMeters = meters;
+    m_desiredPositionInputMeters = meters;
   }
 
   public double getDesiredPositionMeters() {
-    return m_desiredPositionMeters;
+    return m_desiredPositionInputMeters;
   }
 
   public double getCommandedPositionMeters() {
@@ -398,30 +401,26 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub.set(getControlState().toString());
 
     // Elevator PID Tuning Values
-    //    if (DriverStation.isTest()) {
-    //      elevatorMotors[0].config_kP(0, kPSub.get(0));
-    //      elevatorMotors[0].config_kI(0, kISub.get(0));
-    //      elevatorMotors[0].config_kD(0, kDSub.get(0));
-    //
-    //      maxVel = kMaxVelSub.get(0);
-    //      maxAccel = kMaxAccelSub.get(0);
-    //      m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    //      kS = kSSub.get(0);
-    //      kV = kVSub.get(0);
-    //      kA = kASub.get(0);
-    //      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
-    //
-    //      var testSetpoint = kSetpointSub.get(0);
-    //      if (m_desiredPositionMeters != testSetpoint) {
-    //        setControlState(ELEVATOR.STATE.SETPOINT);
-    //        m_desiredPositionMeters = testSetpoint;
-    //      }
-    //    }
+//    setControlState(STATE.TEST_SETPOINT);
+    if (m_controlState == STATE.TEST_SETPOINT) {
+      DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
+      elevatorMotors[0].config_kP(0, kPSub.get(0));
+      elevatorMotors[0].config_kI(0, kISub.get(0));
+      elevatorMotors[0].config_kD(0, kDSub.get(0));
+
+      maxVel = kMaxVelSub.get(0);
+      maxAccel = kMaxAccelSub.get(0);
+      m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+      kS = kSSub.get(0);
+      kV = kVSub.get(0);
+      kA = kASub.get(0);
+      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
+    }
   }
 
   public void updateLog() {
     outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
-    setpointMetersEntry.append(m_desiredPositionMeters);
+    setpointMetersEntry.append(m_desiredPositionInputMeters);
     positionMetersEntry.append(heightMeters);
   }
 
@@ -490,7 +489,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
-          m_desiredPositionMeters =
+          m_desiredPositionOutputMeters =
               MathUtil.clamp(
                   joystickInput * setpointMultiplier + getHeightMeters(),
                   ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
@@ -507,18 +506,22 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           setPercentOutput(percentOutput);
           break;
         case USER_SETPOINT:
-          m_desiredPositionMeters += joystickInput * setpointMultiplier;
+          m_desiredPositionOutputMeters = m_desiredPositionInputMeters + joystickInput * setpointMultiplier;
+          break;
+        case TEST_SETPOINT:
+          m_desiredPositionOutputMeters = kSetpointSub.get(0);
           break;
         default:
         case AUTO_SETPOINT:
+          m_desiredPositionOutputMeters = m_desiredPositionInputMeters;
           break;
       }
       if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-        if (m_desiredPositionMeters - getHeightMeters() > 0)
+        if (m_desiredPositionInputMeters - getHeightMeters() > 0)
           m_currentConstraints = m_fastConstraints;
         else m_currentConstraints = m_slowConstraints;
 
-        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
         var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         var currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);

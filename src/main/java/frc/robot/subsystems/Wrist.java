@@ -29,7 +29,8 @@ import frc.robot.Constants.WRIST.STATE;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
-  private double m_desiredSetpointRadians;
+  private double m_desiredSetpointInputRadians;
+  private double m_desiredSetpointOutputRadians;
   private double m_commandedAngleRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
@@ -202,11 +203,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public void setDesiredPositionRadians(double desiredAngleRadians) {
-    m_desiredSetpointRadians = desiredAngleRadians;
+    m_desiredSetpointInputRadians = desiredAngleRadians;
   }
 
   public double getDesiredPositionRadians() {
-    return m_desiredSetpointRadians;
+    return m_desiredSetpointInputRadians;
   }
 
   public double getCommandedPositionRadians() {
@@ -328,7 +329,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
     wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
     wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-    //    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
+    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
@@ -359,25 +360,24 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     currentCommandStatePub.set(getControlState().toString());
     // kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
-       
-    var maxVel = kMaxVelSub.get(0);
-    var maxAccel = kMaxAccelSub.get(0);
-    m_currentTrapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    var kS = kSSub.get(Constants.WRIST.FFkS);
-    var kG = kGSub.get(Constants.WRIST.kG);
-    var kV = kVSub.get(Constants.WRIST.FFkV);
-    var kA = kASub.get(Constants.WRIST.kA);
 
-    m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+    // Tuning controls
+//    setControlState(STATE.TEST_SETPOINT);
+    if(m_controlState == STATE.TEST_SETPOINT) {
+      DriverStation.reportWarning("USING WRIST TEST MODE!", false);
+      var maxVel = kMaxVelSub.get(0);
+      var maxAccel = kMaxAccelSub.get(0);
+      m_currentTrapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+      var kS = kSSub.get(Constants.WRIST.FFkS);
+      var kG = kGSub.get(Constants.WRIST.kG);
+      var kV = kVSub.get(Constants.WRIST.FFkV);
+      var kA = kASub.get(Constants.WRIST.kA);
 
-    wristMotor.config_kP(0, kPSub.get(0));
-    wristMotor.config_kI(0, kISub.get(0));
-    wristMotor.config_kD(0, kDSub.get(0));
+      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
 
-    var testSetpoint = kSetpointSub.get(0);
-    if (m_desiredSetpointRadians != testSetpoint) {
-      setControlState(STATE.AUTO_SETPOINT);
-      m_desiredSetpointRadians = testSetpoint;
+      wristMotor.config_kP(0, kPSub.get(0));
+      wristMotor.config_kI(0, kISub.get(0));
+      wristMotor.config_kD(0, kDSub.get(0));
     }
   }
 
@@ -426,7 +426,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
-          m_desiredSetpointRadians = m_joystickInput * setpointMultiplier + getPositionRadians();
+          m_desiredSetpointOutputRadians = m_joystickInput * setpointMultiplier + getPositionRadians();
           MathUtil.clamp(
               m_joystickInput * setpointMultiplier + getPositionRadians(),
               WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
@@ -443,14 +443,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           setPercentOutput(percentOutput);
           break;
         case USER_SETPOINT:
-          m_desiredSetpointRadians += m_joystickInput * setpointMultiplier;
+          m_desiredSetpointOutputRadians = m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
+          break;
+        case TEST_SETPOINT:
+          m_desiredSetpointOutputRadians = Units.degreesToRadians(kSetpointSub.get(0));
           break;
         default:
         case AUTO_SETPOINT:
+          m_desiredSetpointOutputRadians = m_desiredSetpointInputRadians;
           break;
       }
       if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
-        m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
+        m_goal = new TrapezoidProfile.State(m_desiredSetpointOutputRadians, 0);
         var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
         var currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
