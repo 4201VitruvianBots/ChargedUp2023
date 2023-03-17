@@ -69,6 +69,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
                       Constants.SWERVEDRIVE.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
+  private double m_rollOffset;
   private Trajectory m_trajectory;
 
   private final SwerveDrivePoseEstimator m_odometry;
@@ -205,6 +206,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   public void setOdometry(Pose2d pose) {
     m_pigeon.setYaw(pose.getRotation().getDegrees());
     m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
+  }
+
+  public void setRollOffset() {
+    m_rollOffset = -m_pigeon.getRoll();
+  }
+
+  public double getRollOffset() {
+    return m_rollOffset;
   }
 
   public double getPitchDegrees() {

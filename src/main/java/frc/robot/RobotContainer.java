@@ -34,6 +34,7 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
@@ -135,7 +136,7 @@ public class RobotContainer implements AutoCloseable {
 
     leftJoystickTriggers[0].whileTrue(
         new SetSwerveMaxTranslationVeolcity(
-            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond / 25.0));
+            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.750));
 
     leftJoystickTriggers[1].whileTrue(
         new IntakeVisionAlignment(
@@ -252,6 +253,7 @@ public class RobotContainer implements AutoCloseable {
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+    SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
 
     initTestController();
   }
@@ -403,7 +405,7 @@ public class RobotContainer implements AutoCloseable {
   }
 
   private void initAutoBuilder() {
-    m_eventMap.put("wait1", new WaitCommand(0.5));
+    m_eventMap.put("wait", new WaitCommand(1));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(

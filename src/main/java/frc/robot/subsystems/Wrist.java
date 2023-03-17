@@ -131,7 +131,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.setInverted(WRIST.motorInversionType);
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
-    if (RobotBase.isReal()) Timer.delay(1);
+    if (RobotBase.isReal()) Timer.delay(2);
 
     resetAngleDegrees(-15.0);
 

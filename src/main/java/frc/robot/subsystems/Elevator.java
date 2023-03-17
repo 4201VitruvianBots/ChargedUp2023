@@ -94,7 +94,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
 
-  private final double maxForwardOutput = 0.6;
+  private final double maxForwardOutput = 0.5;
   private final double maxReverseOutput = -0.45;
   private final double percentOutputMultiplier = 0.75;
   public final double setpointMultiplier = 0.25;
