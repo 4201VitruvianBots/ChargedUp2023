@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
@@ -71,6 +72,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
   private double m_rollOffset;
   private Trajectory m_trajectory;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
@@ -196,6 +199,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   public void setSwerveModuleStatesAuto(SwerveModuleState[] states) {
     setSwerveModuleStates(states, false);
+  }
+
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+      module.setReduceCanUtilization(limitCan);
+    }
   }
 
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
@@ -328,16 +338,24 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
   }
 
-  private void updateSmartDashboard() {
+  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
 
-    pitchPub.set(getPitchDegrees() + 2.460938);
-    rollPub.set(getRollDegrees());
-    yawPub.set(getHeadingDegrees());
-    odometryXPub.set(getOdometry().getEstimatedPosition().getX());
-    odometryYPub.set(getOdometry().getEstimatedPosition().getY());
-    odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
+    switch (limitCan) {
+      case NORMAL:
+        // Put not required stuff here
+        pitchPub.set(getPitchDegrees() + 2.460938);
+        rollPub.set(getRollDegrees());
+        yawPub.set(getHeadingDegrees());
+        odometryXPub.set(getOdometry().getEstimatedPosition().getX());
+        odometryYPub.set(getOdometry().getEstimatedPosition().getY());
+        odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
+        break;
+      default:
+      case LIMITED:
+        break;
+    }
   }
 
   public void disabledPeriodic() {}
@@ -349,7 +367,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     }
 
     updateOdometry();
-    updateSmartDashboard();
+    updateSmartDashboard(limitCanUtil);
   }
 
   @Override

@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
@@ -44,6 +45,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private double m_lastAngle;
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -222,6 +225,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_pose = pose;
   }
 
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   public Pose2d getModulePose() {
     return m_pose;
   }
@@ -249,13 +256,20 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
   }
 
-  private void updateSmartDashboard() {
+  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
     //    SmartDashboard.putNumber("Module " + m_moduleNumber + " error",
     // Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
 
-    moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
-    moduleMotorHeadingPub.set(getHeadingDegrees());
-    moduleEncoderHealthPub.set(getInitSuccess());
+    switch (limitCan) {
+      case NORMAL:
+        moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
+        moduleMotorHeadingPub.set(getHeadingDegrees());
+        moduleEncoderHealthPub.set(getInitSuccess());
+        break;
+      default:
+      case LIMITED:
+        break;
+    }
   }
 
   public void updateLog() {
@@ -265,7 +279,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    updateSmartDashboard(limitCanUtil);
     updateLog();
   }
 
