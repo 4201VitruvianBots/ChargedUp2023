@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
+import frc.robot.Constants.WRIST.STATE;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
@@ -121,7 +122,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     //    wristMotor.setStatusFramePeriod(2, 0);
     wristMotor.configVoltageCompSaturation(10);
     wristMotor.enableVoltageCompensation(true);
-
+    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
     wristMotor.config_kP(0, WRIST.kP);
     wristMotor.config_kD(0, WRIST.kD);
     wristMotor.config_kI(0, WRIST.kI);
@@ -345,7 +346,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
     kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
     kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-    //    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
+    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   // SmartDashboard function
@@ -357,28 +358,27 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
     currentCommandStatePub.set(getControlState().toString());
-    kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
-    //    if (DriverStation.isTest()) {
-    //      var maxVel = kMaxVelSub.get(0);
-    //      var maxAccel = kMaxAccelSub.get(0);
-    //      m_trapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    //      var kS = kSSub.get(Constants.WRIST.FFkS);
-    //      var kG = kGSub.get(Constants.WRIST.kG);
-    //      var kV = kVSub.get(Constants.WRIST.FFkV);
-    //      var kA = kASub.get(Constants.WRIST.kA);
-    //
-    //      m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-    //
-    //      wristMotor.config_kP(0, kPSub.get(0));
-    //      wristMotor.config_kI(0, kISub.get(0));
-    //      wristMotor.config_kD(0, kDSub.get(0));
-    //
-    //      var testSetpoint = kSetpointSub.get(0);
-    //      if (m_desiredSetpointRadians != testSetpoint) {
-    //        setControlState(Constants.WRIST.STATE.SETPOINT);
-    //        m_desiredSetpointRadians = testSetpoint;
-    //      }
-    //    }
+    // kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
+       
+    var maxVel = kMaxVelSub.get(0);
+    var maxAccel = kMaxAccelSub.get(0);
+    m_currentTrapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    var kS = kSSub.get(Constants.WRIST.FFkS);
+    var kG = kGSub.get(Constants.WRIST.kG);
+    var kV = kVSub.get(Constants.WRIST.FFkV);
+    var kA = kASub.get(Constants.WRIST.kA);
+
+    m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+
+    wristMotor.config_kP(0, kPSub.get(0));
+    wristMotor.config_kI(0, kISub.get(0));
+    wristMotor.config_kD(0, kDSub.get(0));
+
+    var testSetpoint = kSetpointSub.get(0);
+    if (m_desiredSetpointRadians != testSetpoint) {
+      setControlState(STATE.AUTO_SETPOINT);
+      m_desiredSetpointRadians = testSetpoint;
+    }
   }
 
   public void updateLog() {
