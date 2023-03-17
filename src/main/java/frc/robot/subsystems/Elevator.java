@@ -394,7 +394,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
-    
+
     switch (limitCan) {
       case NORMAL:
         // Put not required stuff here

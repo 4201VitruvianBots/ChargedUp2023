@@ -41,7 +41,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
-  
+
   private final int simEncoderSign =
       WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
@@ -367,7 +367,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     currentCommandStatePub.set(getControlState().toString());
     // kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
-       
+
     var maxVel = kMaxVelSub.get(0);
     var maxAccel = kMaxAccelSub.get(0);
     m_currentTrapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
