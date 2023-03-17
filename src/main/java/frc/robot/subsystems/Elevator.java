@@ -340,7 +340,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (getLimitSwitch() && !lowerLimitSwitchTriggeered) {
       setSensorPosition(0.0);
       lowerLimitSwitchTriggeered = true;
-    } else if(lowerLimitSwitchTriggeered && !getLimitSwitch()) {
+    } else if (lowerLimitSwitchTriggeered && !getLimitSwitch()) {
       lowerLimitSwitchTriggeered = false;
     }
     heightMeters = getHeightMeters();
