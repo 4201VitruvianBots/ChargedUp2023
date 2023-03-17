@@ -40,6 +40,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Initializing hall effect sensor at bottom of elevator
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(Constants.DIO.elevatorLowerLimitSwitch);
+  private boolean lowerLimitSwitchTriggeered = false;
 
   public enum ELEVATOR_SPEED {
     NORMAL,
@@ -336,7 +337,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    if (getLimitSwitch()) setSensorPosition(0.0);
+    if (getLimitSwitch() && !lowerLimitSwitchTriggeered) {
+      setSensorPosition(0.0);
+      lowerLimitSwitchTriggeered = true;
+    } else if(lowerLimitSwitchTriggeered && !getLimitSwitch()) {
+      lowerLimitSwitchTriggeered = false;
+    }
     heightMeters = getHeightMeters();
   }
 
