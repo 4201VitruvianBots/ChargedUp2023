@@ -162,15 +162,6 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    // TODO: Fix this from flashing
-    // if (DriverStation.isDisabled()) {
-    //   currentRobotState = robotState.DISABLED;
-    //   red = 255;
-    //   green = 0;
-    //   blue = 0;
-    //   m_toAnimate = null;
-    // }
-
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null) {
       m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
@@ -178,12 +169,6 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
-    // ledStatePub.set(currentRobotState.toString());
-    // the code below was printing out just LED Mode over and over again in the Led tab for some
-    // reason but the code above does show the current state
-    //   Shuffleboard.getTab("Controls")
-    // .add("LED Mode", currentRobotState.toString());
-
   }
 
   public INTAKING_STATES getPieceIntent() {

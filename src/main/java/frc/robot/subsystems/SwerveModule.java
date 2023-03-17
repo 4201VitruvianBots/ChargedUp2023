@@ -257,9 +257,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
-    //    SmartDashboard.putNumber("Module " + m_moduleNumber + " error",
-    // Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
-
     switch (limitCan) {
       case NORMAL:
         moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
@@ -273,14 +270,14 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateLog() {
-    // moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
-    // moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
+    moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
+    moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
   }
 
   @Override
   public void periodic() {
     updateSmartDashboard(limitCanUtil);
-    updateLog();
+    //    updateLog();
   }
 
   @Override
@@ -299,9 +296,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
-
-    //    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
-    //    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
 
     m_turnMotor
         .getSimCollection()

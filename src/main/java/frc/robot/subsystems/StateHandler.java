@@ -43,7 +43,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
 
-  private Timer m_inactiveTimer = new Timer();
+  private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
 
@@ -543,13 +543,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }
 
-    // Limit max swerve speed by elevator height (Probably a bad idea, have operator do this
-    // manually)
-    //    if (isTipping()) {
-    //      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-    //      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
-    //    }
-
     // TODO: Update this based on Intake sensors
     switch (currentIntakeState) {
       case CONE:
@@ -586,7 +579,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void testPeriodic() {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentZone = m_mainStateChooser.getSelected();
-    m_fieldSim.getValidNodes();
     m_fieldSim.getTargetNode();
   }
 

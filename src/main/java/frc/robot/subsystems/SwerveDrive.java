@@ -133,10 +133,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
     if (useHeadingTarget) {
-      // rotation = m_setpoint.velocity;
       rotation = m_rotationOutput;
-      // SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
-      // SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
       chassisSpeeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
     } else {
@@ -166,9 +163,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void calculateRotationSpeed() {
-    // m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
-    // var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-    // m_setpoint = profile.calculate(0.02);
     if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
         > Units.degreesToRadians(1))
       m_rotationOutput =
@@ -236,7 +230,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   public double getHeadingDegrees() {
     return m_pigeon.getYaw();
-    // return 0;
   }
 
   public Rotation2d getHeadingRotation2d() {

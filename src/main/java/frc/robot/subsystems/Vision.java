@@ -539,7 +539,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
           0,
           0
         });
-    //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateSmartDashboard();
     updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
