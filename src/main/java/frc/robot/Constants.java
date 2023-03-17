@@ -243,7 +243,7 @@ public final class Constants {
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final int kFalconEncoderCPR = 2048;
-    public final int kCANCoderCPR = 4096;
+    public static final int kCANCoderCPR = 4096;
 
     public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
     public static final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
@@ -252,14 +252,14 @@ public final class Constants {
         (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
     public static final double kTurningMotorDistancePerPulse =
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
-    public final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+    public static final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
     public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
     public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
     public static final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
 
-    public final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
-    public final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
+    public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
+    public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
 
   public static final class VISION {
@@ -312,7 +312,7 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
-    public static int kTimeoutMs = 0;
+    public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
@@ -327,7 +327,7 @@ public final class Constants {
     public static final double kA = 0.16;
 
     public static final double kP = 0.075;
-    public static double kI = 0.00005;
+    public static final double kI = 0.00005;
     public static final double kD = 0.0;
 
     public enum STATE {
