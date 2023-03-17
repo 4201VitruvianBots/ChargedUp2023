@@ -371,8 +371,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
 
     // Tuning controls
-//    setControlState(STATE.TEST_SETPOINT);
-    if(m_controlState == STATE.TEST_SETPOINT) {
+    //    setControlState(STATE.TEST_SETPOINT);
+    if (m_controlState == STATE.TEST_SETPOINT) {
       DriverStation.reportWarning("USING WRIST TEST MODE!", false);
       var maxVel = kMaxVelSub.get(0);
       var maxAccel = kMaxAccelSub.get(0);
@@ -435,7 +435,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     if (isClosedLoop) {
       switch (m_controlState) {
         case CLOSED_LOOP_MANUAL:
-          m_desiredSetpointOutputRadians = m_joystickInput * setpointMultiplier + getPositionRadians();
+          m_desiredSetpointOutputRadians =
+              m_joystickInput * setpointMultiplier + getPositionRadians();
           MathUtil.clamp(
               m_joystickInput * setpointMultiplier + getPositionRadians(),
               WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
@@ -452,7 +453,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           setPercentOutput(percentOutput);
           break;
         case USER_SETPOINT:
-          m_desiredSetpointOutputRadians = m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
+          m_desiredSetpointOutputRadians =
+              m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
           break;
         case TEST_SETPOINT:
           m_desiredSetpointOutputRadians = Units.degreesToRadians(kSetpointSub.get(0));

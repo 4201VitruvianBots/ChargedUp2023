@@ -47,9 +47,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   private double
-          m_desiredPositionInputMeters; // The height in encoder units our robot is trying to reach
+      m_desiredPositionInputMeters; // The height in encoder units our robot is trying to reach
   private double
-          m_desiredPositionOutputMeters; // The height in encoder units our robot is trying to reach
+      m_desiredPositionOutputMeters; // The height in encoder units our robot is trying to reach
   private double
       m_commandedPositionMeters; // The height in encoder units our robot is trying to reach
   private ELEVATOR.SETPOINT desiredHeightState =
@@ -415,7 +415,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
 
     // Elevator PID Tuning Values
-//    setControlState(STATE.TEST_SETPOINT);
+    //    setControlState(STATE.TEST_SETPOINT);
     if (m_controlState == STATE.TEST_SETPOINT) {
       DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
       elevatorMotors[0].config_kP(0, kPSub.get(0));
@@ -520,7 +520,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           setPercentOutput(percentOutput);
           break;
         case USER_SETPOINT:
-          m_desiredPositionOutputMeters = m_desiredPositionInputMeters + joystickInput * setpointMultiplier;
+          m_desiredPositionOutputMeters =
+              m_desiredPositionInputMeters + joystickInput * setpointMultiplier;
           break;
         case TEST_SETPOINT:
           m_desiredPositionOutputMeters = Units.inchesToMeters(kSetpointSub.get(0));
