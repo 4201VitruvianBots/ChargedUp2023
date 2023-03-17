@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -128,6 +129,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isReal()) Timer.delay(0.2);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    m_angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+    m_angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     resetAngleToAbsolute();
 
     // Check if the offset was applied properly. Delay to give it some time to set
