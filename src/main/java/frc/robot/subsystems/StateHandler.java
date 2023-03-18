@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -520,6 +521,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     // If no user input for more than one second, then reset elevator to stowed
+    if(!DriverStation.isAutonomous()) {
     if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled()) && !inactiveTimerEnabled) {
       inactiveTimerEnabled = true;
       timestamp = m_inactiveTimer.get();
@@ -536,6 +538,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
       }
     }
+  }
 
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);

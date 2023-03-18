@@ -51,16 +51,20 @@ public class OnePieceNoBalance extends SequentialCommandGroup {
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
                 .withTimeout(3),
             new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
+
+            new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive).withTimeout(0.5),
+
         new ParallelDeadlineGroup(
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
                 .withTimeout(1),
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
                 .withTimeout(1),
-            new AutoRunIntakeCone(intake, -0.5, vision, swerveDrive).withTimeout(1)),
+            new AutoRunIntakeCone(intake, -0.7, vision, swerveDrive).withTimeout(1)),
+
         new ParallelDeadlineGroup(
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(0.5),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1),
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())
-                .withTimeout(0.5)),
+                .withTimeout(1)),
         autoPath,
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

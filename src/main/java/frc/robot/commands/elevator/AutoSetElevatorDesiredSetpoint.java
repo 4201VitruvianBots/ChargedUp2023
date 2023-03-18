@@ -7,6 +7,11 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.subsystems.Elevator;
+import java.util.function.DoubleSupplier;
 
 public class AutoSetElevatorDesiredSetpoint extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
@@ -24,7 +29,10 @@ public class AutoSetElevatorDesiredSetpoint extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_elevator.setRunningBool(true);
+    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
