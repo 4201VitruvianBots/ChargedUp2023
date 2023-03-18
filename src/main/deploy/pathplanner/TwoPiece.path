@@ -24,18 +24,18 @@
     },
     {
       "anchorPoint": {
-        "x": 6.89,
-        "y": 4.7
+        "x": 6.9399999999999995,
+        "y": 4.65
       },
       "prevControl": {
-        "x": 5.864979832589881,
-        "y": 4.7
+        "x": 5.914979832589881,
+        "y": 4.65
       },
       "nextControl": {
-        "x": 5.864979832589881,
-        "y": 4.7
+        "x": 5.914979832589881,
+        "y": 4.65
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -3.0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
@@ -54,15 +54,15 @@
     {
       "anchorPoint": {
         "x": 4.2439474352632915,
-        "y": 4.815203490056104
+        "y": 4.79
       },
       "prevControl": {
         "x": 4.7699067327959215,
-        "y": 4.842408281307791
+        "y": 4.8172047912516875
       },
       "nextControl": {
         "x": 3.8429119865445514,
-        "y": 4.794460277191341
+        "y": 4.769256787135237
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -92,7 +92,9 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "RunIntakeCubeReverse"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -101,14 +103,21 @@
   ],
   "markers": [
     {
-      "position": 1.1181818181818182,
+      "position": 1.12,
       "names": [
         "SetWristStowed",
         "SetElevatorStowed"
       ]
     },
     {
-      "position": 0.4636363636363636,
+      "position": 2.9454545454545453,
+      "names": [
+        "SetElevatorHighConeNode",
+        "SetWristHighConeNode"
+      ]
+    },
+    {
+      "position": 0.4909090909090909,
       "names": [
         "SetWristIntaking",
         "SetWristIntaking",

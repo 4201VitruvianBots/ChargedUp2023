@@ -25,7 +25,7 @@ public class JustBalance extends SequentialCommandGroup {
 
     var trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
+            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
     var autoPath = autoBuilder.fullAuto(trajectory);
     addCommands(
