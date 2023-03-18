@@ -16,9 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "wait"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
         "waitBehavior": "before",
         "waitTime": 3.0
@@ -51,11 +49,11 @@
     },
     {
       "anchorPoint": {
-        "x": 3.85,
+        "x": 4.04,
         "y": 2.75
       },
       "prevControl": {
-        "x": 3.1704530634559283,
+        "x": 3.360453063455928,
         "y": 2.75
       },
       "nextControl": null,

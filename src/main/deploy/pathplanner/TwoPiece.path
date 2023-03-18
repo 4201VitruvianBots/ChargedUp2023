@@ -92,9 +92,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "RunIntakeConeReverse"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -110,14 +108,7 @@
       ]
     },
     {
-      "position": 2.9454545454545453,
-      "names": [
-        "SetElevatorHighConeNode",
-        "SetWristHighConeNode"
-      ]
-    },
-    {
-      "position": 0.6272727272727272,
+      "position": 0.4636363636363636,
       "names": [
         "SetWristIntaking",
         "SetWristIntaking",

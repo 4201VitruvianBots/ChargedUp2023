@@ -83,7 +83,23 @@ public class TwoPiece extends SequentialCommandGroup {
         //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1),
         //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())
         //         .withTimeout(1)),
-  
+        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        new ParallelCommandGroup(
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
+        ),
+        new WaitCommand(0.5),
+        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
+        new WaitCommand(1.5),
+
+        new ParallelCommandGroup(
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())
+        ),
+
+
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

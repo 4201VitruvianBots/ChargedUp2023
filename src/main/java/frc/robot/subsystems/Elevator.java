@@ -138,9 +138,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kSSub,
       kVSub,
       kASub;
-  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub;
+  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub, kPercentOutputPub;
   private StringPublisher kDesiredStatePub,
-      kPercentOutputPub,
       kClosedLoopModePub,
       currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
@@ -379,7 +378,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
-    kPercentOutputPub = elevatorNtTab.getStringTopic("Percent Output").publish();
+    kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
     kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
@@ -423,13 +422,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         kEncoderCountsPub.set(getEncoderCounts());
         kHeightPub.set(getHeightMeters());
         kDesiredStatePub.set(desiredHeightState.name());
-        kPercentOutputPub.set(String.format("%.0f%%", getPercentOutput() * 100.0));
+        kPercentOutputPub.set(getPercentOutput());
         lowerLimitSwitchPub.set(getLimitSwitch());
         currentCommandStatePub.set(getControlState().toString());
         break;
       default:
       case LIMITED:
         lowerLimitSwitchPub.set(getLimitSwitch());
+        kPercentOutputPub.set(getPercentOutput());
         break;
     }
 
