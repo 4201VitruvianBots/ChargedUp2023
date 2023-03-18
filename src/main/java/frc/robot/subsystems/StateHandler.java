@@ -542,7 +542,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
-
     } else {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }

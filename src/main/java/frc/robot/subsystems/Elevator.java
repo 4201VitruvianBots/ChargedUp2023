@@ -75,6 +75,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double kV = ELEVATOR.kV;
   private double kA = ELEVATOR.kA;
 
+  private final TrapezoidProfile.Constraints m_stopSlippingConstraints = 
+      new TrapezoidProfile.Constraints(maxVel * .5, maxAccel);
   private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
   private final TrapezoidProfile.Constraints m_fastConstraints =
@@ -469,13 +471,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Limits the speed of the elevator when we are close to the bottom (a.k.a. STOWED position)
   public void updateReverseOutput() {
-    if (Units.metersToInches(getHeightMeters()) < 4.0) newReverseOutput = -0.22;
-    else newReverseOutput = maxReverseOutput;
+    // if (Units.metersToInches(getHeightMeters()) < 4.0) newReverseOutput = -0.22;
+    // else newReverseOutput = maxReverseOutput;
 
-    if (currentReverseOutput != newReverseOutput) {
-      elevatorMotors[0].configPeakOutputReverse(newReverseOutput);
-      currentReverseOutput = newReverseOutput;
-    }
+    // if (currentReverseOutput != newReverseOutput) {
+    //   elevatorMotors[0].configPeakOutputReverse(newReverseOutput);
+    //   currentReverseOutput = newReverseOutput;
+    // }
   }
 
   public void updateForwardOutput() {
@@ -567,7 +569,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
         if (m_desiredPositionInputMeters - getHeightMeters() > 0)
           m_currentConstraints = m_fastConstraints;
+          else if(getHeightMeters() < Units.inchesToMeters(3.0)){
+            m_currentConstraints = m_stopSlippingConstraints; 
+          }
         else m_currentConstraints = m_slowConstraints;
+        
 
         m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
         var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
