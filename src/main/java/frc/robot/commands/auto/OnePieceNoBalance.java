@@ -11,7 +11,6 @@ import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
-import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
@@ -23,10 +22,10 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
-public class OnePiece extends SequentialCommandGroup {
+public class OnePieceNoBalance extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
 
-  public OnePiece(
+  public OnePieceNoBalance(
       String pathName,
       SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
@@ -63,7 +62,6 @@ public class OnePiece extends SequentialCommandGroup {
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())
                 .withTimeout(0.5)),
         autoPath,
-        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
