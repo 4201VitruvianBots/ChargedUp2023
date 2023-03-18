@@ -411,9 +411,9 @@ public class RobotContainer implements AutoCloseable {
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
     m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
     m_eventMap.put(
-        "RunIntakeConeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
+        "RunIntakeConeReverse", new AutoRunIntakeCone(m_intake, -0.8, m_vision, m_swerveDrive));
     m_eventMap.put(
-        "RunIntakeCubeReverse", new AutoRunIntakeCone(m_intake, -0.5, m_vision, m_swerveDrive));
+        "RunIntakeCubeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
     m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
     m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
     m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
@@ -441,7 +441,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetWristMidConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
@@ -449,7 +449,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetWristHighConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
@@ -514,6 +514,18 @@ public class RobotContainer implements AutoCloseable {
             m_intake,
             m_vision,
             m_elevator));
+
+            m_autoChooser.addOption(
+                "TwoPiece",
+                new TwoPiece(
+                    "TwoPiece",
+                    m_autoBuilder,
+                    m_swerveDrive,
+                    m_fieldSim,
+                    m_wrist,
+                    m_intake,
+                    m_vision,
+                    m_elevator));
 
     m_autoChooser.addOption(
         "BlueOnePieceNoBalance",

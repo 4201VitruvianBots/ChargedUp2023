@@ -26,10 +26,10 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
-public class OnePiece extends SequentialCommandGroup {
+public class TwoPiece extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
 
-  public OnePiece(
+  public TwoPiece(
       String pathName,
       SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
@@ -41,7 +41,7 @@ public class OnePiece extends SequentialCommandGroup {
 
     m_trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
+            pathName, new PathConstraints(Units.feetToMeters(2), Units.feetToMeters(2)));
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
 
@@ -52,13 +52,13 @@ public class OnePiece extends SequentialCommandGroup {
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
 
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-        new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-        ),
-        new WaitCommand(0.5),
-        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-        new WaitCommand(1.5),
+        // new ParallelCommandGroup(
+        //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+        //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
+        // ),
+        // new WaitCommand(0.5),
+        // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
+        // new WaitCommand(1.5),
 
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
@@ -66,7 +66,6 @@ public class OnePiece extends SequentialCommandGroup {
         ),
 
               autoPath,
-        new AutoBalance(swerveDrive),
 
             // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
 
