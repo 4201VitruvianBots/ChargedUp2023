@@ -39,7 +39,7 @@ public class TwoPiece extends SequentialCommandGroup {
 
     m_trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
+            pathName, new PathConstraints(Units.feetToMeters(13), Units.feetToMeters(10)));
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
 
@@ -52,14 +52,23 @@ public class TwoPiece extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
-        new WaitCommand(0.1),
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-        new WaitCommand(0.5),
+        new WaitCommand(0.3),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         autoPath,
-
+        
+        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        new ParallelCommandGroup(
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+        new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(1),
+        new WaitCommand(0.3),
+        new ParallelCommandGroup(
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
 
         // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive).withTimeout(0.5),

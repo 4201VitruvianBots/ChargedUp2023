@@ -51,6 +51,10 @@ public class BottomDriveForward extends SequentialCommandGroup {
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         autoPath,
+        new ParallelCommandGroup(
+            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+       
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
