@@ -6,15 +6,12 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
-import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
@@ -48,29 +45,25 @@ public class PlaceOneBalance extends SequentialCommandGroup {
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
-        
-        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
 
+        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-        ),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         new WaitCommand(0.5),
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(1.5),
-
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())
-        ).withTimeout(3),
+                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()))
+            .withTimeout(3),
+        autoPath,
 
-              autoPath,
+        // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
 
-            // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
-
-            // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive).withTimeout(0.5),
-            // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(0.5),
+        // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive).withTimeout(0.5),
+        // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(0.5),
 
         // new ParallelDeadlineGroup(
         //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
@@ -83,7 +76,7 @@ public class PlaceOneBalance extends SequentialCommandGroup {
         //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1),
         //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())
         //         .withTimeout(1)),
-  
+
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

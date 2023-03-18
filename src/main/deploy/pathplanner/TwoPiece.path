@@ -92,9 +92,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "RunIntakeCubeReverse"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -107,13 +105,6 @@
       "names": [
         "SetWristStowed",
         "SetElevatorStowed"
-      ]
-    },
-    {
-      "position": 2.9454545454545453,
-      "names": [
-        "SetElevatorHighConeNode",
-        "SetWristHighConeNode"
       ]
     },
     {

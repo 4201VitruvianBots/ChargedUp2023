@@ -75,7 +75,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double kV = ELEVATOR.kV;
   private double kA = ELEVATOR.kA;
 
-  private final TrapezoidProfile.Constraints m_stopSlippingConstraints = 
+  private final TrapezoidProfile.Constraints m_stopSlippingConstraints =
       new TrapezoidProfile.Constraints(maxVel * .5, maxAccel);
   private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(maxVel, maxAccel);
@@ -138,10 +138,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kSSub,
       kVSub,
       kASub;
-  private DoublePublisher kHeightPub, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub, kPercentOutputPub;
-  private StringPublisher kDesiredStatePub,
-      kClosedLoopModePub,
-      currentCommandStatePub;
+  private DoublePublisher kHeightPub,
+      kEncoderCountsPub,
+      kDesiredHeightPub,
+      kHeightInchesPub,
+      kPercentOutputPub;
+  private StringPublisher kDesiredStatePub, kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
@@ -569,11 +571,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
         if (m_desiredPositionInputMeters - getHeightMeters() > 0)
           m_currentConstraints = m_fastConstraints;
-          else if(getHeightMeters() < Units.inchesToMeters(3.0)){
-            m_currentConstraints = m_stopSlippingConstraints; 
-          }
-        else m_currentConstraints = m_slowConstraints;
-        
+        else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
+          m_currentConstraints = m_stopSlippingConstraints;
+        } else m_currentConstraints = m_slowConstraints;
 
         m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
         var profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
