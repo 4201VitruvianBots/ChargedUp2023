@@ -26,10 +26,10 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
-public class TwoPiece extends SequentialCommandGroup {
+public class PlaceOneNoBalance extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
 
-  public TwoPiece(
+  public PlaceOneNoBalance(
       String pathName,
       SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
@@ -41,7 +41,7 @@ public class TwoPiece extends SequentialCommandGroup {
 
     m_trajectory =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(9), Units.feetToMeters(9)));
+            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
 
@@ -63,7 +63,7 @@ public class TwoPiece extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())
-        ),
+        ).withTimeout(3),
 
               autoPath,
 
