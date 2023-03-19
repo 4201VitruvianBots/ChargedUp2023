@@ -39,18 +39,20 @@ public class JustBalance extends SequentialCommandGroup {
             pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
-    addCommands(
-      new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+    addCommands(          
       new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-      new ParallelCommandGroup(
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
-      new WaitCommand(0.1),
-      new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-      new WaitCommand(0.5),
-      new ParallelCommandGroup(
+      new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
           new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+
+      // new ParallelCommandGroup(
+      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+      //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+      // new WaitCommand(0.1),
+      // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
+      // new WaitCommand(0.5),
+      // new ParallelCommandGroup(
+      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+      //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
           autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
