@@ -41,8 +41,8 @@ public class JustBalance extends SequentialCommandGroup {
     var autoPath = autoBuilder.fullAuto(m_trajectory);
     addCommands(          
       new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-      new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+      // new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
 
       // new ParallelCommandGroup(
       //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
@@ -53,7 +53,7 @@ public class JustBalance extends SequentialCommandGroup {
       // new ParallelCommandGroup(
       //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
       //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-          autoPath,
+          // autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

@@ -33,6 +33,7 @@ import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
@@ -612,6 +613,7 @@ public class RobotContainer implements AutoCloseable {
     // m_autoChooser.addOption(
     //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
+    m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     if (RobotBase.isSimulation()) {

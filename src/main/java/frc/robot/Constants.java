@@ -219,7 +219,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.7715;
-    public static double frontRightCANCoderOffset = 218.76;
+    public static double frontRightCANCoderOffset = 203.8625;
     public static double backLeftCANCoderOffset = 190.591;
     public static double backRightCANCoderOffset = 32.915;
 
@@ -481,7 +481,7 @@ public final class Constants {
     // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
     SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 218.76; // 41.748;
+    SWERVEDRIVE.frontRightCANCoderOffset =  203.8625; // 41.748;
     SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
     SWERVEDRIVE.backRightCANCoderOffset = 32.915;
   }
