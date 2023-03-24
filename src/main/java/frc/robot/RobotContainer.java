@@ -410,7 +410,7 @@ public class RobotContainer implements AutoCloseable {
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(1));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.5, m_vision, m_swerveDrive));
+    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.6, m_vision, m_swerveDrive));
     m_eventMap.put(
         "RunIntakeConeReverse", new AutoRunIntakeCone(m_intake, -0.8, m_vision, m_swerveDrive));
     m_eventMap.put(
@@ -515,6 +515,18 @@ public class RobotContainer implements AutoCloseable {
             m_intake,
             m_vision,
             m_elevator));
+
+            m_autoChooser.addOption(
+                "MasonOnTheGrind",
+                new TwoPieceTest(
+                    "TwoPieceTest",
+                    m_autoBuilder,
+                    m_swerveDrive,
+                    m_fieldSim,
+                    m_wrist,
+                    m_intake,
+                    m_vision,
+                    m_elevator));
 
             m_autoChooser.addOption(
                 "PlaceOneBalance",
