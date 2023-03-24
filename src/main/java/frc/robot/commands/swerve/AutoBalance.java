@@ -68,16 +68,16 @@ public class AutoBalance extends CommandBase {
       m_swerveDrive.setSwerveModuleStates(states, false);
     }
     // if(false) {
-      if (Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 1.5
-          && !timerStart
-          && timestamp != 0) {
-        timerStart = true;
-        timestamp = m_timer.get();
-      } else if (timerStart
-          && Math.abs(m_swerveDrive.getHeadingDegrees() - m_swerveDrive.getRollOffset()) >= 1.5) {
-        timerStart = false;
-        timestamp = 0;
-      }
+    if (Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 1.5
+        && !timerStart
+        && timestamp != 0) {
+      timerStart = true;
+      timestamp = m_timer.get();
+    } else if (timerStart
+        && Math.abs(m_swerveDrive.getHeadingDegrees() - m_swerveDrive.getRollOffset()) >= 1.5) {
+      timerStart = false;
+      timestamp = 0;
+    }
     // } else {
     //   if (Math.abs(-5 - m_swerveDrive.getRollOffset()) < 1.5
     //       && !timerStart
@@ -112,10 +112,9 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(timestamp != 0) {
-    return m_timer.get() - timestamp > 2;
-    }
-    else {
+    if (timestamp != 0) {
+      return m_timer.get() - timestamp > 2;
+    } else {
       return false;
     }
   }

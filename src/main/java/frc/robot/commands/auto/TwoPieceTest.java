@@ -7,7 +7,6 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
@@ -57,7 +56,6 @@ public class TwoPieceTest extends SequentialCommandGroup {
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())),
         autoPath,
-        
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         new ParallelCommandGroup(
@@ -86,7 +84,8 @@ public class TwoPieceTest extends SequentialCommandGroup {
         // new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         // new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         // new ParallelCommandGroup(
-        //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+        //     new AutoSetElevatorDesiredSetpoint(elevator,
+        // ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
         //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         // new WaitCommand(0.1),
         // new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(1),

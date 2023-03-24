@@ -481,7 +481,7 @@ public final class Constants {
     // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
     SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset =  203.8625; // 41.748;
+    SWERVEDRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
     SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
     SWERVEDRIVE.backRightCANCoderOffset = 32.915;
   }
