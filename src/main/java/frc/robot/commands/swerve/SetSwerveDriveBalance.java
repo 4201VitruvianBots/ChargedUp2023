@@ -53,7 +53,7 @@ public class SetSwerveDriveBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double output = outputCalculator.calculate(m_swerveDrive.getPitchDegrees());
+    double output = outputCalculator.calculate(m_swerveDrive.getRollDegrees());
     states =
         new SwerveModuleState[] {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),

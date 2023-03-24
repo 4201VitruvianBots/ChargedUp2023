@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -520,24 +521,27 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     // If no user input for more than one second, then reset elevator to stowed
-    if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled()) && !inactiveTimerEnabled) {
-      inactiveTimerEnabled = true;
-      timestamp = m_inactiveTimer.get();
-    } else if (inactiveTimerEnabled
-        && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
-      inactiveTimerEnabled = false;
-      timestamp = 0;
-    }
-    if (inactiveTimerEnabled) {
-      if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
-        m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
-        m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-        m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-        m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+    if (!DriverStation.isAutonomous()) {
+      if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
+          && !inactiveTimerEnabled) {
+        inactiveTimerEnabled = true;
+        timestamp = m_inactiveTimer.get();
+      } else if (inactiveTimerEnabled
+          && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
+        inactiveTimerEnabled = false;
+        timestamp = 0;
+      }
+      if (inactiveTimerEnabled) {
+        if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
+          m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+          m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+          m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+          m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+        }
       }
     }
 
-    if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
+    if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
     } else {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);

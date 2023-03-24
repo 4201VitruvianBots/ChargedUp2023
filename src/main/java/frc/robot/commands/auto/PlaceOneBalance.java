@@ -23,8 +23,8 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
-public class JustBalance extends SequentialCommandGroup {
-  public JustBalance(
+public class PlaceOneBalance extends SequentialCommandGroup {
+  public PlaceOneBalance(
       String pathName,
       SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
@@ -39,21 +39,19 @@ public class JustBalance extends SequentialCommandGroup {
             pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
-    addCommands(          
+    addCommands(
+      new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
       new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-      // new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-
-      // new ParallelCommandGroup(
-      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-      //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
-      // new WaitCommand(0.1),
-      // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-      // new WaitCommand(0.5),
-      // new ParallelCommandGroup(
-      //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-      //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-          // autoPath,
+      new ParallelCommandGroup(
+          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+      new WaitCommand(0.1),
+      new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
+      new WaitCommand(0.5),
+      new ParallelCommandGroup(
+          new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+          new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+          autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

@@ -5,6 +5,7 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 
 public class AutoSetWristDesiredSetpoint extends CommandBase {
@@ -22,7 +23,11 @@ public class AutoSetWristDesiredSetpoint extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+    m_wrist.setUserSetpoint(true);
+    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

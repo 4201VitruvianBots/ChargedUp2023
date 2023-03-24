@@ -2,66 +2,62 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.81,
+        "x": 1.83,
         "y": 2.75
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8099999999999996,
-        "y": 2.75
+        "x": 2.436943342564179,
+        "y": 2.7129022239483
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "wait"
-        ],
+        "names": [],
         "executionBehavior": "sequential",
-        "waitBehavior": "before",
-        "waitTime": 3.0
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 7.8,
-        "y": 2.75
+        "x": 2.3,
+        "y": 2.7512792844611207
       },
       "prevControl": {
-        "x": 6.784435059765656,
-        "y": 2.75
+        "x": 2.141517961602251,
+        "y": 2.7512792844611207
       },
       "nextControl": {
-        "x": 7.81277448457142,
-        "y": 2.75
+        "x": 2.50933152277809,
+        "y": 2.7512792844611207
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "wait"
-        ],
-        "executionBehavior": "sequential",
-        "waitBehavior": "before",
-        "waitTime": 2.0
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 3.85,
+        "x": 5.14,
         "y": 2.75
       },
       "prevControl": {
-        "x": 4.967512100526559,
+        "x": 4.460453063455928,
         "y": 2.75
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": -90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,

@@ -43,7 +43,7 @@ public class AutoBalance extends CommandBase {
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
-    outputCalculator.setTolerance(1);
+    outputCalculator.setTolerance(0);
     m_timer.reset();
     m_timer.start();
   }
@@ -51,7 +51,8 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset()) > 3) {
+    if (Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset())
+        > 1.5) { // add +2.63 for offset (natural tilt is -2.63 on field)
 
       double output = outputCalculator.calculate(-m_swerveDrive.getRollDegrees());
       // TODO; set a way to initiallze pitch to 0
@@ -66,16 +67,29 @@ public class AutoBalance extends CommandBase {
 
       m_swerveDrive.setSwerveModuleStates(states, false);
     }
-    if (Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 3.0
-        && !timerStart
-        && timestamp != 0) {
-      timerStart = true;
-      timestamp = m_timer.get();
-    } else if (timerStart
-        && Math.abs(m_swerveDrive.getHeadingDegrees() - m_swerveDrive.getRollOffset()) >= 3.0) {
-      timerStart = false;
-      timestamp = 0;
-    }
+    // if(false) {
+      if (Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 1.5
+          && !timerStart
+          && timestamp != 0) {
+        timerStart = true;
+        timestamp = m_timer.get();
+      } else if (timerStart
+          && Math.abs(m_swerveDrive.getHeadingDegrees() - m_swerveDrive.getRollOffset()) >= 1.5) {
+        timerStart = false;
+        timestamp = 0;
+      }
+    // } else {
+    //   if (Math.abs(-5 - m_swerveDrive.getRollOffset()) < 1.5
+    //       && !timerStart
+    //       && timestamp != 0) {
+    //     timerStart = true;
+    //     timestamp = m_timer.get();
+    //   } else if (timerStart
+    //       && Math.abs(-5 - m_swerveDrive.getRollOffset()) >= 1.5) {
+    //     timerStart = false;
+    //     timestamp = 0;
+    //   }
+    // // }
   }
 
   // Called once the command ends or is interrupted.
@@ -98,6 +112,11 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(timestamp != 0) {
     return m_timer.get() - timestamp > 2;
+    }
+    else {
+      return false;
+    }
   }
 }
