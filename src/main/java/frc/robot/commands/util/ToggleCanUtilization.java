@@ -25,8 +25,10 @@ public class ToggleCanUtilization extends CommandBase {
   public void initialize() {
     CAN_UTIL_LIMIT limitCan;
     if (m_stateHandler.getReduceCanUtilization() == CAN_UTIL_LIMIT.NORMAL) {
+      System.out.println("Setting from normal to limited");
       limitCan = CAN_UTIL_LIMIT.LIMITED;
     } else {
+      System.out.println("Setting from limited to normal");
       limitCan = CAN_UTIL_LIMIT.NORMAL;
     }
     m_stateHandler.setReduceCanUtilization(limitCan);

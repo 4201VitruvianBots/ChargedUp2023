@@ -4,13 +4,18 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -40,13 +45,38 @@ public class DistanceSensor implements AutoCloseable {
   private Object obj;
 
   // Shuffleboard setup
-  StringPublisher rawStringPub;
+  StringPublisher rawStringPub, gamePiecePub;
   DoublePublisher sensor1InchPub,
       sensor2InchPub,
       sensor1MMPub,
       sensor2MMPub,
       coneInchesPub,
       cubeInchesPub;
+  
+  // Mechanism2d visualization setup
+  public Mechanism2d mech2d = new Mechanism2d(Constants.INTAKE.innerIntakeWidth * 1.5, Constants.INTAKE.innerIntakeWidth);
+  public MechanismRoot2d leftBottomRoot = mech2d.getRoot("Intake Bottom Left", Constants.INTAKE.innerIntakeWidth * 0.25, Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d leftTopRoot = mech2d.getRoot("Intake Top Left", Constants.INTAKE.innerIntakeWidth * 0.25, Constants.INTAKE.innerIntakeWidth * 0.9);
+  public MechanismRoot2d rightBottomRoot = mech2d.getRoot("Intake Bottom Right", Constants.INTAKE.innerIntakeWidth * 1.25, Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d coneRoot = mech2d.getRoot("Cone",
+    Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
+    Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d cubeRoot = mech2d.getRoot("Cube",
+    Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
+    Constants.INTAKE.innerIntakeWidth * 0.9
+  );
+  public MechanismLigament2d leftIntakeLig =
+      leftBottomRoot.append(new MechanismLigament2d("Intake Left", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
+  public MechanismLigament2d rightIntakeLig =
+      rightBottomRoot.append(new MechanismLigament2d("Intake Right", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
+  public MechanismLigament2d coneIntakeLig =
+      leftBottomRoot.append(new MechanismLigament2d("Cone Intake", Constants.INTAKE.innerIntakeWidth, 0));
+  public MechanismLigament2d cubeIntakeLig =
+      leftTopRoot.append(new MechanismLigament2d("Cube Intake", Constants.INTAKE.innerIntakeWidth, 0));
+  public MechanismLigament2d coneLig = 
+      coneRoot.append(new MechanismLigament2d("Cone", getConeWidthMeters(), 0));
+  public MechanismLigament2d cubeLig = 
+      cubeRoot.append(new MechanismLigament2d("Cone", SimConstants.cubeWidth, 0));
 
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
@@ -108,27 +138,26 @@ public class DistanceSensor implements AutoCloseable {
             + "}";
   }
 
-  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
+  public Constants.INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
     double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
     double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
     double cubeSensorValue = getSensorValueMillimeters(Constants.INTAKE.cubeSensorId) / 1000.0;
 
     if (leftConeSensorValue + rightConeSensorValue <= Constants.INTAKE.innerIntakeWidth) {
-      return INTAKE.HELD_GAMEPIECE.CONE;
+      return Constants.INTAKE.HELD_GAMEPIECE.CONE;
     }
     else if (cubeSensorValue <= Constants.INTAKE.innerIntakeWidth - 1) {
-      return INTAKE.HELD_GAMEPIECE.CUBE;
+      return Constants.INTAKE.HELD_GAMEPIECE.CUBE;
     }
     else {
-      return INTAKE.HELD_GAMEPIECE.NONE;
+      return Constants.INTAKE.HELD_GAMEPIECE.NONE;
     }
 
   }
 
-  // Returns the distance in inches from the left of the intake to the center of the game
-  // piece. Negative if to the left, positive if to the right
+  // Returns the distance in inches from the left of the intake to the center of the game piece.
   // Works off 3 sensors, 2 for cone and 1 for cube
-  public double getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE gamePiece) {
+  public double getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE gamePiece) {
     double distanceMeters;
 
     double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
@@ -153,6 +182,9 @@ public class DistanceSensor implements AutoCloseable {
         return 0;
     }
 
+    // Clamp gamepiece distance
+    distanceMeters = MathUtil.clamp(distanceMeters, 0, Constants.INTAKE.innerIntakeWidth);
+
     return Units.metersToInches(distanceMeters);
   }
 
@@ -160,12 +192,18 @@ public class DistanceSensor implements AutoCloseable {
     return getGamepieceDistanceInches(getHeldGamepiece());
   }
 
+  public double getConeWidthMeters() {
+    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
+    return (Constants.INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2;
+  }
+
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE.CONE);
+    return getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE.CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.HELD_GAMEPIECE.CUBE);
+    return getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE.CUBE);
   }
 
   public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
@@ -182,20 +220,28 @@ public class DistanceSensor implements AutoCloseable {
 
   private void initSmartDashboard() {
     var distanceSensorTab =
-        NetworkTableInstance.getDefault().getTable("Suffleboard").getSubTable("Distance Sensor");
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Distance Sensor");
     rawStringPub = distanceSensorTab.getStringTopic("Raw String Data").publish();
+    gamePiecePub = distanceSensorTab.getStringTopic("Detected Gamepiece").publish();
     sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 MM").publish();
     sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 MM").publish();
     sensor1InchPub = distanceSensorTab.getDoubleTopic("Sensor 1 Inches").publish();
     sensor2InchPub = distanceSensorTab.getDoubleTopic("Sensor 2 Inches").publish();
     coneInchesPub = distanceSensorTab.getDoubleTopic("Cone Distance Inches").publish();
     cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
+
+    coneIntakeLig.setColor(new Color8Bit(128, 0, 0));
+    cubeIntakeLig.setColor(new Color8Bit(128, 0, 0));
+    coneLig.setColor(new Color8Bit(255, 255, 0));
+    cubeLig.setColor(new Color8Bit(128, 0, 128));
   }
 
   public void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
+    
     switch (limitCan) {
       case NORMAL:
         // Put not required stuff here
+        SmartDashboard.putData("Intake Sim", mech2d);
         sensor1MMPub.set(getSensorValueMillimeters(1));
         sensor2MMPub.set(getSensorValueMillimeters(2));
         sensor1InchPub.set(getSensorValueInches(1));
@@ -203,6 +249,16 @@ public class DistanceSensor implements AutoCloseable {
         coneInchesPub.set(getConeDistanceInches());
         cubeInchesPub.set(getCubeDistanceInches());
         rawStringPub.set(receivedData);
+        gamePiecePub.set(getHeldGamepiece().name());
+
+        // Mech2d updates
+        coneRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.1);
+        cubeRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.9);
+        coneLig.setLength(getConeWidthMeters());
+        coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
+        cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
       default:
       case LIMITED:
         break;
@@ -212,6 +268,7 @@ public class DistanceSensor implements AutoCloseable {
   public void pollDistanceSensors() {
     // This method will be called once per scheduler run
     // testParserTab.setInteger(testParser());
+    updateSmartDashboard(limitCanUtil);
     try {
       if (RobotBase.isSimulation()) {
         simulationPeriodic();
