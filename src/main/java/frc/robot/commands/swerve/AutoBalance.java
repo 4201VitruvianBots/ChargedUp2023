@@ -1,5 +1,8 @@
 package frc.robot.commands.swerve;
 
+import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
+import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -7,9 +10,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.SWERVEDRIVE;
 import frc.robot.subsystems.SwerveDrive;
-
-import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
-import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
 
 public class AutoBalance extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -69,12 +69,15 @@ public class AutoBalance extends CommandBase {
 
     m_swerveDrive.setSwerveModuleStates(states, false);
 
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < kAutoBalanceAngleThresholdDegrees)
+    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset())
+            < kAutoBalanceAngleThresholdDegrees)
         && !timerStart) {
       timerStart = true;
       timestamp = m_timer.get();
     }
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) >= kAutoBalanceAngleThresholdDegrees) && timerStart) {
+    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset())
+            >= kAutoBalanceAngleThresholdDegrees)
+        && timerStart) {
       timerStart = false;
     }
   }

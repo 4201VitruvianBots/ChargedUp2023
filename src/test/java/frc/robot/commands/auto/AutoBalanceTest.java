@@ -7,8 +7,6 @@ import static utils.TestUtils.setPrivateField;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
 import frc.robot.Constants.AUTO;
 import frc.robot.RobotContainer;
 import frc.robot.commands.swerve.AutoBalance;
@@ -57,10 +55,11 @@ public class AutoBalanceTest {
     cmd.initialize();
 
     setPrivateField(m_swerveDrive, "m_simRoll", -5);
-    while(m_timer.get() < AUTO.kAutoBalanceTimeout * 4) {
-      // Manually run the command and check if it finishes because CommandScheduler doesn't work properly in test
+    while (m_timer.get() < AUTO.kAutoBalanceTimeout * 4) {
+      // Manually run the command and check if it finishes because CommandScheduler doesn't work
+      // properly in test
       cmd.execute();
-      if(m_timer.get() < AUTO.kAutoBalanceTimeout) {
+      if (m_timer.get() < AUTO.kAutoBalanceTimeout) {
         assertFalse(cmd.isFinished());
       } else if (m_timer.get() < AUTO.kAutoBalanceTimeout + AUTO.kAutoBalanceTimeout * 0.5) {
         // Test that AutoBalance doesn't immediately return true once in tolerance
