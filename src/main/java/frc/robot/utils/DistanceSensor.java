@@ -35,9 +35,6 @@ public class DistanceSensor implements AutoCloseable {
   private byte[] buffer = new byte[512];
   private DatagramSocket socket;
   private String receivedData = "";
-  private double sensor1DistanceMeters;
-  private double sensor2DistanceMeters;
-  private double sensor3DistanceMeters;
 
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
@@ -48,8 +45,10 @@ public class DistanceSensor implements AutoCloseable {
   StringPublisher rawStringPub, gamePiecePub;
   DoublePublisher sensor1InchPub,
       sensor2InchPub,
+      sensor3InchPub,
       sensor1MMPub,
       sensor2MMPub,
+      sensor3MMPub,
       coneInchesPub,
       cubeInchesPub;
   
@@ -98,8 +97,6 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getSensorValueMillimeters(int sensor) {
-    // This is a really stupid band-aid solution but I don't have time for anything else
-    if (sensor == 0) sensor = 1;
     try {
       String sensorName = "sensor" + sensor + ".mm";
 
@@ -132,6 +129,8 @@ public class DistanceSensor implements AutoCloseable {
         "{\"sensor1.mm\":"
             + rand.nextInt(394)
             + ",\"sensor2.mm\":"
+            + rand.nextInt(394)
+            + ",\"sensor3.mm\":"
             + rand.nextInt(394)
             + ",\"test\":"
             + rand.nextInt(100)
@@ -225,8 +224,10 @@ public class DistanceSensor implements AutoCloseable {
     gamePiecePub = distanceSensorTab.getStringTopic("Detected Gamepiece").publish();
     sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 MM").publish();
     sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 MM").publish();
+    sensor3MMPub = distanceSensorTab.getDoubleTopic("Sensor 3 MM").publish();
     sensor1InchPub = distanceSensorTab.getDoubleTopic("Sensor 1 Inches").publish();
     sensor2InchPub = distanceSensorTab.getDoubleTopic("Sensor 2 Inches").publish();
+    sensor3InchPub = distanceSensorTab.getDoubleTopic("Sensor 3 Inches").publish();
     coneInchesPub = distanceSensorTab.getDoubleTopic("Cone Distance Inches").publish();
     cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
 
@@ -244,8 +245,10 @@ public class DistanceSensor implements AutoCloseable {
         SmartDashboard.putData("Intake Sim", mech2d);
         sensor1MMPub.set(getSensorValueMillimeters(1));
         sensor2MMPub.set(getSensorValueMillimeters(2));
+        sensor3MMPub.set(getSensorValueMillimeters(3));
         sensor1InchPub.set(getSensorValueInches(1));
         sensor2InchPub.set(getSensorValueInches(2));
+        sensor3InchPub.set(getSensorValueInches(3));
         coneInchesPub.set(getConeDistanceInches());
         cubeInchesPub.set(getCubeDistanceInches());
         rawStringPub.set(receivedData);
@@ -271,7 +274,7 @@ public class DistanceSensor implements AutoCloseable {
     updateSmartDashboard(limitCanUtil);
     try {
       if (RobotBase.isSimulation()) {
-        simulationPeriodic();
+        //simulationPeriodic();
       } else {
         buffer = new byte[512];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);

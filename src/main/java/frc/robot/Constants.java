@@ -156,9 +156,9 @@ public final class Constants {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
-    public static final int leftConeSensorId = 0;
-    public static final int rightConeSensorId = 1;
-    public static final int cubeSensorId = 2;
+    public static final int leftConeSensorId = 1;
+    public static final int rightConeSensorId = 2;
+    public static final int cubeSensorId = 3;
 
     public enum HELD_GAMEPIECE {
       NONE,
