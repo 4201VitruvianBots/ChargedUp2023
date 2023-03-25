@@ -76,7 +76,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final SwerveDrivePoseEstimator m_odometry;
+  private boolean m_simOverride = false;
   private double m_simYaw;
+  private double m_simRoll;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   private boolean useHeadingTarget = false;
@@ -225,7 +227,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public double getRollDegrees() {
-    return m_pigeon.getRoll();
+    if(m_simOverride)
+      return m_simRoll;
+    else
+      return m_pigeon.getRoll();
   }
 
   public double getHeadingDegrees() {
