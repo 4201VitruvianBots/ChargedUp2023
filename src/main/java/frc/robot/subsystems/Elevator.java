@@ -42,11 +42,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean lowerLimitSwitchTriggered = false;
 
   private static double heightMeters =
-    0; // the amount of meters the motor has moved up from the initial stowed position
+      0; // the amount of meters the motor has moved up from the initial stowed position
 
   // Constants with value determined at runtime
   private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
-  private final int simEncoderSign = Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+  private final int simEncoderSign =
+      Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
   private double
       m_desiredPositionInputMeters; // The height in encoder units our robot is trying to reach
@@ -54,19 +55,19 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       m_desiredPositionOutputMeters; // The height in encoder units our robot is trying to reach
   private double
       m_commandedPositionMeters; // The height in encoder units our robot is trying to reach
-  private ELEVATOR.SETPOINT m_desiredHeightState =
-      ELEVATOR.SETPOINT.STOWED;
+  private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
   private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
-  // By default, this is set to true as we use the trapezoid profile to determine what speed we should be at
+  // By default, this is set to true as we use the trapezoid profile to determine what speed we
+  // should be at
   // to get to our setpoint.
   // If the sensors are acting up, we set this value false to directly control the percent output
   // of the motors.
   private boolean isClosedLoop = true;
 
   private boolean isElevatorElevatingElevatando = false;
-  
+
   private double currentForwardOutput = 0;
   private double newForwardOutput = 0;
 
@@ -80,15 +81,19 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Trapezoid profile setup
   private final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-      new TrapezoidProfile.Constraints(Constants.ELEVATOR.kMaxVel * .5, Constants.ELEVATOR.kMaxAccel);
+      new TrapezoidProfile.Constraints(
+          Constants.ELEVATOR.kMaxVel * .5, Constants.ELEVATOR.kMaxAccel);
   private final TrapezoidProfile.Constraints m_slowConstraints =
       new TrapezoidProfile.Constraints(Constants.ELEVATOR.kMaxVel, Constants.ELEVATOR.kMaxAccel);
   private final TrapezoidProfile.Constraints m_fastConstraints =
-      new TrapezoidProfile.Constraints(Constants.ELEVATOR.kMaxVel * 1.3, Constants.ELEVATOR.kMaxAccel * 1.3);
+      new TrapezoidProfile.Constraints(
+          Constants.ELEVATOR.kMaxVel * 1.3, Constants.ELEVATOR.kMaxAccel * 1.3);
   private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private SimpleMotorFeedforward m_feedForward = new SimpleMotorFeedforward(Constants.ELEVATOR.kG, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
+  private SimpleMotorFeedforward m_feedForward =
+      new SimpleMotorFeedforward(
+          Constants.ELEVATOR.kG, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -136,12 +141,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       // Config PID
       motor.selectProfileSlot(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kPIDLoopIdx);
-      motor.config_kP(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kP, Constants.ELEVATOR.kTimeoutMs);
-      motor.config_kI(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kI, Constants.ELEVATOR.kTimeoutMs);
-      motor.config_kD(Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kD, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kP(
+          Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kP, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kI(
+          Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kI, Constants.ELEVATOR.kTimeoutMs);
+      motor.config_kD(
+          Constants.ELEVATOR.kSlotIdx, Constants.ELEVATOR.kD, Constants.ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(Constants.ELEVATOR.kMaxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(Constants.ELEVATOR.kMaxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(
+          Constants.ELEVATOR.kMaxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(
+          Constants.ELEVATOR.kMaxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
 
@@ -314,7 +324,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
     SmartDashboard.putData("Elevator Subsystem", this);
 
-    NetworkTable elevatorNtTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+    NetworkTable elevatorNtTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
@@ -392,7 +403,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       currentForwardOutput = newForwardOutput;
     }
   }
-  
+
   // Update elevator height using encoders and bottom limit switch
   public void updateHeightMeters() {
     /* Uses limit switch to act as a baseline
@@ -446,7 +457,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     updateLog();
-    updateShuffleboard(m_limitCanUtil); // Yes, this needs to be called in the periodic. The simulation does not work without this
+    updateShuffleboard(
+        m_limitCanUtil); // Yes, this needs to be called in the periodic. The simulation does not
+    // work without this
     updateHeightMeters();
     updateForwardOutput();
 
@@ -471,7 +484,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           break;
         case USER_SETPOINT:
           m_desiredPositionOutputMeters =
-              m_desiredPositionInputMeters + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
+              m_desiredPositionInputMeters
+                  + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
           break;
         case TEST_SETPOINT:
           m_desiredPositionOutputMeters = Units.inchesToMeters(kSetpointSub.get(0));
@@ -499,7 +513,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
         setSetpointTrapezoidState(commandedSetpoint);
       }
-    // Fully open loop control
+      // Fully open loop control
     } else {
       double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
       if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
