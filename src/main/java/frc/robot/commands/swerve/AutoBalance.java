@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.SWERVEDRIVE;
 import frc.robot.subsystems.SwerveDrive;
 
+import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
+import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
+
 public class AutoBalance extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
@@ -66,12 +69,12 @@ public class AutoBalance extends CommandBase {
 
     m_swerveDrive.setSwerveModuleStates(states, false);
 
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 1.5)
+    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < kAutoBalanceAngleThresholdDegrees)
         && !timerStart) {
       timerStart = true;
       timestamp = m_timer.get();
     }
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) >= 1.5) && timerStart) {
+    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) >= kAutoBalanceAngleThresholdDegrees) && timerStart) {
       timerStart = false;
     }
   }
@@ -97,7 +100,7 @@ public class AutoBalance extends CommandBase {
   @Override
   public boolean isFinished() {
     if (timerStart) {
-      return (m_timer.get() - timestamp) > 2.0;
+      return (m_timer.get() - timestamp) > kAutoBalanceTimeout;
     } else {
       return false;
     }

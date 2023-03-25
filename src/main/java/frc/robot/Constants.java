@@ -458,6 +458,11 @@ public final class Constants {
     }
   }
 
+  public static class AUTO {
+    public static double kAutoBalanceTimeout = 2.0;
+    public static final double kAutoBalanceAngleThresholdDegrees = 1.5;
+  }
+
   public enum SCORING_STATE {
     STOWED,
     AUTO_BALANCE,
