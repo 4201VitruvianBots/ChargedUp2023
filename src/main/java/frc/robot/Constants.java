@@ -92,6 +92,11 @@ public final class Constants {
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
+    public static final double kMaxForwardOutput = 0.6;
+    public static final double kMaxReverseOutput = -0.45;
+    public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kSetpointMultiplier = 0.25;
+
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public enum STATE {
@@ -151,6 +156,11 @@ public final class Constants {
       public double get() {
         return value;
       }
+    }
+
+    public enum ELEVATOR_SPEED {
+      NORMAL,
+      LIMITED
     }
   }
 

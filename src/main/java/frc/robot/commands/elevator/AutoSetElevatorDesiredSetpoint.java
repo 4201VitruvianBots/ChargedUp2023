@@ -26,7 +26,7 @@ public class AutoSetElevatorDesiredSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setRunningBool(true);
+    m_elevator.setIsElevating(true);
     m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
   }
 
