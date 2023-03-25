@@ -39,9 +39,8 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   // Mechanism2d visualization setup
   public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
   public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
-  public MechanismLigament2d m_ligament2d =
-      m_root2d.append(new MechanismLigament2d("LED", 2, 90));
-  
+  public MechanismLigament2d m_ligament2d = m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+
   // Create LED strip
   public LEDSubsystem(Controls controls) {
     m_candle.configFactoryDefault(); // sets up LED strip
