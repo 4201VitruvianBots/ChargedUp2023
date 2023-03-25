@@ -226,10 +226,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public double getRollDegrees() {
-    if (m_simOverride)
-      return m_simRoll;
-    else
-      return m_pigeon.getRoll();
+    if (m_simOverride) return m_simRoll;
+    else return m_pigeon.getRoll();
   }
 
   public double getHeadingDegrees() {
