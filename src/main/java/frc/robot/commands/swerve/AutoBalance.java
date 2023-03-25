@@ -1,5 +1,8 @@
 package frc.robot.commands.swerve;
 
+import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
+import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,6 +22,7 @@ public class AutoBalance extends CommandBase {
   SwerveModuleState[] states;
 
   PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private double m_output = 0;
 
   /**
    * Creates a new ExampleCommand.
@@ -28,7 +32,7 @@ public class AutoBalance extends CommandBase {
   public AutoBalance(SwerveDrive swerveDriveSubsystem) {
     m_swerveDrive = swerveDriveSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDriveSubsystem);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.
@@ -46,50 +50,34 @@ public class AutoBalance extends CommandBase {
     outputCalculator.setTolerance(0);
     m_timer.reset();
     m_timer.start();
+    timerStart = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset())
-        > 1.5) { // add +2.63 for offset (natural tilt is -2.63 on field)
+    m_output =
+        -outputCalculator.calculate(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
+    // TODO; set a way to initialize pitch to 0
 
-      double output = outputCalculator.calculate(-m_swerveDrive.getRollDegrees());
-      // TODO; set a way to initiallze pitch to 0
+    states =
+        new SwerveModuleState[] {
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+        };
 
-      states =
-          new SwerveModuleState[] {
-            new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-            new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-            new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-            new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-          };
+    m_swerveDrive.setSwerveModuleStates(states, false);
 
-      m_swerveDrive.setSwerveModuleStates(states, false);
-    }
-    // if(false) {
-    if (Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset()) < 1.5
-        && !timerStart
-        && timestamp != 0) {
+    double balanceDeltaDegrees =
+        Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
+    if (balanceDeltaDegrees < kAutoBalanceAngleThresholdDegrees && !timerStart) {
       timerStart = true;
       timestamp = m_timer.get();
-    } else if (timerStart
-        && Math.abs(m_swerveDrive.getHeadingDegrees() - m_swerveDrive.getRollOffset()) >= 1.5) {
+    } else if (balanceDeltaDegrees >= kAutoBalanceAngleThresholdDegrees && timerStart) {
       timerStart = false;
-      timestamp = 0;
     }
-    // } else {
-    //   if (Math.abs(-5 - m_swerveDrive.getRollOffset()) < 1.5
-    //       && !timerStart
-    //       && timestamp != 0) {
-    //     timerStart = true;
-    //     timestamp = m_timer.get();
-    //   } else if (timerStart
-    //       && Math.abs(-5 - m_swerveDrive.getRollOffset()) >= 1.5) {
-    //     timerStart = false;
-    //     timestamp = 0;
-    //   }
-    // // }
   }
 
   // Called once the command ends or is interrupted.
@@ -112,10 +100,14 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (timestamp != 0) {
-      return m_timer.get() - timestamp > 2;
+    if (timerStart) {
+      return (m_timer.get() - timestamp) > kAutoBalanceTimeout;
     } else {
       return false;
     }
+  }
+
+  public double getOutput() {
+    return m_output;
   }
 }
