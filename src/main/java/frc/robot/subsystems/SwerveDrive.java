@@ -102,7 +102,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private double m_maxVelocity = Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
 
   public SwerveDrive() {
-
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
@@ -227,10 +226,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public double getRollDegrees() {
-    if(m_simOverride)
-      return m_simRoll;
-    else
-      return m_pigeon.getRoll();
+    if (m_simOverride) return m_simRoll;
+    else return m_pigeon.getRoll();
   }
 
   public double getHeadingDegrees() {

@@ -1,34 +1,19 @@
 package frc.robot.commands.auto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static utils.TestUtils.getPrivateObject;
 import static utils.TestUtils.setPrivateField;
 
-import com.ctre.phoenix.platform.PlatformJNI;
-import com.ctre.phoenix.sensors.BasePigeonSimCollection;
-import com.ctre.phoenix.sensors.PigeonImuJNI;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
-import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.subsystems.Wrist;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.subsystems.SwerveDrive;
-import utils.TestUtils;
-
-import java.util.LinkedHashMap;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AutoBalanceTest {
   protected RobotContainer m_robotContainer;
@@ -41,7 +26,8 @@ public class AutoBalanceTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_robotContainer = new RobotContainer();
     var subsystems = getPrivateObject(CommandScheduler.getInstance(), "m_subsystems");
-    m_swerveDrive = (LinkedHashMap<Subsystem, Command>) subsystems;
+    //    m_swerveDrive = (LinkedHashMap<Subsystem, Command>) subsystems;
+    m_swerveDrive = m_robotContainer.getSwerveDrive();
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -56,38 +42,34 @@ public class AutoBalanceTest {
   // Mark all test functions with @Test
   @Test
   public void TestAutoBalanceTimeout() {
-    var cmd = new WaitCommand(5);
-//    var cmd = new AutoBalance(m_swerveDrive);
-//    cmd.addRequirements(m_swerveDrive);
-////    cmd.schedule();
-//    CommandScheduler.getInstance().schedule(cmd);
-//    CommandScheduler.getInstance().run();
-//    m_swerveDrive.setDefaultCommand(new SetSwerveDrive(m_swerveDrive, ()-> 0, ()-> 0, ()-> 0));
+    var cmd = new AutoBalance(m_swerveDrive);
     setPrivateField(m_swerveDrive, "m_simOverride", true);
-    setPrivateField(m_swerveDrive, "m_simRoll", -1);
-
+    setPrivateField(m_swerveDrive, "m_rollOffset", 0);
 
     Timer m_timer = new Timer();
     m_timer.reset();
     m_timer.start();
-//    while(m_timer.get() < 3) {
-    while(true) {
-      CommandScheduler.getInstance().run();
-      if(CommandScheduler.getInstance().isScheduled(cmd)) {
-        System.out.println("TEST");
-      }
-      if(cmd.isScheduled()) {
-        System.out.println("TEST");
-      }
+    cmd.initialize();
 
-      if(m_swerveDrive.getCurrentCommand() != null) {
-        if (m_timer.get() < 2.0) {
-          assertEquals(m_swerveDrive.getCurrentCommand().getClass(), cmd.getClass());
-        } else {
-          assertNotEquals(m_swerveDrive.getCurrentCommand().getClass(), cmd.getClass());
-        }
-      } else {
-        System.out.println("???");
+    setPrivateField(m_swerveDrive, "m_simRoll", -5);
+    while(m_timer.get() < 8) {
+      cmd.execute();
+      if(m_timer.get() < 2) {
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < 3) {
+        // Test that AutoBalance doesn't immediately return true once in tolerance
+        setPrivateField(m_swerveDrive, "m_simRoll", -1);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < 4.5) {
+        // Test that AutoBalance doesn't return true if moved outside of tolerance
+        setPrivateField(m_swerveDrive, "m_simRoll", -3);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < 6.5) {
+        setPrivateField(m_swerveDrive, "m_simRoll", -1);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() > 6.51) {
+        // Test that AutoBalance only returns true if within tolerance greater than 2 seconds
+        assertTrue(cmd.isFinished());
       }
     }
   }
