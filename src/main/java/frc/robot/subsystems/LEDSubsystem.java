@@ -134,7 +134,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Twinkle);
           break;
         case LOW_BATTERY:
-          setPattern(255, 165, 0, 0, 0, ANIMATION_TYPE.Solid);
+          setPattern(255, 165, 0, 0, 0, ANIMATION_TYPE.Strobe);
         break;
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
