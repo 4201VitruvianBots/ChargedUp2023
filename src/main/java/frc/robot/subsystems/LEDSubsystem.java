@@ -9,9 +9,12 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.LED.*;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 
@@ -130,6 +133,9 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case INITIALIZED:
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Twinkle);
           break;
+        case LOW_BATTERY:
+          setPattern(255, 165, 0, 0, 0, ANIMATION_TYPE.Solid);
+        break;
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
@@ -171,6 +177,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       setSolid = false;
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
+    if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
+      expressState(LED_STATE.LOW_BATTERY);
+    }
+
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
