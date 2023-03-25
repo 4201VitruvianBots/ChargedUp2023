@@ -60,14 +60,14 @@ public final class Constants {
   }
 
   public static final class DIO {
-    public static final int elevatorLowerLimitSwitch = 1;
+    public static final int elevatorLowerLimitSwitch = 9;
     public static final int wristLowerSwitch = 0;
   }
 
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 12.211;
+    public static final double gearRatio = 12.211; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -75,8 +75,8 @@ public final class Constants {
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;
-    public static double kMaxVel = Units.inchesToMeters(25);
-    public static double kMaxAccel = Units.inchesToMeters(20);
+    public static double kMaxVel = Units.inchesToMeters(30);
+    public static double kMaxAccel = Units.inchesToMeters(15);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -84,15 +84,20 @@ public final class Constants {
     public static final double encoderCountsToMeters =
         (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
 
-    public static final double kS = 0.15956;
-    public static final double kV = 8.4689; // 12.57;
-    public static final double kA = 0.23382; // 0.04;
+    public static final double kG = 0.02;
+    public static final double kV = 20.0; // 12.57;
+    public static final double kA = 0.02; // 0.04;
+
+    public static final double kP = 0.04;
+    public static final double kI = 0.00;
+    public static final double kD = 0.00;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
+      TEST_SETPOINT,
       USER_SETPOINT,
       AUTO_SETPOINT
     }
@@ -103,9 +108,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(21)),
+      SCORE_MID_CONE(Units.inchesToMeters(26.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(40)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(19.13));
 
@@ -122,16 +127,19 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
-      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
+      ABSOLUTE_MIN(
+          Units.inchesToMeters(
+              -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
+      // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
       LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(11)),
-      MID_MIN(Units.inchesToMeters(9)),
-      MID_MAX(Units.inchesToMeters(14)),
-      HIGH_MIN(Units.inchesToMeters(12)),
-      HIGH_MAX(Units.inchesToMeters(18)),
-      EXTENDED_MIN(Units.inchesToMeters(16)),
+      LOW_MAX(Units.inchesToMeters(4)),
+      MID_MIN(Units.inchesToMeters(3)),
+      MID_MAX(Units.inchesToMeters(8)),
+      HIGH_MIN(Units.inchesToMeters(6)),
+      HIGH_MAX(Units.inchesToMeters(14)),
+      EXTENDED_MIN(Units.inchesToMeters(12)),
       EXTENDED_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
@@ -211,7 +219,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.7715;
-    public static double frontRightCANCoderOffset = 218.76;
+    public static double frontRightCANCoderOffset = 203.8625;
     public static double backLeftCANCoderOffset = 190.591;
     public static double backRightCANCoderOffset = 32.915;
 
@@ -239,7 +247,7 @@ public final class Constants {
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
     public static final int kFalconEncoderCPR = 2048;
-    public final int kCANCoderCPR = 4096;
+    public static final int kCANCoderCPR = 4096;
 
     public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
     public static final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
@@ -248,14 +256,14 @@ public final class Constants {
         (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
     public static final double kTurningMotorDistancePerPulse =
         360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
-    public final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+    public static final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
 
     public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
     public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
     public static final double kaDriveVoltSecondsSquaredPerMeter = 0.193 / 12;
 
-    public final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
-    public final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
+    public static final double kvTurnVoltSecondsPerRadian = 1.47; // originally 1.5
+    public static final double kaTurnVoltSecondsSquaredPerRadian = 0.348; // originally 0.3
   }
 
   public static final class VISION {
@@ -308,41 +316,42 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
-    public static int kTimeoutMs = 0;
+    public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(360 * 1.35);
-    public static final double kMaxFastAccel = Units.degreesToRadians(250 * 1.35);
-    public static final double FFkS = 0.1;
-    public static final double kG = 1.75;
-    public static final double FFkV = 1.95;
-    public static final double kA = 0.16;
+    public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
+    public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
+    public static final double FFkS = 0.06;
+    public static final double kG = 0.54;
+    public static final double FFkV = 1.6;
+    public static final double kA = 0.02;
 
-    public static final double kP = 0.15;
-    public static double kI = 0.0001;
-    public static final double kD = 0.0;
+    public static final double kP = 0.04;
+    public static final double kI = 0.0;
+    public static final double kD = 1.0;
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
+      TEST_SETPOINT,
       USER_SETPOINT,
       AUTO_SETPOINT
     }
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW(Units.degreesToRadians(-13.0)),
-      SCORE_LOW_REVERSE(Units.degreesToRadians(-10.0)),
+      STOWED(Units.degreesToRadians(104.0)),
+      INTAKING_LOW(Units.degreesToRadians(-14.5)),
+      SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(143.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(146)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -359,11 +368,11 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in radians
-      ABSOLUTE_MIN(Units.degreesToRadians(-15.0)),
+      ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       LOW_MIN(ABSOLUTE_MIN.get()),
       LOW_MAX(Units.degreesToRadians(100.0)),
-      MID_MIN(Units.degreesToRadians(10.0)),
+      MID_MIN(Units.degreesToRadians(25.0)),
       MID_MAX(Units.degreesToRadians(110.0)),
       HIGH_MIN(MID_MIN.get()),
       HIGH_MAX(Units.degreesToRadians(120.0)),
@@ -460,6 +469,11 @@ public final class Constants {
     HIGH_CUBE,
   }
 
+  public enum CAN_UTIL_LIMIT {
+    NORMAL,
+    LIMITED
+  }
+
   private static void initBeta() {
     robotName = "Beta";
     // SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
@@ -467,7 +481,7 @@ public final class Constants {
     // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
     SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 218.76; // 41.748;
+    SWERVEDRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
     SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
     SWERVEDRIVE.backRightCANCoderOffset = 32.915;
   }

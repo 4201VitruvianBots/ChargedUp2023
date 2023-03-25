@@ -276,10 +276,12 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for any target
    */
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
-    if (getPipeline(location) == 1.0) { // CUBE
+    if (getPipeline(location) == 1.0
+        && m_intakeSub.getIntakeStateCube()) { // CUBE and if we're looking for cube
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
-    } else if (getPipeline(location) == 2.0) { // CONE
+    } else if (getPipeline(location) == 2.0
+        && m_intakeSub.getIntakeStateCone()) { // CONE and if we're looking for cone
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
     }
@@ -330,13 +332,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       if (targetFound == targetType.CUBE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          // targetFound = targetType.NONE;
+          targetFound = targetType.NONE;
         }
       }
       if (targetFound == targetType.CONE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          // targetFound = targetType.NONE;
+          targetFound = targetType.NONE;
         }
       }
     }
@@ -537,7 +539,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
           0,
           0
         });
-    //    System.out.println("Vision Periodic");
     // This method will be called once per scheduler run
     updateSmartDashboard();
     updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);

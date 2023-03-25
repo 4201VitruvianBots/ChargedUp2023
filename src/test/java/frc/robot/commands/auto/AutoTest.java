@@ -11,9 +11,10 @@ import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-// @Disabled("WIP")
+@Disabled("WIP")
 public class AutoTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;

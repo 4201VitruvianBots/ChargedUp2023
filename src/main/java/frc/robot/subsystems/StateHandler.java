@@ -11,11 +11,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER.*;
@@ -35,10 +38,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public SUPERSTRUCTURE_STATE m_lastZone = m_currentZone;
   public SUPERSTRUCTURE_STATE m_desiredZone = m_currentZone;
   public ZONE_TRANSITIONS m_nextZone = ZONE_TRANSITIONS.NONE;
+  public CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.LIMITED;
   public Pose2d targetNode;
   private boolean m_zoneEnforcement = true;
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
+
+  private final Timer m_inactiveTimer = new Timer();
+  private boolean inactiveTimerEnabled = false;
+  private double timestamp;
 
   private final Intake m_intake;
   private final Wrist m_wrist;
@@ -53,7 +61,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
       new SendableChooser<>();
 
-  private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub;
+  private StringPublisher m_currentStatePub, m_desiredStatePub, m_nextZonePub, m_limitCanPub;
   private DoublePublisher m_elevatorHeightPub,
       m_elevatorLowerLimPub,
       m_elevatorUpperLimPub,
@@ -79,10 +87,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_setpointSolver = SetpointSolver.getInstance();
     initSmartDashboard();
 
+    m_inactiveTimer.reset();
+    m_inactiveTimer.start();
+
     if (RobotBase.isSimulation()) {
       initializeScoringChooser();
       initializeMainStateChooser();
     }
+  }
+
+  public void init() {
+    m_currentZone =
+        determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
   }
 
   public void initializeScoringChooser() {
@@ -118,6 +134,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void setCurrentScoringState(SCORING_STATE state) {
     m_scoringState = state;
+  }
+
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
+  public CAN_UTIL_LIMIT getReduceCanUtilization() {
+    return limitCanUtil;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -339,6 +363,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (WRIST.THRESHOLD.MID_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MIN.get());
           }
         }
         break;
@@ -348,12 +375,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.LOW_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.LOW_MAX.get());
           }
         } else if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < m_elevator.getHeightMeters()) {
           // MID -> HIGH
           if (WRIST.THRESHOLD.HIGH_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.HIGH_MIN.get());
           }
         }
         break;
@@ -363,12 +396,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
           }
         } else if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < m_elevator.getHeightMeters()) {
           // HIGH -> EXTENDED
           if (WRIST.THRESHOLD.EXTENDED_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.EXTENDED_MIN.get());
           }
         }
         break;
@@ -380,6 +419,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.MID_MAX.get()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
+          } else if (!m_wrist.isUserControlled()) {
+            m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+            m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
           }
         }
         break;
@@ -422,20 +464,30 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
     m_wristLowerLimPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
     m_wristUpperLimPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
+    m_limitCanPub = stateHandlerTab.getStringTopic("canUtilization").publish();
   }
 
-  private void updateSmartDashboard() {
+  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putString("Superstructure State", getCurrentZone().toString());
 
     m_currentStatePub.set(getCurrentZone().toString());
     m_desiredStatePub.set(getDesiredZone().toString());
-    m_nextZonePub.set(getNextZone().toString());
     m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
-    m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimitMeters()));
-    m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimitMeters()));
     m_wristAnglePub.set(m_wrist.getPositionDegrees());
-    m_wristUpperLimPub.set(Units.radiansToDegrees(m_wrist.getUpperLimit()));
-    m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
+    m_limitCanPub.set(limitCanUtil.name());
+
+    switch (limitCan) {
+      case NORMAL:
+        m_nextZonePub.set(getNextZone().toString());
+        m_elevatorUpperLimPub.set(Units.metersToInches(m_elevator.getUpperLimitMeters()));
+        m_elevatorLowerLimPub.set(Units.metersToInches(m_elevator.getLowerLimitMeters()));
+        m_wristUpperLimPub.set(Units.radiansToDegrees(m_wrist.getUpperLimit()));
+        m_wristLowerLimPub.set(Units.radiansToDegrees(m_wrist.getLowerLimit()));
+        break;
+      default:
+      case LIMITED:
+        break;
+    }
   }
 
   public void switchTargetNode(boolean left) {
@@ -445,12 +497,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
+    updateSmartDashboard(limitCanUtil);
     // targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
 
-    // Determine current zone based on elevator/wrist position
-    m_currentZone =
-        determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+    //     Determine current zone based on elevator/wrist position
 
     // Undefined behavior, use previous zone as a backup
     if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.DANGER_ZONE.getZone()) {
@@ -470,18 +520,32 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       zoneAdvancement();
     }
 
-    if (m_currentZone.getZone() == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()) {
+    // If no user input for more than one second, then reset elevator to stowed
+    if (!DriverStation.isAutonomous()) {
+      if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
+          && !inactiveTimerEnabled) {
+        inactiveTimerEnabled = true;
+        timestamp = m_inactiveTimer.get();
+      } else if (inactiveTimerEnabled
+          && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
+        inactiveTimerEnabled = false;
+        timestamp = 0;
+      }
+      if (inactiveTimerEnabled) {
+        if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
+          m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+          m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
+          m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+          m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+        }
+      }
+    }
+
+    if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
     } else {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
     }
-
-    // Limit max swerve speed by elevator height (Probably a bad idea, have operator do this
-    // manually)
-    //    if (isTipping()) {
-    //      m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-    //      m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
-    //    }
 
     // TODO: Update this based on Intake sensors
     switch (currentIntakeState) {
@@ -510,12 +574,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
+
+    m_elevator.setReduceCanUtilization(limitCanUtil);
+    m_wrist.setReduceCanUtilization(limitCanUtil);
+    m_drive.setReduceCanUtilization(limitCanUtil);
   }
 
   public void testPeriodic() {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentZone = m_mainStateChooser.getSelected();
-    m_fieldSim.getValidNodes();
     m_fieldSim.getTargetNode();
   }
 

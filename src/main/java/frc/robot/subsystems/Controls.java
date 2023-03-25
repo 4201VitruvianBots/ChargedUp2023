@@ -52,11 +52,6 @@ public class Controls extends SubsystemBase implements AutoCloseable {
 
   /** Initializes values on SmartDashboard */
   private void initSmartDashboard() {
-    //    Shuffleboard.getTab("SmartDashboard")
-    //            .add("Alliance", getAllianceColorBoolean())
-    //            .withWidget(BuiltInWidgets.kBooleanBox)
-    //            .withProperties(Map.of("Color when true", "#FF0000", "Color when false",
-    // "#0000FF"));
     var controlsTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
@@ -70,10 +65,8 @@ public class Controls extends SubsystemBase implements AutoCloseable {
 
   /** Sends values to SmartDashboard */
   private void updateSmartDashboard() {
-    // SmartDashboard.putBoolean("Alliance", getAllianceColorBoolean());
     allianceString.set(getAllianceColor().toString());
     allianceBoolean.set(getAllianceColorBoolean());
-    //    System.out.println("Alliance Color: " + getAllianceColor().toString());
   }
 
   @Override
@@ -83,13 +76,11 @@ public class Controls extends SubsystemBase implements AutoCloseable {
     }
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    //    System.out.println("Test1");
   }
 
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    //    System.out.println("Test2");
   }
 
   @Override

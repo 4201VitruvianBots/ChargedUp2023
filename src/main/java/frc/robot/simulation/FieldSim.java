@@ -59,7 +59,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private ArrayList<Translation2d> blueCoopertitionNodes = new ArrayList<>();
 
   private ArrayList<Translation2d> blueNodes = new ArrayList<>();
-
   private ArrayList<Translation2d> redHybridNodes = new ArrayList<>();
   private ArrayList<Translation2d> redMidConeNodes = new ArrayList<>();
   private ArrayList<Translation2d> redMidCubeNodes = new ArrayList<>();
@@ -298,7 +297,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
         getValidNodes().stream()
             .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
             .collect(Collectors.toList());
-    // Only works on WPILIB version 2023.3.2 and above
+
     if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
     else return robotPose.nearest(possibleNodes);
   }

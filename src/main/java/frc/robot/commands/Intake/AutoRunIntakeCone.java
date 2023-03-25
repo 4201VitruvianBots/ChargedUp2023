@@ -52,15 +52,15 @@ public class AutoRunIntakeCone extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakeStateCone(false);
-    m_intake.setPercentOutput(0);
-    m_intake.setBooleanState(false);
+    // m_intake.setIntakeStateCone(false);
+    // m_intake.setPercentOutput(0);
+    // m_intake.setBooleanState(false);
     // m_swerve.enableHeadingTarget(false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

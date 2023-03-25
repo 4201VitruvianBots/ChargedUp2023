@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
@@ -43,6 +45,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private double m_lastAngle;
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -128,6 +132,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isReal()) Timer.delay(0.2);
     m_angleEncoder.configFactoryDefault();
     m_angleEncoder.configAllSettings(CtreUtils.generateCanCoderConfig());
+    m_angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+    m_angleEncoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     resetAngleToAbsolute();
 
     // Check if the offset was applied properly. Delay to give it some time to set
@@ -219,6 +225,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_pose = pose;
   }
 
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+  }
+
   public Pose2d getModulePose() {
     return m_pose;
   }
@@ -246,24 +256,28 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
   }
 
-  private void updateSmartDashboard() {
-    //    SmartDashboard.putNumber("Module " + m_moduleNumber + " error",
-    // Math.abs(getHeadingDegrees() + m_angleOffset - m_angleEncoder.getAbsolutePosition()));
-
-    moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
-    moduleMotorHeadingPub.set(getHeadingDegrees());
-    moduleEncoderHealthPub.set(getInitSuccess());
+  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
+    switch (limitCan) {
+      case NORMAL:
+        moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
+        moduleMotorHeadingPub.set(getHeadingDegrees());
+        moduleEncoderHealthPub.set(getInitSuccess());
+        break;
+      default:
+      case LIMITED:
+        break;
+    }
   }
 
   public void updateLog() {
-    // moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
-    // moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
+    moduleTurnCurrentEntry.append(m_turnMotor.getMotorOutputVoltage());
+    moduleDriveCurrentEntry.append(m_driveMotor.getMotorOutputVoltage());
   }
 
   @Override
   public void periodic() {
-    updateSmartDashboard();
-    updateLog();
+    updateSmartDashboard(limitCanUtil);
+    //    updateLog();
   }
 
   @Override
@@ -282,9 +296,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
-
-    //    m_turnMotorSimDistance = Math.IEEEremainder(m_turnMotorSimDistance, 360);
-    //    m_driveMotorSimDistance = Math.IEEEremainder(m_driveMotorSimDistance, 360);
 
     m_turnMotor
         .getSimCollection()

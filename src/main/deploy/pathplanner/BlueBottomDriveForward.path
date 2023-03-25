@@ -16,10 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "SetWristStowed",
-          "SetElevatorStowed"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -92,9 +89,9 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "SetWristStowed",
-          "SetElevatorStowed",
-          "RunIntakeCone"
+          "SetWristIntaking",
+          "SetElevatorIntaking",
+          "RunIntakeCube"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
@@ -108,7 +105,7 @@
       "names": [
         "SetWristIntaking",
         "SetElevatorIntaking",
-        "RunIntakeCone"
+        "RunIntakeCube"
       ]
     }
   ]

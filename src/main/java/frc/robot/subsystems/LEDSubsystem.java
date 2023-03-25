@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.*;
-import com.ctre.phoenix.led.Animation;
-import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
@@ -25,6 +23,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
   private LED_STATE currentRobotState = LED_STATE.DISABLED;
+  private boolean setSolid;
   private Animation m_toAnimate = null;
 
   private final Controls m_controls; // figure out during robotics class
@@ -34,6 +33,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final StringPublisher ledStatePub;
   // Create LED strip
   public LEDSubsystem(Controls controls) {
+    m_candle.configFactoryDefault(); // sets up LED strip
     // sets up LED strip
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true; // sets lights of when the LEDs are activated
@@ -43,7 +43,15 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         0.75; // 1 is highest we can go we don't want to blind everyone at the event
     configAll.vBatOutputMode = VBatOutputMode.Modulated; // Modulate
     m_candle.configAllSettings(configAll, 100);
-
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_2_Startup, 255);
+    m_candle.setStatusFramePeriod(
+        CANdleStatusFrame.CANdleStatusFrame_Status_3_FirmwareApiStatus, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_4_ControlTelem, 255);
+    m_candle.setStatusFramePeriod(
+        CANdleStatusFrame.CANdleStatusFrame_Status_5_PixelPulseTrain, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_6_BottomPixels, 255);
+    m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_7_TopPixels, 255);
     m_controls = controls;
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
@@ -155,28 +163,15 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    // TODO: Fix this from flashing
-    // if (DriverStation.isDisabled()) {
-    //   currentRobotState = robotState.DISABLED;
-    //   red = 255;
-    //   green = 0;
-    //   blue = 0;
-    //   m_toAnimate = null;
-    // }
-
     // null indicates that the animation is "Solid"
-    if (m_toAnimate == null) {
+    if (m_toAnimate == null && !setSolid) {
+      setSolid = true;
       m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
     } else {
+      setSolid = false;
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
-    // ledStatePub.set(currentRobotState.toString());
-    // the code below was printing out just LED Mode over and over again in the Led tab for some
-    // reason but the code above does show the current state
-    //   Shuffleboard.getTab("Controls")
-    // .add("LED Mode", currentRobotState.toString());
-
   }
 
   public INTAKING_STATES getPieceIntent() {

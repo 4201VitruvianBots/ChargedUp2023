@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
@@ -69,7 +70,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
                       Constants.SWERVEDRIVE.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(Constants.CAN.pigeon, "rio");
+  private double m_rollOffset;
   private Trajectory m_trajectory;
+
+  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final SwerveDrivePoseEstimator m_odometry;
   private double m_simYaw;
@@ -129,10 +133,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
     if (useHeadingTarget) {
-      // rotation = m_setpoint.velocity;
       rotation = m_rotationOutput;
-      // SmartDashboard.putNumber("Rotation Target", Units.radiansToDegrees(m_setpoint.position));
-      // SmartDashboard.putNumber("Rotation Speed ", Units.radiansToDegrees(rotation));
       chassisSpeeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
     } else {
@@ -162,9 +163,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void calculateRotationSpeed() {
-    // m_goal = new TrapezoidProfile.State(Units.degreesToRadians(m_desiredRobotHeading), 0);
-    // var profile = new TrapezoidProfile(m_constraints, m_goal, m_setpoint);
-    // m_setpoint = profile.calculate(0.02);
     if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
         > Units.degreesToRadians(1))
       m_rotationOutput =
@@ -197,6 +195,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     setSwerveModuleStates(states, false);
   }
 
+  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
+    limitCanUtil = limitCan;
+    for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+      module.setReduceCanUtilization(limitCan);
+    }
+  }
+
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
     var states = Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
@@ -205,6 +210,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   public void setOdometry(Pose2d pose) {
     m_pigeon.setYaw(pose.getRotation().getDegrees());
     m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
+  }
+
+  public void setRollOffset() {
+    m_rollOffset = -m_pigeon.getRoll(); // -2.63
+  }
+
+  public double getRollOffset() {
+    return m_rollOffset;
   }
 
   public double getPitchDegrees() {
@@ -217,11 +230,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   public double getHeadingDegrees() {
     return m_pigeon.getYaw();
-    // return 0;
   }
 
   public Rotation2d getHeadingRotation2d() {
     return Rotation2d.fromDegrees(getHeadingDegrees());
+  }
+
+  public Pigeon2 getPigeon() {
+    return m_pigeon;
   }
 
   public Pose2d getPoseMeters() {
@@ -319,16 +335,28 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
   }
 
-  private void updateSmartDashboard() {
+  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
+    SmartDashboard.putNumber("Roll Offset", m_rollOffset);
 
-    pitchPub.set(getPitchDegrees() + 2.460938);
-    rollPub.set(getRollDegrees());
-    yawPub.set(getHeadingDegrees());
-    odometryXPub.set(getOdometry().getEstimatedPosition().getX());
-    odometryYPub.set(getOdometry().getEstimatedPosition().getY());
-    odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
+    switch (limitCan) {
+      case NORMAL:
+        // Put not required stuff here
+        pitchPub.set(getPitchDegrees());
+        rollPub.set(getRollDegrees() + getRollOffset());
+        yawPub.set(getHeadingDegrees());
+        odometryXPub.set(getOdometry().getEstimatedPosition().getX());
+        odometryYPub.set(getOdometry().getEstimatedPosition().getY());
+        odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
+        break;
+      default:
+      case LIMITED:
+        pitchPub.set(getPitchDegrees());
+        rollPub.set(getRollDegrees() + getRollOffset());
+        yawPub.set(getHeadingDegrees());
+        break;
+    }
   }
 
   public void disabledPeriodic() {}
@@ -340,7 +368,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     }
 
     updateOdometry();
-    updateSmartDashboard();
+    updateSmartDashboard(limitCanUtil);
   }
 
   @Override

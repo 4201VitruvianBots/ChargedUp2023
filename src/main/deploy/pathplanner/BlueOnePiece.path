@@ -16,10 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "SetWristStowed",
-          "SetElevatorStowed"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -53,15 +50,15 @@
     {
       "anchorPoint": {
         "x": 6.89,
-        "y": 4.580717732864038
+        "y": 4.7
       },
       "prevControl": {
         "x": 5.864979832589881,
-        "y": 4.580717732864038
+        "y": 4.7
       },
       "nextControl": {
         "x": 5.864979832589881,
-        "y": 4.580717732864038
+        "y": 4.7
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -70,12 +67,11 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "wait1",
           "SetWristIntaking",
           "RunIntakeCone",
           "SetElevatorIntaking"
         ],
-        "executionBehavior": "parallelDeadline",
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -93,7 +89,7 @@
         "x": 5.148802696677498,
         "y": 3.0849813694598818
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -115,36 +111,35 @@
         "y": 3.1000000000000005
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "AutoBalance"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
+  "maxVelocity": 3.0,
+  "maxAcceleration": 4.0,
+  "isReversed": null,
   "markers": [
     {
       "position": 2.072727272727273,
       "names": [
         "SetWristStowed",
-        "SetElevatorStowed",
-        "IntakeHoldCone"
+        "IntakeHoldCone",
+        "SetElevatorStowed"
       ]
     },
     {
-      "position": 0.8,
+      "position": 0.8363636363636358,
       "names": [
-        "SetElevatorIntaking",
-        "RunIntakeCone",
-        "SetWristIntaking"
+        "RunIntakeCone"
       ]
     }
   ]
