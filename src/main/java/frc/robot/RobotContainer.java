@@ -696,6 +696,10 @@ public class RobotContainer implements AutoCloseable {
     return m_controls;
   }
 
+  public LEDSubsystem getLEDs() {
+    return m_led;
+  }
+
   public FieldSim getFieldSim() {
     return m_fieldSim;
   }
