@@ -217,7 +217,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     m_rollOffset = -m_pigeon.getRoll(); // -2.63
   }
 
-  public double getRollOffset() {
+  public double getRollOffsetDegrees() {
     return m_rollOffset;
   }
 
@@ -348,7 +348,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       case NORMAL:
         // Put not required stuff here
         pitchPub.set(getPitchDegrees());
-        rollPub.set(getRollDegrees() + getRollOffset());
+        rollPub.set(getRollDegrees() + getRollOffsetDegrees());
         yawPub.set(getHeadingDegrees());
         odometryXPub.set(getOdometry().getEstimatedPosition().getX());
         odometryYPub.set(getOdometry().getEstimatedPosition().getY());
@@ -357,7 +357,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       default:
       case LIMITED:
         pitchPub.set(getPitchDegrees());
-        rollPub.set(getRollDegrees() + getRollOffset());
+        rollPub.set(getRollDegrees() + getRollOffsetDegrees());
         yawPub.set(getHeadingDegrees());
         break;
     }

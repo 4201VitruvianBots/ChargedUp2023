@@ -57,7 +57,7 @@ public class AutoBalance extends CommandBase {
   @Override
   public void execute() {
     m_output =
-        outputCalculator.calculate(-m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset());
+        outputCalculator.calculate(-m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
     // TODO; set a way to initialize pitch to 0
 
     states =
@@ -71,7 +71,7 @@ public class AutoBalance extends CommandBase {
     m_swerveDrive.setSwerveModuleStates(states, false);
 
     double balanceDeltaDegrees =
-        Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset());
+        Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffsetDegrees());
     if (balanceDeltaDegrees < kAutoBalanceAngleThresholdDegrees && !timerStart) {
       timerStart = true;
       timestamp = m_timer.get();
