@@ -59,7 +59,9 @@ public class AutoBalanceTest {
       // Manually run the command and check if it finishes because CommandScheduler doesn't work
       // properly in test
       cmd.execute();
+
       if (m_timer.get() < AUTO.kAutoBalanceTimeout) {
+        // Initialize the test out of tolerance and wait a bit
         assertFalse(cmd.isFinished());
       } else if (m_timer.get() < AUTO.kAutoBalanceTimeout + AUTO.kAutoBalanceTimeout * 0.5) {
         // Test that AutoBalance doesn't immediately return true once in tolerance
@@ -70,10 +72,53 @@ public class AutoBalanceTest {
         setPrivateField(m_swerveDrive, "m_simRoll", -3);
         assertFalse(cmd.isFinished());
       } else if (m_timer.get() < AUTO.kAutoBalanceTimeout * 3.25) {
+        // Put the Swerve in tolerance again, but make sure it
         setPrivateField(m_swerveDrive, "m_simRoll", -1);
         assertFalse(cmd.isFinished());
       } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
-        // Test that AutoBalance only returns true if within tolerance greater than 2 seconds
+        // Test that AutoBalance only returns true if within tolerance greater than the timeout
+        assertTrue(cmd.isFinished());
+      }
+    }
+  }
+
+  @Test
+  public void TestAutoBalanceOffset() {
+    var cmd = new AutoBalance(m_swerveDrive);
+
+    // Override values for testing
+    setPrivateField(m_swerveDrive, "m_simOverride", true);
+    setPrivateField(m_swerveDrive, "m_rollOffset", -5);
+    AUTO.kAutoBalanceTimeout = AUTO.kAutoBalanceTimeout / 100.0;
+
+    Timer m_timer = new Timer();
+    m_timer.reset();
+    m_timer.start();
+    cmd.initialize();
+
+    setPrivateField(m_swerveDrive, "m_simRoll", -10);
+    while (m_timer.get() < AUTO.kAutoBalanceTimeout * 4) {
+      // Manually run the command and check if it finishes because CommandScheduler doesn't work
+      // properly in test
+      cmd.execute();
+
+      if (m_timer.get() < AUTO.kAutoBalanceTimeout) {
+        // Initialize the test out of tolerance and wait a bit
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout + AUTO.kAutoBalanceTimeout * 0.5) {
+        // Test that AutoBalance doesn't immediately return true once in tolerance
+        setPrivateField(m_swerveDrive, "m_simRoll", -6);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout * 2.25) {
+        // Test that AutoBalance doesn't return true if moved outside of tolerance
+        setPrivateField(m_swerveDrive, "m_simRoll", -8);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout * 3.25) {
+        // Put the Swerve in tolerance again, but make sure it
+        setPrivateField(m_swerveDrive, "m_simRoll", -6);
+        assertFalse(cmd.isFinished());
+      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
+        // Test that AutoBalance only returns true if within tolerance greater than the timeout
         assertTrue(cmd.isFinished());
       }
     }
