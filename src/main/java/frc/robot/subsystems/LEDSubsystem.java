@@ -9,7 +9,11 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LED.*;
@@ -31,6 +35,13 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final int LEDcount = 72;
 
   private final StringPublisher ledStatePub;
+
+  // Mechanism2d visualization setup
+  public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+  public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
+  public MechanismLigament2d m_ligament2d =
+      m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+  
   // Create LED strip
   public LEDSubsystem(Controls controls) {
     m_candle.configFactoryDefault(); // sets up LED strip
@@ -56,6 +67,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
+
+    // Initialize visualization
+    m_ligament2d.setLineWeight(1000); // making the line THICK
+    SmartDashboard.putData("LED Sim", m_mech2d);
   }
 
   /**
@@ -159,6 +174,11 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       }
       currentRobotState = state;
     }
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    m_ligament2d.setColor(new Color8Bit(this.red, this.green, this.blue));
   }
 
   @Override
