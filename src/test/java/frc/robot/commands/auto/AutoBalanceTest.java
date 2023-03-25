@@ -26,7 +26,6 @@ public class AutoBalanceTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_robotContainer = new RobotContainer();
     var subsystems = getPrivateObject(CommandScheduler.getInstance(), "m_subsystems");
-    //    m_swerveDrive = (LinkedHashMap<Subsystem, Command>) subsystems;
     m_swerveDrive = m_robotContainer.getSwerveDrive();
   }
 
@@ -37,6 +36,29 @@ public class AutoBalanceTest {
   // is set up (e.g. resource errors from using the same PWM/DIO port)
   void shutdown() throws Exception {
     m_robotContainer.close();
+  }
+
+  @Test
+  public void TestAutoBalanceOutput() {
+    var cmd = new AutoBalance(m_swerveDrive);
+
+    // Override values for testing
+    setPrivateField(m_swerveDrive, "m_simOverride", true);
+    setPrivateField(m_swerveDrive, "m_rollOffset", 0);
+
+    cmd.initialize();
+
+    double output;
+    setPrivateField(m_swerveDrive, "m_simRoll", -15);
+    // Manually run the command and check if it finishes because CommandScheduler doesn't work
+    // properly in test
+    cmd.execute();
+    output = cmd.getOutput();
+    assertTrue(output < 0);
+    setPrivateField(m_swerveDrive, "m_simRoll", 15);
+    cmd.execute();
+    output = cmd.getOutput();
+    assertTrue(output > 0);
   }
 
   // Mark all test functions with @Test

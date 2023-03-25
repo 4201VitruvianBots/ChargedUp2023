@@ -22,6 +22,7 @@ public class AutoBalance extends CommandBase {
   SwerveModuleState[] states;
 
   PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private double m_output = 0;
 
   /**
    * Creates a new ExampleCommand.
@@ -55,16 +56,16 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double output =
+    m_output =
         outputCalculator.calculate(-m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffset());
-    // TODO; set a way to initiallze pitch to 0
+    // TODO; set a way to initialize pitch to 0
 
     states =
         new SwerveModuleState[] {
-          new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
-          new SwerveModuleState(output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
+          new SwerveModuleState(m_output, Rotation2d.fromDegrees(90)),
         };
 
     m_swerveDrive.setSwerveModuleStates(states, false);
@@ -104,5 +105,9 @@ public class AutoBalance extends CommandBase {
     } else {
       return false;
     }
+  }
+
+  public double getOutput() {
+    return m_output;
   }
 }
