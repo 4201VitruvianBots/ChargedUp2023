@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.AUTO;
 import frc.robot.RobotContainer;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.subsystems.SwerveDrive;
@@ -44,9 +45,11 @@ public class AutoBalanceTest {
   @Test
   public void TestAutoBalanceTimeout() {
     var cmd = new AutoBalance(m_swerveDrive);
+
+    // Override values for testing
     setPrivateField(m_swerveDrive, "m_simOverride", true);
     setPrivateField(m_swerveDrive, "m_rollOffset", 0);
-    Constants.AUTO.kAutoBalanceTimeout = Constants.AUTO.kAutoBalanceTimeout / 100.0;
+    AUTO.kAutoBalanceTimeout = AUTO.kAutoBalanceTimeout / 100.0;
 
     Timer m_timer = new Timer();
     m_timer.reset();
@@ -54,22 +57,23 @@ public class AutoBalanceTest {
     cmd.initialize();
 
     setPrivateField(m_swerveDrive, "m_simRoll", -5);
-    while(m_timer.get() < 8) {
+    while(m_timer.get() < AUTO.kAutoBalanceTimeout * 4) {
+      // Manually run the command and check if it finishes because CommandScheduler doesn't work properly in test
       cmd.execute();
-      if(m_timer.get() < Constants.AUTO.kAutoBalanceTimeout) {
+      if(m_timer.get() < AUTO.kAutoBalanceTimeout) {
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() < Constants.AUTO.kAutoBalanceTimeout + Constants.AUTO.kAutoBalanceTimeout * 0.5) {
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout + AUTO.kAutoBalanceTimeout * 0.5) {
         // Test that AutoBalance doesn't immediately return true once in tolerance
         setPrivateField(m_swerveDrive, "m_simRoll", -1);
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() < Constants.AUTO.kAutoBalanceTimeout * 2.25) {
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout * 2.25) {
         // Test that AutoBalance doesn't return true if moved outside of tolerance
         setPrivateField(m_swerveDrive, "m_simRoll", -3);
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() < Constants.AUTO.kAutoBalanceTimeout * 3.25) {
+      } else if (m_timer.get() < AUTO.kAutoBalanceTimeout * 3.25) {
         setPrivateField(m_swerveDrive, "m_simRoll", -1);
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() > Constants.AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
+      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
         // Test that AutoBalance only returns true if within tolerance greater than 2 seconds
         assertTrue(cmd.isFinished());
       }
