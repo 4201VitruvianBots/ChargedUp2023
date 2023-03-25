@@ -69,15 +69,12 @@ public class AutoBalance extends CommandBase {
 
     m_swerveDrive.setSwerveModuleStates(states, false);
 
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset())
-            < kAutoBalanceAngleThresholdDegrees)
-        && !timerStart) {
+    double balanceDeltaDegrees =
+        Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset());
+    if (balanceDeltaDegrees < kAutoBalanceAngleThresholdDegrees && !timerStart) {
       timerStart = true;
       timestamp = m_timer.get();
-    }
-    if ((Math.abs(m_swerveDrive.getRollDegrees() - m_swerveDrive.getRollOffset())
-            >= kAutoBalanceAngleThresholdDegrees)
-        && timerStart) {
+    } else if (balanceDeltaDegrees >= kAutoBalanceAngleThresholdDegrees && timerStart) {
       timerStart = false;
     }
   }
