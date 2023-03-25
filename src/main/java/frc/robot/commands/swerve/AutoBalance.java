@@ -101,11 +101,7 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (timerStart) {
-      return (m_timer.get() - timestamp) > kAutoBalanceTimeout;
-    } else {
-      return false;
-    }
+    return m_timer.get() - timestamp > 2;
   }
 
   public double getOutput() {
