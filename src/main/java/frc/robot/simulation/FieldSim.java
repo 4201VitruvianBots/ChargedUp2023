@@ -103,6 +103,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     return m_field2d;
   }
 
+  /**
+   * Initialize arrays with all the scoring positions on the field based on alliance color, game
+   * piece type, and if it is a cooperatition node. Ideally, this is a pre-processing step that we
+   * only need to do once to improve robot code performance by avoiding unnecessary repeated calls.
+   */
   private void initializeScoringNodes() {
     // Split nodes into separate lists to make it easier to filter
     blueHybridNodes = new ArrayList<>(Arrays.asList(Grids.lowTranslations));
@@ -190,6 +195,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     robotPose = m_swerveDrive.getPoseMeters();
     m_field2d.setRobotPose(robotPose);
 
+    // Test Code - Disable during competition to improve performance
     if (false) {
       m_field2d
           .getObject("lLocalizerTagPoses")
@@ -238,12 +244,12 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  /*
-   * Priority list:
-   * 1 - Node is on our alliance or coopertition grid
-   * 2 - Node takes our current game piece
-   * 3 - Node is on the same level as our elevator
-   * 4 - Node is closest to our robot
+  /**
+   * Return a list of valid nodes for scoring based on the following priorities: [1] - Node is on
+   * our alliance or coopertition grid. [2] - Node takes our current game piece. [3] - Node is on
+   * the same level as our elevator. [4] - Node is closest to our robot
+   *
+   * <p>TODO: This code is not optimized/is slow - need to improve performance/simplify
    */
   public void updateValidNodes(SCORING_STATE scoringState) {
     if (RobotBase.isSimulation() && testScoringState) {
@@ -292,6 +298,12 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     return validNodes;
   }
 
+  /**
+   * Based on the current robot's state and the list of valid nodes, return the nearest nearest node
+   * for scoring
+   *
+   * @return
+   */
   public Pose2d getTargetNode() {
     List<Pose2d> possibleNodes =
         getValidNodes().stream()

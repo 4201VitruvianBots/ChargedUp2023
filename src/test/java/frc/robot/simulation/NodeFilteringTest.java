@@ -10,7 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class NodeFilteringTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
@@ -58,5 +59,6 @@ public class NodeFilteringTest {
     double average = totalTime / states.length;
 
     System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
+    assertTrue(average < 0.020);
   }
 }

@@ -322,6 +322,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         }
       default:
       case NONE:
+        // If not in a transition zone, use the current zone's limits
         switch (m_currentZone.getZone()) {
           case 1: // LOW
             m_elevator.setLowerLimitMeters(ELEVATOR.THRESHOLD.LOW_MIN.get());
@@ -541,6 +542,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
     }
 
+    // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
     } else {
