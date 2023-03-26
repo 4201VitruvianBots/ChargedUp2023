@@ -18,6 +18,7 @@ public class AutoRunIntakeCone extends CommandBase {
 
   private double m_PercentOutput;
 
+  // TODO: Consolidate AutoRunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
   public AutoRunIntakeCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;

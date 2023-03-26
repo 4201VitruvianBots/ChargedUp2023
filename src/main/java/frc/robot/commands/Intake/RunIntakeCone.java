@@ -13,6 +13,7 @@ public class RunIntakeCone extends CommandBase {
 
   private double m_PercentOutput;
 
+  // TODO: Consolidate RunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
   public RunIntakeCone(Intake intake, double PercentOutput) {
     m_intake = intake;

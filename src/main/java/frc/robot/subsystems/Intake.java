@@ -22,6 +22,8 @@ import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
+
+  // TODO: Review variables
   private static boolean isIntaking = false;
 
   private static boolean isIntakingCone = false;
@@ -46,6 +48,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
     // set current limit on talonfx motors
+    // TODO: Need to test current/voltage limits to verify what is appropriate or not
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 0.1));
     intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
@@ -70,6 +73,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return 0;
   }
 
+  // TODO: IS this necessary? If not remove it
   // control mode function
   public boolean getIntakeState() {
     return isIntaking;
@@ -105,6 +109,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return intakeMotor.getStatorCurrent();
   }
 
+  // TODO: IS this necessary? If not remove it
   public void setBooleanState(boolean state) {
     isIntaking = state;
   }
