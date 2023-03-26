@@ -407,6 +407,7 @@ public class RobotContainer implements AutoCloseable {
     m_stateHandler.init();
   }
 
+  // TODO: Remove AutoBuilder
   private void initAutoBuilder() {
     m_eventMap.put("wait", new WaitCommand(1));
     m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));

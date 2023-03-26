@@ -25,6 +25,7 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
+// TODO: Rewrite without AutoBuilder
 public class OnePiece extends SequentialCommandGroup {
   private List<PathPlannerTrajectory> m_trajectory;
 
