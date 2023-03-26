@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 
+// TODO: Is this command necessary? If not, remove it
 public class SetWristDesiredSetpointState extends CommandBase {
   private final Wrist m_wrist;
   private WRIST.STATE m_state;

@@ -29,6 +29,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
+  // TODO: Review variables
   private double m_desiredSetpointInputRadians;
   private double m_desiredSetpointOutputRadians;
   private double m_commandedAngleRadians;
@@ -47,6 +48,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_joystickInput;
   private boolean m_userSetpoint;
 
+  // TODO: Make this universal/put in StateHandler
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final int simEncoderSign =
@@ -131,6 +133,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     //    wristMotor.setStatusFramePeriod(1, 0);
     //    wristMotor.setStatusFramePeriod(2, 0);
+    // TODO: Review limits, test to see what is appropriate or not
     wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
     wristMotor.config_kP(0, WRIST.kP);
     wristMotor.config_kI(0, WRIST.kI);
@@ -158,6 +161,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_joystickInput = input;
   }
 
+  // TODO: Is this necessary? If not, remove it
   public void setUserSetpoint(boolean bool) {
     m_userSetpoint = bool;
   }
@@ -307,6 +311,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  // TODO: Is this necessary? If not, remove it
   private void updateIValue() {
     if (getPositionRadians() < Units.degreesToRadians(30)) {
       newKI = 0.00001;
@@ -319,6 +324,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  // TODO: Move to Constants.WRIST
   public enum WRIST_SPEED {
     SLOW,
     FAST
@@ -330,6 +336,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
   }
 
+  // TODO: Add wristAngleDegrees to Wrist Tab
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
     SmartDashboard.putData("Reset90", new ResetAngleDegrees(this, Units.degreesToRadians(90)));
@@ -418,10 +425,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     positionDegreesEntry.append(getPositionDegrees());
   }
 
+  // TODO: Is this needed? If not, remove it
   public boolean isScoring() {
     return (getPositionDegrees() > 170);
   }
 
+  // TODO: Do Not Remove. WIP for auto scoring
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
