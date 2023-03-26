@@ -47,6 +47,7 @@ import frc.robot.Constants.ELEVATOR;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
+  // TODO: Review variables
   // Initializing both motors
   public final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
@@ -57,6 +58,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       new DigitalInput(Constants.DIO.elevatorLowerLimitSwitch);
   private boolean lowerLimitSwitchTriggered = false;
 
+  // TODO: Is this necessary? If not, remove it
   private static double heightMeters =
       0; // the amount of meters the motor has moved up from the initial stowed position
 
@@ -70,6 +72,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
   private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
+  // TODO: Move to StateHandler/make global
   private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   // By default, this is set to true as we use the trapezoid profile to determine what speed we
@@ -78,9 +81,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // the motors.
   private boolean isClosedLoop = true;
 
+  // TODO: Is this necessary? If not, remove it
   // True if elevator motors are actively moving towards a setpoint
   private boolean isElevatorElevatingElevatando = false;
 
+  // TODO: Is this necessary? If not, remove it
   // This is used in limiting the elevator's speed once we reach the top of the elevator
   private double currentForwardOutput = 0;
   private double newForwardOutput = 0;
@@ -195,6 +200,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
+  // TODO: Is this outdated? If so, remove it
   // Not currently used by the main logic
   public void setSetpointMotionMagicMeters(double setpoint) {
     elevatorMotors[0].set(
@@ -215,6 +221,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         (m_feedForward.calculate(state.velocity) / 12.0));
   }
 
+  // TODO: Rename for clarity
   // Sets the setpoint to our current height, effectively keeping the elevator in place.
   public void resetState() {
     m_setpoint = new TrapezoidProfile.State(getHeightMeters(), getVelocityMeters());
@@ -225,6 +232,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
   }
 
+  // TODO: Rename for clarity
   // Returns the elevator's velocity in meters per second.
   public double getVelocityMeters() {
     return elevatorMotors[0].getSelectedSensorVelocity()
@@ -240,10 +248,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
+  // TODO: Is this necessary? If not, remove it
   public boolean getIsElevating() {
     return isElevatorElevatingElevatando;
   }
 
+  // TODO: Is this necessary? If not, remove it
   public boolean setIsElevating(boolean state) {
     return isElevatorElevatingElevatando = state;
   }
@@ -259,6 +269,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
   }
 
+  // TODO: Is this necessary? If not, remove it
   public ELEVATOR.SETPOINT getSetpointState() {
     return m_desiredHeightState;
   }
@@ -303,10 +314,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_joystickInput = m_joystickY;
   }
 
+  // TODO: Is this necessary? If not, remove it
   public void setUserSetpoint(boolean bool) {
     m_userSetpoint = bool;
   }
 
+  // TODO: Is this necessary? If not, remove it
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
@@ -341,6 +354,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         0);
   }
 
+  // TODO: Remove CAN_UTIL_LIMIT from function args
   // Initializes shuffleboard values. Does not update them
   private void initShuffleboard(CAN_UTIL_LIMIT limitCan) {
     if (RobotBase.isSimulation()) {
@@ -387,6 +401,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
+  // TODO: Remove CAN_UTIL_LIMIT from function args
   public void updateShuffleboard(CAN_UTIL_LIMIT limitCan) {
     SmartDashboard.putBoolean("Elevator Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
@@ -494,6 +509,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateHeightMeters();
     updateForwardOutput();
 
+    // TODO: Rewrite logic
     if (isClosedLoop) {
       switch (m_controlState) {
           // Default joystick control
