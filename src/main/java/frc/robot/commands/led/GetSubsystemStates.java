@@ -20,6 +20,7 @@ public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LEDSubsystem m_led;
 
+  // TODO: Cleanup
   private final Intake m_intake;
   private final Controls m_controls;
   private final StateHandler m_stateHandler;
@@ -50,6 +51,7 @@ public class GetSubsystemStates extends CommandBase {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
+  // TODO: Review logic
   @Override
   public void execute() {
     // the prioritized state to be expressed to the LEDs

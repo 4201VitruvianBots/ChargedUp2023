@@ -22,10 +22,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
+  // TODO: Remove LED_STATE and tie it to STATEHANDLER constants
   private LED_STATE currentRobotState = LED_STATE.DISABLED;
   private boolean setSolid;
   private Animation m_toAnimate = null;
 
+  // TODO: Is this needed? If not, remove it.
   private final Controls m_controls; // figure out during robotics class
 
   private final int LEDcount = 72;
@@ -174,10 +176,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
+  // TODO: Remove this and tie this to STATEHANDLER constants
   public INTAKING_STATES getPieceIntent() {
     return pieceIntent;
   }
 
+  // TODO: Is this needed? If not, remove it
   public void setPieceIntent(INTAKING_STATES type) {
     pieceIntent = type;
   }

@@ -17,6 +17,7 @@ public class SetPieceTypeIntent extends CommandBase {
   private final INTAKING_STATES m_pieceType;
 
   /** Sets the LED based on the subsystems' statuses */
+  // TODO: Is this needed? If not, remove it
   public SetPieceTypeIntent(LEDSubsystem led, INTAKING_STATES piecetype) {
     m_led = led;
     m_pieceType = piecetype;
