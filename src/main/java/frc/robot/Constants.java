@@ -195,7 +195,8 @@ public final class Constants {
       CUBE_BUTTON,
       CHARGING_STATION,
       SCORING,
-      LOCKED_ON
+      LOCKED_ON,
+      LOW_BATTERY
     }
   }
 

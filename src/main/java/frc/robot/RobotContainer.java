@@ -32,6 +32,7 @@ import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
+import frc.robot.commands.led.SetScoringState;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -175,6 +176,7 @@ public class RobotContainer implements AutoCloseable {
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
 
     // Score MID Setpoints
+    xboxController.b().whileTrue(new SetScoringState(m_led, ELEVATOR.SETPOINT.SCORE_MID_CONE));
     xboxController
         .b()
         .whileTrue(
@@ -207,6 +209,7 @@ public class RobotContainer implements AutoCloseable {
                 m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
 
     // High
+    xboxController.y().whileTrue(new SetScoringState(m_led, ELEVATOR.SETPOINT.SCORE_HIGH_CONE));
     xboxController
         .y()
         .whileTrue(

@@ -9,9 +9,12 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.LED.*;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 
@@ -39,10 +42,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     // sets up LED strip
     CANdleConfiguration configAll = new CANdleConfiguration();
     configAll.statusLedOffWhenActive = true; // sets lights of when the LEDs are activated
-    configAll.disableWhenLOS = false; // disables LEDs when robot is off(?)
+    configAll.disableWhenLOS = false; // disables LEDs when there is no signal for control
     configAll.stripType = LEDStripType.GRB;
     configAll.brightnessScalar =
-        0.75; // 1 is highest we can go we don't want to blind everyone at the event
+        0.5; // 1 is highest we can go we don't want to blind everyone at the event
     configAll.vBatOutputMode = VBatOutputMode.Modulated; // Modulate
     m_candle.configAllSettings(configAll, 100);
     m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_1_General, 255);
@@ -132,6 +135,9 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case INITIALIZED:
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Twinkle);
           break;
+        case LOW_BATTERY:
+          setPattern(255, 165, 0, 0, 0, ANIMATION_TYPE.Strobe);
+        break;
         case ENABLED: // Solid green
           setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
@@ -150,8 +156,8 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case CHARGING_STATION:
           setPattern(125, 125, 125, 125, 0, ANIMATION_TYPE.Rainbow);
           break;
-        case SCORING: // Flashing white
-          setPattern(0, 0, 0, 255, 1, ANIMATION_TYPE.Strobe);
+        case SCORING: // Flashing White
+          setPattern(100, 100, 100, 15, 0, ANIMATION_TYPE.Solid);
           break;
         case LOCKED_ON: // Flashing Green
           setPattern(0, 255, 0, 0, 1, ANIMATION_TYPE.Strobe);
@@ -173,6 +179,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       setSolid = false;
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
+    if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
+      expressState(LED_STATE.LOW_BATTERY);
+    }
+
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
