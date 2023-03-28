@@ -2,6 +2,7 @@ package frc.robot.commands.auto;
 
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
@@ -30,22 +31,27 @@ public class AntHoney extends SequentialCommandGroup {
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
         // fieldSim),
+        new RepeatCommand(
+            new SequentialCommandGroup(
+        
 
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1),
         new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCone(intake, 0.8, vision, swerveDrive))
-            .withTimeout(10),
+                new AutoRunIntakeCone(intake, 0.3, vision, swerveDrive)),
+            new WaitCommand(2),
+
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1)),
-        new WaitCommand(1),
+            new AutoRunIntakeCone(intake, 0, vision, swerveDrive)).withTimeout(3),
+        new WaitCommand(0.5),
+
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())),
-        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(2),
+        new AutoRunIntakeCone(intake, -0.3, vision, swerveDrive).withTimeout(2),
         new WaitCommand(1),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
@@ -55,24 +61,27 @@ public class AntHoney extends SequentialCommandGroup {
 
         // TODO: CUBE
 
-        new ParallelCommandGroup(
+    new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCube(intake, 0.65, vision, swerveDrive))
-            .withTimeout(4),
+                new AutoRunIntakeCube(intake, 0.3, vision, swerveDrive)),
+            new WaitCommand(3),
+
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoRunIntakeCube(intake, 0, vision, swerveDrive).withTimeout(1)),
-        new WaitCommand(1),
+            new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(1),
+        new WaitCommand(0.5),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())),
-        new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(1),
+        new AutoRunIntakeCube(intake, -0.3, vision, swerveDrive).withTimeout(2),
         new WaitCommand(1),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        new WaitCommand(1));
+        new AutoRunIntakeCube(intake, 0, vision, swerveDrive).withTimeout(1),
+        new WaitCommand(1))));
+      
   }
 }
