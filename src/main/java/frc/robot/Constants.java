@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -227,12 +228,26 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_Translation = 0.6;
-    public static final double kI_Translation = 0;
-    public static final double kD_Translation = 0;
-    public static final double kP_Rotation = 4;
-    public static final double kI_Rotation = 0;
-    public static final double kD_Rotation = 0.01;
+    // public static final double kP_Translation = 0.6;
+    // public static final double kI_Translation = 0;
+    // public static final double kD_Translation = 0;
+    // public static final double kP_Rotation = 4;
+    // public static final double kI_Rotation = 0;
+    // public static final double kD_Rotation = 0.01;
+
+    public static final double kP_X = 0.6;
+    public static final double kI_X = 0;
+    public static final double kD_X = 0;
+    public static final double kP_Y = 0.6;
+    public static final double kI_Y = 0;
+    public static final double kD_Y = 0;
+    public static final double kP_Theta = 4.0;
+    public static final double kI_Theta = 0;
+    public static final double kD_Theta = 0.01;
+
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxRotationRadiansPerSecond, kMaxRotationRadiansPerSecondSquared);
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,

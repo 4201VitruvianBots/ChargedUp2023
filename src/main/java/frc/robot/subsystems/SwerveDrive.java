@@ -10,7 +10,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
+import frc.robot.Constants.SWERVEDRIVE;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
@@ -90,12 +91,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
           Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private final ProfiledPIDController m_rotationController =
-      new ProfiledPIDController(
-          Constants.SWERVEDRIVE.kP_Rotation,
-          Constants.SWERVEDRIVE.kI_Rotation,
-          Constants.SWERVEDRIVE.kD_Rotation,
-          m_constraints);
+  private PIDController m_xController =
+      new PIDController(SWERVEDRIVE.kP_X, SWERVEDRIVE.kI_X, SWERVEDRIVE.kD_X);
+  private PIDController m_yController =
+      new PIDController(SWERVEDRIVE.kP_Y, SWERVEDRIVE.kI_Y, SWERVEDRIVE.kD_Y);
+  private PIDController m_turnController =
+      new PIDController(SWERVEDRIVE.kP_Theta, SWERVEDRIVE.kI_Theta, SWERVEDRIVE.kD_Theta);
+
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
@@ -167,8 +169,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
         > Units.degreesToRadians(1))
       m_rotationOutput =
-          m_rotationController.calculate(
-              getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
+          m_turnController.calculate(getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
     else m_rotationOutput = 0;
   }
 
@@ -282,6 +283,18 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       }
     }
     return true;
+  }
+
+  public PIDController getXPidController() {
+    return m_xController;
+  }
+
+  public PIDController getYPidController() {
+    return m_yController;
+  }
+
+  public PIDController getThetaPidController() {
+    return m_turnController;
   }
 
   public void setNeutralMode(NeutralMode mode) {

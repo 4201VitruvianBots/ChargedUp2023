@@ -1,7 +1,6 @@
 package frc.robot.commands.swerve;
 
 import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
-import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;

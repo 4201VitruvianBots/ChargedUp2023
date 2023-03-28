@@ -7,7 +7,6 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.*;
@@ -465,24 +464,6 @@ public class RobotContainer implements AutoCloseable {
         "SetElevatorLowReverseCubeNode",
         new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
-
-    m_autoBuilder =
-        new SwerveAutoBuilder(
-            m_swerveDrive::getPoseMeters,
-            m_swerveDrive::setOdometry,
-            Constants.SWERVEDRIVE.kSwerveKinematics,
-            new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Translation,
-                Constants.SWERVEDRIVE.kI_Translation,
-                Constants.SWERVEDRIVE.kD_Translation),
-            new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Rotation,
-                Constants.SWERVEDRIVE.kI_Rotation,
-                Constants.SWERVEDRIVE.kD_Rotation),
-            m_swerveDrive::setSwerveModuleStatesAuto,
-            m_eventMap,
-            true,
-            m_swerveDrive);
   }
 
   public SwerveAutoBuilder getAutoBuilder() {
