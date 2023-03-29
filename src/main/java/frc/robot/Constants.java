@@ -470,6 +470,32 @@ public final class Constants {
       HIGH_TO_EXTENDED,
       EXTENDED_TO_HIGH,
     }
+
+    public enum SETPOINT {
+      // Units are in meters
+      STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
+      SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
+      SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
+      SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get());
+
+      private final double elevatorSetpointMeters;
+      private final double wristSetpointRadians;
+
+      SETPOINT(double elevatorSetpointMeters, double wristSetpointRadians) {
+        this.elevatorSetpointMeters = elevatorSetpointMeters;
+        this.wristSetpointRadians = wristSetpointRadians;
+      }
+
+      public double getElevatorSetpointMeters() {
+        return elevatorSetpointMeters;
+      }
+
+      public double getWristSetpointRadians() {
+        return wristSetpointRadians;
+      }
+    }
   }
 
   public static class AUTO {

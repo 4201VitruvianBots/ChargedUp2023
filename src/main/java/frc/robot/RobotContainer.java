@@ -26,7 +26,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
@@ -35,8 +37,6 @@ import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.Intake.IntakeVisionAlignment;
 import frc.robot.commands.Intake.RunIntakeCone;
 import frc.robot.commands.Intake.RunIntakeCube;
-import frc.robot.commands.auto.AntHoney;
-import frc.robot.commands.auto.Exhibition;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.ResetElevatorHeightMeters;
@@ -46,6 +46,7 @@ import frc.robot.commands.elevator.ToggleElevatorControlMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
@@ -174,81 +175,28 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .a()
         .whileTrue(
-            new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getLeftY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
-    xboxController
-        .a()
-        .whileTrue(
-            new ConditionalCommand(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_REVERSE.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_LOW_REVERSE.get(), xboxController::getRightY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_LOW));
 
     // Score MID Setpoints
     xboxController
         .b()
         .whileTrue(
-            new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getLeftY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
-    xboxController
-        .b()
-        .whileTrue(
-            new ConditionalCommand(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getRightY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_MID));
 
     // Stowed
     xboxController
         .x()
         .whileTrue(
-            new SetElevatorDesiredSetpoint(
-                m_elevator, ELEVATOR.SETPOINT.STOWED.get(), xboxController::getLeftY));
-    xboxController
-        .x()
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
-
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
     // High
     xboxController
         .y()
         .whileTrue(
-            new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
-                    m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getLeftY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
-    xboxController
-        .y()
-        .whileTrue(
-            new ConditionalCommand(
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getRightY),
-                new SetWristDesiredSetpoint(
-                    m_wrist, WRIST.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getRightY),
-                () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_HIGH));
     // Toggle elevator, wrist control state
     xboxController
         .povUp()
-        .onTrue(
-            new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
-    xboxController
-        .povUp()
-        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
+        .onTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_EXTENDED));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -507,12 +455,6 @@ public class RobotContainer implements AutoCloseable {
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-
-    m_autoChooser.addOption("Exhibiton", new Exhibition());
-    m_autoChooser.addOption(
-        "AntHoney",
-        new AntHoney(
-            m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
