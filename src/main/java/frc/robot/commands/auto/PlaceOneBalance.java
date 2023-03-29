@@ -2,7 +2,6 @@ package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -26,7 +25,6 @@ import frc.robot.utils.TrajectoryUtils;
 public class PlaceOneBalance extends SequentialCommandGroup {
   public PlaceOneBalance(
       String pathName,
-      SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,
@@ -34,14 +32,16 @@ public class PlaceOneBalance extends SequentialCommandGroup {
       Elevator elevator,
       Vision vision) {
 
-    var m_trajectory =
+    var trajectories =
         TrajectoryUtils.readTrajectory(
             pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+    var swerveCommands =
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
-    var autoPath = autoBuilder.fullAuto(m_trajectory);
     addCommands(
+        // TODO: Reset Odometry
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        new PlotAutoTrajectory(fieldSim, pathName, trajectories),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
@@ -51,7 +51,7 @@ public class PlaceOneBalance extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        autoPath,
+        // autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

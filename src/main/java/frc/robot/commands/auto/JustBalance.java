@@ -2,7 +2,6 @@ package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.swerve.AutoBalance;
@@ -18,7 +17,6 @@ import frc.robot.utils.TrajectoryUtils;
 public class JustBalance extends SequentialCommandGroup {
   public JustBalance(
       String pathName,
-      SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,
@@ -26,13 +24,15 @@ public class JustBalance extends SequentialCommandGroup {
       Elevator elevator,
       Vision vision) {
 
-    var m_trajectory =
+    var trajectories =
         TrajectoryUtils.readTrajectory(
             pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+    var swerveCommands =
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
-    var autoPath = autoBuilder.fullAuto(m_trajectory);
     addCommands(
-        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        // TODO: Reset Odometry
+        new PlotAutoTrajectory(fieldSim, pathName, trajectories),
         // new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
 

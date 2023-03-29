@@ -3,7 +3,6 @@ package frc.robot.commands.auto;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -15,6 +14,7 @@ import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
@@ -27,11 +27,10 @@ import java.util.List;
 
 // TODO: Rewrite without AutoBuilder
 public class OnePiece extends SequentialCommandGroup {
-  private List<PathPlannerTrajectory> m_trajectory;
+  private List<PathPlannerTrajectory> m_trajectories;
 
   public OnePiece(
       String pathName,
-      SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,
@@ -39,18 +38,17 @@ public class OnePiece extends SequentialCommandGroup {
       Vision vision,
       Elevator elevator) {
 
-    m_trajectory =
+    m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
-
-    var autoPath = autoBuilder.fullAuto(m_trajectory);
+            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+    var swerveCommands =
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
-        //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
-        // fieldSim),
-
+        new SetSwerveOdometry(
+            swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
@@ -60,7 +58,7 @@ public class OnePiece extends SequentialCommandGroup {
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        autoPath,
+        // autoPath,
         new AutoBalance(swerveDrive),
 
         // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
@@ -85,6 +83,6 @@ public class OnePiece extends SequentialCommandGroup {
   }
 
   public List<PathPlannerTrajectory> getTrajectory() {
-    return m_trajectory;
+    return m_trajectories;
   }
 }

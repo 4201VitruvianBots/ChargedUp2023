@@ -5,9 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -45,9 +43,6 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
-import frc.robot.utils.TrajectoryUtils;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -78,9 +73,6 @@ public class RobotContainer implements AutoCloseable {
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
-  HashMap<String, Command> m_eventMap = new HashMap<>();
-  private SwerveAutoBuilder m_autoBuilder;
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   // Initialize used utils
@@ -102,7 +94,6 @@ public class RobotContainer implements AutoCloseable {
     m_logger.pause();
     configureBindings();
 
-    initAutoBuilder();
     initializeAutoChooser();
   }
 
@@ -406,70 +397,6 @@ public class RobotContainer implements AutoCloseable {
     m_stateHandler.init();
   }
 
-  // TODO: Remove AutoBuilder
-  private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(1));
-    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.6, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "RunIntakeConeReverse", new AutoRunIntakeCone(m_intake, -0.8, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "RunIntakeCubeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
-    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
-    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
-    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "SetWristIntaking",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorIntaking",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristStowed",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorStowed",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristLowConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorLowConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristMidConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorMidConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristHighConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorHighConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristLowReverseCubeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorLowReverseCubeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-  }
-
-  public SwerveAutoBuilder getAutoBuilder() {
-    return m_autoBuilder;
-  }
-
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
@@ -477,56 +404,27 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "BlueOnePiece",
         new OnePiece(
-            "OnePiece",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator));
+            "OnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
 
     m_autoChooser.addOption(
         "TwoPiece",
         new TwoPiece(
-            "TwoPiece",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator));
+            "TwoPiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
 
     m_autoChooser.addOption(
         "PlaceOneBalance",
         new PlaceOneBalance(
-            "PlaceOneBalance",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision));
+            "PlaceOneBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     m_autoChooser.addOption(
         "JustBalance",
         new JustBalance(
-            "JustBalance",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision));
+            "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
         new BottomDriveForward(
             "BottomDriveForward",
-            m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -535,32 +433,32 @@ public class RobotContainer implements AutoCloseable {
             m_elevator));
 
     m_autoChooser.addOption(
-        "DriveForward",
-        new DriveForward("DriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+        "DriveForward", new DriveForward("DriveForward", m_swerveDrive, m_fieldSim, m_wrist));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     if (RobotBase.isSimulation()) {
-      autoPlotter = new SendableChooser<>();
-      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
-      dummy.add(new PathPlannerTrajectory());
-      autoPlotter.setDefaultOption("None", dummy);
-      String[] autos = {
-        "BlueTopTwoCone",
-        "BlueOnePiece",
-        "RedTopTwoCone",
-        "BlueBottomDriveForward",
-        "RedBottomDriveForward",
-        "BlueDriveForward",
-        "RedDriveForward"
-      };
-      for (var auto : autos) {
-        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
-        autoPlotter.addOption(auto, trajectory);
-      }
-
-      SmartDashboard.putData("Auto Visualizer", autoPlotter);
+      // TODO: Fix this; broke after rewrite
+      //      autoPlotter = new SendableChooser<>();
+      //      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+      //      dummy.add(new PathPlannerTrajectory());
+      //      autoPlotter.setDefaultOption("None", dummy);
+      //      String[] autos = {
+      //        "BlueTwoPiece",
+      //        "BlueOnePiece",
+      //        "RedTwoPiece",
+      //        "BlueBottomDriveForward",
+      //        "RedBottomDriveForward",
+      //        "BlueDriveForward",
+      //        "RedDriveForward"
+      //      };
+      //      for (var auto : autos) {
+      //        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+      //        autoPlotter.addOption(auto, trajectory);
+      //      }
+      //
+      //      SmartDashboard.putData("Auto Visualizer", autoPlotter);
     }
   }
 

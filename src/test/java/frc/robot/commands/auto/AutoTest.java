@@ -2,7 +2,6 @@ package frc.robot.commands.auto;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
@@ -23,7 +22,6 @@ public class AutoTest {
   protected Intake m_intake;
   protected Vision m_vision;
   protected FieldSim m_fieldSim;
-  protected SwerveAutoBuilder m_autoBuilder;
 
   @BeforeEach
   // this method will run before each test
@@ -36,7 +34,6 @@ public class AutoTest {
     m_intake = m_robotContainer.getIntake();
     m_vision = m_robotContainer.getVision();
     m_fieldSim = m_robotContainer.getFieldSim();
-    m_autoBuilder = m_robotContainer.getAutoBuilder();
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -55,14 +52,7 @@ public class AutoTest {
     double blueTrajectoryMaxY = SimConstants.fieldWidth - Units.inchesToMeters(90);
     var blueAuto =
         new OnePiece(
-            "BlueOnePiece",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator);
+            "BlueOnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator);
     var blueTrajectories = blueAuto.getTrajectory();
     for (var segment : blueTrajectories) {
       for (var state : segment.getStates()) {
@@ -84,14 +74,7 @@ public class AutoTest {
 
     var redAuto =
         new OnePiece(
-            "RedOnePiece",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator);
+            "RedOnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator);
     var redTrajectories = redAuto.getTrajectory();
     for (var segment : redTrajectories) {
       for (var state : segment.getStates()) {
