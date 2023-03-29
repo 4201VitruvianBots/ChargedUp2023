@@ -39,7 +39,7 @@ public class AntHoney extends SequentialCommandGroup {
         new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCone(intake, 0.3, vision, swerveDrive)),
+                new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)).withTimeout(2),
             new WaitCommand(2),
 
         new ParallelCommandGroup(
@@ -50,38 +50,41 @@ public class AntHoney extends SequentialCommandGroup {
 
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())).withTimeout(5),
         new AutoRunIntakeCone(intake, -0.3, vision, swerveDrive).withTimeout(2),
         new WaitCommand(1),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+        new AutoRunIntakeCone(intake, 0, vision, swerveDrive)).withTimeout(5),
         new WaitCommand(1),
 
         // TODO: CUBE
 
-    new ParallelCommandGroup(
+        new AutoRunIntakeCube(intake, 0, vision, swerveDrive).withTimeout(1),
+        new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCube(intake, 0.3, vision, swerveDrive)),
-            new WaitCommand(3),
+                new AutoRunIntakeCube(intake, 0.3, vision, swerveDrive)).withTimeout(2),
+            new WaitCommand(2),
 
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(1),
+            new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(3),
         new WaitCommand(0.5),
+
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())).withTimeout(5),
         new AutoRunIntakeCube(intake, -0.3, vision, swerveDrive).withTimeout(2),
         new WaitCommand(1),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        new AutoRunIntakeCube(intake, 0, vision, swerveDrive).withTimeout(1),
-        new WaitCommand(1))));
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+        new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(5),
+        new WaitCommand(1)
+        )));
       
   }
 }
