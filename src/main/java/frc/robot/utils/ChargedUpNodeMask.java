@@ -1,6 +1,7 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.SCORING_STATE;
@@ -38,7 +39,15 @@ public class ChargedUpNodeMask {
   private static final long redHighCubeNodes = blueHighCubeNodes << 32;
   private static final long blueCoopertitionNodes = redCoopertitionNodes << 32;
 
+  private static final long blueConeNodes = blueHybridNodes | blueMidConeNodes | blueHighConeNodes;
+  private static final long blueCubeNodes = blueHybridNodes | blueMidCubeNodes | blueHighCubeNodes;
+  private static final long redConeNodes = blueConeNodes << 32;
+  private static final long redCubeNodes = blueCubeNodes << 32;
+  private static final long coneNodes = blueConeNodes | redConeNodes;
+  private static final long cubeNodes = blueCubeNodes | redCubeNodes;
+
   private static long ignoredNodes = 0;
+  private static long validNodeMask = 0;
 
   private static ArrayList<Translation2d> validNodes = new ArrayList<>();
 
@@ -81,9 +90,7 @@ public class ChargedUpNodeMask {
   }
 
   public static void updateValidNodes(Pose2d robotPose, SCORING_STATE scoringState) {
-    validNodes.clear();
-
-    long validNodeMask = 0xFFFF_FFFF_FFFF_FFFFL;
+    validNodeMask = 0xFFFF_FFFF_FFFF_FFFFL;
     boolean usingRedNodes;
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       if (robotPose.getX() > SimConstants.fieldLength / 2) {
@@ -115,7 +122,11 @@ public class ChargedUpNodeMask {
       validNodeMask = validNodeMask & (usingRedNodes ? redHighCubeNodes : blueHighCubeNodes);
     }
 
-    validNodeMask = validNodeMask - ignoredNodes;
+    validNodeMask = validNodeMask & ~(ignoredNodes);
+  }
+
+  public static ArrayList<Translation2d> getValidNodes() {
+    validNodes.clear();
 
     for (int i = 0; i < allNodes.size(); i++) {
       long mask = 1L << i;
@@ -124,18 +135,23 @@ public class ChargedUpNodeMask {
         validNodes.add(allNodes.get(i));
       }
     }
-  }
 
-  public static ArrayList<Translation2d> getValidNodes() {
     return validNodes;
   }
 
   public static Pose2d getTargetNode(Pose2d robotPose) {
-    return new Pose2d();
+    var validNodes = getValidNodes();
+    if (validNodes.size() == 0) return new Pose2d();
+    else
+      return new Pose2d(robotPose.getTranslation().nearest(validNodes), Rotation2d.fromDegrees(0));
   }
 
   // TODO: change second argument to an enum
   public static Pose2d getTargetNode(Pose2d robotPose, int gamePieceType) {
-    return new Pose2d();
+    validNodeMask = validNodeMask & ~(gamePieceType == 0 ? coneNodes : cubeNodes);
+    var validNodes = getValidNodes();
+    if (validNodes.size() == 0) return new Pose2d();
+    else
+      return new Pose2d(robotPose.getTranslation().nearest(validNodes), Rotation2d.fromDegrees(0));
   }
 }
