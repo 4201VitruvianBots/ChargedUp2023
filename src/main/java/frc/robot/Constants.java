@@ -424,30 +424,36 @@ public final class Constants {
       CUBE
     }
 
+    public enum ZONE {
+      ALPHA,
+      BETA,
+      GAMA,
+    }
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
-      DANGER_ZONE(0),
-      // LOW
-      STOWED(1),
-      INTAKE_LOW(1),
-      SCORE_LOW_REVERSE(1),
-      SCORE_LOW(1),
-      SCORE_LOW_CONE(1),
-      SCORE_LOW_CUBE(1),
-      LOW_ZONE(1),
+      DANGER_ZONE(ZONE.ALPHA.ordinal()),
+      // LOWs
+      STOWED(ZONE.ALPHA.ordinal()),
+      INTAKE_LOW(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_REVERSE(ZONE.ALPHA.ordinal()),
+      SCORE_LOW(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_CONE(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_CUBE(ZONE.ALPHA.ordinal()),
+      LOW_ZONE(ZONE.ALPHA.ordinal()),
       // MID
-      MID_ZONE(2),
+      MID_ZONE(ZONE.BETA.ordinal()),
       // HIGH
-      HIGH_ZONE(3),
+      HIGH_ZONE(ZONE.GAMA.ordinal()),
       // EXTENDED
-      EXTENDED_ZONE(4),
-      INTAKE_EXTENDED(4),
-      SCORE_MID(4),
-      SCORE_HIGH(4),
-      SCORE_MID_CONE(4),
-      SCORE_MID_CUBE(4),
-      SCORE_HIGH_CONE(4),
-      SCORE_HIGH_CUBE(4);
+      EXTENDED_ZONE(ZONE.GAMA.ordinal()),
+      INTAKE_EXTENDED(ZONE.GAMA.ordinal()),
+      SCORE_MID(ZONE.GAMA.ordinal()),
+      SCORE_HIGH(ZONE.GAMA.ordinal()),
+      SCORE_MID_CONE(ZONE.GAMA.ordinal()),
+      SCORE_MID_CUBE(ZONE.GAMA.ordinal()),
+      SCORE_HIGH_CONE(ZONE.GAMA.ordinal()),
+      SCORE_HIGH_CUBE(ZONE.GAMA.ordinal());
 
       // State Zone is determined by elevator setpoints
       private final int zone;

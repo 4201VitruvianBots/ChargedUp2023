@@ -508,11 +508,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         break;
       default:
       case LIMITED:
-      m_nextZonePub.set(getNextZone().toString());
-      m_elevatorUpperLimPub.set(Units.metersToInches(elevatorUpperLimitMeters));
-      m_elevatorLowerLimPub.set(Units.metersToInches(elevatorLowerLimitMeters));
-      m_wristUpperLimPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
-      m_wristLowerLimPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
+        m_nextZonePub.set(getNextZone().toString());
+        m_elevatorUpperLimPub.set(Units.metersToInches(elevatorUpperLimitMeters));
+        m_elevatorLowerLimPub.set(Units.metersToInches(elevatorLowerLimitMeters));
+        m_wristUpperLimPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
+        m_wristLowerLimPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
         break;
     }
   }
