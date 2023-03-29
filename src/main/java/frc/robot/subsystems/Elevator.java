@@ -49,7 +49,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // TODO: Review variables
   // Initializing both motors
-  public final TalonFX[] elevatorMotors = {
+  private final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
   };
 
@@ -57,10 +57,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final DigitalInput lowerLimitSwitch =
       new DigitalInput(Constants.DIO.elevatorLowerLimitSwitch);
   private boolean lowerLimitSwitchTriggered = false;
-
-  // TODO: Is this necessary? If not, remove it
-  private static double heightMeters =
-      0; // the amount of meters the motor has moved up from the initial stowed position
 
   // Constants with value determined at runtime
   private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
@@ -81,11 +77,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // the motors.
   private boolean isClosedLoop = true;
 
-  // TODO: Is this necessary? If not, remove it
-  // True if elevator motors are actively moving towards a setpoint
-  private boolean isElevatorElevatingElevatando = false;
-
-  // TODO: Is this necessary? If not, remove it
   // This is used in limiting the elevator's speed once we reach the top of the elevator
   private double currentForwardOutput = 0;
   private double newForwardOutput = 0;
@@ -139,10 +130,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 50, maxHeightMeters * 50);
-  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxHeightMeters * 25, 0);
+  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters, maxHeightMeters);
+  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxHeightMeters / 2, 0);
   public MechanismLigament2d elevatorLigament2d =
-      root2d.append(new MechanismLigament2d("Elevator", heightMeters, 90));
+      root2d.append(new MechanismLigament2d("Elevator", getHeightMeters(), 90));
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
@@ -183,7 +174,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
 
-    initShuffleboard(m_limitCanUtil);
+    initShuffleboard();
     m_timer.reset();
     m_timer.start();
   }
@@ -194,17 +185,23 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Setting the raw output of the motors
-  public void setPercentOutput(double output) {
+  public void setPercentOutput(double output, boolean enforceLimits) {
     // If we have activated our limit switch, do not move the elevator backward
     if (getLimitSwitch() && output < 0) output = Math.max(output, 0);
+
+    // Enforce limits if requested
+    if (enforceLimits) {
+      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254))
+        output = Math.min(output, 0);
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) 
+        output = Math.max(output, 0);
+    }
+
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-  // TODO: Is this outdated? If so, remove it
-  // Not currently used by the main logic
-  public void setSetpointMotionMagicMeters(double setpoint) {
-    elevatorMotors[0].set(
-        TalonFXControlMode.MotionMagic, setpoint / Constants.ELEVATOR.encoderCountsToMeters);
+  public void setPercentOutput(double output) {
+    setPercentOutput(output, false);
   }
 
   // Clamp the desired setpoint to within our lower and upper limits
@@ -221,20 +218,18 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         (m_feedForward.calculate(state.velocity) / 12.0));
   }
 
-  // TODO: Rename for clarity
   // Sets the setpoint to our current height, effectively keeping the elevator in place.
-  public void resetState() {
-    m_setpoint = new TrapezoidProfile.State(getHeightMeters(), getVelocityMeters());
+  public void haltPosition() {
+    m_setpoint = new TrapezoidProfile.State(getHeightMeters(), getVelocityMetersPerSecond());
   }
 
   // Elevator's height position
   public double getHeightMeters() {
     return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
   }
-
-  // TODO: Rename for clarity
+  
   // Returns the elevator's velocity in meters per second.
-  public double getVelocityMeters() {
+  public double getVelocityMetersPerSecond() {
     return elevatorMotors[0].getSelectedSensorVelocity()
         * Constants.ELEVATOR.encoderCountsToMeters
         * 10;
@@ -248,14 +243,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return elevatorMotors[0].getMotorOutputVoltage();
   }
 
-  // TODO: Is this necessary? If not, remove it
+  // Returns true if elevator is within half of an inch of its set position
   public boolean getIsElevating() {
-    return isElevatorElevatingElevatando;
-  }
-
-  // TODO: Is this necessary? If not, remove it
-  public boolean setIsElevating(boolean state) {
-    return isElevatorElevatingElevatando = state;
+    return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
   }
 
   // Returns true if limit switch is activated
@@ -267,11 +257,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Usually used to zero the motors if the robot is started in a non-stowed position
   public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
-  }
-
-  // TODO: Is this necessary? If not, remove it
-  public ELEVATOR.SETPOINT getSetpointState() {
-    return m_desiredHeightState;
   }
 
   public void setSetpointState(ELEVATOR.SETPOINT heightEnum) {
@@ -314,12 +299,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_joystickInput = m_joystickY;
   }
 
-  // TODO: Is this necessary? If not, remove it
-  public void setUserSetpoint(boolean bool) {
-    m_userSetpoint = bool;
-  }
-
-  // TODO: Is this necessary? If not, remove it
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
@@ -354,9 +333,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         0);
   }
 
-  // TODO: Remove CAN_UTIL_LIMIT from function args
   // Initializes shuffleboard values. Does not update them
-  private void initShuffleboard(CAN_UTIL_LIMIT limitCan) {
+  private void initShuffleboard() {
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData("Elevator Sim", mech2d);
     }
@@ -401,15 +379,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
-  // TODO: Remove CAN_UTIL_LIMIT from function args
-  public void updateShuffleboard(CAN_UTIL_LIMIT limitCan) {
+  public void updateShuffleboard() {
     SmartDashboard.putBoolean("Elevator Closed Loop", getClosedLoopState());
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
 
-    switch (limitCan) {
+    switch (m_limitCanUtil) {
       case NORMAL:
         // Put not required stuff here
         kEncoderCountsPub.set(getHeightEncoderCounts());
@@ -430,7 +407,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public void updateLog() {
     outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
     setpointMetersEntry.append(m_desiredPositionInputMeters);
-    positionMetersEntry.append(heightMeters);
+    positionMetersEntry.append(getHeightMeters());
   }
 
   // Will severely limit the forward output of the motors when the elevator is fully extended to
@@ -456,7 +433,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
       lowerLimitSwitchTriggered = false;
     }
-    heightMeters = getHeightMeters();
   }
 
   @Override
@@ -495,24 +471,21 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
     // directly setting the length to meters
-    // TODO: Make the mech2d proportional
-    elevatorLigament2d.setLength(Units.metersToInches(elevatorSim.getPositionMeters()));
+    elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
     updateLog();
-    updateShuffleboard(
-        m_limitCanUtil); // Yes, this needs to be called in the periodic. The simulation does not
-    // work without this
+    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not work without this
     updateHeightMeters();
     updateForwardOutput();
 
     // TODO: Rewrite logic
     if (isClosedLoop) {
       switch (m_controlState) {
-          // Default joystick control
+        // Default joystick control
         case CLOSED_LOOP_MANUAL:
           m_desiredPositionOutputMeters =
               MathUtil.clamp(
@@ -520,23 +493,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
                   ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
                   ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
           break;
-          // Called when setting to open loop
+        // Called when setting to open loop
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
-          if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
-            percentOutput = Math.min(percentOutput, 0);
-          }
-          if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) {
-            percentOutput = Math.max(percentOutput, 0);
-          }
-          setPercentOutput(percentOutput);
+          setPercentOutput(percentOutput, true);
           break;
         case USER_SETPOINT:
           m_desiredPositionOutputMeters =
               m_desiredPositionInputMeters
                   + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
           break;
-          // Called in test mode when a user-defined setpoint is set in shuffleboard
+        // Called in test mode when a user-defined setpoint is set in shuffleboard
         case TEST_SETPOINT:
           m_desiredPositionOutputMeters = Units.inchesToMeters(kSetpointSub.get(0));
           break;
@@ -568,19 +535,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
         setSetpointTrapezoidState(commandedSetpoint);
       }
-      // Guarenteed open loop control
+    // Guarenteed open loop control
     } else {
       double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
-      // Enforces limits. In this way it is not truly open loop, but it'll prevent the robot from
-      // breaking
-      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254)) {
-        percentOutput = Math.min(percentOutput, 0);
-      }
-      if (getHeightMeters() < (getLowerLimitMeters() + 0.0015)) {
-        percentOutput = Math.max(percentOutput, 0);
-      }
       // Sets final percent output
-      setPercentOutput(percentOutput);
+      // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
+      setPercentOutput(percentOutput, true);
     }
   }
 

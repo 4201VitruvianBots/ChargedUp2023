@@ -34,10 +34,8 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setIsElevating(true);
     m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
     m_elevator.setDesiredPositionMeters(m_setpoint);
-    m_elevator.setUserSetpoint(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -53,8 +51,6 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setUserSetpoint(false);
-    m_elevator.setIsElevating(false);
     //    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
     //    m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
   }

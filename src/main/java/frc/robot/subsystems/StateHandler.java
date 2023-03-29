@@ -572,7 +572,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           m_wrist.getHorizontalTranslation().getX(),
           m_scoringState);
       m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
-      m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
+      m_elevator.setDesiredPositionMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
