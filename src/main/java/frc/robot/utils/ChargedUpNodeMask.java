@@ -13,7 +13,9 @@ import java.util.Map;
 
 /** Step 1: Define all nodes in an ArrayList Step 2: Use bit masks Step 3: ??? Step 4: Profit */
 public class ChargedUpNodeMask {
-  private static Map<Integer, Translation2d> allNodes = new HashMap<>();
+  private static final Map<Integer, Translation2d> blueNodes = new HashMap<>();
+  private static final Map<Integer, Translation2d> redNodes = new HashMap<>();
+  private static Map<Integer, Translation2d> currentNodes = redNodes;
 
   /** Node Definitions */
   // Starting with Blue Nodes, numbering starts at 0 with the rightmost LOW_HYBRID node, closest to
@@ -22,117 +24,110 @@ public class ChargedUpNodeMask {
   // double substation and
   // 29 is the right Blue double substation.
   // Red Node numbering is mirrored from blue nodes given the same pattern from above.
-  private static final long blueNodes = 0b0000_0111_1111_1111_1111_1111_1111_1111L;
+  private static final int nodes = 0b0000_0111_1111_1111_1111_1111_1111_1111;
 
-  private static final long blueHybridNodes = 0b0000_0000_0000_0000_0000_0001_1111_1111L;
-  private static final long blueMidConeNodes = 0b0000_0000_0000_0010_1101_1010_0000_0000L;
-  private static final long blueMidCubeNodes = 0b0000_0000_0000_0001_0010_0100_0000_0000L;
-  private static final long blueHighConeNodes = 0b0000_0101_1011_0100_0000_0000_0000_0000L;
-  private static final long blueHighCubeNodes = 0b0000_0010_0100_1000_0000_0000_0000_0000L;
-  private static final long redCoopertitionNodes = 0b0000_0000_1110_0000_0111_0000_0011_1000L;
+  private static final int hybridNodes = 0b0000_0000_0000_0000_0000_0001_1111_1111;
+  private static final int midConeNodes = 0b0000_0000_0000_0010_1101_1010_0000_0000;
+  private static final int midCubeNodes = 0b0000_0000_0000_0001_0010_0100_0000_0000;
+  private static final int highConeNodes = 0b0000_0101_1011_0100_0000_0000_0000_0000;
+  private static final int highCubeNodes = 0b0000_0010_0100_1000_0000_0000_0000_0000;
 
-  private static final long redNodes = blueNodes << 32;
-  private static final long redHybridNodes = blueHybridNodes << 32;
-  private static final long redMidConeNodes = blueMidConeNodes << 32;
-  private static final long redMidCubeNodes = blueMidCubeNodes << 32;
-  private static final long redHighConeNodes = blueHighConeNodes << 32;
-  private static final long redHighCubeNodes = blueHighCubeNodes << 32;
-  private static final long blueCoopertitionNodes = redCoopertitionNodes << 32;
+  private static final int coopertitionNodes = 0b0000_0000_1110_0000_0111_0000_0011_1000;
+  private static final int coneNodes = hybridNodes | midConeNodes | highConeNodes;
+  private static final int cubeNodes = hybridNodes | midCubeNodes | highCubeNodes;
 
-  private static final long blueConeNodes = blueHybridNodes | blueMidConeNodes | blueHighConeNodes;
-  private static final long blueCubeNodes = blueHybridNodes | blueMidCubeNodes | blueHighCubeNodes;
-  private static final long redConeNodes = blueConeNodes << 32;
-  private static final long redCubeNodes = blueCubeNodes << 32;
-  private static final long coneNodes = blueConeNodes | redConeNodes;
-  private static final long cubeNodes = blueCubeNodes | redCubeNodes;
+  private static int ignoredRedNodes = 0;
+  private static int ignoredBlueNodes = 0;
+  private static int validNodeMask = 0;
 
-  private static long ignoredNodes = 0;
-  private static long validNodeMask = 0;
+  private static final ArrayList<Translation2d> validNodes = new ArrayList<>();
 
-  private static ArrayList<Translation2d> validNodes = new ArrayList<>();
-
-  public static void initializeNodes() {
+  public static void initializeNodeMaps() {
     // Split nodes into separate lists to make it easier to filter
     for (int i = 0; i < SimConstants.Grids.lowTranslations.length; i++) {
-      allNodes.put(i, SimConstants.Grids.lowTranslations[i]);
-      allNodes.put(i + 32, SimConstants.allianceFlip(SimConstants.Grids.lowTranslations[i]));
+      blueNodes.put(i, SimConstants.Grids.lowTranslations[i]);
+      redNodes.put(i, SimConstants.allianceFlip(SimConstants.Grids.lowTranslations[i]));
     }
 
     for (int i = 0; i < SimConstants.Grids.midTranslations.length; i++) {
-      allNodes.put(i + 9, SimConstants.Grids.midTranslations[i]);
-      allNodes.put(i + 9 + 32, SimConstants.allianceFlip(SimConstants.Grids.midTranslations[i]));
+      blueNodes.put(i + 9, SimConstants.Grids.midTranslations[i]);
+      redNodes.put(i + 9, SimConstants.allianceFlip(SimConstants.Grids.midTranslations[i]));
     }
 
     for (int i = 0; i < SimConstants.Grids.highTranslations.length; i++) {
-      allNodes.put(i + 18, SimConstants.Grids.highTranslations[i]);
-      allNodes.put(i + 18 + 32, SimConstants.allianceFlip(SimConstants.Grids.highTranslations[i]));
+      blueNodes.put(i + 18, SimConstants.Grids.highTranslations[i]);
+      redNodes.put(i + 18, SimConstants.allianceFlip(SimConstants.Grids.highTranslations[i]));
     }
 
     // Padding
-    allNodes.put(27, new Translation2d());
-    allNodes.put(28, new Translation2d());
-    allNodes.put(29, new Translation2d());
-    allNodes.put(30, new Translation2d());
-    allNodes.put(31, new Translation2d());
-    allNodes.put(27 + 32, SimConstants.allianceFlip(new Translation2d()));
-    allNodes.put(28 + 32, SimConstants.allianceFlip(new Translation2d()));
-    allNodes.put(29 + 32, SimConstants.allianceFlip(new Translation2d()));
-    allNodes.put(30 + 32, SimConstants.allianceFlip(new Translation2d()));
-    allNodes.put(31 + 32, SimConstants.allianceFlip(new Translation2d()));
+    //    blueNodes.put(27, new Translation2d());
+    //    blueNodes.put(28, new Translation2d());
+    //    blueNodes.put(29, new Translation2d());
+    //    blueNodes.put(30, new Translation2d());
+    //    blueNodes.put(31, new Translation2d());
+    //    redNodes.put(27, SimConstants.allianceFlip(new Translation2d()));
+    //    redNodes.put(28, SimConstants.allianceFlip(new Translation2d()));
+    //    redNodes.put(29, SimConstants.allianceFlip(new Translation2d()));
+    //    redNodes.put(30, SimConstants.allianceFlip(new Translation2d()));
+    //    redNodes.put(31, SimConstants.allianceFlip(new Translation2d()));
   }
 
   public static void addIgnoredNode(int nodeIndex) {
-    ignoredNodes = ignoredNodes | 1L << nodeIndex;
+    if (nodeIndex < 32) ignoredBlueNodes = ignoredBlueNodes | 1 << nodeIndex;
+    else if (nodeIndex < 64) ignoredRedNodes = ignoredRedNodes | 1 << (nodeIndex - 32);
   }
 
   public static void removeIgnoredNode(int nodeIndex) {
-    ignoredNodes = ignoredNodes & ~(1L << nodeIndex);
+    if (nodeIndex < 32) ignoredBlueNodes = ignoredBlueNodes & ~(1 << nodeIndex);
+    else if (nodeIndex < 64) ignoredRedNodes = ignoredRedNodes & ~(1 << (nodeIndex - 32));
   }
 
   public static void updateValidNodes(Pose2d robotPose, SCORING_STATE scoringState) {
-    validNodeMask = 0xFFFF_FFFF_FFFF_FFFFL;
-    boolean usingRedNodes;
+    validNodeMask = 0xFFFF_FFFF;
+
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       if (robotPose.getX() > SimConstants.fieldLength / 2) {
-        validNodeMask = validNodeMask & redNodes;
-        usingRedNodes = true;
+        validNodeMask = nodes;
+        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        currentNodes = redNodes;
       } else {
-        validNodeMask = validNodeMask & blueCoopertitionNodes;
-        usingRedNodes = false;
+        validNodeMask = coopertitionNodes;
+        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        currentNodes = blueNodes;
       }
     } else {
       if (robotPose.getX() < SimConstants.fieldLength / 2) {
-        validNodeMask = validNodeMask & blueNodes;
-        usingRedNodes = false;
+        validNodeMask = nodes;
+        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        currentNodes = blueNodes;
       } else {
-        validNodeMask = validNodeMask & redCoopertitionNodes;
-        usingRedNodes = true;
+        validNodeMask = coopertitionNodes;
+        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        currentNodes = redNodes;
       }
     }
 
     if (scoringState == SCORING_STATE.LOW || scoringState == SCORING_STATE.LOW_REVERSE) {
-      validNodeMask = validNodeMask & (usingRedNodes ? redHybridNodes : blueHybridNodes);
+      validNodeMask = validNodeMask & hybridNodes;
     } else if (scoringState == SCORING_STATE.MID_CONE) {
-      validNodeMask = validNodeMask & (usingRedNodes ? redMidConeNodes : blueMidConeNodes);
+      validNodeMask = validNodeMask & midConeNodes;
     } else if (scoringState == SCORING_STATE.MID_CUBE) {
-      validNodeMask = validNodeMask & (usingRedNodes ? redMidCubeNodes : blueMidCubeNodes);
+      validNodeMask = validNodeMask & midCubeNodes;
     } else if (scoringState == SCORING_STATE.HIGH_CONE) {
-      validNodeMask = validNodeMask & (usingRedNodes ? redHighConeNodes : blueHighConeNodes);
+      validNodeMask = validNodeMask & highConeNodes;
     } else if (scoringState == SCORING_STATE.HIGH_CUBE) {
-      validNodeMask = validNodeMask & (usingRedNodes ? redHighCubeNodes : blueHighCubeNodes);
+      validNodeMask = validNodeMask & highCubeNodes;
     }
-
-    validNodeMask = validNodeMask & ~(ignoredNodes);
   }
 
   public static ArrayList<Translation2d> getValidNodes() {
     validNodes.clear();
 
-    for (int i = 0; i < allNodes.size(); i++) {
-      long mask = 1L << i;
-      long validNode = validNodeMask & mask;
+    for (int i = 0; i < 27; i++) {
+      int mask = 1 << i;
+      int validNode = validNodeMask & mask;
       if (validNode != 0) {
-        validNodes.add(allNodes.get(i));
+        validNodes.add(currentNodes.get(i));
       }
     }
 

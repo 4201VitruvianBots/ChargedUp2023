@@ -15,9 +15,7 @@ import frc.robot.RobotContainer;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.Controls;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,38 +25,35 @@ public class ChargedUpNodeMaskTest {
   protected RobotContainer m_robotContainer;
   protected Controls m_controls;
 
-  private static ArrayList<Pose2d> allNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> validNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> validNodes = new ArrayList<>();
 
-  private static ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> blueMidConeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> blueMidCubeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> blueHighConeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> blueHighCubeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> blueCoopertitionNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueMidConeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueMidCubeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueHighConeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueHighCubeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> blueCoopertitionNodes = new ArrayList<>();
 
-  private static ArrayList<Translation2d> blueNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redHybridNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redMidConeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redMidCubeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redHighConeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redHighCubeNodes = new ArrayList<>();
-  private static ArrayList<Translation2d> redCoopertitionNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redHybridNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redMidConeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redMidCubeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redHighConeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redHighCubeNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> redCoopertitionNodes = new ArrayList<>();
 
-  private static ArrayList<Translation2d> redNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> ignoredNodes = new ArrayList<>();
+  private static final ArrayList<Translation2d> ignoredNodes = new ArrayList<>();
 
   @BeforeAll
   static void setupNodeArrays() {
-    initializeNodes();
+    initializeNodeMaps();
 
     // Split nodes into separate lists to make it easier to filter
-    blueHybridNodes = new ArrayList<>(Arrays.asList(SimConstants.Grids.lowTranslations));
-    redHybridNodes =
-        blueHybridNodes.stream()
-            .map(SimConstants::allianceFlip)
-            .collect(Collectors.toCollection(ArrayList::new));
+    for (int i = 0; i < SimConstants.Grids.lowTranslations.length; i++) {
+      blueHybridNodes.add(SimConstants.Grids.lowTranslations[i]);
+      redHybridNodes.add(SimConstants.allianceFlip(SimConstants.Grids.lowTranslations[i]));
+    }
 
     for (int i = 0; i < SimConstants.Grids.nodeRowCount; i++) {
       boolean isCube = i == 1 || i == 4 || i == 7;
@@ -81,6 +76,17 @@ public class ChargedUpNodeMaskTest {
         redHighConeNodes.add(SimConstants.allianceFlip(SimConstants.Grids.highTranslations[i]));
       }
     }
+    blueNodes.addAll(blueHybridNodes);
+    blueNodes.addAll(blueMidConeNodes);
+    blueNodes.addAll(blueMidCubeNodes);
+    blueNodes.addAll(blueHighConeNodes);
+    blueNodes.addAll(blueHighCubeNodes);
+
+    redNodes.addAll(redHybridNodes);
+    redNodes.addAll(redMidConeNodes);
+    redNodes.addAll(redMidCubeNodes);
+    redNodes.addAll(redHighConeNodes);
+    redNodes.addAll(redHighCubeNodes);
 
     // Mark Cooperatition Nodes separately
     for (int i = 0; i < 3; i++) {
@@ -101,17 +107,6 @@ public class ChargedUpNodeMaskTest {
         redCoopertitionNodes.add(SimConstants.allianceFlip(gridRow[j]));
       }
     }
-    blueNodes.addAll(blueHybridNodes);
-    blueNodes.addAll(blueMidConeNodes);
-    blueNodes.addAll(blueMidCubeNodes);
-    blueNodes.addAll(blueHighConeNodes);
-    blueNodes.addAll(blueHighCubeNodes);
-
-    redNodes.addAll(redHybridNodes);
-    redNodes.addAll(redMidConeNodes);
-    redNodes.addAll(redMidCubeNodes);
-    redNodes.addAll(redHighConeNodes);
-    redNodes.addAll(redHighCubeNodes);
   }
 
   @BeforeEach
@@ -139,6 +134,7 @@ public class ChargedUpNodeMaskTest {
 
     state = SCORING_STATE.STOWED;
     updateValidNodes(robotPose, state);
+    var test = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redNodes));
 
     state = SCORING_STATE.LOW;
