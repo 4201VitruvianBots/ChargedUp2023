@@ -12,6 +12,7 @@ import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
@@ -39,19 +40,26 @@ public class PlaceOneBalance extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
     addCommands(
-        // TODO: Reset Odometry
-        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+        /** Setting Up Auto Zeros robot to path flips path if nessesary */
+        new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
+
+        /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
-        new WaitCommand(0.1),
-        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-        new WaitCommand(0.5),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)),
+
+        /** Outakes cone */
+        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive),
+        new WaitCommand(1),
+
+        /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        // autoPath,
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+            new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
+        swerveCommands.get(0),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
