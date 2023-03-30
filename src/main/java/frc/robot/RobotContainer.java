@@ -36,7 +36,6 @@ import frc.robot.commands.Intake.IntakeVisionAlignment;
 import frc.robot.commands.Intake.RunIntakeCone;
 import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.auto.AntHoney;
-import frc.robot.commands.auto.Exhibition;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.ResetElevatorHeightMeters;
@@ -508,9 +507,8 @@ public class RobotContainer implements AutoCloseable {
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
-    m_autoChooser.addOption("Exhibiton", new Exhibition());
     m_autoChooser.addOption(
-        "AntHoney",
+        "Exhibition",
         new AntHoney(
             m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
