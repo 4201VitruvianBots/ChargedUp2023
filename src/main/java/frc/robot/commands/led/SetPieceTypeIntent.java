@@ -36,6 +36,9 @@ public class SetPieceTypeIntent extends CommandBase {
     } else if (m_pieceType == INTAKING_STATES.CUBE) {
       m_led.expressState(LED_STATE.CUBE_BUTTON);
     }
+    else if (m_pieceType == INTAKING_STATES.RAINBOW) {
+      m_led.expressState(LED_STATE.RAINBOW);
+    }
   }
 
   // Called once the command ends or is interrupted.

@@ -99,7 +99,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
             new LarsonAnimation(red, green, blue, white, speed, LEDcount, BounceMode.Front, 7);
         break;
       case Rainbow: // neon cat type beat
-        m_toAnimate = new RainbowAnimation(1, speed, LEDcount);
+        m_toAnimate = new RainbowAnimation(0.5, speed, LEDcount);
         break;
       case RgbFade: // cycling between red, greed, and blue
         m_toAnimate = new RgbFadeAnimation(1, speed, LEDcount);
@@ -158,15 +158,17 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case ELEVATING:
           setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.ColorFlow);
           break;
-        case CHARGING_STATION:
-          setPattern(125, 125, 125, 125, 0, ANIMATION_TYPE.Rainbow);
+        case RAINBOW:
+          setPattern(125, 125, 125, 125, .5, ANIMATION_TYPE.Rainbow);
           break;
         case SCORING: // Flashing white
           setPattern(0, 0, 0, 255, 1, ANIMATION_TYPE.Strobe);
           break;
         case LOCKED_ON: // Flashing Green
-          setPattern(0, 255, 0, 0, 1, ANIMATION_TYPE.Strobe);
+          setPattern(0, 255, 0, 0, 
+          1, ANIMATION_TYPE.Strobe);
           break;
+        
         default:
           break;
       }

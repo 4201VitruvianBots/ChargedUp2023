@@ -209,6 +209,7 @@ public final class Constants {
       CUBE_BUTTON,
       CHARGING_STATION,
       SCORING,
+      RAINBOW,
       LOCKED_ON
     }
   }
@@ -359,7 +360,7 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(104.0)),
-      INTAKING_LOW(Units.degreesToRadians(-14.5)),
+      INTAKING_LOW(Units.degreesToRadians(-13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
@@ -421,7 +422,8 @@ public final class Constants {
       NONE,
       INTAKING,
       CONE,
-      CUBE
+      CUBE,
+      RAINBOW
     }
 
     public enum SUPERSTRUCTURE_STATE {

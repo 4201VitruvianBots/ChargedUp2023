@@ -6,14 +6,18 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.LED;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
@@ -26,7 +30,8 @@ public class AntHoney extends SequentialCommandGroup {
       Wrist wrist,
       Intake intake,
       Elevator elevator,
-      Vision vision) {
+      Vision vision,
+      LEDSubsystem led) {
 
     addCommands(
         //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
@@ -39,13 +44,15 @@ public class AntHoney extends SequentialCommandGroup {
         new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
-                new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)).withTimeout(2),
+                new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive),
+                new SetPieceTypeIntent(led, INTAKING_STATES.CONE)).withTimeout(2),
             new WaitCommand(2),
 
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive)).withTimeout(3),
+            new SetPieceTypeIntent(led, INTAKING_STATES.RAINBOW)).withTimeout(3),
+  new AutoRunIntakeCone(intake, 0.3, vision, swerveDrive),
         new WaitCommand(0.5),
 
         new ParallelCommandGroup(
@@ -65,24 +72,26 @@ public class AntHoney extends SequentialCommandGroup {
         new ParallelCommandGroup(
                 new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                new SetPieceTypeIntent(led, INTAKING_STATES.CUBE),
                 new AutoRunIntakeCube(intake, 0.3, vision, swerveDrive)).withTimeout(2),
             new WaitCommand(2),
 
         new ParallelCommandGroup(
+            new SetPieceTypeIntent(led, INTAKING_STATES.RAINBOW),
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-            new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(3),
+            new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(2.5),
         new WaitCommand(0.5),
 
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())).withTimeout(5),
+            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())).withTimeout(3),
         new AutoRunIntakeCube(intake, -0.3, vision, swerveDrive).withTimeout(2),
         new WaitCommand(1),
         new ParallelCommandGroup(
             new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-        new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(5),
+        new AutoRunIntakeCube(intake, 0, vision, swerveDrive)).withTimeout(3),
         new WaitCommand(1)
         )));
       
