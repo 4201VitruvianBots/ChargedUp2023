@@ -6,6 +6,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -31,22 +32,11 @@ public class JustBalance extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
     addCommands(
-        // TODO: Reset Odometry
-        new PlotAutoTrajectory(fieldSim, pathName, trajectories),
-        // new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-        //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-
-        // new ParallelCommandGroup(
-        //     new AutoSetElevatorDesiredSetpoint(elevator,
-        // ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-        //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
-        // new WaitCommand(0.1),
-        // new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
-        // new WaitCommand(0.5),
-        // new ParallelCommandGroup(
-        //     new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-        //     new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        // autoPath,
+    /** Setting Up Auto Zeros robot to path flips path if nessesary */
+    new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
+    new PlotAutoTrajectory(fieldSim, pathName, trajectories),
+    
+      swerveCommands.get(0),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));

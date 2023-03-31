@@ -40,7 +40,7 @@ public class TwoPiece extends SequentialCommandGroup {
 
     List<PathPlannerTrajectory> trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(12)));
+            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
 
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
@@ -108,7 +108,7 @@ public class TwoPiece extends SequentialCommandGroup {
 
         /** Places Cube */
         new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive),
-        new WaitCommand(0.3),
+        new WaitCommand(0.7),
 
         /** Stows and Stops Intake */
         new ParallelCommandGroup(
