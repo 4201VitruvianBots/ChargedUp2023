@@ -142,14 +142,12 @@ public final class Constants {
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(4)),
-      MID_MIN(Units.inchesToMeters(3)),
-      MID_MAX(Units.inchesToMeters(8)),
-      HIGH_MIN(Units.inchesToMeters(6)),
-      HIGH_MAX(Units.inchesToMeters(14)),
-      EXTENDED_MIN(Units.inchesToMeters(12)),
-      EXTENDED_MAX(ABSOLUTE_MAX.get());
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.inchesToMeters(4)),
+      BETA_MIN(Units.inchesToMeters(3.5)),
+      BETA_MAX(Units.inchesToMeters(28)),
+      GAMMA_MIN(Units.inchesToMeters(27.5)),
+      GAMMA_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 
@@ -384,14 +382,13 @@ public final class Constants {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.degreesToRadians(100.0)),
-      MID_MIN(Units.degreesToRadians(25.0)),
-      MID_MAX(Units.degreesToRadians(110.0)),
-      HIGH_MIN(MID_MIN.get()),
-      HIGH_MAX(Units.degreesToRadians(120.0)),
-      EXTENDED_MIN(HIGH_MIN.get()),
-      EXTENDED_MAX(ABSOLUTE_MAX.get()),
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.degreesToRadians(100.0)),
+      BETA_MIN(Units.degreesToRadians(25.0)),
+      BETA_MAX(Units.degreesToRadians(120.0)),
+      GAMMA_MIN(Units.degreesToRadians(90.0)),  //TODO: Maybe change this to 25.0 like it was before as extended
+      GAMMA_MAX(ABSOLUTE_MAX.get()),
+
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
@@ -427,7 +424,7 @@ public final class Constants {
     public enum ZONE {
       ALPHA,
       BETA,
-      GAMA,
+      GAMMA,
     }
 
     public enum SUPERSTRUCTURE_STATE {
@@ -440,20 +437,20 @@ public final class Constants {
       SCORE_LOW(ZONE.ALPHA.ordinal()),
       SCORE_LOW_CONE(ZONE.ALPHA.ordinal()),
       SCORE_LOW_CUBE(ZONE.ALPHA.ordinal()),
-      LOW_ZONE(ZONE.ALPHA.ordinal()),
+      ALPHA_ZONE(ZONE.ALPHA.ordinal()),
       // MID
-      MID_ZONE(ZONE.BETA.ordinal()),
+      BETA_ZONE(ZONE.BETA.ordinal()),
+      SCORE_MID(ZONE.BETA.ordinal()),
+      SCORE_MID_CONE(ZONE.BETA.ordinal()),
+      SCORE_MID_CUBE(ZONE.BETA.ordinal()),
       // HIGH
-      HIGH_ZONE(ZONE.GAMA.ordinal()),
+      GAMMA_ZONE(ZONE.GAMMA.ordinal()),
       // EXTENDED
-      EXTENDED_ZONE(ZONE.GAMA.ordinal()),
-      INTAKE_EXTENDED(ZONE.GAMA.ordinal()),
-      SCORE_MID(ZONE.GAMA.ordinal()),
-      SCORE_HIGH(ZONE.GAMA.ordinal()),
-      SCORE_MID_CONE(ZONE.GAMA.ordinal()),
-      SCORE_MID_CUBE(ZONE.GAMA.ordinal()),
-      SCORE_HIGH_CONE(ZONE.GAMA.ordinal()),
-      SCORE_HIGH_CUBE(ZONE.GAMA.ordinal());
+      EXTENDED_ZONE(ZONE.GAMMA.ordinal()),
+      INTAKE_EXTENDED(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH_CONE(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH_CUBE(ZONE.GAMMA.ordinal());
 
       // State Zone is determined by elevator setpoints
       private final int zone;
@@ -469,12 +466,10 @@ public final class Constants {
 
     public enum ZONE_TRANSITIONS {
       NONE,
-      LOW_TO_MID,
-      MID_TO_LOW,
-      MID_TO_HIGH,
-      HIGH_TO_MID,
-      HIGH_TO_EXTENDED,
-      EXTENDED_TO_HIGH,
+      ALPHA_TO_BETA, 
+      BETA_TO_ALPHA,
+      BETA_TO_GAMMA,
+      GAMMA_TO_BETA,
     }
 
     public enum SETPOINT {
