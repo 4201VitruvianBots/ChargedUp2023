@@ -24,7 +24,6 @@ import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
-import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -542,9 +541,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.FAST);
     } else {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.SLOW);
     }
 
     // TODO: Update this based on Intake sensors

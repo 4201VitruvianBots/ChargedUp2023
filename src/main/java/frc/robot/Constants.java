@@ -342,6 +342,11 @@ public final class Constants {
       AUTO_SETPOINT
     }
 
+    public enum WRIST_SPEED {
+      SLOW,
+      FAST
+    }
+
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(104.0)),

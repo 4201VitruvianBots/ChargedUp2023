@@ -26,10 +26,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.WRIST;
+import frc.robot.Constants.WRIST.WRIST_SPEED;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
-  // TODO: Review variables
   private double m_desiredSetpointInputRadians;
   private double m_desiredSetpointOutputRadians;
   private double m_commandedAngleRadians;
@@ -40,10 +40,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private double currentKI = 0;
   private double newKI = 0;
-
-  private double testKP;
-  private double testKI;
-  private double testKD;
 
   private double m_joystickInput;
   private boolean m_userSetpoint;
@@ -59,6 +55,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Intake m_intake;
 
   private static final DigitalInput lowerSwitch = new DigitalInput(Constants.DIO.wristLowerSwitch);
+
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
@@ -95,8 +92,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           false
           //          VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
-  // Logging setup
 
+  // Logging setup
   public DataLog log = DataLogManager.getLog();
   public DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
   public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
@@ -161,7 +158,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_joystickInput = input;
   }
 
-  // TODO: Is this necessary? If not, remove it
   public void setUserSetpoint(boolean bool) {
     m_userSetpoint = bool;
   }
@@ -322,12 +318,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       wristMotor.config_kI(0, newKI);
       currentKI = newKI;
     }
-  }
-
-  // TODO: Move to Constants.WRIST
-  public enum WRIST_SPEED {
-    SLOW,
-    FAST
   }
 
   //
