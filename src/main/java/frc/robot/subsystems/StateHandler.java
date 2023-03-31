@@ -371,10 +371,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MIN.get());
-          // }
         }
         break;
       case 2: // MID
@@ -384,20 +380,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.LOW_MAX.get());
-          // }
         } else if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < m_elevator.getHeightMeters()) {
           // MID -> HIGH
           if (WRIST.THRESHOLD.HIGH_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.HIGH_MIN.get());
-          // }
         }
         break;
       case 3: // HIGH
@@ -407,20 +395,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
-          // }
         } else if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < m_elevator.getHeightMeters()) {
           // HIGH -> EXTENDED
           if (WRIST.THRESHOLD.EXTENDED_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.EXTENDED_MIN.get());
-          // }
         }
         break;
       case 4: // EXTENDED
@@ -432,10 +412,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           }
-          // else if (!m_wrist.isUserControlled()) {
-          //   m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          //   m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
-          // }
         }
         break;
       default:
@@ -458,10 +434,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             wristUpperLimitRadians));
   }
 
-  // Whopper whopper whopper whopper
-  // junior double triple whopper
-  // flame grilled taste with perfect toppers
-  // I rule this day
   public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
     var elevatorPose =
         m_drive
