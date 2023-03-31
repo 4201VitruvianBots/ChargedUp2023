@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.*;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
@@ -25,15 +27,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
-  // TODO: Remove LED_STATE and tie it to STATEHANDLER constants
-  private LED_STATE currentRobotState = LED_STATE.DISABLED;
+  private SUPERSTRUCTURE_STATE currentRobotState;
   private boolean setSolid;
   private Animation m_toAnimate = null;
 
-  // TODO: Is this needed? If not, remove it.
-  private final Controls m_controls; // figure out during robotics class
-
-  private final int LEDcount = 72;
 
   private final StringPublisher ledStatePub;
   // Create LED strip
@@ -57,7 +54,6 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         CANdleStatusFrame.CANdleStatusFrame_Status_5_PixelPulseTrain, 255);
     m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_6_BottomPixels, 255);
     m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_7_TopPixels, 255);
-    m_controls = controls;
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
@@ -81,35 +77,35 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     switch (toChange) {
       case ColorFlow: // stripe of color flowing through the led strip
         m_toAnimate =
-            new ColorFlowAnimation(red, green, blue, white, speed, LEDcount, Direction.Forward);
+            new ColorFlowAnimation(red, green, blue, white, speed, LED.LEDcount, Direction.Forward);
         break;
       case Fire: // red and orange leds flaming up and down the led strip
-        m_toAnimate = new FireAnimation(0.5, 0.7, LEDcount, 0.7, 0.5);
+        m_toAnimate = new FireAnimation(0.5, 0.7, LED.LEDcount, 0.7, 0.5);
         break;
       case Larson: // a line bouncing back and forth with its width determined by size
         m_toAnimate =
-            new LarsonAnimation(red, green, blue, white, speed, LEDcount, BounceMode.Front, 7);
+            new LarsonAnimation(red, green, blue, white, speed, LED.LEDcount, BounceMode.Front, 7);
         break;
       case Rainbow: // neon cat type beat
-        m_toAnimate = new RainbowAnimation(1, speed, LEDcount);
+        m_toAnimate = new RainbowAnimation(1, speed, LED.LEDcount);
         break;
       case RgbFade: // cycling between red, greed, and blue
-        m_toAnimate = new RgbFadeAnimation(1, speed, LEDcount);
+        m_toAnimate = new RgbFadeAnimation(1, speed, LED.LEDcount);
         break;
       case SingleFade: // slowly turn all leds from solid color to off
-        m_toAnimate = new SingleFadeAnimation(red, green, blue, white, speed, LEDcount);
+        m_toAnimate = new SingleFadeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
       case Strobe: // switching between solid color and full off at high speed
-        m_toAnimate = new StrobeAnimation(red, green, blue, white, speed, LEDcount);
+        m_toAnimate = new StrobeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
       case Twinkle: // random leds turning on and off with certain color
         m_toAnimate =
-            new TwinkleAnimation(red, green, blue, white, speed, LEDcount, TwinklePercent.Percent6);
+            new TwinkleAnimation(red, green, blue, white, speed, LED.LEDcount, TwinklePercent.Percent6);
         break;
       case TwinkleOff: // twinkle in reverse
         m_toAnimate =
             new TwinkleOffAnimation(
-                red, green, blue, white, speed, LEDcount, TwinkleOffPercent.Percent100);
+                red, green, blue, white, speed, LED.LEDcount, TwinkleOffPercent.Percent100);
         break;
       case Solid:
         this.red = red;
@@ -126,41 +122,20 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
    * @param state the dominant robot state that LEDs will express
    */
   // will set LEDs a coordinated color for an action !TBD!
-  public void expressState(LED_STATE state) {
+  public void expressState(SUPERSTRUCTURE_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
-        case DISABLED: // Solid red
-          setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid);
-          break;
-        case INITIALIZED:
-          setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Twinkle);
-          break;
-        case LOW_BATTERY:
-          setPattern(255, 165, 0, 0, 0, ANIMATION_TYPE.Strobe);
-        break;
-        case ENABLED: // Solid green
-          setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
-          break;
-        case INTAKING: // Solid blue
+        case INTAKE_LOW: // Solid Blue
           setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
           break;
-        case CONE_BUTTON: // Solid Yellow
-          setPattern(150, 120, 0, 0, 0, ANIMATION_TYPE.Solid);
+        case SCORE_LOW: // Solid Orange
+          setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
           break;
-        case CUBE_BUTTON: // Solid purple
-          setPattern(128, 0, 128, 0, 0, ANIMATION_TYPE.Solid);
-          break;
-        case ELEVATING:
-          setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.ColorFlow);
-          break;
-        case CHARGING_STATION:
-          setPattern(125, 125, 125, 125, 0, ANIMATION_TYPE.Rainbow);
-          break;
-        case SCORING: // Flashing White
-          setPattern(100, 100, 100, 15, 0, ANIMATION_TYPE.Solid);
-          break;
-        case LOCKED_ON: // Flashing Green
-          setPattern(0, 255, 0, 0, 1, ANIMATION_TYPE.Strobe);
+        case SCORE_MID: // Solid White
+          setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
+        break;
+        case SCORE_HIGH: // Solid Pink
+          setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
           break;
         default:
           break;
@@ -174,27 +149,16 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     // null indicates that the animation is "Solid"
     if (m_toAnimate == null && !setSolid) {
       setSolid = true;
-      m_candle.setLEDs(red, green, blue, 0, 0, LEDcount); // setting all LEDs to color
+      m_candle.setLEDs(red, green, blue, 0, 0, LED.LEDcount); // setting all LEDs to color
     } else {
       setSolid = false;
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
-    if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
-      expressState(LED_STATE.LOW_BATTERY);
-    }
+
 
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
-  // TODO: Remove this and tie this to STATEHANDLER constants
-  public INTAKING_STATES getPieceIntent() {
-    return pieceIntent;
-  }
-
-  // TODO: Is this needed? If not, remove it
-  public void setPieceIntent(INTAKING_STATES type) {
-    pieceIntent = type;
-  }
 
   @Override
   public void close() throws Exception {}

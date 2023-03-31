@@ -31,8 +31,6 @@ import frc.robot.commands.auto.*;
 // import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
-import frc.robot.commands.led.SetPieceTypeIntent;
-import frc.robot.commands.led.SetScoringState;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -119,7 +117,7 @@ public class RobotContainer implements AutoCloseable {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_stateHandler));
 
     SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
@@ -176,7 +174,6 @@ public class RobotContainer implements AutoCloseable {
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
 
     // Score MID Setpoints
-    xboxController.b().whileTrue(new SetScoringState(m_led, ELEVATOR.SETPOINT.SCORE_MID_CONE));
     xboxController
         .b()
         .whileTrue(
@@ -209,7 +206,6 @@ public class RobotContainer implements AutoCloseable {
                 m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
 
     // High
-    xboxController.y().whileTrue(new SetScoringState(m_led, ELEVATOR.SETPOINT.SCORE_HIGH_CONE));
     xboxController
         .y()
         .whileTrue(
@@ -240,13 +236,11 @@ public class RobotContainer implements AutoCloseable {
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .rightBumper()
         .whileTrue(
             new SetWristDesiredSetpoint(
                 m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
         .whileTrue(

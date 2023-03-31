@@ -169,6 +169,8 @@ public final class Constants {
 
   public static final class LED {
 
+    public static final int LEDcount = 72;
+
     /** Different LED animation types */
     public enum ANIMATION_TYPE {
       ColorFlow,
@@ -186,16 +188,7 @@ public final class Constants {
     /** Different robot states */
     public enum LED_STATE {
       DISABLED,
-      INITIALIZED,
       ENABLED,
-      INTAKING,
-      ELEVATING,
-      WRIST,
-      CONE_BUTTON,
-      CUBE_BUTTON,
-      CHARGING_STATION,
-      SCORING,
-      LOCKED_ON,
       LOW_BATTERY
     }
   }
