@@ -11,7 +11,7 @@ import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
-public class SetElevatorDesiredSetpoint extends CommandBase {
+public class SetElevatorSetpoint extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
@@ -19,11 +19,11 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
 
   private final double m_setpoint;
 
-  public SetElevatorDesiredSetpoint(Elevator elevator, double setpoint) {
+  public SetElevatorSetpoint(Elevator elevator, double setpoint) {
     this(elevator, setpoint, () -> 0);
   }
 
-  public SetElevatorDesiredSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
+  public SetElevatorSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_setpoint = setpoint;
@@ -34,14 +34,14 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);

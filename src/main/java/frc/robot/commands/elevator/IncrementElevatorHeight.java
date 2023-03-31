@@ -40,7 +40,7 @@ public class IncrementElevatorHeight extends CommandBase {
 
     if (joystickYDeadbandOutput != 0.0) {
 
-      if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
+      if (m_elevator.getControlState() == ELEVATOR.STATE.CLOSED_LOOP) {
         m_elevator.setJoystickY(-joystickYDeadbandOutput);
       } else {
         m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);

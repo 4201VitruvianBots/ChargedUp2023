@@ -44,10 +44,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR.STATE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
-  // TODO: Review variables
   // Initializing both motors
   private final TalonFX[] elevatorMotors = {
     new TalonFX(Constants.CAN.elevatorMotorLeft), new TalonFX(Constants.CAN.elevatorMotorRight)
@@ -58,10 +58,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       new DigitalInput(Constants.DIO.elevatorLowerLimitSwitch);
   private boolean lowerLimitSwitchTriggered = false;
 
-  // Constants with value determined at runtime
   private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
-  private final int simEncoderSign =
-      Constants.ELEVATOR.mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
   private double m_desiredPositionInputMeters; // The height in meters our robot is trying to reach
   private double m_desiredPositionOutputMeters; // The height in meters our robot is trying to reach
@@ -90,20 +87,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   // Trapezoid profile setup
-  private final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-      new TrapezoidProfile.Constraints(
-          Constants.ELEVATOR.kMaxVel * .5, Constants.ELEVATOR.kMaxAccel);
-  private final TrapezoidProfile.Constraints m_slowConstraints =
-      new TrapezoidProfile.Constraints(Constants.ELEVATOR.kMaxVel, Constants.ELEVATOR.kMaxAccel);
-  private final TrapezoidProfile.Constraints m_fastConstraints =
-      new TrapezoidProfile.Constraints(
-          Constants.ELEVATOR.kMaxVel * 1.3, Constants.ELEVATOR.kMaxAccel * 1.3);
-  private TrapezoidProfile.Constraints m_currentConstraints = m_slowConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints = Constants.ELEVATOR.m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(
           Constants.ELEVATOR.kG, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
+  // This timer is used to calculate the time since the previous periodic run to determine our new setpoint
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -200,8 +190,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
+  // Enforces limits by default
   public void setPercentOutput(double output) {
-    setPercentOutput(output, false);
+    setPercentOutput(output, true);
   }
 
   // Clamp the desired setpoint to within our lower and upper limits
@@ -210,6 +201,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
   }
 
+  // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
@@ -235,12 +227,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         * 10;
   }
 
+  // Returns the raw sensor position with no conversions
   public double getHeightEncoderCounts() {
     return elevatorMotors[0].getSelectedSensorPosition();
-  }
-
-  public double getMotorOutputVoltage() {
-    return elevatorMotors[0].getMotorOutputVoltage();
   }
 
   // Returns true if elevator is within half of an inch of its set position
@@ -257,10 +246,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Usually used to zero the motors if the robot is started in a non-stowed position
   public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
-  }
-
-  public void setSetpointState(ELEVATOR.SETPOINT heightEnum) {
-    m_desiredHeightState = heightEnum;
   }
 
   public void setDesiredPositionMeters(double meters) {
@@ -317,10 +302,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return isClosedLoop;
   }
 
+  // Sets the control state of the elevator
   public void setControlState(ELEVATOR.STATE state) {
-    m_controlState = state;
+    // If we are in open loop override, no other control states will be set except open loop.
+    if (isClosedLoop) {
+      m_controlState = state;
+    } else {
+      m_controlState = STATE.OPEN_LOOP_MANUAL;
+    }
   }
 
+  // Returns the current control state enum
   public ELEVATOR.STATE getControlState() {
     return m_controlState;
   }
@@ -450,7 +442,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (simEncoderSign
+                (Constants.ELEVATOR.simEncoderSign
                     * elevatorSim.getPositionMeters()
                     / Constants.ELEVATOR.encoderCountsToMeters));
 
@@ -460,7 +452,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign
+                (Constants.ELEVATOR.simEncoderSign
                     * elevatorSim.getVelocityMetersPerSecond()
                     / Constants.ELEVATOR.encoderCountsToMeters
                     * 10));
@@ -482,65 +474,47 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateHeightMeters();
     updateForwardOutput();
 
-    // TODO: Rewrite logic
-    if (isClosedLoop) {
-      switch (m_controlState) {
-        // Default joystick control
-        case CLOSED_LOOP_MANUAL:
-          m_desiredPositionOutputMeters =
-              MathUtil.clamp(
-                  m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier + getHeightMeters(),
-                  ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
-                  ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get());
-          break;
-        // Called when setting to open loop
-        case OPEN_LOOP_MANUAL:
-          double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
-          setPercentOutput(percentOutput, true);
-          break;
-        case USER_SETPOINT:
-          m_desiredPositionOutputMeters =
-              m_desiredPositionInputMeters
-                  + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
-          break;
-        // Called in test mode when a user-defined setpoint is set in shuffleboard
-        case TEST_SETPOINT:
-          m_desiredPositionOutputMeters = Units.inchesToMeters(kSetpointSub.get(0));
-          break;
-        default:
-        case AUTO_SETPOINT:
-          m_desiredPositionOutputMeters = m_desiredPositionInputMeters;
-          break;
-      }
-      // Trapezoid profile stuff
-      // Will only run when enabled (is this necessary?) and we are not in open loop override
-      if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-        // Updates the constraints, or limits, of the elevator
-        if (m_desiredPositionInputMeters - getHeightMeters() > 0)
-          m_currentConstraints = m_fastConstraints;
-        else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
-          m_currentConstraints = m_stopSlippingConstraints;
-        } else m_currentConstraints = m_slowConstraints;
+    switch (m_controlState) {
+      // Called when setting to open loop
+      case OPEN_LOOP_MANUAL:
+        double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
+        // Sets final percent output
+        // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
+        setPercentOutput(percentOutput, true);
+        break;
+      // Used by the buttons and closed loop manual control (although no code currently exists to handle this state)
+      case CLOSED_LOOP:
+        m_desiredPositionOutputMeters =
+            m_desiredPositionInputMeters
+                + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
+      break;
+      default:
+      case AUTO_SETPOINT:
+        m_desiredPositionOutputMeters = m_desiredPositionInputMeters;
+        break;
+    }
+    // Trapezoid profile stuff
+    // Will only run when enabled (is this necessary?) and we are not in open loop override
+    if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+      // Updates the constraints of the elevator
+      if (m_desiredPositionInputMeters - getHeightMeters() > 0)
+        m_currentConstraints = Constants.ELEVATOR.m_fastConstraints;
+      else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
+        m_currentConstraints = Constants.ELEVATOR.m_stopSlippingConstraints;
+      } else m_currentConstraints = Constants.ELEVATOR.m_slowConstraints;
 
-        // Updates our trapezoid profile state based on the time since our last periodic and our
-        // recorded change in height
-        m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
-        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        double currentTime = m_timer.get();
-        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
-        m_lastTimestamp = currentTime;
+      // Updates our trapezoid profile state based on the time since our last periodic and our
+      // recorded change in height
+      m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
+      TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+      double currentTime = m_timer.get();
+      m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
+      m_lastTimestamp = currentTime;
 
-        var commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
-        m_commandedPositionMeters = commandedSetpoint.position;
-        kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
-        setSetpointTrapezoidState(commandedSetpoint);
-      }
-    // Guarenteed open loop control
-    } else {
-      double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
-      // Sets final percent output
-      // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
-      setPercentOutput(percentOutput, true);
+      TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
+      m_commandedPositionMeters = commandedSetpoint.position;
+      kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
+      setSetpointTrapezoidState(commandedSetpoint);
     }
   }
 

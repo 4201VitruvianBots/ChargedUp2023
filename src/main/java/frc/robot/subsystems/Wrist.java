@@ -483,7 +483,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           }
           setPercentOutput(percentOutput);
           break;
-        case USER_SETPOINT:
+        case CLOSED_LOOP:
           m_desiredSetpointOutputRadians =
               m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
           break;
