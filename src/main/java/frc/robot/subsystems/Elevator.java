@@ -84,7 +84,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(
           Constants.ELEVATOR.kG, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
-  // This timer is used to calculate the time since the previous periodic run to determine our new setpoint
+  // This timer is used to calculate the time since the previous periodic run to determine our new
+  // setpoint
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -174,8 +175,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (enforceLimits) {
       if (getHeightMeters() > (getUpperLimitMeters() - Units.inchesToMeters(1)))
         output = Math.min(output, 0);
-      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) 
-        output = Math.max(output, 0);
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) output = Math.max(output, 0);
     }
 
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
@@ -205,7 +205,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public double getHeightMeters() {
     return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
   }
-  
+
   // Returns the elevator's velocity in meters per second.
   public double getVelocityMetersPerSecond() {
     return elevatorMotors[0].getSelectedSensorVelocity()
@@ -219,7 +219,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Returns true if elevator is within half of an inch of its set position
-  // This means that the elevator is only trying to hold its current setpoint, not move towards a new one
+  // This means that the elevator is only trying to hold its current setpoint, not move towards a
+  // new one
   public boolean getAroundSetpoint() {
     return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
   }
@@ -342,7 +343,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateShuffleboard() {
-    SmartDashboard.putBoolean("Elevator Closed Loop", getControlState() == ELEVATOR.STATE.CLOSED_LOOP);
+    SmartDashboard.putBoolean(
+        "Elevator Closed Loop", getControlState() == ELEVATOR.STATE.CLOSED_LOOP);
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
     kClosedLoopModePub.set(getControlState() == ELEVATOR.STATE.CLOSED_LOOP ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
@@ -435,16 +437,18 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   @Override
   public void periodic() {
     updateLog();
-    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not work without this
+    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
+    // work without this
     updateHeightMeters();
     updateForwardOutput();
 
     switch (m_controlState) {
-      // Called when setting to open loop
+        // Called when setting to open loop
       case OPEN_LOOP_MANUAL:
         double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
         // Sets final percent output
-        // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
+        // True means it will enforce limits. In this way it is not truly open loop, but it'll
+        // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
       default:
