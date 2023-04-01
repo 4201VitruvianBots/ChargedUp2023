@@ -534,7 +534,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
       if (inactiveTimerEnabled) {
         if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
-          m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+          m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
           m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
           m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
           m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());

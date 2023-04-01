@@ -30,7 +30,6 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -60,11 +59,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
-  private double m_desiredPositionInputMeters; // The height in meters our robot is trying to reach
-  private double m_desiredPositionOutputMeters; // The height in meters our robot is trying to reach
+  private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
   private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
   private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
-  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.AUTO_SETPOINT;
+  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.CLOSED_LOOP;
   // TODO: Move to StateHandler/make global
   private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
@@ -233,7 +231,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Returns true if elevator is within half of an inch of its set position
-  public boolean getIsElevating() {
+  // This means that the elevator is only trying to hold its current setpoint, not move towards a new one
+  public boolean getAroundSetpoint() {
     return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
   }
 
@@ -249,7 +248,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void setDesiredPositionMeters(double meters) {
-    m_desiredPositionInputMeters = meters;
+    m_desiredPositionMeters = meters;
   }
 
   public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
@@ -257,7 +256,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public double getDesiredPositionMeters() {
-    return m_desiredPositionInputMeters;
+    return m_desiredPositionMeters;
   }
 
   public double getCommandedPositionMeters() {
@@ -377,28 +376,23 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
+    lowerLimitSwitchPub.set(getLimitSwitch());
+    kPercentOutputPub.set(getPercentOutput());
 
-    switch (m_limitCanUtil) {
-      case NORMAL:
-        // Put not required stuff here
-        kEncoderCountsPub.set(getHeightEncoderCounts());
-        kHeightPub.set(getHeightMeters());
-        kDesiredStatePub.set(m_desiredHeightState.name());
-        kPercentOutputPub.set(getPercentOutput());
-        lowerLimitSwitchPub.set(getLimitSwitch());
-        currentCommandStatePub.set(getControlState().toString());
-        break;
-      default:
-      case LIMITED:
-        lowerLimitSwitchPub.set(getLimitSwitch());
-        kPercentOutputPub.set(getPercentOutput());
-        break;
+    if (m_limitCanUtil == CAN_UTIL_LIMIT.NORMAL) {
+      // Put not required stuff here
+      kEncoderCountsPub.set(getHeightEncoderCounts());
+      kHeightPub.set(getHeightMeters());
+      kDesiredStatePub.set(m_desiredHeightState.name());
+      kPercentOutputPub.set(getPercentOutput());
+      lowerLimitSwitchPub.set(getLimitSwitch());
+      currentCommandStatePub.set(getControlState().toString());
     }
   }
 
   public void updateLog() {
     outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
-    setpointMetersEntry.append(m_desiredPositionInputMeters);
+    setpointMetersEntry.append(m_desiredPositionMeters);
     positionMetersEntry.append(getHeightMeters());
   }
 
@@ -482,40 +476,36 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
-      // Used by the buttons and closed loop manual control (although no code currently exists to handle this state)
-      case CLOSED_LOOP:
-        m_desiredPositionOutputMeters =
-            m_desiredPositionInputMeters
-                + m_joystickInput * Constants.ELEVATOR.kSetpointMultiplier;
-      break;
       default:
-      case AUTO_SETPOINT:
-        m_desiredPositionOutputMeters = m_desiredPositionInputMeters;
+      case CLOSED_LOOP:
+        // Updates the constraints of the elevator
+        if (m_desiredPositionMeters - getHeightMeters() > 0) {
+          m_currentConstraints = Constants.ELEVATOR.m_fastConstraints;
+        } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
+          m_currentConstraints = Constants.ELEVATOR.m_stopSlippingConstraints;
+        } else {
+          m_currentConstraints = Constants.ELEVATOR.m_slowConstraints;
+        }
+
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        double currentTime = m_timer.get();
+        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
+        m_lastTimestamp = currentTime;
+
+        TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
+        m_commandedPositionMeters = commandedSetpoint.position;
+        kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
+        setSetpointTrapezoidState(commandedSetpoint);
         break;
     }
-    // Trapezoid profile stuff
-    // Will only run when enabled (is this necessary?) and we are not in open loop override
-    if (DriverStation.isEnabled() && m_controlState != ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
-      // Updates the constraints of the elevator
-      if (m_desiredPositionInputMeters - getHeightMeters() > 0)
-        m_currentConstraints = Constants.ELEVATOR.m_fastConstraints;
-      else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
-        m_currentConstraints = Constants.ELEVATOR.m_stopSlippingConstraints;
-      } else m_currentConstraints = Constants.ELEVATOR.m_slowConstraints;
+  }
 
-      // Updates our trapezoid profile state based on the time since our last periodic and our
-      // recorded change in height
-      m_goal = new TrapezoidProfile.State(m_desiredPositionOutputMeters, 0);
-      TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-      double currentTime = m_timer.get();
-      m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
-      m_lastTimestamp = currentTime;
-
-      TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
-      m_commandedPositionMeters = commandedSetpoint.position;
-      kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
-      setSetpointTrapezoidState(commandedSetpoint);
-    }
+  public void teleopInit() {
+    setDesiredPositionMeters(getHeightMeters());
+    haltPosition();
   }
 
   @Override

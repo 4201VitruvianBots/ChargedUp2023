@@ -33,10 +33,6 @@ public class RunWristJoystick extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (Math.abs(joystickYDeadbandOutput) != 0) {
-      //      m_wrist.setControlState(
-      //          m_wrist.getClosedLoopState()
-      //              ? WRIST.STATE.CLOSED_LOOP_MANUAL
-      //              : WRIST.STATE.OPEN_LOOP_MANUAL);
       if (m_wrist.getControlState() == WRIST.STATE.CLOSED_LOOP) {
         m_wrist.setUserInput(-joystickYDeadbandOutput);
       } else {

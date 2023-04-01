@@ -121,7 +121,6 @@ public final class Constants {
       OPEN_LOOP_MANUAL,
       TEST_SETPOINT,
       CLOSED_LOOP,
-      AUTO_SETPOINT
     }
 
     public enum SETPOINT {

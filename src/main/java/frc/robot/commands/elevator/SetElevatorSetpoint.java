@@ -6,6 +6,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
@@ -24,7 +25,6 @@ public class SetElevatorSetpoint extends CommandBase {
   }
 
   public SetElevatorSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_setpoint = setpoint;
     m_input = input;
@@ -50,10 +50,7 @@ public class SetElevatorSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    //    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
-    //    m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

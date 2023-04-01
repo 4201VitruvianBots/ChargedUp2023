@@ -26,7 +26,7 @@ public class AutoSetElevatorSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
+    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
