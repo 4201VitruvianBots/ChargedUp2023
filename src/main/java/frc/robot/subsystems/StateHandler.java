@@ -332,34 +332,28 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       case 0: // ALPHA
         if (ELEVATOR.THRESHOLD.BETA_MIN.get() < m_elevator.getHeightMeters()) {
           // LOW -> MIN
-          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) {
+          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) { 
             m_currentZone = SUPERSTRUCTURE_STATE.BETA_ZONE;
             return;
           }
         }
         break;
-      case 1: // BETA
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
-          // HIGH -> MID
-          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
-            m_currentZone = SUPERSTRUCTURE_STATE.BETA_ZONE;
-            return;
-          }
-        } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
-          // HIGH -> EXTENDED
-          if (WRIST.THRESHOLD.GAMMA_MAX.get() < m_wrist.getPositionRadians()) {
-            m_currentZone = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+      case 1: // MID
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
+          // MID -> LOW
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.ALPHA_MAX.get()) {
+            m_currentZone = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
             return;
           }
         }
         break;
-      case 2: // GAMMA
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
+      case 2: // EXTENDED
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.GAMMA_MAX.get()) {
           // EXTENDED -> HIGH
           // Modified to avoid wrist hitting the elevator going down
           //            if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
-          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
-            m_currentZone = SUPERSTRUCTURE_STATE.BETA_ZONE;
+          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.GAMMA_MAX.get()) {
+            m_currentZone = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
             return;
           }
         }

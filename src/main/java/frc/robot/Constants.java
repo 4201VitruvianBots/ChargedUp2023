@@ -383,9 +383,9 @@ public final class Constants {
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.degreesToRadians(100.0)),
+      ALPHA_MAX(Units.degreesToRadians(110.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
-      BETA_MAX(Units.degreesToRadians(120.0)),
+      BETA_MAX(Units.degreesToRadians(146.0)),
       GAMMA_MIN(Units.degreesToRadians(90.0)),  //TODO: Maybe change this to 25.0 like it was before as extended
       GAMMA_MAX(ABSOLUTE_MAX.get()),
 

@@ -225,7 +225,7 @@ public class RobotContainer implements AutoCloseable {
     initTestController();
   }
 
-  private void initTestController() {
+  private void initTestController() { //TODO: Rewrite this to use the new Statehandler system
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
