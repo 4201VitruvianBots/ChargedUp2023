@@ -7,7 +7,7 @@ package frc.robot.commands.led;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LED.LED_STATE;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem;
 
 /** Sets the LED based on the subsystems' statuses */
 public class SetPieceTypeIntent extends CommandBase {

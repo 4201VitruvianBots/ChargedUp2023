@@ -40,7 +40,7 @@ public class SetWristDesiredSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
     m_wrist.setDesiredPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);

@@ -27,7 +27,6 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setRunningBool(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,18 +39,14 @@ public class IncrementElevatorHeight extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-
-      if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
-      } else {
+      m_elevator.setJoystickY(-joystickYDeadbandOutput);
+      if (m_elevator.getControlState() == ELEVATOR.STATE.CLOSED_LOOP) 
         m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
-      }
     }
     if (joystickYDeadbandOutput == 0
         && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-      m_elevator.resetState();
+      m_elevator.haltPosition();
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
@@ -63,7 +58,6 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_elevator.setRunningBool(false);
   }
 
   // Returns true when the command should end.

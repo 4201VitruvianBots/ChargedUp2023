@@ -4,7 +4,12 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
@@ -19,7 +24,12 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -464,7 +474,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           break;
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * percentOutputMultiplier;
-          if (getPositionRadians() > (getUpperLimit() - 0.0254)) {
+          if (getPositionRadians() > (getUpperLimit() - Units.inchesToMeters(1))) {
             percentOutput = Math.min(percentOutput, 0);
           }
           if (getPositionRadians() < (getLowerLimit() + 0.005)) {
@@ -472,7 +482,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           }
           setPercentOutput(percentOutput);
           break;
-        case USER_SETPOINT:
+        case CLOSED_LOOP:
           m_desiredSetpointOutputRadians =
               m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
           break;

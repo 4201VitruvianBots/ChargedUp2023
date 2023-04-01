@@ -5,9 +5,14 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -92,14 +97,32 @@ public final class Constants {
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
+    public static final double kMaxForwardOutput = 0.6;
+    public static final double kMaxReverseOutput = -0.45;
+    public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kSetpointMultiplier = 0.25;
+
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
+
+    public static final int simEncoderSign =
+      mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+
+    // Trapezoid profile stuff
+    public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxVel * .5, kMaxAccel);
+    // Used when elevator is moving downward
+    public static final TrapezoidProfile.Constraints m_slowConstraints =
+        new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
+    // Used when elevator is moving upward
+    public static final TrapezoidProfile.Constraints m_fastConstraints =
+        new TrapezoidProfile.Constraints(
+            kMaxVel * 1.3, kMaxAccel * 1.3);
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
-      CLOSED_LOOP_MANUAL,
       TEST_SETPOINT,
-      USER_SETPOINT,
-      AUTO_SETPOINT
+      CLOSED_LOOP,
     }
 
     public enum SETPOINT {
@@ -151,6 +174,11 @@ public final class Constants {
       public double get() {
         return value;
       }
+    }
+
+    public enum ELEVATOR_SPEED {
+      NORMAL,
+      LIMITED
     }
   }
 
@@ -338,7 +366,7 @@ public final class Constants {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
       TEST_SETPOINT,
-      USER_SETPOINT,
+      CLOSED_LOOP,
       AUTO_SETPOINT
     }
 
@@ -461,6 +489,11 @@ public final class Constants {
       HIGH_TO_EXTENDED,
       EXTENDED_TO_HIGH,
     }
+  }
+
+  public static class AUTO {
+    public static double kAutoBalanceTimeout = 2.0;
+    public static final double kAutoBalanceAngleThresholdDegrees = 1.5;
   }
 
   public enum SCORING_STATE {

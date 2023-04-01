@@ -1,7 +1,10 @@
 package frc.robot.utils;
 
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Contains functions to convert {@link Map}s with {@link SWERVE_MODULE_POSITION} keys to and from

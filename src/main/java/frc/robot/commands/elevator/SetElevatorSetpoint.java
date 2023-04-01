@@ -5,49 +5,54 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
+import java.util.function.DoubleSupplier;
 
-public class AutoSetElevatorDesiredSetpoint extends CommandBase {
+public class SetElevatorSetpoint extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
+  private final DoubleSupplier m_input;
+
   private final double m_setpoint;
 
-  public AutoSetElevatorDesiredSetpoint(Elevator elevator, double setpoint) {
+  public SetElevatorSetpoint(Elevator elevator, double setpoint) {
+    this(elevator, setpoint, () -> 0);
+  }
 
-    // Use addRequirements() here to declare subsystem dependencies.
+  public SetElevatorSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
     m_elevator = elevator;
     m_setpoint = setpoint;
+    m_input = input;
     addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setRunningBool(true);
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
+    m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_elevator.setDesiredPositionMeters(m_setpoint);
+
+    double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_elevator.setJoystickY(-joystickDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // if (m_elevator.getElevatorState() == m_elevatorState) {
-    //   interrupted = true;
-    // }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
-  // 1 inch = 0.254 meters
   public boolean isFinished() {
-    return (Math.abs(m_elevator.getHeightMeters() - m_setpoint) < 0.0254);
+    return false;
   }
 }

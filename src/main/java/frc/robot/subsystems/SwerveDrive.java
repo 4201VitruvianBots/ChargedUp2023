@@ -22,7 +22,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -76,7 +77,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private final SwerveDrivePoseEstimator m_odometry;
+  private boolean m_simOverride = false;
   private double m_simYaw;
+  private double m_simRoll;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   private boolean useHeadingTarget = false;
@@ -100,7 +103,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private double m_maxVelocity = Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
 
   public SwerveDrive() {
-
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
@@ -216,7 +218,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     m_rollOffset = -m_pigeon.getRoll(); // -2.63
   }
 
-  public double getRollOffset() {
+  public double getRollOffsetDegrees() {
     return m_rollOffset;
   }
 
@@ -225,7 +227,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public double getRollDegrees() {
-    return m_pigeon.getRoll();
+    if (m_simOverride) return m_simRoll;
+    else return m_pigeon.getRoll();
   }
 
   public double getHeadingDegrees() {
@@ -344,7 +347,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       case NORMAL:
         // Put not required stuff here
         pitchPub.set(getPitchDegrees());
-        rollPub.set(getRollDegrees() + getRollOffset());
+        rollPub.set(getRollDegrees() + getRollOffsetDegrees());
         yawPub.set(getHeadingDegrees());
         odometryXPub.set(getOdometry().getEstimatedPosition().getX());
         odometryYPub.set(getOdometry().getEstimatedPosition().getY());
@@ -353,7 +356,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       default:
       case LIMITED:
         pitchPub.set(getPitchDegrees());
-        rollPub.set(getRollDegrees() + getRollOffset());
+        rollPub.set(getRollDegrees() + getRollOffsetDegrees());
         yawPub.set(getHeadingDegrees());
         break;
     }
