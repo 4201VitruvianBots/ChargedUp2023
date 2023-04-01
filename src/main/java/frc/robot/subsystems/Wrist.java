@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.WRIST_SPEED;
 import frc.robot.commands.wrist.ResetWristAngle;
@@ -50,9 +49,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private double m_joystickInput;
   private boolean m_userSetpoint;
-
-  // TODO: Make this universal/put in StateHandler
-  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
   private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
@@ -111,6 +107,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
   private DoublePublisher kDesiredAngleDegreesPub;
+  private DoublePublisher kCurrentAngleDegreesPub;
   private DoublePublisher currentTrapezoidVelocity;
   private DoublePublisher currentTrapezoidAcceleration;
   private StringPublisher currentCommandStatePub;
@@ -229,10 +226,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return getSensorPosition() * WRIST.encoderUnitsToDegrees;
   }
 
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    limitCanUtil = limitCan;
-  }
-
   // this is get current angle
   public double getVelocityDegreesPerSecond() {
     return wristMotor.getSelectedSensorVelocity() * WRIST.encoderUnitsToDegrees * 10;
@@ -255,13 +248,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // }
   }
 
-  // TODO: Add limit switches
-  private boolean getLimitSwitchState(int i) {
-    return false;
+  public boolean getLimitSwitchState() {
+    return !lowerSwitch.get();
   }
-  //  public static boolean getWristLowerSwitch() {
-  //    return !wristLowerSwitch.get();
-  //  }
 
   // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
   // the ground.
@@ -297,7 +286,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  // TODO: Is this necessary? If not, remove it
   private void updateIValue() {
     if (getPositionRadians() < Units.degreesToRadians(30)) {
       newKI = 0.00001;
@@ -314,43 +302,43 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return new TrapezoidProfile.State(
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
   }
-
-  // TODO: Add wristAngleDegrees to Wrist Tab
+  
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
     SmartDashboard.putData("Reset90", new ResetWristAngle(this, Units.degreesToRadians(90)));
 
     NetworkTable wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
-    wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
-    wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
-    wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
-    wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
-    wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
-    wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
-    wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
-    wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-    wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
-
-    // Initialize Test Values
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
+    kCurrentAngleDegreesPub = wristTab.getDoubleTopic("Current Angle Degrees").publish();
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
-    kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
-    kMaxAccelSub =
-        wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
-    kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
-    kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
-    kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
-    kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
-    kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
-    kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
-    kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-    kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
+    // // Initialize Test Values
+    // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
+    // wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
+    // wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
+    // wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
+    // wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
+    // wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
+    // wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
+    // wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
+    // wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
+    // wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
+
+    // kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
+    // kMaxAccelSub =
+    //     wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
+    // kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
+    // kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
+    // kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
+    // kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
+    // kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
+    // kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
+    // kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
+    // kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   // SmartDashboard function
@@ -358,11 +346,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putString("Wrist Closed Loop", getControlState().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
+    currentCommandStatePub.set(getControlState().toString());
+    kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
+    kCurrentAngleDegreesPub.set(getPositionDegrees());
+
     // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
     // currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
-
-    currentCommandStatePub.set(getControlState().toString());
-    // kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
 
     // Tuning controls
     //    setControlState(STATE.TEST_SETPOINT);
@@ -404,12 +393,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     positionDegreesEntry.append(getPositionDegrees());
   }
 
-  // TODO: Is this needed? If not, remove it
-  public boolean isScoring() {
-    return (getPositionDegrees() > 170);
-  }
-
-  // TODO: Do Not Remove. WIP for auto scoring
+  // Do Not Remove. WIP for auto scoring
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;

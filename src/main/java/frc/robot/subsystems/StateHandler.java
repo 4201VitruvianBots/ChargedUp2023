@@ -577,7 +577,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     m_elevator.setReduceCanUtilization(limitCanUtil);
-    m_wrist.setReduceCanUtilization(limitCanUtil);
     m_drive.setReduceCanUtilization(limitCanUtil);
   }
 
