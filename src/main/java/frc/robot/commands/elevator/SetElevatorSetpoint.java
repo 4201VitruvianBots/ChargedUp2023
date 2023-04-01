@@ -6,7 +6,6 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
@@ -41,7 +40,6 @@ public class SetElevatorSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);

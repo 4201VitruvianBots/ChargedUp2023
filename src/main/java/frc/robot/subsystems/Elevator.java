@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.ELEVATOR.STATE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -65,12 +64,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.CLOSED_LOOP;
   // TODO: Move to StateHandler/make global
   private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
-
-  // By default, this is set to true as we use the trapezoid profile to determine what speed we
-  // should be at to get to our setpoint.
-  // If the sensors are acting up, we set this value false to directly control the percent output of
-  // the motors.
-  private boolean isClosedLoop = true;
 
   // This is used in limiting the elevator's speed once we reach the top of the elevator
   private double currentForwardOutput = 0;
@@ -179,18 +172,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     // Enforce limits if requested
     if (enforceLimits) {
-      if (getHeightMeters() > (getUpperLimitMeters() - 0.0254))
+      if (getHeightMeters() > (getUpperLimitMeters() - Units.inchesToMeters(1)))
         output = Math.min(output, 0);
       if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) 
         output = Math.max(output, 0);
     }
 
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
-  }
-
-  // Enforces limits by default
-  public void setPercentOutput(double output) {
-    setPercentOutput(output, true);
   }
 
   // Clamp the desired setpoint to within our lower and upper limits
@@ -289,26 +277,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return m_joystickInput != 0 && m_userSetpoint == false;
   }
 
-  /*
-   * Closed loop (default): Uses a trapezoid profile and a set setpoint to determine motor output
-   * Open loop: Changes motor output directly
-   */
-  public void setControlMode(boolean isClosedLoop) {
-    this.isClosedLoop = isClosedLoop;
-  }
-
-  public boolean getClosedLoopState() {
-    return isClosedLoop;
-  }
-
   // Sets the control state of the elevator
   public void setControlState(ELEVATOR.STATE state) {
-    // If we are in open loop override, no other control states will be set except open loop.
-    if (isClosedLoop) {
-      m_controlState = state;
-    } else {
-      m_controlState = STATE.OPEN_LOOP_MANUAL;
-    }
+    m_controlState = state;
   }
 
   // Returns the current control state enum
@@ -371,9 +342,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateShuffleboard() {
-    SmartDashboard.putBoolean("Elevator Closed Loop", getClosedLoopState());
+    SmartDashboard.putBoolean("Elevator Closed Loop", getControlState() == ELEVATOR.STATE.CLOSED_LOOP);
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
-    kClosedLoopModePub.set(isClosedLoop ? "Closed" : "Open");
+    kClosedLoopModePub.set(getControlState() == ELEVATOR.STATE.CLOSED_LOOP ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
     lowerLimitSwitchPub.set(getLimitSwitch());

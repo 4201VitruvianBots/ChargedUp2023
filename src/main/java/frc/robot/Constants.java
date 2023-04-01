@@ -111,8 +111,10 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
         new TrapezoidProfile.Constraints(
             kMaxVel * .5, kMaxAccel);
+    // Used when elevator is moving downward
     public static final TrapezoidProfile.Constraints m_slowConstraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
+    // Used when elevator is moving upward
     public static final TrapezoidProfile.Constraints m_fastConstraints =
         new TrapezoidProfile.Constraints(
             kMaxVel * 1.3, kMaxAccel * 1.3);

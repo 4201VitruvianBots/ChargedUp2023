@@ -5,6 +5,7 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
@@ -47,6 +48,6 @@ public class AutoSetElevatorSetpoint extends CommandBase {
   @Override
   // 1 inch = 0.254 meters
   public boolean isFinished() {
-    return (Math.abs(m_elevator.getHeightMeters() - m_setpoint) < 0.0254);
+    return (Math.abs(m_elevator.getHeightMeters() - m_setpoint) < Units.inchesToMeters(1));
   }
 }
