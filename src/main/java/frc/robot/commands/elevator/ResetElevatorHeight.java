@@ -6,48 +6,44 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 
-public class AutoSetElevatorDesiredSetpoint extends CommandBase {
+public class ResetElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
-  private final double m_setpoint;
+  private final double m_meters;
 
-  public AutoSetElevatorDesiredSetpoint(Elevator elevator, double setpoint) {
+  public ResetElevatorHeight(Elevator elevator, double meters) {
 
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    m_setpoint = setpoint;
+    m_meters = meters;
     addRequirements(m_elevator);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_elevator.setIsElevating(true);
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setDesiredPositionMeters(m_setpoint);
+    m_elevator.setSensorPosition(m_meters);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // if (m_elevator.getElevatorState() == m_elevatorState) {
-    //   interrupted = true;
-    // }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
-  // 1 inch = 0.254 meters
   public boolean isFinished() {
-    return (Math.abs(m_elevator.getHeightMeters() - m_setpoint) < 0.0254);
+    return true;
   }
 }

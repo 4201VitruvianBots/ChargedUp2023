@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
@@ -52,7 +52,7 @@ public class TopDriveForward extends SequentialCommandGroup {
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
         new ParallelCommandGroup(
                 new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+                new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
                 new AutoRunIntakeCone(intake, 0.7, vision, swerveDrive))
             .withTimeout(1));
   }

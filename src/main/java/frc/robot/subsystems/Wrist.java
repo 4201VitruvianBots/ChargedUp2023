@@ -475,7 +475,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           break;
         case OPEN_LOOP_MANUAL:
           double percentOutput = m_joystickInput * percentOutputMultiplier;
-          if (getPositionRadians() > (getUpperLimit() - 0.0254)) {
+          if (getPositionRadians() > (getUpperLimit() - Units.inchesToMeters(1))) {
             percentOutput = Math.min(percentOutput, 0);
           }
           if (getPositionRadians() < (getLowerLimit() + 0.005)) {
@@ -483,7 +483,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           }
           setPercentOutput(percentOutput);
           break;
-        case USER_SETPOINT:
+        case CLOSED_LOOP:
           m_desiredSetpointOutputRadians =
               m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
           break;

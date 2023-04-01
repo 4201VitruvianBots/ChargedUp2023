@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
@@ -42,10 +43,10 @@ import frc.robot.commands.auto.OnePiece;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.auto.TwoPieceTest;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.ResetElevatorHeightMeters;
-import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.ResetElevatorHeight;
+import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 // import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.led.GetSubsystemStates;
@@ -142,7 +143,7 @@ public class RobotContainer implements AutoCloseable {
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
 
-    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
+    SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
     SmartDashboard.putData(new ToggleCanUtilization(m_stateHandler));
   }
@@ -181,9 +182,9 @@ public class RobotContainer implements AutoCloseable {
         .a()
         .whileTrue(
             new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), xboxController::getLeftY),
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
     xboxController
@@ -201,9 +202,9 @@ public class RobotContainer implements AutoCloseable {
         .b()
         .whileTrue(
             new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), xboxController::getLeftY),
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
     xboxController
@@ -220,7 +221,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new SetElevatorDesiredSetpoint(
+            new SetElevatorSetpoint(
                 m_elevator, ELEVATOR.SETPOINT.STOWED.get(), xboxController::getLeftY));
     xboxController
         .x()
@@ -233,9 +234,9 @@ public class RobotContainer implements AutoCloseable {
         .y()
         .whileTrue(
             new ConditionalCommand(
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), xboxController::getLeftY),
-                new SetElevatorDesiredSetpoint(
+                new SetElevatorSetpoint(
                     m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), xboxController::getLeftY),
                 () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
     xboxController
@@ -251,7 +252,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .povUp()
         .onTrue(
-            new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
+            new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
     xboxController
         .povUp()
         .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
@@ -320,9 +321,9 @@ public class RobotContainer implements AutoCloseable {
           .cross()
           .whileTrue(
               new ConditionalCommand(
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), testController::getLeftY),
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get(), testController::getLeftY),
                   () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
       testController
@@ -340,9 +341,9 @@ public class RobotContainer implements AutoCloseable {
           .circle()
           .whileTrue(
               new ConditionalCommand(
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), testController::getLeftY),
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), testController::getLeftY),
                   () -> m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE));
       testController
@@ -359,7 +360,7 @@ public class RobotContainer implements AutoCloseable {
       testController
           .square()
           .whileTrue(
-              new SetElevatorDesiredSetpoint(
+              new SetElevatorSetpoint(
                   m_elevator, ELEVATOR.SETPOINT.STOWED.get(), testController::getLeftY));
       testController
           .square()
@@ -372,11 +373,11 @@ public class RobotContainer implements AutoCloseable {
           .triangle()
           .whileTrue(
               new ConditionalCommand(
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator,
                       ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(),
                       testController::getLeftY),
-                  new SetElevatorDesiredSetpoint(
+                  new SetElevatorSetpoint(
                       m_elevator,
                       ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(),
                       testController::getLeftY),
@@ -394,7 +395,7 @@ public class RobotContainer implements AutoCloseable {
       // Toggle elevator, wrist control state
       testController
           .povDown()
-          .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+          .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
       testController
           .povDown()
           .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
@@ -411,8 +412,7 @@ public class RobotContainer implements AutoCloseable {
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
+    m_elevator.teleopInit();
     m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
@@ -422,7 +422,7 @@ public class RobotContainer implements AutoCloseable {
   public void autonomousInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
+    m_elevator.haltPosition();
     m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
@@ -445,14 +445,14 @@ public class RobotContainer implements AutoCloseable {
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorIntaking",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristStowed",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorStowed",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowConeNode",
@@ -460,7 +460,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristMidConeNode",
@@ -468,7 +468,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristHighConeNode",
@@ -476,7 +476,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowReverseCubeNode",
@@ -484,7 +484,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowReverseCubeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
 
     m_autoBuilder =
