@@ -29,8 +29,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private static boolean isIntakingCone = false;
   private static boolean isIntakingCube = false;
 
-  private final double kF = 0;
-  private final double kP = 0.2;
+ 
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
@@ -58,8 +57,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.enableVoltageCompensation(true);
 
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    intakeMotor.config_kF(0, kF);
-    intakeMotor.config_kP(0, kP);
+    intakeMotor.config_kF(0, Constants.INTAKE.kF);
+    intakeMotor.config_kP(0, Constants.INTAKE.kP);
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and

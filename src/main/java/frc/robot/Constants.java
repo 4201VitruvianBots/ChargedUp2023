@@ -159,6 +159,8 @@ public final class Constants {
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
     public static final int cubeSensorId = 2;
+    public static double kF = 0;
+    public static double kP = 0.2;
 
     public enum HELD_GAMEPIECE {
       NONE,
@@ -317,7 +319,7 @@ public final class Constants {
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
     public static final int kTimeoutMs = 0;
-
+    
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined
