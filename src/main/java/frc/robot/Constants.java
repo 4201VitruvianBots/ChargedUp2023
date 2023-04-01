@@ -445,8 +445,6 @@ public final class Constants {
       SCORE_MID_CUBE(ZONE.BETA.ordinal()),
       // HIGH
       GAMMA_ZONE(ZONE.GAMMA.ordinal()),
-      // EXTENDED
-      EXTENDED_ZONE(ZONE.GAMMA.ordinal()),
       INTAKE_EXTENDED(ZONE.GAMMA.ordinal()),
       SCORE_HIGH(ZONE.GAMMA.ordinal()),
       SCORE_HIGH_CONE(ZONE.GAMMA.ordinal()),
@@ -470,6 +468,7 @@ public final class Constants {
       BETA_TO_ALPHA,
       BETA_TO_GAMMA,
       GAMMA_TO_BETA,
+      GAMMA_TO_ALPHA; 
     }
 
     public enum SETPOINT {
@@ -479,7 +478,8 @@ public final class Constants {
       SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
       SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(
-          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get());
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
+      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get()); 
 
       private final double elevatorSetpointMeters;
       private final double wristSetpointRadians;

@@ -221,8 +221,8 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         && elevatorPositionMeters <= ELEVATOR.THRESHOLD.GAMMA_MAX.get()) {
       if (WRIST.THRESHOLD.GAMMA_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.GAMMA_MAX.get())
-        return SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
-      else assumedZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
+        return SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+      else assumedZone = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
     }
 
     // Undefined state, put a breakpoint here when debugging to check logic
@@ -252,13 +252,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         case 2: // GAMMA
           if (m_desiredZone.getZone() < m_currentZone.getZone())
             m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_BETA;
-          break;
         default:
           // Undefined behavior, put a breakpoint here when debugging to check logic
           System.out.println("This should never be reached");
           break;
       }
-    } else m_nextZone = ZONE_TRANSITIONS.NONE;
+    } else m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_ALPHA;
 
     // Use zone transition info to set mechanism limits. Only threshold limit when within
     // transition zones
@@ -269,14 +268,16 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.BETA_MAX.get();
           wristLowerLimitRadians = WRIST.THRESHOLD.BETA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.ALPHA_MAX.get();
+          m_currentZone= SUPERSTRUCTURE_STATE.BETA_ZONE;
           break;
         }
       case BETA_TO_ALPHA:
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
           elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MIN.get();
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.BETA_MAX.get();
-          wristLowerLimitRadians = WRIST.THRESHOLD.BETA_MIN.get();
+          wristLowerLimitRadians = WRIST.THRESHOLD.ALPHA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.ALPHA_MAX.get();
+          m_currentZone=SUPERSTRUCTURE_STATE.ALPHA_ZONE;
           break;
         }
       case BETA_TO_GAMMA:
@@ -285,6 +286,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MAX.get();
           wristLowerLimitRadians = WRIST.THRESHOLD.GAMMA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get();
+          m_currentZone= SUPERSTRUCTURE_STATE.GAMMA_ZONE;
           break;
         }
       case GAMMA_TO_BETA:
@@ -295,8 +297,20 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           // Modified to avoid wrist hitting elevator
           //          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
           wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get() - 0.1;
+          m_currentZone= SUPERSTRUCTURE_STATE.BETA_ZONE;
           break;
         }
+      case GAMMA_TO_ALPHA:
+      if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
+        elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MIN.get();
+        elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MAX.get();
+        wristLowerLimitRadians = WRIST.THRESHOLD.ALPHA_MIN.get();
+        // Modified to avoid wrist hitting elevator
+        //          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
+        wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get() - 0.1;
+        m_currentZone= SUPERSTRUCTURE_STATE.ALPHA_ZONE;
+        break;
+      }
       default:
       case NONE:
         // If not in a transition zone, use the current zone's limits
@@ -348,7 +362,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         }
         break;
       case 2: // EXTENDED
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.GAMMA_MAX.get()) {
+        if (m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.GAMMA_MIN.get()) {
           // EXTENDED -> HIGH
           // Modified to avoid wrist hitting the elevator going down
           //            if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.HIGH_MAX.get()) {
@@ -476,10 +490,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
       if (inactiveTimerEnabled) {
         if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
-          m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
-          m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-          m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
-          m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
+          setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
     }
