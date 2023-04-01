@@ -386,7 +386,9 @@ public final class Constants {
       ALPHA_MAX(Units.degreesToRadians(110.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
       BETA_MAX(Units.degreesToRadians(146.0)),
-      GAMMA_MIN(Units.degreesToRadians(90.0)),  //TODO: Maybe change this to 25.0 like it was before as extended
+      GAMMA_MIN(
+          Units.degreesToRadians(
+              90.0)), // TODO: Maybe change this to 25.0 like it was before as extended
       GAMMA_MAX(ABSOLUTE_MAX.get()),
 
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
@@ -464,11 +466,11 @@ public final class Constants {
 
     public enum ZONE_TRANSITIONS {
       NONE,
-      ALPHA_TO_BETA, 
+      ALPHA_TO_BETA,
       BETA_TO_ALPHA,
       BETA_TO_GAMMA,
       GAMMA_TO_BETA,
-      GAMMA_TO_ALPHA; 
+      GAMMA_TO_ALPHA;
     }
 
     public enum SETPOINT {
@@ -479,7 +481,7 @@ public final class Constants {
       SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(
           ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
-      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get()); 
+      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get());
 
       private final double elevatorSetpointMeters;
       private final double wristSetpointRadians;

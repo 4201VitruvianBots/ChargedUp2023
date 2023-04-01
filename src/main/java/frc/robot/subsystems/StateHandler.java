@@ -125,15 +125,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     SmartDashboard.putData("Main State Selector", m_mainStateChooser);
   }
-
+ //returns current zone which could be an actual zone (alpha, beta, gamma) or a state (score high/mid/low/intaking)
   public SUPERSTRUCTURE_STATE getCurrentZone() {
     return m_currentZone;
   }
-
+//returns the desired zone or state 
   public SUPERSTRUCTURE_STATE getDesiredZone() {
     return m_desiredZone;
   }
-
+//returns the current zone transition
   public ZONE_TRANSITIONS getNextZone() {
     return m_nextZone;
   }
@@ -157,7 +157,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public boolean isOnTarget() {
     return m_isOnTarget;
   }
-
+//Determines the current state based off current wrist/elevator positions. 
   public SUPERSTRUCTURE_STATE determineSuperStructureState(
       double elevatorPositionMeters, double wristPositionRadians) {
     SUPERSTRUCTURE_STATE assumedZone = SUPERSTRUCTURE_STATE.DANGER_ZONE;
@@ -231,7 +231,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     return assumedZone;
   }
-
+//Sets a zone transition based on ordinals of alpha, beta, gamma zones (1,2,3) 
   public void zoneAdvancement() {
     // If your current zone is not equal to your desired zone, assume you are transitioning between
     // zones, otherwise don't set a transition limit
@@ -305,8 +305,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MIN.get();
         elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MAX.get();
         wristLowerLimitRadians = WRIST.THRESHOLD.ALPHA_MIN.get();
-        // Modified to avoid wrist hitting elevator
-        //          m_wrist.setUpperLimit(WRIST.THRESHOLD.HIGH_MAX.get());
         wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get() - 0.1;
         m_currentZone= SUPERSTRUCTURE_STATE.ALPHA_ZONE;
         break;
@@ -378,7 +376,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         break;
     }
   }
-
+//Sets desired setpoint from setpoint enums created, clamps the setpoints before settings based on local limits which are based on the current zone
   public void setDesiredSetpoint(STATEHANDLER.SETPOINT desiredState) {
     m_elevator.setDesiredPositionMeters(
         MathUtil.clamp(
