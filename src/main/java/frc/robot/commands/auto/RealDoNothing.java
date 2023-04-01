@@ -6,7 +6,7 @@ import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
@@ -22,19 +22,19 @@ public class RealDoNothing extends SequentialCommandGroup {
         // fieldSim),
 
         new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
                 new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
                 new AutoRunIntakeCone(intake, -0.7, vision, swerveDrive))
             .withTimeout(1),
         new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
                 new AutoSetElevatorSetpoint(
                     elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()))
             .withTimeout(2.5),
-        new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+        new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2),
         new ParallelCommandGroup(
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
             new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get())));
   }
 }

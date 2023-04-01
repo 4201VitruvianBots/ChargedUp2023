@@ -7,12 +7,12 @@ package frc.robot.commands.wrist;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 
-public class ResetAngleDegrees extends CommandBase {
+public class ResetWristAngle extends CommandBase {
   private final Wrist m_wrist;
   private double m_angle;
 
   /** Creates a new RunWrist. */
-  public ResetAngleDegrees(Wrist wrist, double angle) {
+  public ResetWristAngle(Wrist wrist, double angle) {
     m_wrist = wrist;
     m_angle = angle;
 

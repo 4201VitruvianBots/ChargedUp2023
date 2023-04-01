@@ -11,7 +11,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -41,7 +41,7 @@ public class TopDriveForward extends SequentialCommandGroup {
         // fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectory),
         new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
                 // new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
                 // new AutoSetElevatorDesiredSetpoint(elevator,
                 // ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
@@ -51,7 +51,7 @@ public class TopDriveForward extends SequentialCommandGroup {
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)),
         new ParallelCommandGroup(
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
                 new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
                 new AutoRunIntakeCone(intake, 0.7, vision, swerveDrive))
             .withTimeout(1));

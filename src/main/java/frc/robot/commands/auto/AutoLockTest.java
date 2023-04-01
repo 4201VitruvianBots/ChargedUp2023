@@ -5,7 +5,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
@@ -22,7 +22,7 @@ public class AutoLockTest extends SequentialCommandGroup {
       Wrist wrist) {
 
     addCommands(
-        new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+        new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         // new AutoLock(swerveDrive, throttleInput, strafeInput, rotationInput),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
