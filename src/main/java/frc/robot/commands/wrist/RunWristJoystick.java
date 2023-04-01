@@ -42,7 +42,7 @@ public class RunWristJoystick extends CommandBase {
     }
     if (joystickYDeadbandOutput == 0 && m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL) {
       m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
-      m_wrist.resetState();
+      m_wrist.haltPosition();
     }
   }
 

@@ -362,12 +362,21 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
+    public static final int simEncoderSign =
+      WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+    
+    public static final TrapezoidProfile.Constraints slowConstraints =
+        new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+    public static final TrapezoidProfile.Constraints fastConstraints =
+        new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+    
+    public static final double kMaxPercentOutput = 1.0;
+    public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
+    public static final double kPercentOutputMultiplier = 0.3;
+
     public enum STATE {
       OPEN_LOOP_MANUAL,
-      CLOSED_LOOP_MANUAL,
-      TEST_SETPOINT,
       CLOSED_LOOP,
-      AUTO_SETPOINT
     }
 
     public enum WRIST_SPEED {

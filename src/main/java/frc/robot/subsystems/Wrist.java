@@ -9,7 +9,6 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
@@ -20,13 +19,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -40,13 +39,11 @@ import frc.robot.Constants.WRIST.WRIST_SPEED;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
-  private double m_desiredSetpointInputRadians;
-  private double m_desiredSetpointOutputRadians;
+  private double m_desiredSetpointRadians;
   private double m_commandedAngleRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
-  private boolean isClosedLoop = true;
-  private WRIST.STATE m_controlState = WRIST.STATE.AUTO_SETPOINT;
+  private WRIST.STATE m_controlState = WRIST.STATE.CLOSED_LOOP;
 
   private double currentKI = 0;
   private double newKI = 0;
@@ -57,9 +54,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // TODO: Make this universal/put in StateHandler
   private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
-  private final int simEncoderSign =
-      WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
-
   private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
   private final Intake m_intake;
@@ -69,12 +63,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   /** Creates a new Wrist. */
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
-  private final TrapezoidProfile.Constraints m_slowTrapezoidalConstraints =
-      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
-  private final TrapezoidProfile.Constraints m_fastTrapezoidalConstraints =
-      new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
-  private TrapezoidProfile.Constraints m_currentTrapezoidalConstraints =
-      m_slowTrapezoidalConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints =
+    Constants.WRIST.slowConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -86,10 +76,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
-
-  private final double maxPercentOutput = 1.0;
-  public final double setpointMultiplier = Units.degreesToRadians(60.0);
-  private final double percentOutputMultiplier = 0.3;
 
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
@@ -131,22 +117,19 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public Wrist(Intake intake) {
     m_intake = intake;
-    // One motor for the wrist
 
     // factory default configs
     wristMotor.configFactoryDefault();
     wristMotor.setNeutralMode(NeutralMode.Brake);
     wristMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
-
-    //    wristMotor.setStatusFramePeriod(1, 0);
-    //    wristMotor.setStatusFramePeriod(2, 0);
-    // TODO: Review limits, test to see what is appropriate or not
-    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
     wristMotor.config_kP(0, WRIST.kP);
     wristMotor.config_kI(0, WRIST.kI);
     wristMotor.config_kD(0, WRIST.kD);
-    wristMotor.configPeakOutputForward(maxPercentOutput, WRIST.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(-maxPercentOutput, WRIST.kTimeoutMs);
+    wristMotor.configPeakOutputForward(Constants.WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
+    wristMotor.configPeakOutputReverse(-Constants.WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
+
+    // TODO: Review limits, test to see what is appropriate or not
+    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
 
     wristMotor.setInverted(WRIST.motorInversionType);
 
@@ -158,10 +141,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     initSmartDashboard();
     m_timer.reset();
     m_timer.start();
-  }
-
-  public boolean getClosedLoopState() {
-    return isClosedLoop;
   }
 
   public void setUserInput(double input) {
@@ -187,8 +166,17 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // set percent output function
   // period function that edits the elevator's height, from there make sure it obeys the limit (27.7
   // rotation)
-  private void setPercentOutput(double value) {
-    wristMotor.set(ControlMode.PercentOutput, value);
+  private void setPercentOutput(double output, boolean enforceLimits) {
+    if (enforceLimits) {
+      if (getPositionRadians() > (getUpperLimit() - Units.inchesToMeters(1))) {
+        output = Math.min(output, 0);
+      }
+      if (getPositionRadians() < (getLowerLimit() + 0.005)) {
+        output = Math.max(output, 0);
+      }
+    }
+
+    wristMotor.set(ControlMode.PercentOutput, output);
   }
 
   // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
@@ -214,18 +202,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (m_feedforward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  public void resetState() {
+  public void haltPosition() {
     m_setpoint =
         new TrapezoidProfile.State(
             getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
   }
 
   public void setDesiredPositionRadians(double desiredAngleRadians) {
-    m_desiredSetpointInputRadians = desiredAngleRadians;
+    m_desiredSetpointRadians = desiredAngleRadians;
   }
 
   public double getDesiredPositionRadians() {
-    return m_desiredSetpointInputRadians;
+    return m_desiredSetpointRadians;
   }
 
   public double getCommandedPositionRadians() {
@@ -281,14 +269,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.setSelectedSensorPosition(angleDegrees / Constants.WRIST.encoderUnitsToDegrees);
   }
 
-  public void setControlMode(boolean isClosedLoop) {
-    this.isClosedLoop = isClosedLoop;
-  }
-
-  public boolean getControlMode() {
-    return isClosedLoop;
-  }
-
   public void setLowerLimit(double radians) {
     m_lowerLimitRadians = radians;
   }
@@ -308,11 +288,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
     switch (speed) {
       case FAST:
-        m_currentTrapezoidalConstraints = m_fastTrapezoidalConstraints;
+        m_currentConstraints = Constants.WRIST.fastConstraints;
         break;
       default:
       case SLOW:
-        m_currentTrapezoidalConstraints = m_slowTrapezoidalConstraints;
+        m_currentConstraints = Constants.WRIST.slowConstraints;
         break;
     }
   }
@@ -330,7 +310,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  //
   private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
@@ -341,7 +320,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putData(this);
     SmartDashboard.putData("Reset90", new ResetAngleDegrees(this, Units.degreesToRadians(90)));
 
-    var wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
+    NetworkTable wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
     wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
     wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
@@ -376,7 +355,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // SmartDashboard function
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Wrist Closed Loop", getClosedLoopState());
+    SmartDashboard.putString("Wrist Closed Loop", getControlState().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
     // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
@@ -458,55 +437,31 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateSmartDashboard();
     updateLog();
-
     updateIValue();
-    // This method will be called once per scheduler run
-    if (isClosedLoop) {
-      switch (m_controlState) {
-        case CLOSED_LOOP_MANUAL:
-          m_desiredSetpointOutputRadians =
-              m_joystickInput * setpointMultiplier + getPositionRadians();
-          m_desiredSetpointOutputRadians =
-              MathUtil.clamp(
-                  m_desiredSetpointOutputRadians,
-                  WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-                  WRIST.THRESHOLD.ABSOLUTE_MAX.get());
-          break;
-        case OPEN_LOOP_MANUAL:
-          double percentOutput = m_joystickInput * percentOutputMultiplier;
-          if (getPositionRadians() > (getUpperLimit() - Units.inchesToMeters(1))) {
-            percentOutput = Math.min(percentOutput, 0);
-          }
-          if (getPositionRadians() < (getLowerLimit() + 0.005)) {
-            percentOutput = Math.max(percentOutput, 0);
-          }
-          setPercentOutput(percentOutput);
-          break;
-        case CLOSED_LOOP:
-          m_desiredSetpointOutputRadians =
-              m_desiredSetpointInputRadians + m_joystickInput * setpointMultiplier;
-          break;
-        case TEST_SETPOINT:
-          m_desiredSetpointOutputRadians = Units.degreesToRadians(kSetpointSub.get(0));
-          break;
-        default:
-        case AUTO_SETPOINT:
-          m_desiredSetpointOutputRadians = m_desiredSetpointInputRadians;
-          break;
-      }
-      if (DriverStation.isEnabled() && m_controlState != WRIST.STATE.OPEN_LOOP_MANUAL) {
-        m_goal = new TrapezoidProfile.State(m_desiredSetpointOutputRadians, 0);
-        var profile = new TrapezoidProfile(m_currentTrapezoidalConstraints, m_goal, m_setpoint);
-        var currentTime = m_timer.get();
+
+    switch (m_controlState) {
+      // Called when setting to open loop
+      case OPEN_LOOP_MANUAL:
+        double percentOutput = m_joystickInput * Constants.WRIST.kPercentOutputMultiplier;
+        // Sets final percent output
+        // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
+        setPercentOutput(percentOutput, true);
+        break;
+      default:
+      case CLOSED_LOOP:
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
+        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        double currentTime = m_timer.get();
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
-        var commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
+
+        TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
         m_commandedAngleRadians = commandedSetpoint.position;
-        kCommandedAngleDegreesPub.set(Units.radiansToDegrees(commandedSetpoint.position));
+        kDesiredAngleDegreesPub.set(commandedSetpoint.position);
         setSetpointTrapezoidState(commandedSetpoint);
-      }
-    } else {
-      setPercentOutput(m_joystickInput * percentOutputMultiplier);
+        break;
     }
   }
 
@@ -515,7 +470,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
             wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
-    var currentTime = m_timer.get();
+    double currentTime = m_timer.get();
     m_armSim.update(currentTime - m_lastSimTimestamp);
     m_lastSimTimestamp = currentTime;
 
@@ -526,7 +481,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (simEncoderSign
+                (Constants.WRIST.simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getAngleRads())
                     / Constants.WRIST.encoderUnitsToDegrees));
 
@@ -534,7 +489,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign
+                (Constants.WRIST.simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));

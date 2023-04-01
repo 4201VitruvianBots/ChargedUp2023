@@ -51,7 +51,7 @@ public class SetWristDesiredSetpoint extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_wrist.setUserSetpoint(false);
-    //    m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+    //    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
     //    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
   }
 

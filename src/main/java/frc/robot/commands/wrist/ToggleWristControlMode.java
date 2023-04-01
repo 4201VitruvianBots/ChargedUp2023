@@ -6,6 +6,7 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
+import frc.robot.Constants.WRIST;
 
 public class ToggleWristControlMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
@@ -26,7 +27,10 @@ public class ToggleWristControlMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setControlMode(!m_wrist.getControlMode());
+    if (m_wrist.getControlState() == WRIST.STATE.CLOSED_LOOP)
+      m_wrist.setControlState(WRIST.STATE.OPEN_LOOP_MANUAL);
+    else if (m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL)
+      m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
