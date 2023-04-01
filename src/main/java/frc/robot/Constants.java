@@ -319,7 +319,7 @@ public final class Constants {
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
     public static final int kTimeoutMs = 0;
-    
+
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     // Values were experimentally determined

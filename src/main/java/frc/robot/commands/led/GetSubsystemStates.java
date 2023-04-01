@@ -58,7 +58,6 @@ public class GetSubsystemStates extends CommandBase {
     var desiredState = m_stateHandler.getDesiredZone();
     coneButton = m_led.getPieceIntent() == INTAKING_STATES.CONE;
     cubeButton = m_led.getPieceIntent() == INTAKING_STATES.CUBE;
-    intaking = m_intake.getIntakeState();
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (disabled) {

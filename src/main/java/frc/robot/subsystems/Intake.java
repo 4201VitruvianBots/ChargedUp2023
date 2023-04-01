@@ -29,7 +29,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private static boolean isIntakingCone = false;
   private static boolean isIntakingCube = false;
 
- 
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
@@ -47,7 +46,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
     // set current limit on talonfx motors
-    // TODO: Need to test current/voltage limits to verify what is appropriate or not
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 0.1));
     intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
@@ -74,11 +72,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   // TODO: IS this necessary? If not remove it
   // control mode function
-  public boolean getIntakeState() {
-    return isIntaking;
-  }
 
-  public boolean getIntakeStateCone() {
+  public boolean getIntakeConeState() {
     return isIntakingCone;
   }
 
@@ -86,7 +81,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     isIntakingCone = state;
   }
 
-  public boolean getIntakeStateCube() {
+  public boolean getIntakeCubeState() {
     return isIntakingCube;
   }
 
@@ -120,7 +115,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Shuffleboard or SmartDashboard function
 
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Intake", getIntakeState());
+    SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
+    SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
   }
 
   public void updateLog() {
