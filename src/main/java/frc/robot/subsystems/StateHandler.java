@@ -341,20 +341,21 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     // Check current mechanism positions before advancing zones
     switch (m_currentZone.getZone()) {
-      case 0: // ALPHA
+      case 0: // MID
+      if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
+        // MID -> LOW
+        if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.ALPHA_MAX.get()) {
+          m_currentZone = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
+          return;
+        }
+      }
+      break;
+
+      case 1: // ALPHA
         if (ELEVATOR.THRESHOLD.BETA_MIN.get() < m_elevator.getHeightMeters()) {
           // LOW -> MIN
           if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) { 
             m_currentZone = SUPERSTRUCTURE_STATE.BETA_ZONE;
-            return;
-          }
-        }
-        break;
-      case 1: // MID
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
-          // MID -> LOW
-          if (m_wrist.getPositionRadians() < WRIST.THRESHOLD.ALPHA_MAX.get()) {
-            m_currentZone = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
             return;
           }
         }

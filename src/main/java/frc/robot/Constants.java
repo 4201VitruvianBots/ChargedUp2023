@@ -431,7 +431,7 @@ public final class Constants {
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
-      DANGER_ZONE(ZONE.ALPHA.ordinal()),
+      DANGER_ZONE(0),
       // LOWs
       STOWED(ZONE.ALPHA.ordinal()),
       INTAKE_LOW(ZONE.ALPHA.ordinal()),
