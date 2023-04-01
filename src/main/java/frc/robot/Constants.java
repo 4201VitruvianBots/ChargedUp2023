@@ -5,7 +5,11 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -93,6 +97,11 @@ public final class Constants {
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
+    public static final double kMaxForwardOutput = 0.6;
+    public static final double kMaxReverseOutput = -0.45;
+    public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kSetpointMultiplier = 0.25;
+
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public enum STATE {
@@ -134,14 +143,12 @@ public final class Constants {
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(4)),
-      MID_MIN(Units.inchesToMeters(3)),
-      MID_MAX(Units.inchesToMeters(8)),
-      HIGH_MIN(Units.inchesToMeters(6)),
-      HIGH_MAX(Units.inchesToMeters(14)),
-      EXTENDED_MIN(Units.inchesToMeters(12)),
-      EXTENDED_MAX(ABSOLUTE_MAX.get());
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.inchesToMeters(4)),
+      BETA_MIN(Units.inchesToMeters(3.5)),
+      BETA_MAX(Units.inchesToMeters(28)),
+      GAMMA_MIN(Units.inchesToMeters(27.5)),
+      GAMMA_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 
@@ -152,6 +159,11 @@ public final class Constants {
       public double get() {
         return value;
       }
+    }
+
+    public enum ELEVATOR_SPEED {
+      NORMAL,
+      LIMITED
     }
   }
 
@@ -385,14 +397,15 @@ public final class Constants {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.degreesToRadians(100.0)),
-      MID_MIN(Units.degreesToRadians(25.0)),
-      MID_MAX(Units.degreesToRadians(110.0)),
-      HIGH_MIN(MID_MIN.get()),
-      HIGH_MAX(Units.degreesToRadians(120.0)),
-      EXTENDED_MIN(HIGH_MIN.get()),
-      EXTENDED_MAX(ABSOLUTE_MAX.get()),
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.degreesToRadians(110.0)),
+      BETA_MIN(Units.degreesToRadians(25.0)),
+      BETA_MAX(Units.degreesToRadians(146.0)),
+      GAMMA_MIN(
+          Units.degreesToRadians(
+              90.0)), // TODO: Maybe change this to 25.0 like it was before as extended
+      GAMMA_MAX(ABSOLUTE_MAX.get()),
+
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
@@ -425,30 +438,34 @@ public final class Constants {
       CUBE
     }
 
+    public enum ZONE {
+      ALPHA,
+      BETA,
+      GAMMA,
+    }
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
       DANGER_ZONE(0),
-      // LOW
-      STOWED(1),
-      INTAKE_LOW(1),
-      SCORE_LOW_REVERSE(1),
-      SCORE_LOW(1),
-      SCORE_LOW_CONE(1),
-      SCORE_LOW_CUBE(1),
-      LOW_ZONE(1),
+      // LOWs
+      STOWED(ZONE.ALPHA.ordinal()),
+      INTAKE_LOW(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_REVERSE(ZONE.ALPHA.ordinal()),
+      SCORE_LOW(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_CONE(ZONE.ALPHA.ordinal()),
+      SCORE_LOW_CUBE(ZONE.ALPHA.ordinal()),
+      ALPHA_ZONE(ZONE.ALPHA.ordinal()),
       // MID
-      MID_ZONE(2),
+      BETA_ZONE(ZONE.BETA.ordinal()),
+      SCORE_MID(ZONE.BETA.ordinal()),
+      SCORE_MID_CONE(ZONE.BETA.ordinal()),
+      SCORE_MID_CUBE(ZONE.BETA.ordinal()),
       // HIGH
-      HIGH_ZONE(3),
-      // EXTENDED
-      EXTENDED_ZONE(4),
-      INTAKE_EXTENDED(4),
-      SCORE_MID(4),
-      SCORE_HIGH(4),
-      SCORE_MID_CONE(4),
-      SCORE_MID_CUBE(4),
-      SCORE_HIGH_CONE(4),
-      SCORE_HIGH_CUBE(4);
+      GAMMA_ZONE(ZONE.GAMMA.ordinal()),
+      INTAKE_EXTENDED(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH_CONE(ZONE.GAMMA.ordinal()),
+      SCORE_HIGH_CUBE(ZONE.GAMMA.ordinal());
 
       // State Zone is determined by elevator setpoints
       private final int zone;
@@ -464,12 +481,38 @@ public final class Constants {
 
     public enum ZONE_TRANSITIONS {
       NONE,
-      LOW_TO_MID,
-      MID_TO_LOW,
-      MID_TO_HIGH,
-      HIGH_TO_MID,
-      HIGH_TO_EXTENDED,
-      EXTENDED_TO_HIGH,
+      ALPHA_TO_BETA,
+      BETA_TO_ALPHA,
+      BETA_TO_GAMMA,
+      GAMMA_TO_BETA,
+      GAMMA_TO_ALPHA;
+    }
+
+    public enum SETPOINT {
+      // Units are in meters
+      STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
+      SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
+      SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
+      SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
+      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get());
+
+      private final double elevatorSetpointMeters;
+      private final double wristSetpointRadians;
+
+      SETPOINT(double elevatorSetpointMeters, double wristSetpointRadians) {
+        this.elevatorSetpointMeters = elevatorSetpointMeters;
+        this.wristSetpointRadians = wristSetpointRadians;
+      }
+
+      public double getElevatorSetpointMeters() {
+        return elevatorSetpointMeters;
+      }
+
+      public double getWristSetpointRadians() {
+        return wristSetpointRadians;
+      }
     }
   }
 

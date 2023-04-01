@@ -59,6 +59,11 @@ public class Controls extends SubsystemBase implements AutoCloseable {
     controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
   }
 
+  /**
+   * Periodically check the DriverStation to get the Alliance color. This mainly runs when the robot
+   * is disabled to avoid a bug where the robot tries to get the alliance color before it is
+   * connected to a driver station.
+   */
   public void updateAllianceColor() {
     allianceColor = DriverStation.getAlliance();
   }

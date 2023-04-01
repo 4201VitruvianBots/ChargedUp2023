@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LED.LED_STATE;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.Controls;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.StateHandler;
 
 /*scoring = flashing white, intakingcube = blue,
 intakingcone = orange, locked on = flashing green,

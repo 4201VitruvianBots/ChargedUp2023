@@ -126,6 +126,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
       m_simTimer.reset();
       m_simTimer.start();
     }
+
+    // To distinguish modules in CommandScheduler
+    setName("SwerveModule_" + m_modulePosition.ordinal());
   }
 
   private void initModuleHeading() {
