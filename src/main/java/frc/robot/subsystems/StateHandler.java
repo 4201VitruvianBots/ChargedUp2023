@@ -12,6 +12,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -257,19 +258,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           else if (m_desiredZone.getZone() > m_currentZone.getZone())
             m_nextZone = ZONE_TRANSITIONS.BETA_TO_GAMMA;
           break;
-        case 2: // GAMMA
-          if (m_desiredZone.getZone() < m_currentZone.getZone()
-              && m_desiredZone == SUPERSTRUCTURE_STATE.SCORE_MID)
+          case 2: // GAMMA
+          if (m_desiredZone.getZone() < m_currentZone.getZone())
             m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_BETA;
-          else m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_ALPHA;
         default:
           // Undefined behavior, put a breakpoint here when debugging to check logic
           System.out.println("This should never be reached");
           break;
       }
-    } else
-      m_nextZone =
-          ZONE_TRANSITIONS.GAMMA_TO_ALPHA; // Used to be NONE, but GAMMA_TO_ALPHA works here
+    } else m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_ALPHA;  // Used to be NONE, but GAMMA_TO_ALPHA works here
 
     // By adding this, we achieved the behavior that we want, the buttons are able to hold their
     // setpoints (score, mid, low),
@@ -494,22 +491,22 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     // If no user input for more than one second, then reset elevator to stowed
-    // if (!DriverStation.isAutonomous()) {
-    //   if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
-    //       && !inactiveTimerEnabled) {
-    //     inactiveTimerEnabled = true;
-    //     timestamp = m_inactiveTimer.get();
-    //   } else if (inactiveTimerEnabled
-    //       && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
-    //     inactiveTimerEnabled = false;
-    //     timestamp = 0;
-    //   }
-    //   if (inactiveTimerEnabled) {
-    //     if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
-    //       setDesiredSetpoint(SETPOINT.STOWED);
-    //     }
-    //   }
-    // }
+    if (!DriverStation.isAutonomous()) {
+      if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
+          && !inactiveTimerEnabled) {
+        inactiveTimerEnabled = true;
+        timestamp = m_inactiveTimer.get();
+      } else if (inactiveTimerEnabled
+          && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
+        inactiveTimerEnabled = false;
+        timestamp = 0;
+      }
+      if (inactiveTimerEnabled) {
+        if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
+          setDesiredSetpoint(SETPOINT.STOWED);
+        }
+      }
+    }
 
     // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
