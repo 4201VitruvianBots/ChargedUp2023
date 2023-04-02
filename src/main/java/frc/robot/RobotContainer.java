@@ -185,7 +185,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new SetSetpointThenStow(
+            new SetSetpoint(
                 m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
     // High
     xboxController
@@ -205,12 +205,12 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .a()
         .whileTrue(
-            new SetSetpointThenStow(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
         .whileTrue(
-            new SetSetpointThenStow(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
