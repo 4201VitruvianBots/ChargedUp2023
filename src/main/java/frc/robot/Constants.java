@@ -77,6 +77,7 @@ public final class Constants {
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
+    public static final int angleDegrees = 35;
 
     // PID
     public static final double kSensorUnitsPerRotation = 2048.0;

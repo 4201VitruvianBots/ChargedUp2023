@@ -29,7 +29,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRIST;
@@ -51,6 +53,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   private final Intake m_intake;
+  private final Elevator m_elevator;
 
   private TrapezoidProfile.Constraints m_currentConstraints =
     Constants.WRIST.slowConstraints;
@@ -70,6 +73,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_currentKI = 0;
   private double m_newKI = 0;
 
+  // Simulation setup
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
           Constants.WRIST.gearBox,
@@ -81,6 +85,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
+  private MechanismLigament2d ligament2d;
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
@@ -110,8 +115,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private StringPublisher currentCommandStatePub;
 
   /** Creates a new Wrist. */
-  public Wrist(Intake intake) {
+  public Wrist(Intake intake, Elevator elevator) {
     m_intake = intake;
+    m_elevator = elevator;
 
     // Factory default configs
     wristMotor.configFactoryDefault();
@@ -306,6 +312,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
+    ligament2d = 
+      m_elevator.getLigament2d().append(
+        new MechanismLigament2d("Wrist", Constants.WRIST.length,
+          180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
+    
+    ligament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    
     // // Initialize Test Values
     // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
     // wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
@@ -461,6 +474,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
+    
+    // Update the angle of the mech2d
+    ligament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
   }
 
   @Override

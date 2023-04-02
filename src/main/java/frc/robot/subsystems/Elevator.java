@@ -112,9 +112,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Mechanism2d visualization setup
   public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters, maxHeightMeters);
-  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxHeightMeters / 2, 0);
+  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", 0, 0);
   public MechanismLigament2d elevatorLigament2d =
-      root2d.append(new MechanismLigament2d("Elevator", getHeightMeters(), 90));
+      root2d.append(new MechanismLigament2d("Elevator", getHeightMeters(), Constants.ELEVATOR.angleDegrees));
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
@@ -209,7 +209,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns the elevator's velocity in meters per second.
   public double getVelocityMetersPerSecond() {
     return elevatorMotors[0].getSelectedSensorVelocity()
-        * Constants.ELEVATOR.encoderCountsToMeters
+        * Constants.ELEVATOR.encoderCountsToMeters 
         * 10;
   }
 
@@ -293,6 +293,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         -getHeightMeters() * Math.cos(Constants.ELEVATOR.mountAngleRadians.getRadians())
             + centerOffset,
         0);
+  }
+
+  // Returns the ligament of the elevator so the wrist ligament can be attached to it
+  public MechanismLigament2d getLigament2d() {
+    return elevatorLigament2d;
   }
 
   // Initializes shuffleboard values. Does not update them

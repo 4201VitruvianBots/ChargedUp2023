@@ -90,6 +90,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_inactiveTimer.start();
 
     if (RobotBase.isSimulation()) {
+      limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
       initializeScoringChooser();
       initializeMainStateChooser();
     }
