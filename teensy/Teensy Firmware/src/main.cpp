@@ -26,8 +26,9 @@ EthernetUDP udp;
 
 uint8_t ReplyBuffer[] = "acknowledged";  // a string to send back
 
-VL53L0X sensor;
+VL53L0X sensor1;
 VL53L0X sensor2;
+VL53L0X sensor3;
 
 void setup() {
     Serial.begin(115200);
@@ -64,12 +65,13 @@ void setup() {
 
     Wire.begin();
     Wire1.begin();
+    Wire2.begin();
 
-    sensor.setTimeout(500);
-    if (!sensor.init()) {
-        Serial.println("Failed to detect and initialize sensor!");
+    sensor1.setTimeout(500);
+    if (!sensor1.init()) {
+        Serial.println("Failed to detect and initialize sensor1!");
     }
-    sensor.startContinuous();
+    sensor1.startContinuous();
 
     sensor2.setBus(&Wire1);
     sensor2.setTimeout(500);
@@ -77,24 +79,36 @@ void setup() {
         Serial.println("Failed to detect and initialize sensor2!");
     }
     sensor2.startContinuous();
+
+    sensor3.setBus(&Wire2);
+    sensor3.setTimeout(500);
+    if (!sensor3.init()) {
+        Serial.println("Failed to detect and initialize sensor3!");
+    }
+    sensor3.startContinuous();
 }
 
 StaticJsonDocument<1000> doc;
 
 uint8_t i = 0;
 void loop() {
-    int distance = sensor.readRangeContinuousMillimeters();
-    if (sensor.timeoutOccurred()) {
+    int distance = sensor1.readRangeContinuousMillimeters();
+    if (sensor1.timeoutOccurred()) {
         Serial.print(" TIMEOUT");
     }
     doc["sensor1.mm"] = distance;
-
 
     int distance2 = sensor2.readRangeContinuousMillimeters();
     if (sensor2.timeoutOccurred()) {
         Serial.print(" TIMEOUT");
     }
     doc["sensor2.mm"] = distance2;
+
+    int distance3 = sensor3.readRangeContinuousMillimeters();
+    if (sensor3.timeoutOccurred()) {
+        Serial.print(" TIMEOUT");
+    }
+    doc["sensor3.mm"] = distance3;
 
 
     /*
