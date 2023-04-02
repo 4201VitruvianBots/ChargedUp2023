@@ -7,11 +7,17 @@ import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
+
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -27,12 +33,19 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
-  private SUPERSTRUCTURE_STATE currentRobotState;
+  private SUPERSTRUCTURE_STATE currentRobotState = SUPERSTRUCTURE_STATE.STOWED;
   private boolean setSolid;
   private Animation m_toAnimate = null;
 
 
   private final StringPublisher ledStatePub;
+
+   // Mechanism2d visualization setup
+   public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+   public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
+   public MechanismLigament2d m_ligament2d =
+       m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+
   // Create LED strip
   public LEDSubsystem(Controls controls) {
     m_candle.configFactoryDefault(); // sets up LED strip
@@ -57,6 +70,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
+
+     // Initialize visualization
+     m_ligament2d.setLineWeight(1000); // making the line THICK
+     SmartDashboard.putData("LED Sim", m_mech2d);
   }
 
   /**
@@ -125,25 +142,86 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   public void expressState(SUPERSTRUCTURE_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
-        case INTAKE_LOW: // Solid Blue
-          setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
+        case LOW_ZONE:
+        case INTAKE_LOW:
+        case SCORE_LOW_REVERSE: 
+        case SCORE_LOW:
+        case SCORE_LOW_CONE:
+        case SCORE_LOW_CUBE:
+            setPattern(247, 116, 40, 0, 0, ANIMATION_TYPE.Solid); // Solid Orange
           break;
-        case SCORE_LOW: // Solid Orange
-          setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
+        //   break;
+        case MID_ZONE:
+            setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
-        case SCORE_MID: // Solid White
-          setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
-        break;
-        case SCORE_HIGH: // Solid Pink
-          setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
+        case HIGH_ZONE:
+            setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
           break;
-        default:
+        case EXTENDED_ZONE:
+        case INTAKE_EXTENDED:
+        case SCORE_MID:
+        case SCORE_HIGH:
+        case SCORE_MID_CONE:
+        case SCORE_MID_CUBE:
+        case SCORE_HIGH_CONE:
+        case SCORE_HIGH_CUBE:
+            setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid); // Solid White
+          break;
+        case DISABLED:
+            setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
+          break;
+        case ENABLED:
+            setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
+          break;
+          default:
           break;
       }
+      // if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW) {
+      //   setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
+      // }
+      // else if (state == SUPERSTRUCTURE_STATE.SCORE_LOW || state == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE || state == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE || state == SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE || state == SUPERSTRUCTURE_STATE.LOW_ZONE) {
+      //   setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
+      // }
+      // else if (state == SUPERSTRUCTURE_STATE.SCORE_MID || state == SUPERSTRUCTURE_STATE.SCORE_MID_CONE || state == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE || state == SUPERSTRUCTURE_STATE.MID_ZONE) {
+      //   setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
+      // }
+      // else if (state == SUPERSTRUCTURE_STATE.SCORE_HIGH || state == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE || state == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE || state == SUPERSTRUCTURE_STATE.HIGH_ZONE) {
+      //   setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
+      // }
+      //  else {
+      //   setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
+      // }
+
+      // switch (state) {
+      //   case INTAKE_LOW: // Solid Blue
+      //     setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
+      //     break;
+      //   case SCORE_LOW: // Solid Orange
+      //     setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
+      //     break;
+      //   case SCORE_MID: // Solid White
+      //     setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
+      //   break;
+      //   case SCORE_HIGH: // Solid Pink
+      //     setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
+      //     break;
+      //   case DISABLED:
+      //     setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid);
+      //     break;
+      //   default:
+      //   case ENABLED:
+      //     setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
+      //     break;
+      // }
       currentRobotState = state;
     }
   }
 
+  @Override
+  public void simulationPeriodic() {
+    m_ligament2d.setColor(new Color8Bit(this.red, this.green, this.blue));
+  }
+  
   @Override
   public void periodic() {
     // null indicates that the animation is "Solid"

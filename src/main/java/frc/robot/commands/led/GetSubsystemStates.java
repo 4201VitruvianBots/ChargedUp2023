@@ -33,23 +33,49 @@ public class GetSubsystemStates extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    var currentState = m_stateHandler.getCurrentZone();
+  }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     // the prioritized state to be expressed to the LEDs
     // set in order of priority to be expressed from the least priority to the
-    // highest priority
-      if (m_stateHandler.getCurrentZone() == SUPERSTRUCTURE_STATE.SCORE_HIGH) {
-        m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
-    } else if (m_stateHandler.getCurrentZone() == SUPERSTRUCTURE_STATE.SCORE_MID) {
-        m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
-    } else if (m_stateHandler.getCurrentZone() == SUPERSTRUCTURE_STATE.SCORE_LOW) {
-        m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
-    } else if (m_stateHandler.getCurrentZone() == SUPERSTRUCTURE_STATE.INTAKE_LOW) {
-        m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW);
+    // highest priority 
+    if (DriverStation.isDisabled()) {
+        m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
+    } else if (!DriverStation.isDisabled()) {
+          switch (m_stateHandler.getCurrentZone()) {
+            case LOW_ZONE:
+            case INTAKE_LOW:
+            case SCORE_LOW_REVERSE: 
+            case SCORE_LOW:
+            case SCORE_LOW_CONE:
+            case SCORE_LOW_CUBE:
+                m_led.expressState(SUPERSTRUCTURE_STATE.LOW_ZONE); // Solid Orange
+              break;
+            case MID_ZONE:
+                m_led.expressState(SUPERSTRUCTURE_STATE.MID_ZONE);; // Solid White
+              break;
+            case HIGH_ZONE:
+                m_led.expressState(SUPERSTRUCTURE_STATE.HIGH_ZONE);; // Solid White
+              break;
+            case EXTENDED_ZONE:
+            case INTAKE_EXTENDED:
+            case SCORE_MID:
+            case SCORE_HIGH:
+            case SCORE_MID_CONE:
+            case SCORE_MID_CUBE:
+            case SCORE_HIGH_CONE:
+            case SCORE_HIGH_CUBE:
+                m_led.expressState(SUPERSTRUCTURE_STATE.EXTENDED_ZONE);; // Solid White
+              break;
+              default:
+                m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
+              break;
+        }
     }
-  }
+  } 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
@@ -65,3 +91,4 @@ public class GetSubsystemStates extends CommandBase {
     return true;
   }
 }
+
