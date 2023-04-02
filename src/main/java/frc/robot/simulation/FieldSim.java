@@ -76,7 +76,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   private DriverStation.Alliance m_currentAlliance = Alliance.Red;
   SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
-  private boolean testScoringState = false;
+  private boolean testScoringState = true;
 
   public FieldSim(
       SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
@@ -199,8 +199,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     robotPose = m_swerveDrive.getPoseMeters();
     m_field2d.setRobotPose(robotPose);
 
-    // Test Code - Disable during competition to improve performance
-    if (false) {
+    if (RobotBase.isSimulation()) {
       m_field2d
           .getObject("lLocalizerTagPoses")
           .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
@@ -234,12 +233,12 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
 
-    //    m_field2d
-    //        .getObject("Grid Node")
-    //        .setPoses(
-    //            validNodes.stream()
-    //                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
-    //                .collect(Collectors.toList()));
+    m_field2d
+        .getObject("Grid Node")
+        .setPoses(
+            validNodes.stream()
+                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
+                .collect(Collectors.toList()));
 
     if (RobotBase.isSimulation()) {
       m_field2d
