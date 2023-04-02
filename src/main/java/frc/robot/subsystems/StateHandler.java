@@ -412,24 +412,25 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void updateZoneLimits() {
     switch (m_currentState.getZone()) {
-        case 0: // ALPHA
+        case 1: // ALPHA
           elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MIN.get();
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MAX.get();
           wristLowerLimitRadians = WRIST.THRESHOLD.ALPHA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.ALPHA_MAX.get();
           break;
-        case 1: // BETA
+        case 2: // BETA
           elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.BETA_MIN.get();
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.BETA_MAX.get();
           wristLowerLimitRadians = WRIST.THRESHOLD.BETA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get();
           break;
-        case 2: // GAMMA
+        case 3: // GAMMA
           elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MIN.get();
           elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MAX.get();
           wristLowerLimitRadians = WRIST.THRESHOLD.GAMMA_MIN.get();
           wristUpperLimitRadians = WRIST.THRESHOLD.GAMMA_MAX.get();
           break;
+        case 0:
         default:
           // Undefined state, put a breakpoint here when debugging to check logic
           System.out.println("This should never be reached");
