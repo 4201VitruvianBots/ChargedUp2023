@@ -47,7 +47,6 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
-import frc.robot.commands.statehandler.SetSetpointThenStow;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
@@ -173,7 +172,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .rightBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.INTAKING_LOW));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.INTAKING_LOW));
 
     // Score MID Setpoints
     xboxController
@@ -185,8 +185,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new SetSetpoint(
-                m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
     // High
     xboxController
         .y()
@@ -204,13 +203,11 @@ public class RobotContainer implements AutoCloseable {
     xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .a()
-        .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
+        .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
-        .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
+        .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press

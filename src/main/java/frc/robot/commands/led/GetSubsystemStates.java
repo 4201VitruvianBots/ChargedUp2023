@@ -58,7 +58,7 @@ public class GetSubsystemStates extends CommandBase {
     // the prioritized state to be expressed to the LEDs
     disabled = DriverStation.isDisabled();
     enabled = !disabled;
-    var desiredState = m_stateHandler.getDesiredZone();
+    var desiredState = m_stateHandler.getDesiredState();
     coneButton = m_led.getPieceIntent() == INTAKING_STATES.CONE;
     cubeButton = m_led.getPieceIntent() == INTAKING_STATES.CUBE;
     intaking = m_intake.getIntakeState();
