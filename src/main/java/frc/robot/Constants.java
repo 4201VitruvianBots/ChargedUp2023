@@ -136,12 +136,16 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
+      // Used to tell current zone for transitions
       ABSOLUTE_MIN(
           Units.inchesToMeters(
               -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
+      // Alpha 0<x<4 inches
+      // Beta 3.5 - 28 inches
+      // Gamma 27.5 - 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
       ALPHA_MAX(Units.inchesToMeters(4)),
       BETA_MIN(Units.inchesToMeters(3.5)),
@@ -429,28 +433,32 @@ public final class Constants {
       GAMMA,
     }
 
+    public final static int alphaOrdinal = ZONE.ALPHA.ordinal();
+    public final static int betaOrdinal = ZONE.BETA.ordinal();
+    public final static int gammaOrdinal = ZONE.GAMMA.ordinal();
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
       DANGER_ZONE(0),
       // LOWs
-      STOWED(ZONE.ALPHA.ordinal()),
-      INTAKE_LOW(ZONE.ALPHA.ordinal()),
-      SCORE_LOW_REVERSE(ZONE.ALPHA.ordinal()),
-      SCORE_LOW(ZONE.ALPHA.ordinal()),
-      SCORE_LOW_CONE(ZONE.ALPHA.ordinal()),
-      SCORE_LOW_CUBE(ZONE.ALPHA.ordinal()),
-      ALPHA_ZONE(ZONE.ALPHA.ordinal()),
+      STOWED(alphaOrdinal),
+      INTAKE_LOW(alphaOrdinal),
+      SCORE_LOW_REVERSE(alphaOrdinal),
+      SCORE_LOW(alphaOrdinal),
+      SCORE_LOW_CONE(alphaOrdinal),
+      SCORE_LOW_CUBE(alphaOrdinal),
+      ALPHA_ZONE(alphaOrdinal),
       // MID
-      BETA_ZONE(ZONE.BETA.ordinal()),
-      SCORE_MID(ZONE.BETA.ordinal()),
-      SCORE_MID_CONE(ZONE.BETA.ordinal()),
-      SCORE_MID_CUBE(ZONE.BETA.ordinal()),
+      BETA_ZONE(betaOrdinal),
+      SCORE_MID(betaOrdinal),
+      SCORE_MID_CONE(betaOrdinal),
+      SCORE_MID_CUBE(betaOrdinal),
       // HIGH
-      GAMMA_ZONE(ZONE.GAMMA.ordinal()),
-      INTAKE_EXTENDED(ZONE.GAMMA.ordinal()),
-      SCORE_HIGH(ZONE.GAMMA.ordinal()),
-      SCORE_HIGH_CONE(ZONE.GAMMA.ordinal()),
-      SCORE_HIGH_CUBE(ZONE.GAMMA.ordinal());
+      GAMMA_ZONE(gammaOrdinal),
+      INTAKE_EXTENDED(gammaOrdinal),
+      SCORE_HIGH(gammaOrdinal),
+      SCORE_HIGH_CONE(gammaOrdinal),
+      SCORE_HIGH_CUBE(gammaOrdinal);
 
       // State Zone is determined by elevator setpoints
       private final int zone;

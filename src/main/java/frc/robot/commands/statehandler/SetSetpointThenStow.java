@@ -10,7 +10,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
-public class SetSetpoint extends CommandBase {
+public class SetSetpointThenStow extends CommandBase {
   /** Creates a new SetStatehandlerstate. */
   private Elevator m_Elevator;
 
@@ -18,7 +18,7 @@ public class SetSetpoint extends CommandBase {
   private StateHandler m_StateHandler;
   private STATEHANDLER.SETPOINT m_desiredState;
 
-  public SetSetpoint(
+  public SetSetpointThenStow(
       StateHandler stateHandler,
       Elevator elevator,
       Wrist Wrist,
@@ -48,6 +48,6 @@ public class SetSetpoint extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false; 
+    return false;
   }
 }
