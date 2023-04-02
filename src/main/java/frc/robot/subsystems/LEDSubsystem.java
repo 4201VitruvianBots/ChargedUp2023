@@ -173,46 +173,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case ENABLED:
             setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
           break;
+        case LOW_BATTERY:
+            setPattern(255, 255, 0, 0, 1, ANIMATION_TYPE.Strobe); // Flashing Yellow
+          break;
           default:
           break;
       }
-      // if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW) {
-      //   setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
-      // }
-      // else if (state == SUPERSTRUCTURE_STATE.SCORE_LOW || state == SUPERSTRUCTURE_STATE.SCORE_LOW_CONE || state == SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE || state == SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE || state == SUPERSTRUCTURE_STATE.LOW_ZONE) {
-      //   setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
-      // }
-      // else if (state == SUPERSTRUCTURE_STATE.SCORE_MID || state == SUPERSTRUCTURE_STATE.SCORE_MID_CONE || state == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE || state == SUPERSTRUCTURE_STATE.MID_ZONE) {
-      //   setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
-      // }
-      // else if (state == SUPERSTRUCTURE_STATE.SCORE_HIGH || state == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE || state == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE || state == SUPERSTRUCTURE_STATE.HIGH_ZONE) {
-      //   setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
-      // }
-      //  else {
-      //   setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
-      // }
-
-      // switch (state) {
-      //   case INTAKE_LOW: // Solid Blue
-      //     setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid);
-      //     break;
-      //   case SCORE_LOW: // Solid Orange
-      //     setPattern(255, 146, 0, 0, 0, ANIMATION_TYPE.Solid);
-      //     break;
-      //   case SCORE_MID: // Solid White
-      //     setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid);
-      //   break;
-      //   case SCORE_HIGH: // Solid Pink
-      //     setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid);
-      //     break;
-      //   case DISABLED:
-      //     setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid);
-      //     break;
-      //   default:
-      //   case ENABLED:
-      //     setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid);
-      //     break;
-      // }
       currentRobotState = state;
     }
   }
@@ -233,6 +199,9 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
 
+    if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
+      expressState(SUPERSTRUCTURE_STATE.LOW_BATTERY);
+    }
 
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }

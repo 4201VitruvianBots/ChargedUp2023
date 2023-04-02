@@ -407,6 +407,7 @@ public final class Constants {
     public enum SUPERSTRUCTURE_STATE {
       DISABLED(0),
       ENABLED(0),
+      LOW_BATTERY(0),
       // UNDEFINED
       DANGER_ZONE(0),
       // LOW

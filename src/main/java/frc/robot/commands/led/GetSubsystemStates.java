@@ -65,9 +65,7 @@ public class GetSubsystemStates extends CommandBase {
               break;
             case EXTENDED_ZONE:
             case INTAKE_EXTENDED:
-
             case SCORE_HIGH:
-
             case SCORE_HIGH_CONE:
             case SCORE_HIGH_CUBE:
                 m_led.expressState(SUPERSTRUCTURE_STATE.EXTENDED_ZONE);; // Solid White
