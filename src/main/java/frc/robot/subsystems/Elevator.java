@@ -28,10 +28,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -61,10 +58,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
   private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
   private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
-  private ELEVATOR.STATE m_controlState = ELEVATOR.STATE.CLOSED_LOOP;
+  // TODO: Unify this to one enum
+  private ELEVATOR.STATE m_closedLoopControl = ELEVATOR.STATE.CLOSED_LOOP;
   // TODO: Move to StateHandler/make global
   private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
 
+  // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
   // This is used in limiting the elevator's speed once we reach the top of the elevator
   private double currentForwardOutput = 0;
   private double newForwardOutput = 0;
@@ -145,6 +144,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           Constants.ELEVATOR.kMaxForwardOutput, Constants.ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(
           Constants.ELEVATOR.kMaxReverseOutput, Constants.ELEVATOR.kTimeoutMs);
+      // TODO: Review after new elevator is integrated
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
 
@@ -166,6 +166,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
+  public void setPercentOutput(double output) {
+    setPercentOutput(output, false);
+  }
+
   // Setting the raw output of the motors
   public void setPercentOutput(double output, boolean enforceLimits) {
     // If we have activated our limit switch, do not move the elevator backward
@@ -181,6 +185,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
+  // TODO: Remove
   // Clamp the desired setpoint to within our lower and upper limits
   private TrapezoidProfile.State limitDesiredSetpointMeters(TrapezoidProfile.State state) {
     return new TrapezoidProfile.State(
@@ -203,7 +208,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Elevator's height position
   public double getHeightMeters() {
-    return elevatorMotors[0].getSelectedSensorPosition() * Constants.ELEVATOR.encoderCountsToMeters;
+    return getHeightEncoderCounts() * Constants.ELEVATOR.encoderCountsToMeters;
   }
 
   // Returns the elevator's velocity in meters per second.
@@ -221,7 +226,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns true if elevator is within half of an inch of its set position
   // This means that the elevator is only trying to hold its current setpoint, not move towards a
   // new one
-  public boolean getAroundSetpoint() {
+  public boolean atSetpoint() {
     return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
   }
 
@@ -230,7 +235,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return !lowerLimitSwitch.get();
   }
 
-  // Sets the percieved position of the motors
+  // Sets the perceived position of the motors
   // Usually used to zero the motors if the robot is started in a non-stowed position
   public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / Constants.ELEVATOR.encoderCountsToMeters);
@@ -279,13 +284,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Sets the control state of the elevator
-  public void setControlState(ELEVATOR.STATE state) {
-    m_controlState = state;
+  public void setClosedLoopControlState(ELEVATOR.STATE state) {
+    m_closedLoopControl = state;
   }
 
   // Returns the current control state enum
-  public ELEVATOR.STATE getControlState() {
-    return m_controlState;
+  public ELEVATOR.STATE getClosedLoopControlState() {
+    return m_closedLoopControl;
+  }
+
+  public boolean isClosedLoopControl() {
+    return getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP;
   }
 
   // Returns a translation of the elevator's position in relation to the robot's position.
@@ -316,6 +325,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
+    // TODO: Rewrite test interface
     elevatorNtTab.getDoubleTopic("kP").publish().set(Constants.ELEVATOR.kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(Constants.ELEVATOR.kI);
     elevatorNtTab.getDoubleTopic("kD").publish().set(Constants.ELEVATOR.kD);
@@ -344,9 +354,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public void updateShuffleboard() {
     SmartDashboard.putBoolean(
-        "Elevator Closed Loop", getControlState() == ELEVATOR.STATE.CLOSED_LOOP);
+        "Elevator Closed Loop", getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP);
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
-    kClosedLoopModePub.set(getControlState() == ELEVATOR.STATE.CLOSED_LOOP ? "Closed" : "Open");
+    kClosedLoopModePub.set(
+        getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP ? "Closed" : "Open");
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
     lowerLimitSwitchPub.set(getLimitSwitch());
@@ -359,7 +370,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kDesiredStatePub.set(m_desiredHeightState.name());
       kPercentOutputPub.set(getPercentOutput());
       lowerLimitSwitchPub.set(getLimitSwitch());
-      currentCommandStatePub.set(getControlState().toString());
+      currentCommandStatePub.set(getClosedLoopControlState().toString());
     }
   }
 
@@ -394,43 +405,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  @Override
-  public void simulationPeriodic() {
-    elevatorSim.setInput(getPercentOutput() * 12);
-
-    // Next, we update it. The standard loop time is 20ms.
-    double currentTime = m_timer.get();
-    elevatorSim.update(currentTime - m_lastSimTimestamp);
-    m_lastSimTimestamp = currentTime;
-
-    // Internally sets the position of the motors in encoder counts based on our current height in
-    // meters
-    elevatorMotors[0]
-        .getSimCollection()
-        .setIntegratedSensorRawPosition(
-            (int)
-                (Constants.ELEVATOR.simEncoderSign
-                    * elevatorSim.getPositionMeters()
-                    / Constants.ELEVATOR.encoderCountsToMeters));
-
-    // Internally sets the velocity of the motors in encoder counts per 100 ms based on our velocity
-    // in meters per second (1000 ms)
-    elevatorMotors[0]
-        .getSimCollection()
-        .setIntegratedSensorVelocity(
-            (int)
-                (Constants.ELEVATOR.simEncoderSign
-                    * elevatorSim.getVelocityMetersPerSecond()
-                    / Constants.ELEVATOR.encoderCountsToMeters
-                    * 10));
-
-    // Sets the simulated voltage of the roboRio based on our current draw from the elevator
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
-
-    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
-    // directly setting the length to meters
-    elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
+  public void teleopInit() {
+    setDesiredPositionMeters(getHeightMeters());
+    haltPosition();
   }
 
   // This method will be called once per scheduler run
@@ -442,7 +419,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateHeightMeters();
     updateForwardOutput();
 
-    switch (m_controlState) {
+    switch (m_closedLoopControl) {
         // Called when setting to open loop
       case OPEN_LOOP_MANUAL:
         double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
@@ -478,9 +455,44 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  public void teleopInit() {
-    setDesiredPositionMeters(getHeightMeters());
-    haltPosition();
+  @Override
+  public void simulationPeriodic() {
+    elevatorSim.setInput(
+        MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
+
+    // Next, we update it. The standard loop time is 20ms.
+    double currentTime = m_timer.get();
+    elevatorSim.update(currentTime - m_lastSimTimestamp);
+    m_lastSimTimestamp = currentTime;
+
+    // Internally sets the position of the motors in encoder counts based on our current height in
+    // meters
+    elevatorMotors[0]
+        .getSimCollection()
+        .setIntegratedSensorRawPosition(
+            (int)
+                (Constants.ELEVATOR.simEncoderSign
+                    * elevatorSim.getPositionMeters()
+                    / Constants.ELEVATOR.encoderCountsToMeters));
+
+    // Internally sets the velocity of the motors in encoder counts per 100 ms based on our velocity
+    // in meters per second (1000 ms)
+    elevatorMotors[0]
+        .getSimCollection()
+        .setIntegratedSensorVelocity(
+            (int)
+                (Constants.ELEVATOR.simEncoderSign
+                    * elevatorSim.getVelocityMetersPerSecond()
+                    / Constants.ELEVATOR.encoderCountsToMeters
+                    * 10));
+
+    // Sets the simulated voltage of the roboRio based on our current draw from the elevator
+    RoboRioSim.setVInVoltage(
+        BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+
+    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
+    // directly setting the length to meters
+    elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
   @Override

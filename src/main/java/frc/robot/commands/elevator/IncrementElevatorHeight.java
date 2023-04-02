@@ -39,11 +39,11 @@ public class IncrementElevatorHeight extends CommandBase {
 
     if (joystickYDeadbandOutput != 0.0) {
       m_elevator.setJoystickY(-joystickYDeadbandOutput);
-      if (m_elevator.getControlState() == ELEVATOR.STATE.CLOSED_LOOP)
-        m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+      if (m_elevator.getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP)
+        m_elevator.setClosedLoopControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
     }
     if (joystickYDeadbandOutput == 0
-        && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+        && m_elevator.getClosedLoopControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.haltPosition();
     }
