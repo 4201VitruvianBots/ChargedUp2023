@@ -428,18 +428,23 @@ public final class Constants {
     }
 
     public enum ZONE {
+      UNDEFINED, // Danger
       ALPHA,
       BETA,
       GAMMA,
     }
 
+    public static final int undefinedOrdinal = ZONE.UNDEFINED.ordinal();
     public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
     public static final int betaOrdinal = ZONE.BETA.ordinal();
     public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
 
+    public static final double elevatorSetpointTolerance = Units.inchesToMeters(1);
+    public static final double wristSetpointTolerance = Units.degreesToRadians(4);
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
-      DANGER_ZONE(0),
+      DANGER_ZONE(undefinedOrdinal),
       // LOWs
       STOWED(alphaOrdinal),
       INTAKE_LOW(alphaOrdinal),
