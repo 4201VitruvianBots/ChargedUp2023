@@ -133,28 +133,28 @@ public class ChargedUpNodeMaskTest {
     SCORING_STATE state;
 
     state = SCORING_STATE.STOWED;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     var test = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redNodes));
 
     state = SCORING_STATE.LOW;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redHybridNodes));
 
     state = SCORING_STATE.MID_CONE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redMidConeNodes));
 
     state = SCORING_STATE.MID_CUBE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redMidCubeNodes));
 
     state = SCORING_STATE.HIGH_CONE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redHighConeNodes));
 
     state = SCORING_STATE.HIGH_CUBE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redHighCubeNodes));
   }
 
@@ -166,28 +166,28 @@ public class ChargedUpNodeMaskTest {
     SCORING_STATE state;
 
     state = SCORING_STATE.STOWED;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     var a = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueNodes));
 
     state = SCORING_STATE.LOW;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueHybridNodes));
 
     state = SCORING_STATE.MID_CONE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueMidConeNodes));
 
     state = SCORING_STATE.MID_CUBE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueMidCubeNodes));
 
     state = SCORING_STATE.HIGH_CONE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueHighConeNodes));
 
     state = SCORING_STATE.HIGH_CUBE;
-    updateValidNodes(robotPose, state);
+    updateNodeMask(robotPose, state);
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueHighCubeNodes));
   }
 }

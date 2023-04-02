@@ -433,9 +433,9 @@ public final class Constants {
       GAMMA,
     }
 
-    public final static int alphaOrdinal = ZONE.ALPHA.ordinal();
-    public final static int betaOrdinal = ZONE.BETA.ordinal();
-    public final static int gammaOrdinal = ZONE.GAMMA.ordinal();
+    public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
+    public static final int betaOrdinal = ZONE.BETA.ordinal();
+    public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED

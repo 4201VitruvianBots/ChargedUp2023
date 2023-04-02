@@ -259,25 +259,22 @@ public class RobotContainer implements AutoCloseable {
       // Score LOW Setpoints
       testController
           .cross()
-          .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW)); 
+          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
 
       // Score MID Setpoints
       testController
           .circle()
-          .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_MID)); 
+          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_MID));
 
       // Stowed
       testController
           .square()
-          .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.STOWED)); 
+          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.STOWED));
 
       // High
       testController
           .triangle()
-          .whileTrue( new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_HIGH)); 
+          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_HIGH));
 
       // Toggle elevator, wrist control state
       testController
@@ -458,6 +455,10 @@ public class RobotContainer implements AutoCloseable {
 
   public LEDSubsystem getLEDs() {
     return m_led;
+  }
+
+  public StateHandler getStateHandler() {
+    return m_stateHandler;
   }
 
   public FieldSim getFieldSim() {

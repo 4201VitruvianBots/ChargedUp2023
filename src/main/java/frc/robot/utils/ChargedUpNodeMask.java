@@ -82,7 +82,7 @@ public class ChargedUpNodeMask {
     else if (nodeIndex < 64) ignoredRedNodes = ignoredRedNodes & ~(1 << (nodeIndex - 32));
   }
 
-  public static void updateValidNodes(Pose2d robotPose, SCORING_STATE scoringState) {
+  public static void updateNodeMask(Pose2d robotPose, SCORING_STATE scoringState) {
     validNodeMask = 0xFFFF_FFFF;
 
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {

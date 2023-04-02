@@ -142,6 +142,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_nextZone;
   }
 
+  public SCORING_STATE getCurrentScoringState() {
+    return m_scoringState;
+  }
+
   public void setCurrentScoringState(SCORING_STATE state) {
     m_scoringState = state;
   }
@@ -254,9 +258,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_nextZone = ZONE_TRANSITIONS.BETA_TO_GAMMA;
           break;
         case 2: // GAMMA
-          if (m_desiredZone.getZone() < m_currentZone.getZone() && m_desiredZone == SUPERSTRUCTURE_STATE.SCORE_MID)
+          if (m_desiredZone.getZone() < m_currentZone.getZone()
+              && m_desiredZone == SUPERSTRUCTURE_STATE.SCORE_MID)
             m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_BETA;
-          else m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_ALPHA; 
+          else m_nextZone = ZONE_TRANSITIONS.GAMMA_TO_ALPHA;
         default:
           // Undefined behavior, put a breakpoint here when debugging to check logic
           System.out.println("This should never be reached");
@@ -525,7 +530,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       case NONE:
         break;
     }
-    // m_fieldSim.updateValidNodes(m_scoringState);
 
     if (m_smartScoringEnabled) {
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
