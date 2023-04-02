@@ -45,7 +45,7 @@ public class GetSubsystemStates extends CommandBase {
     if (DriverStation.isDisabled()) {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
     } else if (!DriverStation.isDisabled()) {
-          switch (m_stateHandler.getCurrentZone()) {
+          switch (m_stateHandler.getDesiredZone()) {
             case LOW_ZONE:
             case INTAKE_LOW:
             case SCORE_LOW_REVERSE: 
@@ -55,17 +55,19 @@ public class GetSubsystemStates extends CommandBase {
                 m_led.expressState(SUPERSTRUCTURE_STATE.LOW_ZONE); // Solid Orange
               break;
             case MID_ZONE:
+            case SCORE_MID_CONE:
+            case SCORE_MID_CUBE:
+            case SCORE_MID:
                 m_led.expressState(SUPERSTRUCTURE_STATE.MID_ZONE);; // Solid White
               break;
             case HIGH_ZONE:
-                m_led.expressState(SUPERSTRUCTURE_STATE.HIGH_ZONE);; // Solid White
+                m_led.expressState(SUPERSTRUCTURE_STATE.HIGH_ZONE);; // Solid Pink
               break;
             case EXTENDED_ZONE:
             case INTAKE_EXTENDED:
-            case SCORE_MID:
+
             case SCORE_HIGH:
-            case SCORE_MID_CONE:
-            case SCORE_MID_CUBE:
+
             case SCORE_HIGH_CONE:
             case SCORE_HIGH_CUBE:
                 m_led.expressState(SUPERSTRUCTURE_STATE.EXTENDED_ZONE);; // Solid White

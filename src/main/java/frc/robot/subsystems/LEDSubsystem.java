@@ -152,6 +152,9 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
           break;
         //   break;
         case MID_ZONE:
+        case SCORE_MID:
+        case SCORE_MID_CONE:
+        case SCORE_MID_CUBE:
             setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
         case HIGH_ZONE:
@@ -159,10 +162,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
           break;
         case EXTENDED_ZONE:
         case INTAKE_EXTENDED:
-        case SCORE_MID:
         case SCORE_HIGH:
-        case SCORE_MID_CONE:
-        case SCORE_MID_CUBE:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
             setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid); // Solid White
