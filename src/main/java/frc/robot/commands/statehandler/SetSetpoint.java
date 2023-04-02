@@ -42,7 +42,6 @@ public class SetSetpoint extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_StateHandler.setDesiredSetpoint(m_desiredState);
   }
 
   // Returns true when the command should end.

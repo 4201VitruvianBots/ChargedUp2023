@@ -173,7 +173,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .rightBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_LOW));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.INTAKING_LOW));
 
     // Score MID Setpoints
     xboxController
@@ -205,7 +205,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .a()
         .whileTrue(
-            new SetSetpointThenStow(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
+            new SetSetpointThenStow(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
