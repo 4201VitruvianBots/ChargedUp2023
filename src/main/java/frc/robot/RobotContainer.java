@@ -170,10 +170,9 @@ public class RobotContainer implements AutoCloseable {
 
     // Score LOW Setpoints
     xboxController
-        .rightBumper()
+        .a()
         .whileTrue(
-            new SetSetpoint(
-                m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.INTAKING_LOW));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_LOW));
 
     // Score MID Setpoints
     xboxController
@@ -202,8 +201,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
     xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
-        .a()
-        .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_LOW));
+        .rightBumper()
+        .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW));
     xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
     xboxController
         .leftBumper()
@@ -295,7 +294,7 @@ public class RobotContainer implements AutoCloseable {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
     m_elevator.resetState();
-    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
+    m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
     m_stateHandler.init();
@@ -305,7 +304,7 @@ public class RobotContainer implements AutoCloseable {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
     m_elevator.resetState();
-    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
+    m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
     m_stateHandler.init();

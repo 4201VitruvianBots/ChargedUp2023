@@ -220,7 +220,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
             getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
   }
 
-  public void setDesiredPositionRadians(double desiredAngleRadians) {
+  public void setSetpointPositionRadians(double desiredAngleRadians) {
     m_desiredSetpointInputRadians = desiredAngleRadians;
   }
 

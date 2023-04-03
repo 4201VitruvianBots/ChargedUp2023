@@ -392,7 +392,7 @@ public final class Constants {
       BETA_MAX(Units.degreesToRadians(146.0)),
       GAMMA_MIN(
           Units.degreesToRadians(
-              90.0)), // TODO: Maybe change this to 25.0 like it was before as extended
+              40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
       GAMMA_MAX(ABSOLUTE_MAX.get()),
 
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),

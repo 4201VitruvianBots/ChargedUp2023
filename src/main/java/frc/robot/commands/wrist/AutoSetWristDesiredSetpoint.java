@@ -32,7 +32,7 @@ public class AutoSetWristDesiredSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    m_wrist.setSetpointPositionRadians(m_setpoint);
   }
 
   // Called once the command ends or is interrupted.
