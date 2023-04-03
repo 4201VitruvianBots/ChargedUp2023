@@ -12,8 +12,8 @@ import java.util.function.DoubleSupplier;
 
 public class SetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
-  private double m_setpoint;
   private final DoubleSupplier m_input;
+  private final double m_setpoint;
 
   public SetWristSetpoint(Wrist wrist, double setpoint) {
     this(wrist, setpoint, () -> 0);
@@ -40,7 +40,7 @@ public class SetWristSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
     m_wrist.setDesiredPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);

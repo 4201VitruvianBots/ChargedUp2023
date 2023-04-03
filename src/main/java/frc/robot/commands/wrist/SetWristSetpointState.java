@@ -11,7 +11,7 @@ import frc.robot.subsystems.Wrist;
 // TODO: Is this command necessary? If not, remove it
 public class SetWristSetpointState extends CommandBase {
   private final Wrist m_wrist;
-  private WRIST.STATE m_state;
+  private final WRIST.STATE m_state;
 
   /** Creates a new RunWrist. */
   public SetWristSetpointState(Wrist wrist, WRIST.STATE state) {
@@ -29,7 +29,7 @@ public class SetWristSetpointState extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setControlState(m_state);
+    m_wrist.setClosedLoopControl(m_state);
   }
 
   // Called once the command ends or is interrupted.

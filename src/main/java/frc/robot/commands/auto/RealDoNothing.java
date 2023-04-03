@@ -28,8 +28,7 @@ public class RealDoNothing extends SequentialCommandGroup {
             .withTimeout(1),
         new ParallelCommandGroup(
                 new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
-                new AutoSetElevatorSetpoint(
-                    elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()))
+                new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()))
             .withTimeout(2.5),
         new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
         new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2),

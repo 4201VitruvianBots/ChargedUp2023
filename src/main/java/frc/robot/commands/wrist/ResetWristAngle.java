@@ -9,7 +9,7 @@ import frc.robot.subsystems.Wrist;
 
 public class ResetWristAngle extends CommandBase {
   private final Wrist m_wrist;
-  private double m_angle;
+  private final double m_angle;
 
   /** Creates a new RunWrist. */
   public ResetWristAngle(Wrist wrist, double angle) {

@@ -107,19 +107,17 @@ public final class Constants {
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
     public static final int simEncoderSign =
-      mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+        mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
     // Trapezoid profile stuff
     public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxVel * .5, kMaxAccel);
+        new TrapezoidProfile.Constraints(kMaxVel * .5, kMaxAccel);
     // Used when elevator is moving downward
     public static final TrapezoidProfile.Constraints m_slowConstraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
     // Used when elevator is moving upward
     public static final TrapezoidProfile.Constraints m_fastConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxVel * 1.3, kMaxAccel * 1.3);
+        new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
@@ -183,6 +181,7 @@ public final class Constants {
       LIMITED
     }
   }
+
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
     public static final double length = Units.inchesToMeters(12);
@@ -367,13 +366,15 @@ public final class Constants {
     public static final double kD = 1.0;
 
     public static final int simEncoderSign =
-      WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
-    
+        WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+
     public static final TrapezoidProfile.Constraints slowConstraints =
-        new TrapezoidProfile.Constraints(Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+        new TrapezoidProfile.Constraints(
+            Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
     public static final TrapezoidProfile.Constraints fastConstraints =
-        new TrapezoidProfile.Constraints(Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
-    
+        new TrapezoidProfile.Constraints(
+            Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
     public static final double kPercentOutputMultiplier = 0.3;

@@ -10,7 +10,7 @@ import frc.robot.subsystems.Wrist;
 
 public class AutoSetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
-  private double m_setpoint;
+  private final double m_setpoint;
 
   /** Creates a new RunWrist. */
   public AutoSetWristSetpoint(Wrist wrist, double setpoint) {
@@ -24,9 +24,7 @@ public class AutoSetWristSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
-    m_wrist.setUserSetpoint(true);
-    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -40,13 +40,15 @@ import frc.robot.commands.wrist.ResetWristAngle;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
 
-  // Initalize single wrist motor
+  // Initialize single wrist motor
   private static final TalonFX wristMotor = new TalonFX(Constants.CAN.wristMotor);
 
   private double m_desiredSetpointRadians;
   private double m_commandedAngleRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
+
+  // TODO: Consolidate Enum definition
   private WRIST.STATE m_controlState = WRIST.STATE.CLOSED_LOOP;
 
   private double m_joystickInput;
@@ -55,18 +57,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Intake m_intake;
   private final Elevator m_elevator;
 
-  private TrapezoidProfile.Constraints m_currentConstraints =
-    Constants.WRIST.slowConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints = Constants.WRIST.slowConstraints;
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  
+
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   public ArmFeedforward m_feedforward =
       new ArmFeedforward(
           Constants.WRIST.FFkS, Constants.WRIST.kG, Constants.WRIST.FFkV, Constants.WRIST.kA);
 
-  // This timer is used in trapezoid profile to calculate the amount of time since the last periodic run
+  // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
+  // run
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -139,8 +141,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
     // Give some time for the CANcoder to recognize the wrist before starting
-    if (RobotBase.isReal())
-      Timer.delay(2);
+    if (RobotBase.isReal()) Timer.delay(2);
 
     resetAngleDegrees(-15.0);
 
@@ -158,17 +159,25 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean isUserControlled() {
-    return m_joystickInput != 0 && m_userSetpoint == false;
+    return m_joystickInput != 0 && !m_userSetpoint;
   }
 
-  public void setControlState(WRIST.STATE state) {
+  public void setClosedLoopControl(WRIST.STATE state) {
     m_controlState = state;
   }
 
-  public WRIST.STATE getControlState() {
+  public WRIST.STATE getClosedLoopControl() {
     return m_controlState;
   }
+  public boolean isClosedLoopControl() {
+    return m_controlState == WRIST.STATE.CLOSED_LOOP;
+  }
 
+  public void setPercentOutput(double output) {
+    setPercentOutput(output, false);
+  }
+
+  // TODO: Review copy/paste
   // set percent output function
   // period function that edits the elevator's height, from there make sure it obeys the limit (27.7
   // rotation)
@@ -196,7 +205,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return wristMotor.getSupplyCurrent();
   }
 
-  // Sets the setpoint of the wrist using a state caluclated in periodic
+  // Sets the setpoint of the wrist using a state calculated in periodic
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
     wristMotor.set(
         ControlMode.Position,
@@ -284,28 +293,47 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
+    return new TrapezoidProfile.State(
+        MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
+  }
+
+  // Do not remove. WIP for auto scoring
+  public Translation2d getHorizontalTranslation() {
+    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
+    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
+    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
+    // Cone: f(x)=-0.270347*t+16.8574;
+    double horizontalDistance = 0;
+    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
+      horizontalDistance =
+          0.00000913468 * Math.pow(getPositionDegrees(), 3)
+              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
+              - 0.0894341 * getPositionDegrees()
+              + 16.1239;
+    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
+      horizontalDistance =
+          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
+          -0.270347 * getPositionDegrees() + 16.8574;
+    return new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+  }
+
   private void updateIValue() {
-    if (getPositionDegrees() < 30)
-      m_newKI = 0.00001;
-    else if (getPositionDegrees() >= 30)
-      m_newKI = 0;
-    
+    if (getPositionDegrees() < 30) m_newKI = 0.00001;
+    else if (getPositionDegrees() >= 30) m_newKI = 0;
+
     if (m_currentKI != m_newKI) {
       wristMotor.config_kI(0, m_newKI);
       m_currentKI = m_newKI;
     }
   }
 
-  private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
-    return new TrapezoidProfile.State(
-        MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
-  }
-
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
     SmartDashboard.putData("Reset90", new ResetWristAngle(this, Units.degreesToRadians(90)));
 
-    NetworkTable wristTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
+    NetworkTable wristTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
@@ -314,16 +342,22 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
-    fourbarLigament2d = 
-      m_elevator.getLigament2d().append(
-        new MechanismLigament2d("Fourbar", Constants.WRIST.fourbarLength,
-          180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
+    fourbarLigament2d =
+        m_elevator
+            .getLigament2d()
+            .append(
+                new MechanismLigament2d(
+                    "Fourbar",
+                    Constants.WRIST.fourbarLength,
+                    180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
     fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
 
     intakeLigament2d =
-      fourbarLigament2d.append(new MechanismLigament2d("Intake", Constants.INTAKE.length, fourbarLigament2d.getAngle()*1.5));
+        fourbarLigament2d.append(
+            new MechanismLigament2d(
+                "Intake", Constants.INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
     intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
-    
+
     // // Initialize Test Values
     // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
     // wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
@@ -350,16 +384,17 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateSmartDashboard() {
-    SmartDashboard.putString("Wrist Closed Loop", getControlState().name());
+    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControl().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
-    currentCommandStatePub.set(getControlState().toString());
+    currentCommandStatePub.set(getClosedLoopControl().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
     kCurrentAngleDegreesPub.set(getPositionDegrees());
 
     // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
     // currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
+    // TODO: Rewrite testing code
     // Tuning controls
     //    setControlState(STATE.TEST_SETPOINT);
     // if (m_controlState == STATE.TEST_SETPOINT) {
@@ -400,44 +435,27 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     positionDegreesEntry.append(getPositionDegrees());
   }
 
-  // Do not remove. WIP for auto scoring
-  public Translation2d getHorizontalTranslation() {
-    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
-    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
-    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
-    // Cone: f(x)=-0.270347*t+16.8574;
-    double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
-      horizontalDistance =
-          0.00000913468 * Math.pow(getPositionDegrees(), 3)
-              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
-              - 0.0894341 * getPositionDegrees()
-              + 16.1239;
-    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
-      horizontalDistance =
-          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
-          -0.270347 * getPositionDegrees() + 16.8574;
-    return new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
-  }
-
   @Override
   public void periodic() {
+    updateIValue();
     updateSmartDashboard();
     updateLog();
-    updateIValue();
 
+    // TODO: Cleanup logic
     switch (m_controlState) {
-      // Called when setting to open loop
+        // Called when setting to open loop
       case OPEN_LOOP_MANUAL:
         double percentOutput = m_joystickInput * Constants.WRIST.kPercentOutputMultiplier;
         // Sets final percent output
-        // True means it will enforce limits. In this way it is not truly open loop, but it'll prevent the robot from breaking
+        // True means it will enforce limits. In this way it is not truly open loop, but it'll
+        // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
       default:
       case CLOSED_LOOP:
         // Updates our trapezoid profile state based on the time since our last periodic and our
         // recorded change in height
+
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
         TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         double currentTime = m_timer.get();
@@ -480,14 +498,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / Constants.WRIST.encoderUnitsToDegrees
                     * 10.0));
-    
+
     // Update the angle of the mech2d
     fourbarLigament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
-    intakeLigament2d.setAngle(fourbarLigament2d.getAngle()*-1.5);
+    intakeLigament2d.setAngle(fourbarLigament2d.getAngle() * -1.5);
   }
 
   @Override
-  public void close() throws Exception {
-
-  }
+  public void close() throws Exception {}
 }

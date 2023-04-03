@@ -365,7 +365,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MIN.get());
           }
         }
@@ -377,7 +377,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.LOW_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.LOW_MAX.get());
           }
         } else if (ELEVATOR.THRESHOLD.HIGH_MIN.get() < m_elevator.getHeightMeters()) {
@@ -386,7 +386,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.HIGH_MIN.get());
           }
         }
@@ -398,7 +398,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.MID_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
           }
         } else if (ELEVATOR.THRESHOLD.EXTENDED_MIN.get() < m_elevator.getHeightMeters()) {
@@ -407,7 +407,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.EXTENDED_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.EXTENDED_MIN.get());
           }
         }
@@ -421,7 +421,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             m_currentZone = SUPERSTRUCTURE_STATE.HIGH_ZONE;
             return;
           } else if (!m_wrist.isUserControlled()) {
-            m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+            m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
             m_wrist.setDesiredPositionRadians(WRIST.THRESHOLD.MID_MAX.get());
           }
         }
@@ -536,7 +536,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
           m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
           m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-          m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+          m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
           m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
         }
       }

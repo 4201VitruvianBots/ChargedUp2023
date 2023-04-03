@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
@@ -226,8 +225,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new SetWristSetpoint(
-                m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
+            new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
 
     // High
     xboxController
@@ -251,8 +249,7 @@ public class RobotContainer implements AutoCloseable {
     // Toggle elevator, wrist control state
     xboxController
         .povUp()
-        .onTrue(
-            new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
+        .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
     xboxController
         .povUp()
         .onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
@@ -396,9 +393,7 @@ public class RobotContainer implements AutoCloseable {
       testController
           .povDown()
           .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
-      testController
-          .povDown()
-          .onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+      testController.povDown().onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
 
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -452,36 +447,31 @@ public class RobotContainer implements AutoCloseable {
         new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorStowed",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
-            .withTimeout(1));
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetWristLowConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowConeNode",
         new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristMidConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
         new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristHighConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
         new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowReverseCubeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowReverseCubeNode",
         new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
