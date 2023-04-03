@@ -69,6 +69,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic run
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
+  private double m_lastSimTimestamp = 0;
 
   private double m_currentKI = 0;
   private double m_newKI = 0;
@@ -85,7 +86,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
-  private MechanismLigament2d ligament2d;
+  private MechanismLigament2d fourbarLigament2d;
+  private MechanismLigament2d intakeLigament2d;
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
@@ -312,12 +314,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
 
-    ligament2d = 
+    fourbarLigament2d = 
       m_elevator.getLigament2d().append(
-        new MechanismLigament2d("Wrist", Constants.WRIST.length,
+        new MechanismLigament2d("Fourbar", Constants.WRIST.fourbarLength,
           180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
-    
-    ligament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+
+    intakeLigament2d =
+      fourbarLigament2d.append(new MechanismLigament2d("Intake", Constants.INTAKE.length, fourbarLigament2d.getAngle()*1.5));
+    intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
     
     // // Initialize Test Values
     // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
@@ -453,7 +458,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(
             wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
     double currentTime = m_timer.get();
-    m_armSim.update(currentTime - m_lastTimestamp);
+    m_armSim.update(currentTime - m_lastSimTimestamp);
+    m_lastSimTimestamp = currentTime;
 
     Unmanaged.feedEnable(20);
 
@@ -476,7 +482,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * 10.0));
     
     // Update the angle of the mech2d
-    ligament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
+    fourbarLigament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
+    intakeLigament2d.setAngle(fourbarLigament2d.getAngle()*-1.5);
   }
 
   @Override

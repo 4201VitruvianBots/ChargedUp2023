@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN_UTIL_LIMIT;
@@ -111,10 +112,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters, maxHeightMeters);
-  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", 0, 0);
+  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
+  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
   public MechanismLigament2d elevatorLigament2d =
-      root2d.append(new MechanismLigament2d("Elevator", getHeightMeters(), Constants.ELEVATOR.angleDegrees));
+      root2d.append(new MechanismLigament2d("Elevator", getHeightMeters() + Constants.ELEVATOR.carriageDistance, Constants.ELEVATOR.angleDegrees));
+  public MechanismLigament2d robotBase2d = 
+      root2d.append(new MechanismLigament2d("Robot Base", Constants.SWERVEDRIVE.kTrackWidth, 0));
 
   // Logging setup
   public DataLog log = DataLogManager.getLog();
@@ -309,6 +312,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+    
+    // Change the color of the robot base mech2d
+    robotBase2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
@@ -433,7 +439,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
     // directly setting the length to meters
-    elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
+    elevatorLigament2d.setLength(elevatorSim.getPositionMeters() + Constants.ELEVATOR.carriageDistance);
   }
 
   // This method will be called once per scheduler run

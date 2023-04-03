@@ -77,6 +77,7 @@ public final class Constants {
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
+    public static final double carriageDistance = Units.inchesToMeters(6.5);
     public static final int angleDegrees = 35;
 
     // PID
@@ -182,9 +183,10 @@ public final class Constants {
       LIMITED
     }
   }
-
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+    public static final double length = Units.inchesToMeters(12);
+
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
     public static final int cubeSensorId = 2;
@@ -345,6 +347,7 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
+    public static final double fourbarLength = Units.inchesToMeters(15);
     public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
@@ -377,7 +380,7 @@ public final class Constants {
 
     public enum STATE {
       OPEN_LOOP_MANUAL,
-      CLOSED_LOOP,
+      CLOSED_LOOP
     }
 
     public enum WRIST_SPEED {
