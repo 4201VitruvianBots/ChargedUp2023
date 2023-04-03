@@ -11,15 +11,18 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
+import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
@@ -36,7 +39,8 @@ public class TwoPiece extends SequentialCommandGroup {
       Wrist wrist,
       Intake intake,
       Vision vision,
-      Elevator elevator) {
+      Elevator elevator,
+      StateHandler stateHandler) {
 
     List<PathPlannerTrajectory> trajectories =
         TrajectoryUtils.readTrajectory(
@@ -51,9 +55,8 @@ public class TwoPiece extends SequentialCommandGroup {
         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
 
         /** Brings elevator & wrist to High Pulls up cone */
-        new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+        new ParallelDeadlineGroup(
+            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)),
 
         /** Outakes cone */
@@ -62,8 +65,7 @@ public class TwoPiece extends SequentialCommandGroup {
 
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
             new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
 
         // /** TODO: test this implementation out
@@ -84,27 +86,23 @@ public class TwoPiece extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            swerveCommands.get(0),
+          //  swerveCommands.get(0),
             new SequentialCommandGroup(
                 new WaitCommand(0.75),
                 new ParallelCommandGroup(
-                    new AutoSetElevatorDesiredSetpoint(
-                        elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get()),
-                    new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.INTAKING_LOW.get()),
+                        new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW),
                     new AutoRunIntakeCube(intake, 0.5, vision, swerveDrive)))),
 
         /** Runs 2nd part of Path, stows, and holds cube */
         new ParallelDeadlineGroup(
-            swerveCommands.get(1),
+           // swerveCommands.get(1),
             new ParallelCommandGroup(
-                new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-                new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
                 new AutoRunIntakeCube(intake, 0.2, vision, swerveDrive))),
 
         /** Brings elevator & wrist to High */
         new ParallelCommandGroup(
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())),
+            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)),
 
         /** Places Cube */
         new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive),

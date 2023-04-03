@@ -136,7 +136,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     strafe *= m_maxVelocity;
     rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
 
-
     /** Setting field vs Robot Relative */
     if (useHeadingTarget) {
       rotation = m_rotationOutput;

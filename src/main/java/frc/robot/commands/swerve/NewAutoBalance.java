@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrive;
 
 public class NewAutoBalance extends CommandBase {
@@ -41,7 +40,7 @@ public class NewAutoBalance extends CommandBase {
   public void execute() {
     double speed = 0.4;
     double zero = m_swerveDrive.getRollOffsetDegrees();
-    if (Math.abs((m_swerveDrive.getRollDegrees()- zero)) > 1) {
+    if (Math.abs((m_swerveDrive.getRollDegrees() - zero)) > 1) {
       speed = 0.13 * Math.signum(m_swerveDrive.getRollDegrees());
       isBalancing = true;
     } else if (isBalancing) {

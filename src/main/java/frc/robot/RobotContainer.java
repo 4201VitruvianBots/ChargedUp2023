@@ -29,12 +29,15 @@ import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.Intake.IntakeVisionAlignment;
 import frc.robot.commands.Intake.RunIntakeCone;
 import frc.robot.commands.Intake.RunIntakeCube;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.JustBalance;
+import frc.robot.commands.auto.OnePiece;
+import frc.robot.commands.auto.PlaceOneBalance;
+import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
 import frc.robot.commands.elevator.ResetElevatorHeightMeters;
 import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
@@ -44,13 +47,13 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
 import frc.robot.commands.util.ToggleCanUtilization;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristDesiredSetpoint;
@@ -363,19 +366,14 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
     m_autoChooser.addOption(
-        "BlueOnePiece",
-        new OnePiece(
-            "OnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
-
-    m_autoChooser.addOption(
         "TwoPiece",
         new TwoPiece(
-            "TwoPiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator));
+            "TwoPiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
         "PlaceOneBalance",
         new PlaceOneBalance(
-            "PlaceOneBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
+            "PlaceOneBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision, m_stateHandler));
 
     m_autoChooser.addOption(
         "JustBalance",
@@ -391,7 +389,7 @@ public class RobotContainer implements AutoCloseable {
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator));
+            m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
         "DriveForward", new DriveForward("DriveForward", m_swerveDrive, m_fieldSim, m_wrist));

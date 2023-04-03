@@ -32,11 +32,9 @@ public class JustBalance extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
     addCommands(
-    /** Setting Up Auto Zeros robot to path flips path if nessesary */
-    new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
-    new PlotAutoTrajectory(fieldSim, pathName, trajectories),
-    
-      swerveCommands.get(0),
+        /** Setting Up Auto Zeros robot to path flips path if nessesary */
+        new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
+        new PlotAutoTrajectory(fieldSim, pathName, trajectories),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
