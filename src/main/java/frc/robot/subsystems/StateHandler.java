@@ -63,6 +63,8 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private double elevatorUpperLimitMeters;
   private double wristLowerLimitRadians;
   private double wristUpperLimitRadians;
+  private double universalWristLowerLimitRadians = STATEHANDLER.universalWristLowerLimitRadians;
+  private double universalWristUpperLimitRadians = STATEHANDLER.universalWristUpperLimitRadians;
 
   private final Intake m_intake;
   private final Wrist m_wrist;
@@ -316,14 +318,19 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateCommandedSetpoints() {
-    setElevatorCommandedSetpoint();
+    double currentWristPosition = m_wrist.getPositionRadians();
+    setElevatorCommandedSetpoint(currentWristPosition);
     setWristCommandedSetpoint();
   }
 
-  private void setElevatorCommandedSetpoint() {
-    m_elevator.setDesiredPositionMeters(
-        MathUtil.clamp(
-            m_elevatorDesiredSetpointMeters, elevatorLowerLimitMeters, elevatorUpperLimitMeters));
+  private void setElevatorCommandedSetpoint(double currentWristPosition) {
+    if ((m_currentState.getZone() == m_desiredState.getZone())
+        || (currentWristPosition >= universalWristLowerLimitRadians
+            && currentWristPosition <= universalWristUpperLimitRadians)) {
+      m_elevator.setDesiredPositionMeters(
+          MathUtil.clamp(
+              m_elevatorDesiredSetpointMeters, elevatorLowerLimitMeters, elevatorUpperLimitMeters));
+    }
   }
 
   private void setWristCommandedSetpoint() {
@@ -357,6 +364,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         // Undefined state, put a breakpoint here when debugging to check logic
         System.out.println("This should never be reached");
         break;
+    }
+    // If the desired state is not in the current zone, set the limits to the universal limits
+    if (m_currentState.getZone() != m_desiredState.getZone()) {
+      wristLowerLimitRadians = universalWristLowerLimitRadians;
+      wristUpperLimitRadians = universalWristUpperLimitRadians;
     }
   }
 

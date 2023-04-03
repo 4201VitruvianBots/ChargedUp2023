@@ -30,7 +30,8 @@ import java.util.Map;
  */
 public final class Constants {
   public static String robotName = "";
-  // Add any constants that do not change between robots here, as well as all enums
+  // Add any constants that do not change between robots here, as well as all
+  // enums
 
   public static class USB {
     public static final int leftJoystick = 0;
@@ -441,6 +442,9 @@ public final class Constants {
 
     public static final double elevatorSetpointTolerance = Units.inchesToMeters(1);
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
+
+    public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(100);
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
