@@ -40,8 +40,13 @@ public class SetWristSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+<<<<<<< HEAD:src/main/java/frc/robot/commands/wrist/SetWristSetpoint.java
     m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
     m_wrist.setDesiredPositionRadians(m_setpoint);
+=======
+    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
+    m_wrist.setSetpointPositionRadians(m_setpoint);
+>>>>>>> main:src/main/java/frc/robot/commands/wrist/SetWristDesiredSetpoint.java
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
     m_wrist.setUserInput(-joystickDeadbandOutput);
