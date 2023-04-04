@@ -79,9 +79,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   private final SwerveDrivePoseEstimator m_odometry;
+  private boolean m_simOverride = false;
   private final Timer m_simTimer = new Timer();
   private double m_lastSimTime = 0;
-  private boolean m_simOverride = false;
   private double m_simYaw;
   private double m_simRoll;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
@@ -93,8 +93,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       new TrapezoidProfile.Constraints(
           Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond,
           Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
-  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
-  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private final ProfiledPIDController m_rotationController =
       new ProfiledPIDController(
           Constants.SWERVEDRIVE.kP_Rotation,
@@ -185,12 +183,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
    */
   public void enableHeadingTarget(boolean enable) {
     useHeadingTarget = enable;
-  }
-
-  public void resetState() {
-    m_setpoint =
-        new TrapezoidProfile.State(
-            Units.degreesToRadians(getHeadingDegrees()), Units.degreesToRadians(0));
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
@@ -386,7 +378,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
-
     for (var module : ModuleMap.orderedValuesList(m_swerveModules)) module.close();
   }
 }

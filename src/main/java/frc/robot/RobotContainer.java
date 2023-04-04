@@ -303,7 +303,6 @@ public class RobotContainer implements AutoCloseable {
     m_elevator.teleopInit();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
-    m_swerveDrive.resetState();
     m_stateHandler.init();
   }
 
@@ -313,7 +312,6 @@ public class RobotContainer implements AutoCloseable {
     m_elevator.resetTrapezoidState();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
-    m_swerveDrive.resetState();
     m_stateHandler.init();
   }
 
