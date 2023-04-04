@@ -63,9 +63,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v3
     
-    - name: Set release environment variable
-      run: echo "EXTRA_GRADLE_ARGS=-PreleaseMode" >> $GITHUB_ENV
-    
     # Declares the repository safe and not under dubious ownership.
     - name: Add repository to git safe directories
       run: git config --global --add safe.directory $GITHUB_WORKSPACE
@@ -80,7 +77,7 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
-      run: ./gradlew build --build-cache -PbuildServer -PskipJavaFormat ${{ env.EXTRA_GRADLE_ARGS }}
+      run: ./gradlew build
     
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
