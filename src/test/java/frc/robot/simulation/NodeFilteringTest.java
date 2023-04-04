@@ -57,7 +57,7 @@ public class NodeFilteringTest {
     }
     double average = totalTime / states.length;
 
-    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
+//    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
     assertTrue(average < 0.020);
   }
 }
