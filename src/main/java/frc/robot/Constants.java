@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -104,12 +105,22 @@ public final class Constants {
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
+    public static final int simEncoderSign =
+        mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+
+    // Trapezoid profile stuff
+    public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
+        new TrapezoidProfile.Constraints(kMaxVel * .5, kMaxAccel);
+    // Used when elevator is moving downward
+    public static final TrapezoidProfile.Constraints m_slowConstraints =
+        new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
+    // Used when elevator is moving upward
+    public static final TrapezoidProfile.Constraints m_fastConstraints =
+        new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
+
     public enum STATE {
       OPEN_LOOP_MANUAL,
-      CLOSED_LOOP_MANUAL,
-      TEST_SETPOINT,
-      USER_SETPOINT,
-      AUTO_SETPOINT
+      CLOSED_LOOP
     }
 
     public enum SETPOINT {
@@ -355,7 +366,7 @@ public final class Constants {
       OPEN_LOOP_MANUAL,
       CLOSED_LOOP_MANUAL,
       TEST_SETPOINT,
-      USER_SETPOINT,
+      CLOSED_LOOP,
       AUTO_SETPOINT
     }
 

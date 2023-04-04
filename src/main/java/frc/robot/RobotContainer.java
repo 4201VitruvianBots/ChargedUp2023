@@ -37,16 +37,24 @@ import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.Intake.IntakeVisionAlignment;
 import frc.robot.commands.Intake.RunIntakeCone;
 import frc.robot.commands.Intake.RunIntakeCube;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.JustBalance;
+import frc.robot.commands.auto.OnePiece;
+import frc.robot.commands.auto.PlaceOneBalance;
+import frc.robot.commands.auto.TwoPiece;
+import frc.robot.commands.auto.TwoPieceTest;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.ResetElevatorHeightMeters;
-import frc.robot.commands.elevator.SetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.ResetElevatorHeight;
+import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 // import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
@@ -134,7 +142,7 @@ public class RobotContainer implements AutoCloseable {
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
 
-    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
+    SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
     SmartDashboard.putData(new ToggleCanUtilization(m_stateHandler));
   }
@@ -275,7 +283,7 @@ public class RobotContainer implements AutoCloseable {
       // Toggle elevator, wrist control state
       testController
           .povDown()
-          .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+          .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
       testController
           .povDown()
           .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
@@ -292,8 +300,7 @@ public class RobotContainer implements AutoCloseable {
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
+    m_elevator.teleopInit();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
@@ -303,7 +310,7 @@ public class RobotContainer implements AutoCloseable {
   public void autonomousInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
+    m_elevator.haltPosition();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
     m_wrist.resetState();
     m_swerveDrive.resetState();
@@ -326,22 +333,21 @@ public class RobotContainer implements AutoCloseable {
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorIntaking",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristStowed",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorStowed",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
-            .withTimeout(1));
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetWristLowConeNode",
         new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristMidConeNode",
@@ -349,7 +355,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristHighConeNode",
@@ -357,7 +363,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowReverseCubeNode",
@@ -365,7 +371,7 @@ public class RobotContainer implements AutoCloseable {
             .withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowReverseCubeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
 
     m_autoBuilder =
@@ -394,6 +400,157 @@ public class RobotContainer implements AutoCloseable {
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
+
+    m_autoChooser.addOption(
+        "BlueOnePiece",
+        new OnePiece(
+            "BlueOnePiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
+
+    m_autoChooser.addOption(
+        "TwoPiece",
+        new TwoPiece(
+            "TwoPiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
+
+    m_autoChooser.addOption(
+        "MasonOnTheGrind",
+        new TwoPieceTest(
+            "TwoPieceTest",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
+
+    m_autoChooser.addOption(
+        "PlaceOneBalance",
+        new PlaceOneBalance(
+            "PlaceOneBalance",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision));
+
+    // m_autoChooser.addOption(
+    //     "BlueOnePieceNoBalance",
+    //     new OnePieceNoBalance(
+    //         "BlueOnePieceNoBalance",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator));
+
+    // m_autoChooser.addOption(
+    //     "RedOnePieceNoBalance",
+    //     new OnePieceNoBalance(
+    //         "BlueOnePieceNoBalance",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator));
+
+    // m_autoChooser.addOption(
+    //     "RedOnePiece",
+    //     new OnePiece(
+    //         "BlueOnePiece",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator));
+
+    m_autoChooser.addOption(
+        "JustBalance",
+        new JustBalance(
+            "TestJustBalance",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision));
+
+    // m_autoChooser.addOption(
+    //     "RedTopTwoBalance", new RedTopTwoBalance("RedTopTwoCone", m_autoBuilder, m_swerveDrive,
+    // m_fieldSim));
+
+    m_autoChooser.addOption(
+        "BlueBottomDriveForward",
+        new BottomDriveForward(
+            "BlueBottomDriveForward",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator));
+
+    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+
+    m_autoChooser.addOption(
+        "DriveForward",
+        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+
+    // m_autoChooser.addOption(
+    //     "RedDriveForward",
+    //     new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+
+    // m_autoChooser.setDefaultOption(
+    //     "BlueTopDriveForward",
+    //     new TopDriveForward(
+    //         "BlueTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
+
+    // m_autoChooser.addOption(
+    //     "RedTopDriveForward",
+    //     new TopDriveForward(
+    //         "RedTopDriveForward",
+    //         m_autoBuilder,
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_elevator,
+    //         m_intake,
+    //         m_vision));
+
+    // m_autoChooser.addOption(
+    //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+
+    m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 

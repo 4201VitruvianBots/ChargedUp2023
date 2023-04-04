@@ -26,7 +26,7 @@ public class AutoSetWristDesiredSetpoint extends CommandBase {
   public void initialize() {
 
     m_wrist.setUserSetpoint(true);
-    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
+    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

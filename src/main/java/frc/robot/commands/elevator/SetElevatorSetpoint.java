@@ -5,45 +5,54 @@
 // Called when the joystick moves up/down, also acts as manual override
 package frc.robot.commands.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
+import java.util.function.DoubleSupplier;
 
-public class SetElevatorDesiredSetpointState extends CommandBase {
+public class SetElevatorSetpoint extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
-  private final ELEVATOR.STATE m_setpoint;
+  private final DoubleSupplier m_input;
 
-  public SetElevatorDesiredSetpointState(Elevator elevator, ELEVATOR.STATE state) {
+  private final double m_setpoint;
 
-    // Use addRequirements() here to declare subsystem dependencies.
+  public SetElevatorSetpoint(Elevator elevator, double setpoint) {
+    this(elevator, setpoint, () -> 0);
+  }
+
+  public SetElevatorSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
     m_elevator = elevator;
-    m_setpoint = state;
+    m_setpoint = setpoint;
+    m_input = input;
     addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setIsElevating(true);
+    m_elevator.setClosedLoopControlState(ELEVATOR.STATE.CLOSED_LOOP);
+    m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setControlState(m_setpoint);
+    m_elevator.setDesiredPositionMeters(m_setpoint);
+
+    double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
+    m_elevator.setJoystickY(-joystickDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_elevator.setIsElevating(false);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return true;
+    return false;
   }
 }

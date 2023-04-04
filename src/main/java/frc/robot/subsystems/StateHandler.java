@@ -277,17 +277,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           }
         } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
           // BETA -> GAMMA
-          // if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
-          //     && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
-            m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
-            return;
-          // }
+          m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+          return;
         }
         break;
-      case 3: // GAMMA
+        case 3: // GAMMA
         // GAMMA -> BETA
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get() && m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
-          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) {
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
+          if (WRIST.THRESHOLD.BETA_MAX.get() > m_wrist.getPositionRadians()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
             return;
           }
@@ -328,7 +325,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             && currentWristPosition <= universalWristUpperLimitRadians)) {
       m_elevator.setDesiredPositionMeters(
           MathUtil.clamp(
-              m_elevatorDesiredSetpointMeters, ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(), ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()));
+              m_elevatorDesiredSetpointMeters,
+              ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+              ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()));
     }
   }
 
@@ -502,7 +501,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           m_wrist.getHorizontalTranslation().getX(),
           m_scoringState);
       m_wrist.setSetpointPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
-      m_elevator.setSetpointMotionMagicMeters(m_setpointSolver.getElevatorSetpointMeters());
+      m_elevator.setDesiredPositionMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
