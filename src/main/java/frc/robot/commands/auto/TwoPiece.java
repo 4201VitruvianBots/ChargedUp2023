@@ -14,6 +14,7 @@ import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
@@ -44,9 +45,7 @@ public class TwoPiece extends SequentialCommandGroup {
     var autoPath = autoBuilder.fullAuto(m_trajectory);
 
     addCommands(
-        //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
-        // fieldSim),
-
+        new SetSwerveOdometry(swerveDrive, m_trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         new ParallelCommandGroup(

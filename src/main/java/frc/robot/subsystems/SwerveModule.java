@@ -282,14 +282,16 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
     var currentTime = m_simTimer.get();
-    m_turnMotorSim.update(currentTime - m_lastSimTime);
-    m_driveMotorSim.update(currentTime - m_lastSimTime);
+    double dt = currentTime - m_lastSimTime;
+    m_turnMotorSim.update(dt);
+    m_driveMotorSim.update(dt);
+
+    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * dt;
+    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * dt;
+
     m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
-
-    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
-    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
 
     m_turnMotor
         .getSimCollection()

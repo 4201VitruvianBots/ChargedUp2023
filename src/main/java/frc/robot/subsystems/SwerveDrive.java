@@ -76,9 +76,11 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private double m_rollOffset;
   private Trajectory m_trajectory;
 
-  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   private final SwerveDrivePoseEstimator m_odometry;
+  private final Timer m_simTimer = new Timer();
+  private double m_lastSimTime = 0;
   private boolean m_simOverride = false;
   private double m_simYaw;
   private double m_simRoll;
@@ -117,6 +119,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isReal()) {
       Timer.delay(1);
       resetModulesToAbsolute();
+    } else {
+      m_simTimer.reset();
+      m_simTimer.start();
     }
     initSmartDashboard();
   }
@@ -368,7 +373,12 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
         Constants.SWERVEDRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
-    m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
+    var currentTime = m_simTimer.get();
+    double dt = currentTime - m_lastSimTime;
+
+    m_simYaw += chassisSpeed.omegaRadiansPerSecond * dt;
+
+    m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));

@@ -186,13 +186,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-  // TODO: Remove
-  // Clamp the desired setpoint to within our lower and upper limits
-  private TrapezoidProfile.State limitDesiredSetpointMeters(TrapezoidProfile.State state) {
-    return new TrapezoidProfile.State(
-        MathUtil.clamp(state.position, m_lowerLimitMeters, m_upperLimitMeters), state.velocity);
-  }
-
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
     elevatorMotors[0].set(
@@ -441,10 +434,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
 
-        TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointMeters(m_setpoint);
-        m_commandedPositionMeters = commandedSetpoint.position;
-        kDesiredHeightPub.set(Units.metersToInches(commandedSetpoint.position));
-        setSetpointTrapezoidState(commandedSetpoint);
+        setSetpointTrapezoidState(m_setpoint);
         break;
     }
   }

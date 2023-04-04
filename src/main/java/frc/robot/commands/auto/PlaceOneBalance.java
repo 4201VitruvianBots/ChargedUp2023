@@ -13,6 +13,7 @@ import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
@@ -39,8 +40,9 @@ public class PlaceOneBalance extends SequentialCommandGroup {
 
     var autoPath = autoBuilder.fullAuto(m_trajectory);
     addCommands(
-        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
+        new SetSwerveOdometry(swerveDrive, m_trajectory.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
+        new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new ParallelCommandGroup(
             new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
             new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
