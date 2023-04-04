@@ -27,10 +27,10 @@ public class ToggleElevatorControlMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_elevator.getControlState() == ELEVATOR.STATE.CLOSED_LOOP)
-      m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-    else if (m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL)
-      m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
+    if (m_elevator.getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP)
+      m_elevator.setClosedLoopControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
+    else if (m_elevator.getClosedLoopControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL)
+      m_elevator.setClosedLoopControlState(ELEVATOR.STATE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

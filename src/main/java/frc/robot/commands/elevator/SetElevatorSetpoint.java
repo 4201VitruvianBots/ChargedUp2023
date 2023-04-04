@@ -33,7 +33,7 @@ public class SetElevatorSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setControlState(ELEVATOR.STATE.CLOSED_LOOP);
+    m_elevator.setClosedLoopControlState(ELEVATOR.STATE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 

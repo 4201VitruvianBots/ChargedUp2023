@@ -60,6 +60,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private TrapezoidProfile.Constraints m_currentConstraints = Constants.WRIST.slowConstraints;
 
+  private Translation2d m_wristHorizontalTranslation = new Translation2d();
+
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
@@ -224,7 +226,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
             getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
   }
 
-  public void setDesiredPositionRadians(double desiredAngleRadians) {
+  public void setSetpointPositionRadians(double desiredAngleRadians) {
     m_desiredSetpointRadians = desiredAngleRadians;
   }
 
@@ -298,7 +300,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   // Do not remove. WIP for auto scoring
-  public Translation2d getHorizontalTranslation() {
+  public Translation2d getHorzTranslation2d() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
@@ -433,6 +435,38 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     desiredPositionEntry.append(getDesiredPositionRadians());
     commandedPositionEntry.append(getCommandedPositionRadians());
     positionDegreesEntry.append(getPositionDegrees());
+  }
+
+  public boolean isScoring() {
+    return (getPositionDegrees() > 170);
+  }
+
+  public void updateHorizontalTranslation() {
+    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
+    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
+    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
+    // Cone: f(x)=-0.270347*t+16.8574;
+    double horizontalDistance = 0;
+    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
+      horizontalDistance =
+          0.00000913468 * Math.pow(getPositionDegrees(), 3)
+              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
+              - 0.0894341 * getPositionDegrees()
+              + 16.1239;
+    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
+      horizontalDistance =
+          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
+          -0.270347 * getPositionDegrees() + 16.8574;
+    m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+  }
+
+  public Translation2d getHorizontalTranslation() {
+    return m_wristHorizontalTranslation;
+  }
+
+  public boolean atSetpoint() {
+    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
+        < Units.degreesToRadians(0.5);
   }
 
   @Override
