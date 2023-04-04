@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -169,6 +170,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public WRIST.STATE getClosedLoopControl() {
     return m_controlState;
   }
+
   public boolean isClosedLoopControl() {
     return m_controlState == WRIST.STATE.CLOSED_LOOP;
   }
@@ -177,16 +179,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     setPercentOutput(output, false);
   }
 
-  // TODO: Review copy/paste
-  // set percent output function
-  // period function that edits the elevator's height, from there make sure it obeys the limit (27.7
-  // rotation)
+  // set percent output function with a boolean to enforce limits
   private void setPercentOutput(double output, boolean enforceLimits) {
     if (enforceLimits) {
-      if (getPositionRadians() > (getUpperLimit() - Units.inchesToMeters(1))) {
+      if (getPositionRadians() > (getUpperLimit() - Units.degreesToRadians(1))) {
         output = Math.min(output, 0);
       }
-      if (getPositionRadians() < (getLowerLimit() + 0.005)) {
+      if (getPositionRadians() < (getLowerLimit() + Units.degreesToRadians(0.1))) {
         output = Math.max(output, 0);
       }
     }
@@ -394,36 +393,37 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
     // currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
 
-    // TODO: Rewrite testing code
-    // Tuning controls
-    //    setControlState(STATE.TEST_SETPOINT);
-    // if (m_controlState == STATE.TEST_SETPOINT) {
-    //   DriverStation.reportWarning("USING WRIST TEST MODE!", false);
-    //   var maxVel = kMaxVelSub.get(0);
-    //   var maxAccel = kMaxAccelSub.get(0);
-    //   m_currentTrapezoidalConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    //   var kS = kSSub.get(Constants.WRIST.FFkS);
-    //   var kG = kGSub.get(Constants.WRIST.kG);
-    //   var kV = kVSub.get(Constants.WRIST.FFkV);
-    //   var kA = kASub.get(Constants.WRIST.kA);
+    // Testing Code
+    // setControlState(STATE.TEST_SETPOINT);
+    // if (m_controlState != STATE.TEST_SETPOINT) {
+    //   return;
+    // }
 
-    //   m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+    // DriverStation.reportWarning("USING WRIST TEST MODE!", false);
+    // double maxVel = kMaxVelSub.get(0);
+    // double maxAccel = kMaxAccelSub.get(0);
+    // m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+    // double kS = kSSub.get(Constants.WRIST.FFkS);
+    // double kG = kGSub.get(Constants.WRIST.kG);
+    // double kV = kVSub.get(Constants.WRIST.FFkV);
+    // double kA = kASub.get(Constants.WRIST.kA);
 
-    //   var newTestKP = kPSub.get(0);
-    //   if (testKP != newTestKP) {
-    //     wristMotor.config_kP(0, newTestKP);
-    //     testKP = newTestKP;
-    //   }
-    //   var newTestKI = kISub.get(0);
-    //   if (testKI != newTestKI) {
-    //     wristMotor.config_kI(0, newTestKI);
-    //     testKI = newTestKI;
-    //   }
-    //   var newTestKD = kDSub.get(0);
-    //   if (testKD != newTestKD) {
-    //     wristMotor.config_kD(0, newTestKD);
-    //     testKD = newTestKD;
-    //   }
+    // m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
+
+    // double newTestKP = kPSub.get(0);
+    // if (testKP != newTestKP) {
+    //   wristMotor.config_kP(0, newTestKP);
+    //   testKP = newTestKP;
+    // }
+    // double newTestKI = kISub.get(0);
+    // if (testKI != newTestKI) {
+    //   wristMotor.config_kI(0, newTestKI);
+    //   testKI = newTestKI;
+    // }
+    // double newTestKD = kDSub.get(0);
+    // if (testKD != newTestKD) {
+    //   wristMotor.config_kD(0, newTestKD);
+    //   testKD = newTestKD;
     // }
   }
 
@@ -441,21 +441,14 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateLog();
 
-    // TODO: Cleanup logic
     switch (m_controlState) {
-        // Called when setting to open loop
       case OPEN_LOOP_MANUAL:
         double percentOutput = m_joystickInput * Constants.WRIST.kPercentOutputMultiplier;
-        // Sets final percent output
-        // True means it will enforce limits. In this way it is not truly open loop, but it'll
-        // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
-      default:
-      case CLOSED_LOOP:
-        // Updates our trapezoid profile state based on the time since our last periodic and our
-        // recorded change in height
 
+      case CLOSED_LOOP:
+      default:
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
         TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         double currentTime = m_timer.get();
