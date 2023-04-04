@@ -41,9 +41,16 @@ public class RunWristJoystick extends CommandBase {
         m_wrist.setUserInput(-joystickYDeadbandOutput);
       }
     }
+<<<<<<< HEAD
     if (joystickYDeadbandOutput == 0 && m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL) {
       m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
       m_wrist.resetState();
+=======
+    if (joystickYDeadbandOutput == 0
+        && m_wrist.getClosedLoopControl() == WRIST.STATE.OPEN_LOOP_MANUAL) {
+      m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
+      m_wrist.haltPosition();
+>>>>>>> 294-refactor-wrist-subsystem
     }
   }
 

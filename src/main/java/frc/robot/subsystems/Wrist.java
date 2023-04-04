@@ -25,7 +25,6 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -59,6 +58,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Elevator m_elevator;
 
   private TrapezoidProfile.Constraints m_currentConstraints = Constants.WRIST.slowConstraints;
+
+  private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
@@ -225,7 +226,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public void setSetpointPositionRadians(double desiredAngleRadians) {
-    m_desiredSetpointInputRadians = desiredAngleRadians;
+    m_desiredSetpointRadians = desiredAngleRadians;
   }
 
   public double getDesiredPositionRadians() {
@@ -298,7 +299,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   // Do not remove. WIP for auto scoring
-  public Translation2d getHorizontalTranslation() {
+  public Translation2d getHorzTranslation2d() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
