@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utils.ModuleMap;
@@ -101,7 +102,6 @@ public final class Constants {
     public static final double kMaxForwardOutput = 0.6;
     public static final double kMaxReverseOutput = -0.45;
     public static final double kPercentOutputMultiplier = 0.2;
-    public static final double kSetpointMultiplier = 0.25;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
@@ -117,11 +117,6 @@ public final class Constants {
     // Used when elevator is moving upward
     public static final TrapezoidProfile.Constraints m_fastConstraints =
         new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
-
-    public enum STATE {
-      OPEN_LOOP_MANUAL,
-      CLOSED_LOOP
-    }
 
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
@@ -348,6 +343,8 @@ public final class Constants {
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
+    public static final double kPercentOutputMultiplier = 0.2;
+
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);
@@ -457,6 +454,8 @@ public final class Constants {
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
     public static final double universalWristUpperLimitRadians = Units.degreesToRadians(100);
 
+    public static boolean limitCanUtilization = true;
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
       DANGER_ZONE(undefinedOrdinal),
@@ -492,15 +491,6 @@ public final class Constants {
       }
     }
 
-    public enum ZONE_TRANSITIONS {
-      NONE,
-      ALPHA_TO_BETA,
-      BETA_TO_ALPHA,
-      BETA_TO_GAMMA,
-      GAMMA_TO_BETA,
-      GAMMA_TO_ALPHA;
-    }
-
     public enum SETPOINT {
       // Units are in meters
       STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
@@ -534,6 +524,12 @@ public final class Constants {
     public static final double kAutoBalanceAngleThresholdDegrees = 1.5;
   }
 
+  public enum CONTROL_MODE {
+    OPEN_LOOP,
+    CLOSED_LOOP,
+    CLOSED_LOOP_TEST
+  }
+
   public enum SCORING_STATE {
     STOWED,
     AUTO_BALANCE,
@@ -552,10 +548,6 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    // SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
-    // SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
-    // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
-    // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
     SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
     SWERVEDRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
     SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
@@ -610,6 +602,11 @@ public final class Constants {
     } else {
       initUnknown();
     }
+
+    if (!DriverStation.isFMSAttached()) {
+      STATEHANDLER.limitCanUtilization = false;
+    }
+
     SmartDashboard.putString("Robot Name", robotName);
   }
 

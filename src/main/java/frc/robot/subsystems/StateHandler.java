@@ -506,9 +506,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       // m_drive.setHeadingSetpoint(m_setpointSolver.getChassisSetpointRotation2d());
     }
 
-    m_elevator.setReduceCanUtilization(limitCanUtil);
     m_wrist.setReduceCanUtilization(limitCanUtil);
-    m_drive.setReduceCanUtilization(limitCanUtil);
   }
 
   public void setElevatorLowerLimitMeters(double lowerLimitMeters) {

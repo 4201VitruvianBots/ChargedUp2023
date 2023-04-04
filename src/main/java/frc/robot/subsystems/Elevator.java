@@ -38,8 +38,9 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.STATEHANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -58,10 +59,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
   private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
   private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
-  // TODO: Unify this to one enum
-  private ELEVATOR.STATE m_closedLoopControl = ELEVATOR.STATE.CLOSED_LOOP;
-  // TODO: Move to StateHandler/make global
-  private CAN_UTIL_LIMIT m_limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+
+  private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
+
+  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
   // This is used in limiting the elevator's speed once we reach the top of the elevator
@@ -202,7 +203,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Sets the setpoint to our current height, effectively keeping the elevator in place.
-  public void haltPosition() {
+  public void resetTrapezoidState() {
     m_setpoint = new TrapezoidProfile.State(getHeightMeters(), getVelocityMetersPerSecond());
   }
 
@@ -245,10 +246,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_desiredPositionMeters = meters;
   }
 
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    m_limitCanUtil = limitCan;
-  }
-
   public double getDesiredPositionMeters() {
     return m_desiredPositionMeters;
   }
@@ -284,17 +281,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   // Sets the control state of the elevator
-  public void setClosedLoopControlState(ELEVATOR.STATE state) {
-    m_closedLoopControl = state;
+  public void setClosedLoopControlMode(CONTROL_MODE mode) {
+    m_controlMode = mode;
   }
 
   // Returns the current control state enum
-  public ELEVATOR.STATE getClosedLoopControlState() {
-    return m_closedLoopControl;
+  public CONTROL_MODE getClosedLoopControlMode() {
+    return m_controlMode;
   }
 
   public boolean isClosedLoopControl() {
-    return getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP;
+    return getClosedLoopControlMode() == CONTROL_MODE.CLOSED_LOOP;
   }
 
   // Returns a translation of the elevator's position in relation to the robot's position.
@@ -353,24 +350,21 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateShuffleboard() {
-    SmartDashboard.putBoolean(
-        "Elevator Closed Loop", getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP);
+    SmartDashboard.putBoolean("Elevator Closed Loop", isClosedLoopControl());
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
-    kClosedLoopModePub.set(
-        getClosedLoopControlState() == ELEVATOR.STATE.CLOSED_LOOP ? "Closed" : "Open");
+
+    kClosedLoopModePub.set(getClosedLoopControlMode().toString());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(getDesiredPositionMeters());
     lowerLimitSwitchPub.set(getLimitSwitch());
-    kPercentOutputPub.set(getPercentOutput());
 
-    if (m_limitCanUtil == CAN_UTIL_LIMIT.NORMAL) {
+    if (!m_limitCanUtil) {
       // Put not required stuff here
       kEncoderCountsPub.set(getHeightEncoderCounts());
       kHeightPub.set(getHeightMeters());
       kDesiredStatePub.set(m_desiredHeightState.name());
       kPercentOutputPub.set(getPercentOutput());
-      lowerLimitSwitchPub.set(getLimitSwitch());
-      currentCommandStatePub.set(getClosedLoopControlState().toString());
+      currentCommandStatePub.set(getClosedLoopControlMode().toString());
     }
   }
 
@@ -407,7 +401,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public void teleopInit() {
     setDesiredPositionMeters(getHeightMeters());
-    haltPosition();
+    resetTrapezoidState();
   }
 
   // This method will be called once per scheduler run
@@ -419,10 +413,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateHeightMeters();
     updateForwardOutput();
 
-    switch (m_closedLoopControl) {
+    switch (m_controlMode) {
         // Called when setting to open loop
-      case OPEN_LOOP_MANUAL:
-        double percentOutput = m_joystickInput * Constants.ELEVATOR.kPercentOutputMultiplier;
+      case OPEN_LOOP:
+        double percentOutput = m_joystickInput * ELEVATOR.kPercentOutputMultiplier;
         // Sets final percent output
         // True means it will enforce limits. In this way it is not truly open loop, but it'll
         // prevent the robot from breaking

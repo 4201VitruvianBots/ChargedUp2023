@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
+import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.CtreUtils;
 
@@ -46,7 +46,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
 
-  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
@@ -228,10 +228,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_pose = pose;
   }
 
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    limitCanUtil = limitCan;
-  }
-
   public Pose2d getModulePose() {
     return m_pose;
   }
@@ -259,16 +255,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
   }
 
-  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
-    switch (limitCan) {
-      case NORMAL:
-        moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
-        moduleMotorHeadingPub.set(getHeadingDegrees());
-        moduleEncoderHealthPub.set(getInitSuccess());
-        break;
-      default:
-      case LIMITED:
-        break;
+  private void updateSmartDashboard() {
+    moduleMotorHeadingPub.set(getHeadingDegrees());
+    moduleEncoderHealthPub.set(getInitSuccess());
+    if (!m_limitCanUtil) {
+      moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
     }
   }
 
@@ -279,7 +270,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    updateSmartDashboard(limitCanUtil);
+    updateSmartDashboard();
     //    updateLog();
   }
 

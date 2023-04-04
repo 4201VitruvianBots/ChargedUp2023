@@ -7,7 +7,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants;
 import frc.robot.subsystems.Elevator;
 
 public class AutoSetElevatorSetpoint extends CommandBase {
@@ -27,7 +27,7 @@ public class AutoSetElevatorSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setClosedLoopControlState(ELEVATOR.STATE.CLOSED_LOOP);
+    m_elevator.setClosedLoopControlMode(Constants.CONTROL_MODE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
