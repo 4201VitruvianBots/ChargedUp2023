@@ -39,11 +39,6 @@ public class AutoBalanceTest {
     m_robotContainer.close();
   }
 
-  @AfterAll
-  static void exit() {
-    System.exit(0);
-  }
-
   @Test
   public void TestAutoBalanceOutput() {
     var cmd = new AutoBalance(m_swerveDrive);

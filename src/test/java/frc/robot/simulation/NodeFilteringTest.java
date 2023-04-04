@@ -33,11 +33,6 @@ public class NodeFilteringTest {
     m_robotContainer.close();
   }
 
-  @AfterAll
-  static void exit() {
-    System.exit(0);
-  }
-
   @Test
   public void updateValidNodesTiming() {
     Timer m_timer = new Timer();

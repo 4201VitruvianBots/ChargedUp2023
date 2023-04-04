@@ -35,11 +35,6 @@ public class FieldSimTest {
     m_robotContainer.close();
   }
 
-  @AfterAll
-  static void exit() {
-    System.exit(0);
-  }
-
   @Test
   public void testRedAllianceRedNodes() {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);

@@ -32,11 +32,6 @@ public class ExampleTest {
     m_robotContainer.close();
   }
 
-  @AfterAll
-  static void exit() {
-    System.exit(0);
-  }
-
   // Mark all test functions with @Test
   @Test
   public void TestTest() {

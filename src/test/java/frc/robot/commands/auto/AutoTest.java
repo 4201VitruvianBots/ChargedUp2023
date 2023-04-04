@@ -43,11 +43,6 @@ public class AutoTest {
     m_robotContainer.close();
   }
 
-  @AfterAll
-  static void exit() {
-    System.exit(0);
-  }
-
   @Test
   public void testAutoPathFipping() {
     System.out.println("Starting Test...");
