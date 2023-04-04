@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.SWERVEMODULE;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -46,28 +47,28 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
 
-  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
-          Constants.SWERVEMODULE.ksDriveVoltSecondsPerMeter,
-          Constants.SWERVEMODULE.kvDriveVoltSecondsSquaredPerMeter,
-          Constants.SWERVEMODULE.kaDriveVoltSecondsSquaredPerMeter);
+          SWERVEMODULE.ksDriveVoltSecondsPerMeter,
+          SWERVEMODULE.kvDriveVoltSecondsSquaredPerMeter,
+          SWERVEMODULE.kaDriveVoltSecondsSquaredPerMeter);
 
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
-          Constants.SWERVEMODULE.kTurnGearbox,
-          Constants.SWERVEMODULE.kTurningMotorGearRatio,
+          SWERVEMODULE.kTurnGearbox,
+          SWERVEMODULE.kTurningMotorGearRatio,
           VecBuilder.fill(0));
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(1.5, 0.6),
-          Constants.SWERVEMODULE.kDriveGearbox,
-          Constants.SWERVEMODULE.kDriveMotorGearRatio);
+          SWERVEMODULE.kDriveGearbox,
+          SWERVEMODULE.kDriveMotorGearRatio);
 
   private double m_drivePercentOutput;
   private double m_turnPercentOutput;
@@ -140,7 +141,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     resetAngleToAbsolute();
 
     // Check if the offset was applied properly. Delay to give it some time to set
-    // TODO: This doesn't cover all edge cases
     if (RobotBase.isReal()) {
       Timer.delay(0.1);
       m_initSuccess =

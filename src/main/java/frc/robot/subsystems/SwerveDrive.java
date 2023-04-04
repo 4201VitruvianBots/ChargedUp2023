@@ -288,14 +288,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     m_maxVelocity = mps;
   }
 
-  public void setCurrentTrajectory(Trajectory trajectory) {
-    m_trajectory = trajectory;
-  }
-
-  public Trajectory getCurrentTrajectory() {
-    return m_trajectory;
-  }
-
   public SwerveDrivePoseEstimator getOdometry() {
     return m_odometry;
   }
