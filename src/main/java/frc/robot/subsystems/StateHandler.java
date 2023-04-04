@@ -80,12 +80,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       new SendableChooser<>();
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_currentZonePub, m_limitCanPub;
-  private DoublePublisher m_elevatorHeightPub,
-      m_elevatorLowerLimPub,
-      m_elevatorUpperLimPub,
+  private DoublePublisher m_elevatorHeightMetersPub,
+      m_elevatorLowerLimitPub,
+      m_elevatorUpperLimitPub,
       m_wristAnglePub,
-      m_wristLowerLimPub,
-      m_wristUpperLimPub;
+      m_wristLowerLimitPub,
+      m_wristUpperLimitPub;
 
   public StateHandler(
       Intake intake,
@@ -388,12 +388,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
     m_desiredStatePub = stateHandlerTab.getStringTopic("desiredState").publish();
     m_currentZonePub = stateHandlerTab.getStringTopic("currentZone").publish();
-    m_elevatorHeightPub = stateHandlerTab.getDoubleTopic("elevatorHeightInches").publish();
-    m_elevatorLowerLimPub = stateHandlerTab.getDoubleTopic("elevatorMinLimit").publish();
-    m_elevatorUpperLimPub = stateHandlerTab.getDoubleTopic("elevatorMaxLimit").publish();
+    m_elevatorHeightMetersPub = stateHandlerTab.getDoubleTopic("elevatorHeightInches").publish();
+    m_elevatorLowerLimitPub = stateHandlerTab.getDoubleTopic("elevatorMinLimit").publish();
+    m_elevatorUpperLimitPub = stateHandlerTab.getDoubleTopic("elevatorMaxLimit").publish();
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
-    m_wristLowerLimPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
-    m_wristUpperLimPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
+    m_wristLowerLimitPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
+    m_wristUpperLimitPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
     m_limitCanPub = stateHandlerTab.getStringTopic("canUtilization").publish();
   }
 
@@ -403,23 +403,23 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentStatePub.set(getCurrentState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());
-    m_elevatorHeightPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
+    m_elevatorHeightMetersPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
     m_wristAnglePub.set(m_wrist.getPositionDegrees());
     m_limitCanPub.set(limitCanUtil.name());
 
     switch (limitCan) {
       case NORMAL:
-        m_elevatorUpperLimPub.set(Units.metersToInches(elevatorUpperLimitMeters));
-        m_elevatorLowerLimPub.set(Units.metersToInches(elevatorLowerLimitMeters));
-        m_wristUpperLimPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
-        m_wristLowerLimPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
+        m_elevatorUpperLimitPub.set(Units.metersToInches(elevatorUpperLimitMeters));
+        m_elevatorLowerLimitPub.set(Units.metersToInches(elevatorLowerLimitMeters));
+        m_wristUpperLimitPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
+        m_wristLowerLimitPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
         break;
       default:
       case LIMITED:
-        m_elevatorUpperLimPub.set(Units.metersToInches(elevatorUpperLimitMeters));
-        m_elevatorLowerLimPub.set(Units.metersToInches(elevatorLowerLimitMeters));
-        m_wristUpperLimPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
-        m_wristLowerLimPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
+        m_elevatorUpperLimitPub.set(Units.metersToInches(elevatorUpperLimitMeters));
+        m_elevatorLowerLimitPub.set(Units.metersToInches(elevatorLowerLimitMeters));
+        m_wristUpperLimitPub.set(Units.radiansToDegrees(wristUpperLimitRadians));
+        m_wristLowerLimitPub.set(Units.radiansToDegrees(wristLowerLimitRadians));
         break;
     }
   }
