@@ -12,6 +12,7 @@ import frc.robot.subsystems.Wrist;
 
 public class SetSetpoint extends CommandBase {
   /** Creates a new SetStatehandlerstate. */
+  //TODO: Specify end condition in autos and make it hold position within this command
   private Elevator m_Elevator;
 
   private Wrist m_Wrist;
@@ -47,9 +48,6 @@ public class SetSetpoint extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_Elevator.atSetpoint() && m_Wrist.atSetpoint()){
-      return true; 
-    }
-    else return false; 
+    return false; 
   }
 }
