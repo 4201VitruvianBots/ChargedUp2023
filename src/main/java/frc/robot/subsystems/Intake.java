@@ -22,8 +22,8 @@ import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
-
   private static boolean isIntakingCone = false;
+
   private static boolean isIntakingCube = false;
 
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
