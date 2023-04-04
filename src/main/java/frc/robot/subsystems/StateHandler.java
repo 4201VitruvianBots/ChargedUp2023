@@ -515,15 +515,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     elevatorLowerLimitMeters = lowerLimitMeters;
   }
 
-  public void setelevatorUpperLimitMetersMeters(double upperLimitMeters) {
+  public void setElevatorUpperLimitMetersMeters(double upperLimitMeters) {
     elevatorUpperLimitMeters = upperLimitMeters;
   }
 
-  public void setwristLowerLimitRadians(double lowerLimitRadians) {
+  public void setWristLowerLimitRadians(double lowerLimitRadians) {
     wristLowerLimitRadians = lowerLimitRadians;
   }
 
-  public void setwristUpperLimitRadians(double upperLimitRadians) {
+  public void setWristUpperLimitRadians(double upperLimitRadians) {
     wristUpperLimitRadians = upperLimitRadians;
   }
 

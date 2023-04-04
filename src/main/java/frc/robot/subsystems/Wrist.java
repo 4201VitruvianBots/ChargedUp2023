@@ -455,6 +455,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return m_wristHorizontalTranslation;
   }
 
+  public boolean atSetpoint() {
+    return Math.abs(getPositionRadians() - getCommandedPositionRadians()) < Units.degreesToRadians(0.5);
+  }
+
   @Override
   public void periodic() {
     updateSmartDashboard();
