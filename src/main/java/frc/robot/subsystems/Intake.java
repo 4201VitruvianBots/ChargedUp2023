@@ -23,9 +23,6 @@ import frc.robot.Constants.INTAKE;
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
 
-  // TODO: Review variables
-  private static boolean isIntaking = false;
-
   private static boolean isIntakingCone = false;
   private static boolean isIntakingCube = false;
 
@@ -70,9 +67,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return 0;
   }
 
-  // TODO: IS this necessary? If not remove it
-  // control mode function
-
   public boolean getIntakeConeState() {
     return isIntakingCone;
   }
@@ -103,11 +97,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return intakeMotor.getStatorCurrent();
   }
 
-  // TODO: IS this necessary? If not remove it
-  public void setBooleanState(boolean state) {
-    isIntaking = state;
-  }
-
   // set percent output function
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
@@ -131,7 +120,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
     // hold
     // the game piece in.
-    if (!isIntaking) {
+    if (!isIntakingCone && !isIntakingCube) {
       if (getConeDistance() > 0) {
         m_percentOutput = 0;
       } else if (getCubeDistance() > 0) {

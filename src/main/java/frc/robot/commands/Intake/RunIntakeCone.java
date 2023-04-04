@@ -26,7 +26,7 @@ public class RunIntakeCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setBooleanState(true);
+    m_intake.setIntakeStateCone(true);
     m_intake.setIntakeStateCone(true);
   }
 
@@ -50,7 +50,7 @@ public class RunIntakeCone extends CommandBase {
     m_intake.setPercentOutput(0);
     m_intake.setIntakeStateCone(false);
     // m_swerve.enableHeadingTarget(false);
-    m_intake.setBooleanState(false);
+    m_intake.setIntakeStateCone(false);
   }
 
   // Returns true when the command should end.
