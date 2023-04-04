@@ -135,7 +135,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
    * Return a list of valid nodes for scoring based on the following priorities: [1] - Node is on
    * our alliance or coopertition grid. [2] - Node takes our current game piece. [3] - Node is on
    * the same level as our elevator. [4] - Node is closest to our robot
-   *
    */
   public void updateValidNodes(SCORING_STATE scoringState) {
     updateNodeMask(m_swerveDrive.getPoseMeters(), scoringState);
@@ -147,49 +146,49 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
     if (RobotBase.isSimulation()) {
       m_field2d
-              .getObject("lLocalizerTagPoses")
-              .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
+          .getObject("lLocalizerTagPoses")
+          .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
       m_field2d
-              .getObject("lLocalizerPoses")
-              .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
+          .getObject("lLocalizerPoses")
+          .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
       m_field2d
-              .getObject("lLocalizerPose")
-              .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
+          .getObject("lLocalizerPose")
+          .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.LEFT_LOCALIZER));
       m_field2d
-              .getObject("rLocalizerTagPoses")
-              .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+          .getObject("rLocalizerTagPoses")
+          .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
       m_field2d
-              .getObject("rLocalizerPoses")
-              .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+          .getObject("rLocalizerPoses")
+          .setPoses(m_vision.getRobotPoses2d(CAMERA_SERVER.RIGHT_LOCALIZER));
       m_field2d
-              .getObject("rLocalizerPose")
-              .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
+          .getObject("rLocalizerPose")
+          .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.RIGHT_LOCALIZER));
     }
 
     m_field2d
-            .getObject("fLocalizerPose")
-            .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
+        .getObject("fLocalizerPose")
+        .setPose(m_vision.getRobotPose2d(CAMERA_SERVER.FUSED_LOCALIZER));
 
     intakePose =
-            m_swerveDrive
-                    .getPoseMeters()
-                    .transformBy(
-                            new Transform2d(
-                                    m_elevator.getField2dTranslation().plus(m_wrist.getHorizontalTranslation()),
-                                    m_swerveDrive.getHeadingRotation2d()));
+        m_swerveDrive
+            .getPoseMeters()
+            .transformBy(
+                new Transform2d(
+                    m_elevator.getField2dTranslation().plus(m_wrist.getHorizontalTranslation()),
+                    m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
 
     m_field2d
-            .getObject("Grid Node")
-            .setPoses(
-                    getValidNodes().stream()
-                            .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
-                            .collect(Collectors.toList()));
+        .getObject("Grid Node")
+        .setPoses(
+            getValidNodes().stream()
+                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
+                .collect(Collectors.toList()));
 
     if (RobotBase.isSimulation()) {
       m_field2d
-              .getObject("Swerve Modules")
-              .setPoses(ModuleMap.orderedValues(m_swerveDrive.getModulePoses(), new Pose2d[0]));
+          .getObject("Swerve Modules")
+          .setPoses(ModuleMap.orderedValues(m_swerveDrive.getModulePoses(), new Pose2d[0]));
     }
   }
 
