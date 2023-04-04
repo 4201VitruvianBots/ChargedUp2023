@@ -9,10 +9,7 @@ import frc.robot.RobotContainer;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 @Disabled("WIP")
 public class AutoTest {
@@ -44,6 +41,11 @@ public class AutoTest {
   // this method will run after each test
   void shutdown() throws Exception {
     m_robotContainer.close();
+  }
+
+  @AfterAll
+  static void exit() {
+    System.exit(0);
   }
 
   @Test

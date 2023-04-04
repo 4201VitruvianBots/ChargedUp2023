@@ -4,16 +4,13 @@
 
 package frc.robot.simulation;
 
-import static frc.robot.utils.ChargedUpNodeMask.initializeNodeMaps;
-import static frc.robot.utils.ChargedUpNodeMask.updateNodeMask;
+import static frc.robot.utils.ChargedUpNodeMask.*;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -47,37 +44,8 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
-  /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
-    - Cones and cubes
-    - Alliance color
-    - Low, mid and high positions
-    - And coopertition grids
-  */
-  private ArrayList<Pose2d> allNodes = new ArrayList<>();
-  private ArrayList<Translation2d> validNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueMidConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueMidCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueHighConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueHighCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueCoopertitionNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> blueNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHybridNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redMidConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redMidCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHighConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHighCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redCoopertitionNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> redNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> ignoredNodes = new ArrayList<>();
-
-  private DriverStation.Alliance m_currentAlliance = Alliance.Red;
   SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
-  private boolean testScoringState = true;
+  private boolean testScoringState = false;
 
   public FieldSim(
       SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
@@ -179,7 +147,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     m_field2d
         .getObject("Grid Node")
         .setPoses(
-            validNodes.stream()
+            getValidNodes().stream()
                 .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
                 .collect(Collectors.toList()));
 
@@ -228,9 +196,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    if (RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
-      m_currentAlliance = Controls.getAllianceColor();
-    }
     updateRobotPoses();
 
     if (RobotBase.isSimulation()) simulationPeriodic();

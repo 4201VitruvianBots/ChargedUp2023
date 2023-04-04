@@ -11,6 +11,7 @@ import frc.robot.Constants.AUTO;
 import frc.robot.RobotContainer;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.subsystems.SwerveDrive;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,11 @@ public class AutoBalanceTest {
   // is set up (e.g. resource errors from using the same PWM/DIO port)
   void shutdown() throws Exception {
     m_robotContainer.close();
+  }
+
+  @AfterAll
+  static void exit() {
+    System.exit(0);
   }
 
   @Test

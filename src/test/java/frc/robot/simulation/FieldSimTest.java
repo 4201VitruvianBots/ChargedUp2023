@@ -10,10 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrive;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import utils.TestUtils;
 
 @Disabled
@@ -36,6 +33,11 @@ public class FieldSimTest {
   // this method will run after each test
   void shutdown() throws Exception {
     m_robotContainer.close();
+  }
+
+  @AfterAll
+  static void exit() {
+    System.exit(0);
   }
 
   @Test

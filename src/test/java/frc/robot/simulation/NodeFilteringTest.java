@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrive;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,11 @@ public class NodeFilteringTest {
   // this method will run after each test
   void shutdown() throws Exception {
     m_robotContainer.close();
+  }
+
+  @AfterAll
+  static void exit() {
+    System.exit(0);
   }
 
   @Test
@@ -57,7 +63,7 @@ public class NodeFilteringTest {
     }
     double average = totalTime / states.length;
 
-//    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
+    //    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
     assertTrue(average < 0.020);
   }
 }
