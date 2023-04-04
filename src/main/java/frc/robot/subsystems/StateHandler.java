@@ -281,7 +281,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           return;
         }
         break;
-        case 3: // GAMMA
+      case 3: // GAMMA
         // GAMMA -> BETA
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
           if (WRIST.THRESHOLD.BETA_MAX.get() > m_wrist.getPositionRadians()) {
