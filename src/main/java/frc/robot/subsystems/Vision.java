@@ -277,11 +277,11 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
     if (getPipeline(location) == 1.0
-        && m_intakeSub.getIntakeStateCube()) { // CUBE and if we're looking for cube
+        && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
     } else if (getPipeline(location) == 2.0
-        && m_intakeSub.getIntakeStateCone()) { // CONE and if we're looking for cone
+        && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
     }
@@ -315,7 +315,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
-    if (m_intakeSub.getIntakeState()) {
+    if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
