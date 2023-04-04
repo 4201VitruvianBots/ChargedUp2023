@@ -60,7 +60,6 @@ import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
-import frc.robot.commands.util.ToggleCanUtilization;
 import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
@@ -144,7 +143,6 @@ public class RobotContainer implements AutoCloseable {
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
-    SmartDashboard.putData(new ToggleCanUtilization(m_stateHandler));
   }
 
   /**
