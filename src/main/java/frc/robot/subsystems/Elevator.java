@@ -86,6 +86,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           Constants.ELEVATOR.kG, Constants.ELEVATOR.kV, Constants.ELEVATOR.kA);
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
+  private static int simEncoderSign = 1;
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -160,6 +161,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     initShuffleboard();
     m_timer.reset();
     m_timer.start();
+
+    simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
   }
 
   // Elevator's motor output as a percentage
@@ -455,7 +458,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (Constants.ELEVATOR.simEncoderSign
+                (simEncoderSign
                     * elevatorSim.getPositionMeters()
                     / Constants.ELEVATOR.encoderCountsToMeters));
 
@@ -465,7 +468,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (Constants.ELEVATOR.simEncoderSign
+                (simEncoderSign
                     * elevatorSim.getVelocityMetersPerSecond()
                     / Constants.ELEVATOR.encoderCountsToMeters
                     * 10));

@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.CONSTANTS.kCANCoderSensorUnitsPerRotation;
+import static frc.robot.Constants.CONSTANTS.kFalconSensorUnitsPerRotation;
+
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -71,6 +74,11 @@ public final class Constants {
     public static final int wristLowerSwitch = 0;
   }
 
+  public static final class CONSTANTS {
+    public static final int kFalconSensorUnitsPerRotation = 2048;
+    public static final int kCANCoderSensorUnitsPerRotation = 4096;
+  }
+
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
@@ -81,7 +89,6 @@ public final class Constants {
     public static final double centerOffset = Units.inchesToMeters(10);
 
     // PID
-    public static final double kSensorUnitsPerRotation = 2048.0;
     public static double kMaxVel = Units.inchesToMeters(30);
     public static double kMaxAccel = Units.inchesToMeters(15);
     public static final int kSlotIdx = 0;
@@ -89,7 +96,7 @@ public final class Constants {
     public static final int kTimeoutMs = 0;
 
     public static final double encoderCountsToMeters =
-        (drumRadiusMeters * 2 * Math.PI) / (kSensorUnitsPerRotation * gearRatio);
+        (drumRadiusMeters * 2 * Math.PI) / (kFalconSensorUnitsPerRotation * gearRatio);
 
     public static final double kG = 0.02;
     public static final double kV = 20.0; // 12.57;
@@ -104,9 +111,6 @@ public final class Constants {
     public static final double kPercentOutputMultiplier = 0.2;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
-
-    public static final int simEncoderSign =
-        mainMotorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
     // Trapezoid profile stuff
     public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
@@ -222,7 +226,7 @@ public final class Constants {
     }
   }
 
-  public static final class SWERVEDRIVE {
+  public static final class SWERVE_DRIVE {
     public static final double kTrackWidth = Units.inchesToMeters(24);
     public static final double kWheelBase = Units.inchesToMeters(24);
 
@@ -265,21 +269,20 @@ public final class Constants {
     }
   }
 
-  public static class SWERVEMODULE {
+  public static class SWERVE_MODULE {
     public static final double kDriveMotorGearRatio = 6.12;
     public static final double kTurningMotorGearRatio = 150.0 / 7.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(4);
-    public static final int kFalconEncoderCPR = 2048;
-    public static final int kCANCoderCPR = 4096;
 
     public static final DCMotor kDriveGearbox = DCMotor.getFalcon500(1);
     public static final DCMotor kTurnGearbox = DCMotor.getFalcon500(1);
 
     public static final double kDriveMotorDistancePerPulse =
-        (kWheelDiameterMeters * Math.PI) / (kFalconEncoderCPR * kDriveMotorGearRatio);
+        (kWheelDiameterMeters * Math.PI) / (kFalconSensorUnitsPerRotation * kDriveMotorGearRatio);
     public static final double kTurningMotorDistancePerPulse =
-        360.0 / (kFalconEncoderCPR * kTurningMotorGearRatio);
-    public static final double kTurnEncoderDistancePerPulse = 360.0 / kCANCoderCPR;
+        360.0 / (kFalconSensorUnitsPerRotation * kTurningMotorGearRatio);
+    public static final double kTurnEncoderDistancePerPulse =
+        360.0 / kCANCoderSensorUnitsPerRotation;
 
     public static final double ksDriveVoltSecondsPerMeter = 0.605 / 12;
     public static final double kvDriveVoltSecondsSquaredPerMeter = 1.72 / 12;
@@ -335,7 +338,8 @@ public final class Constants {
 
   public static final class WRIST {
     public static final double gearRatio = 1024.0 / 27.0;
-    public static final double encoderUnitsToDegrees = 360.0 / (2048.0 * gearRatio);
+    public static final double encoderUnitsToDegrees =
+        360.0 / (kFalconSensorUnitsPerRotation * gearRatio);
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
@@ -548,19 +552,19 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 32.915;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
+    SWERVE_DRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
+    SWERVE_DRIVE.backRightCANCoderOffset = 32.915;
   }
 
   private static void initAlpha() {
     robotName = "Alpha";
 
-    SWERVEDRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 191.25; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 34.7605;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;
+    SWERVE_DRIVE.backLeftCANCoderOffset = 191.25; // 261.475;
+    SWERVE_DRIVE.backRightCANCoderOffset = 34.7605;
 
     ELEVATOR.mainMotorInversionType = TalonFXInvertType.CounterClockwise;
     WRIST.motorInversionType = TalonFXInvertType.Clockwise;
@@ -569,10 +573,10 @@ public final class Constants {
   private static void initSim() {
     robotName = "Sim";
 
-    SWERVEDRIVE.frontLeftCANCoderOffset = 0;
-    SWERVEDRIVE.frontRightCANCoderOffset = 0;
-    SWERVEDRIVE.backLeftCANCoderOffset = 0;
-    SWERVEDRIVE.backRightCANCoderOffset = 0;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 0;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 0;
+    SWERVE_DRIVE.backLeftCANCoderOffset = 0;
+    SWERVE_DRIVE.backRightCANCoderOffset = 0;
   }
 
   private static void initUnknown() {

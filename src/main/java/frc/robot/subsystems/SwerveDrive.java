@@ -29,11 +29,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.SWERVEDRIVE;
-import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,28 +48,28 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
                       new TalonFX(CAN.frontLeftTurnMotor),
                       new TalonFX(CAN.frontLeftDriveMotor),
                       new CANCoder(CAN.frontLeftCanCoder),
-                      SWERVEDRIVE.frontLeftCANCoderOffset),
+                      SWERVE_DRIVE.frontLeftCANCoderOffset),
               SWERVE_MODULE_POSITION.FRONT_RIGHT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.FRONT_RIGHT,
                       new TalonFX(CAN.frontRightTurnMotor),
                       new TalonFX(CAN.frontRightDriveMotor),
                       new CANCoder(CAN.frontRightCanCoder),
-                      SWERVEDRIVE.frontRightCANCoderOffset),
+                      SWERVE_DRIVE.frontRightCANCoderOffset),
               SWERVE_MODULE_POSITION.BACK_LEFT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.BACK_LEFT,
                       new TalonFX(CAN.backLeftTurnMotor),
                       new TalonFX(CAN.backLeftDriveMotor),
                       new CANCoder(CAN.backLeftCanCoder),
-                      SWERVEDRIVE.backLeftCANCoderOffset),
+                      SWERVE_DRIVE.backLeftCANCoderOffset),
               SWERVE_MODULE_POSITION.BACK_RIGHT,
                   new SwerveModule(
                       SWERVE_MODULE_POSITION.BACK_RIGHT,
                       new TalonFX(CAN.backRightTurnMotor),
                       new TalonFX(CAN.backRightDriveMotor),
                       new CANCoder(CAN.backRightCanCoder),
-                      SWERVEDRIVE.backRightCANCoderOffset)));
+                      SWERVE_DRIVE.backRightCANCoderOffset)));
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private double m_rollOffset;
@@ -91,25 +90,25 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(
-          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond,
-          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
+          SWERVE_DRIVE.kMaxRotationRadiansPerSecond,
+          SWERVE_DRIVE.kMaxRotationRadiansPerSecondSquared);
   private final ProfiledPIDController m_rotationController =
       new ProfiledPIDController(
-          Constants.SWERVEDRIVE.kP_Rotation,
-          Constants.SWERVEDRIVE.kI_Rotation,
-          Constants.SWERVEDRIVE.kD_Rotation,
+          SWERVE_DRIVE.kP_Rotation,
+          SWERVE_DRIVE.kI_Rotation,
+          SWERVE_DRIVE.kD_Rotation,
           m_constraints);
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
-  private double m_maxVelocity = Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+  private double m_maxVelocity = SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =
         new SwerveDrivePoseEstimator(
-            Constants.SWERVEDRIVE.kSwerveKinematics,
+            SWERVE_DRIVE.kSwerveKinematics,
             getHeadingRotation2d(),
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
@@ -137,7 +136,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       boolean isOpenLoop) {
     throttle *= m_maxVelocity;
     strafe *= m_maxVelocity;
-    rotation *= Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond;
+    rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
 
     if (useHeadingTarget) {
       rotation = m_rotationOutput;
@@ -152,7 +151,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     }
 
     Map<SWERVE_MODULE_POSITION, SwerveModuleState> moduleStates =
-        ModuleMap.of(Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
+        ModuleMap.of(SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
         ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), m_maxVelocity);
@@ -197,7 +196,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setChassisSpeed(ChassisSpeeds chassisSpeeds) {
-    var states = Constants.SWERVEDRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
     setSwerveModuleStates(states, false);
   }
 
@@ -303,7 +302,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
       Transform2d moduleTransform =
           new Transform2d(
-              Constants.SWERVEDRIVE.kModuleTranslations.get(module.getModulePosition()),
+              SWERVE_DRIVE.kModuleTranslations.get(module.getModulePosition()),
               module.getHeadingRotation2d());
       module.setModulePose(getPoseMeters().transformBy(moduleTransform));
     }
@@ -354,7 +353,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   @Override
   public void simulationPeriodic() {
     ChassisSpeeds chassisSpeed =
-        Constants.SWERVEDRIVE.kSwerveKinematics.toChassisSpeeds(
+        SWERVE_DRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
     var currentTime = m_simTimer.get();

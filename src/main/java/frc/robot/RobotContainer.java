@@ -159,7 +159,7 @@ public class RobotContainer implements AutoCloseable {
 
     leftJoystickTriggers[0].whileTrue(
         new SetSwerveMaxTranslationVeolcity(
-            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.750));
+            m_swerveDrive, Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.750));
 
     leftJoystickTriggers[1].whileTrue(
         new IntakeVisionAlignment(
@@ -374,15 +374,15 @@ public class RobotContainer implements AutoCloseable {
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.SWERVEDRIVE.kSwerveKinematics,
+            Constants.SWERVE_DRIVE.kSwerveKinematics,
             new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Translation,
-                Constants.SWERVEDRIVE.kI_Translation,
-                Constants.SWERVEDRIVE.kD_Translation),
+                Constants.SWERVE_DRIVE.kP_Translation,
+                Constants.SWERVE_DRIVE.kI_Translation,
+                Constants.SWERVE_DRIVE.kD_Translation),
             new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Rotation,
-                Constants.SWERVEDRIVE.kI_Rotation,
-                Constants.SWERVEDRIVE.kD_Rotation),
+                Constants.SWERVE_DRIVE.kP_Rotation,
+                Constants.SWERVE_DRIVE.kI_Rotation,
+                Constants.SWERVE_DRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
             true,
