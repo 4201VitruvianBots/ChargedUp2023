@@ -179,7 +179,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   /*
-   * The pipeline’s latency contribution (ms). Add to "cl" to get total latency.
+   * The pipeline's latency contribution (ms). Add to "cl" to get total latency.
    */
   public double getCameraLatency(CAMERA_SERVER location) {
     switch (location) {
