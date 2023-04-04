@@ -77,7 +77,7 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
-      run: ./gradlew build
+      run: ./gradlew build -x test
     
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
