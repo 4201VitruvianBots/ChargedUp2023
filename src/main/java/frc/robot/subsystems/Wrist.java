@@ -456,7 +456,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean atSetpoint() {
-    return Math.abs(getPositionRadians() - getCommandedPositionRadians()) < Units.degreesToRadians(0.5);
+    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
+        < Units.degreesToRadians(0.5);
   }
 
   @Override
