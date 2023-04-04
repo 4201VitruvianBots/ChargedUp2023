@@ -4,14 +4,13 @@
 
 package frc.robot.simulation;
 
+import static frc.robot.utils.ChargedUpNodeMask.*;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,15 +18,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
-import frc.robot.simulation.SimConstants.Grids;
 import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
+import frc.robot.utils.ChargedUpNodeMask;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,35 +44,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
-  /* Creates lists of the Pose2ds of each of the scoring nodes on the field, sorted into:
-    - Cones and cubes
-    - Alliance color
-    - Low, mid and high positions
-    - And coopertition grids
-  */
-  private ArrayList<Pose2d> allNodes = new ArrayList<>();
-  private ArrayList<Translation2d> validNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueMidConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueMidCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueHighConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueHighCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> blueCoopertitionNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> blueNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHybridNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redMidConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redMidCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHighConeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redHighCubeNodes = new ArrayList<>();
-  private ArrayList<Translation2d> redCoopertitionNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> redNodes = new ArrayList<>();
-
-  private ArrayList<Translation2d> ignoredNodes = new ArrayList<>();
-
-  private DriverStation.Alliance m_currentAlliance = Alliance.Red;
   SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
   private boolean testScoringState = false;
 
@@ -113,65 +82,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
    * only need to do once to improve robot code performance by avoiding unnecessary repeated calls.
    */
   private void initializeScoringNodes() {
-    // Split nodes into separate lists to make it easier to filter
-    blueHybridNodes = new ArrayList<>(Arrays.asList(Grids.lowTranslations));
-    redHybridNodes =
-        blueHybridNodes.stream()
-            .map(SimConstants::allianceFlip)
-            .collect(Collectors.toCollection(ArrayList::new));
-
-    for (int i = 0; i < Grids.nodeRowCount; i++) {
-      boolean isCube = i == 1 || i == 4 || i == 7;
-
-      // Generate Mid Nodes
-      if (isCube) {
-        blueMidCubeNodes.add(Grids.midTranslations[i]);
-        redMidCubeNodes.add(SimConstants.allianceFlip(Grids.midTranslations[i]));
-      } else {
-        blueMidConeNodes.add(Grids.midTranslations[i]);
-        redMidConeNodes.add(SimConstants.allianceFlip(Grids.midTranslations[i]));
-      }
-
-      // Generate High Nodes
-      if (isCube) {
-        blueHighCubeNodes.add(Grids.highTranslations[i]);
-        redHighCubeNodes.add(SimConstants.allianceFlip(Grids.highTranslations[i]));
-      } else {
-        blueHighConeNodes.add(Grids.highTranslations[i]);
-        redHighConeNodes.add(SimConstants.allianceFlip(Grids.highTranslations[i]));
-      }
-    }
-
-    // Mark Cooperatition Nodes separately
-    for (int i = 0; i < 3; i++) {
-      Translation2d[] gridRow = new Translation2d[3];
-      switch (i) {
-        case 0:
-          gridRow = Grids.lowTranslations;
-          break;
-        case 1:
-          gridRow = Grids.midTranslations;
-          break;
-        case 2:
-          gridRow = Grids.highTranslations;
-          break;
-      }
-      for (int j = 3; j < 6; j++) {
-        blueCoopertitionNodes.add(gridRow[j]);
-        redCoopertitionNodes.add(SimConstants.allianceFlip(gridRow[j]));
-      }
-    }
-    blueNodes.addAll(blueHybridNodes);
-    blueNodes.addAll(blueMidConeNodes);
-    blueNodes.addAll(blueMidCubeNodes);
-    blueNodes.addAll(blueHighConeNodes);
-    blueNodes.addAll(blueHighCubeNodes);
-
-    redNodes.addAll(redHybridNodes);
-    redNodes.addAll(redMidConeNodes);
-    redNodes.addAll(redMidCubeNodes);
-    redNodes.addAll(redHighConeNodes);
-    redNodes.addAll(redHighCubeNodes);
+    initializeNodeMaps();
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
@@ -199,8 +110,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     robotPose = m_swerveDrive.getPoseMeters();
     m_field2d.setRobotPose(robotPose);
 
-    // Test Code - Disable during competition to improve performance
-    if (false) {
+    if (RobotBase.isSimulation()) {
       m_field2d
           .getObject("lLocalizerTagPoses")
           .setPoses(m_vision.getTagPoses2d(CAMERA_SERVER.LEFT_LOCALIZER));
@@ -234,12 +144,12 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
                     m_swerveDrive.getHeadingRotation2d()));
     m_field2d.getObject("Intake Pose").setPose(intakePose);
 
-    //    m_field2d
-    //        .getObject("Grid Node")
-    //        .setPoses(
-    //            validNodes.stream()
-    //                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
-    //                .collect(Collectors.toList()));
+    m_field2d
+        .getObject("Grid Node")
+        .setPoses(
+            getValidNodes().stream()
+                .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
+                .collect(Collectors.toList()));
 
     if (RobotBase.isSimulation()) {
       m_field2d
@@ -256,50 +166,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
    * <p>TODO: This code is not optimized/is slow - need to improve performance/simplify
    */
   public void updateValidNodes(SCORING_STATE scoringState) {
-    if (RobotBase.isSimulation() && testScoringState) {
-      scoringState = scoringStateChooser.getSelected();
-    }
-
-    ArrayList<Translation2d> filteredNodes;
-    boolean filterRed;
-    if (m_currentAlliance == Alliance.Red)
-      if (m_swerveDrive.getPoseMeters().getX() > SimConstants.fieldLength / 2.0) {
-        filteredNodes = (ArrayList<Translation2d>) redNodes.clone();
-        filterRed = true;
-      } else {
-        filteredNodes = (ArrayList<Translation2d>) blueCoopertitionNodes.clone();
-        filterRed = false;
-      }
-    else {
-      if (m_swerveDrive.getPoseMeters().getX() < SimConstants.fieldLength / 2.0) {
-        filteredNodes = (ArrayList<Translation2d>) blueNodes.clone();
-        filterRed = false;
-      } else {
-        filteredNodes = (ArrayList<Translation2d>) redCoopertitionNodes.clone();
-        filterRed = true;
-      }
-    }
-
-    if (scoringState == SCORING_STATE.LOW || scoringState == SCORING_STATE.LOW_REVERSE) {
-      filteredNodes.retainAll(filterRed ? redHybridNodes : blueHybridNodes);
-    } else if (scoringState == SCORING_STATE.MID_CONE) {
-      filteredNodes.retainAll(filterRed ? redMidConeNodes : blueMidConeNodes);
-    } else if (scoringState == SCORING_STATE.MID_CUBE) {
-      filteredNodes.retainAll(filterRed ? redMidCubeNodes : blueMidCubeNodes);
-    } else if (scoringState == SCORING_STATE.HIGH_CONE) {
-      filteredNodes.retainAll(filterRed ? redHighConeNodes : blueHighConeNodes);
-    } else if (scoringState == SCORING_STATE.HIGH_CUBE) {
-      filteredNodes.retainAll(filterRed ? redHighCubeNodes : blueHighCubeNodes);
-    }
-
-    // Remove all nodes that are ignored (e.g. scored)
-    filteredNodes.removeAll(ignoredNodes);
-
-    validNodes = filteredNodes;
+    updateNodeMask(m_swerveDrive.getPoseMeters(), scoringState);
   }
 
   public ArrayList<Translation2d> getValidNodes() {
-    return validNodes;
+    return ChargedUpNodeMask.getValidNodes();
   }
 
   /**
@@ -309,21 +180,13 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
    * @return
    */
   public Pose2d getTargetNode() {
-    List<Pose2d> possibleNodes =
-        getValidNodes().stream()
-            .map(t -> new Pose2d(t, Rotation2d.fromDegrees(0)))
-            .collect(Collectors.toList());
-
-    if (possibleNodes.isEmpty()) return new Pose2d(-1, -1, Rotation2d.fromDegrees(0));
-    else return robotPose.nearest(possibleNodes);
+    return ChargedUpNodeMask.getTargetNode(m_swerveDrive.getPoseMeters());
   }
 
+  // TODO: Unit Test this with new node mask implementation
   // True for left, false for right
   public Pose2d getAdjacentNode(Pose2d node, ArrayList<Translation2d> possibleNodes, boolean left) {
-    int nodeIndex = validNodes.indexOf(node.getTranslation());
-    int newIndex = MathUtil.clamp(nodeIndex + (left ? -1 : 1), 0, possibleNodes.size());
-
-    return new Pose2d(possibleNodes.get(newIndex), Rotation2d.fromDegrees(0));
+    return new Pose2d();
   }
 
   public void setDisplayedNodes(ArrayList<Pose2d> displayedNodes, Pose2d highlightedNode) {
@@ -333,9 +196,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    if (RobotBase.isSimulation() || (RobotBase.isReal() && DriverStation.isDisabled())) {
-      m_currentAlliance = Controls.getAllianceColor();
-    }
     updateRobotPoses();
 
     if (RobotBase.isSimulation()) simulationPeriodic();

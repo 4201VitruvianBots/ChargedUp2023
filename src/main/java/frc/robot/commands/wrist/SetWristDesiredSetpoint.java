@@ -41,7 +41,7 @@ public class SetWristDesiredSetpoint extends CommandBase {
   @Override
   public void execute() {
     m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    m_wrist.setSetpointPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
     m_wrist.setUserInput(-joystickDeadbandOutput);

@@ -31,7 +31,8 @@ import java.util.Map;
  */
 public final class Constants {
   public static String robotName = "";
-  // Add any constants that do not change between robots here, as well as all enums
+  // Add any constants that do not change between robots here, as well as all
+  // enums
 
   public static class USB {
     public static final int leftJoystick = 0;
@@ -147,20 +148,22 @@ public final class Constants {
 
     public enum THRESHOLD {
       // Units are in meters
+      // Used to tell current zone for transitions
       ABSOLUTE_MIN(
           Units.inchesToMeters(
               -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.inchesToMeters(4)),
-      MID_MIN(Units.inchesToMeters(3)),
-      MID_MAX(Units.inchesToMeters(8)),
-      HIGH_MIN(Units.inchesToMeters(6)),
-      HIGH_MAX(Units.inchesToMeters(14)),
-      EXTENDED_MIN(Units.inchesToMeters(12)),
-      EXTENDED_MAX(ABSOLUTE_MAX.get());
+      // Alpha 0<x<4 inches
+      // Beta 3.5 - 28 inches
+      // Gamma 27.5 - 50 inches
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.inchesToMeters(4)),
+      BETA_MIN(Units.inchesToMeters(3.5)),
+      BETA_MAX(Units.inchesToMeters(29)),
+      GAMMA_MIN(Units.inchesToMeters(28.5)),
+      GAMMA_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
 
@@ -395,14 +398,15 @@ public final class Constants {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
       ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
-      LOW_MIN(ABSOLUTE_MIN.get()),
-      LOW_MAX(Units.degreesToRadians(100.0)),
-      MID_MIN(Units.degreesToRadians(25.0)),
-      MID_MAX(Units.degreesToRadians(110.0)),
-      HIGH_MIN(MID_MIN.get()),
-      HIGH_MAX(Units.degreesToRadians(120.0)),
-      EXTENDED_MIN(HIGH_MIN.get()),
-      EXTENDED_MAX(ABSOLUTE_MAX.get()),
+      ALPHA_MIN(ABSOLUTE_MIN.get()),
+      ALPHA_MAX(Units.degreesToRadians(110.0)),
+      BETA_MIN(Units.degreesToRadians(25.0)),
+      BETA_MAX(Units.degreesToRadians(146.0)),
+      GAMMA_MIN(
+          Units.degreesToRadians(
+              40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
+      GAMMA_MAX(ABSOLUTE_MAX.get()),
+
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
       HORIZONTAL_LENGTH_0_CUBE(Units.inchesToMeters(16.0)),
@@ -435,30 +439,46 @@ public final class Constants {
       CUBE
     }
 
+    public enum ZONE {
+      UNDEFINED, // Danger
+      ALPHA,
+      BETA,
+      GAMMA,
+    }
+
+    public static final int undefinedOrdinal = ZONE.UNDEFINED.ordinal();
+    public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
+    public static final int betaOrdinal = ZONE.BETA.ordinal();
+    public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
+
+    public static final double elevatorSetpointTolerance = Units.inchesToMeters(1);
+    public static final double wristSetpointTolerance = Units.degreesToRadians(4);
+
+    public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(100);
+
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
-      DANGER_ZONE(0),
-      // LOW
-      STOWED(1),
-      INTAKE_LOW(1),
-      SCORE_LOW_REVERSE(1),
-      SCORE_LOW(1),
-      SCORE_LOW_CONE(1),
-      SCORE_LOW_CUBE(1),
-      LOW_ZONE(1),
+      DANGER_ZONE(undefinedOrdinal),
+      // LOWs
+      STOWED(alphaOrdinal),
+      INTAKE_LOW(alphaOrdinal),
+      SCORE_LOW_REVERSE(alphaOrdinal),
+      SCORE_LOW(alphaOrdinal),
+      SCORE_LOW_CONE(alphaOrdinal),
+      SCORE_LOW_CUBE(alphaOrdinal),
+      ALPHA_ZONE(alphaOrdinal),
       // MID
-      MID_ZONE(2),
+      BETA_ZONE(betaOrdinal),
+      SCORE_MID(betaOrdinal),
+      SCORE_MID_CONE(betaOrdinal),
+      SCORE_MID_CUBE(betaOrdinal),
       // HIGH
-      HIGH_ZONE(3),
-      // EXTENDED
-      EXTENDED_ZONE(4),
-      INTAKE_EXTENDED(4),
-      SCORE_MID(4),
-      SCORE_HIGH(4),
-      SCORE_MID_CONE(4),
-      SCORE_MID_CUBE(4),
-      SCORE_HIGH_CONE(4),
-      SCORE_HIGH_CUBE(4);
+      GAMMA_ZONE(gammaOrdinal),
+      INTAKE_EXTENDED(gammaOrdinal),
+      SCORE_HIGH(gammaOrdinal),
+      SCORE_HIGH_CONE(gammaOrdinal),
+      SCORE_HIGH_CUBE(gammaOrdinal);
 
       // State Zone is determined by elevator setpoints
       private final int zone;
@@ -474,12 +494,38 @@ public final class Constants {
 
     public enum ZONE_TRANSITIONS {
       NONE,
-      LOW_TO_MID,
-      MID_TO_LOW,
-      MID_TO_HIGH,
-      HIGH_TO_MID,
-      HIGH_TO_EXTENDED,
-      EXTENDED_TO_HIGH,
+      ALPHA_TO_BETA,
+      BETA_TO_ALPHA,
+      BETA_TO_GAMMA,
+      GAMMA_TO_BETA,
+      GAMMA_TO_ALPHA;
+    }
+
+    public enum SETPOINT {
+      // Units are in meters
+      STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
+      SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
+      SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
+      SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
+      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get());
+
+      private final double elevatorSetpointMeters;
+      private final double wristSetpointRadians;
+
+      SETPOINT(double elevatorSetpointMeters, double wristSetpointRadians) {
+        this.elevatorSetpointMeters = elevatorSetpointMeters;
+        this.wristSetpointRadians = wristSetpointRadians;
+      }
+
+      public double getElevatorSetpointMeters() {
+        return elevatorSetpointMeters;
+      }
+
+      public double getWristSetpointRadians() {
+        return wristSetpointRadians;
+      }
     }
   }
 
