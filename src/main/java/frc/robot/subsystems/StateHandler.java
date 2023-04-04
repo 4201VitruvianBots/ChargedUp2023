@@ -187,41 +187,41 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.STOWED.get()) < wristSetpointTolerance)
       return SUPERSTRUCTURE_STATE.STOWED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_LOW.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_CONE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_LOW_CONE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CUBE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_CUBE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID_CONE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_MID_CONE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_MID_CONE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_MID_CUBE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_MID_CUBE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_MID_CUBE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_MID_CUBE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get())
-            < Units.inchesToMeters(1)
+            < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_HIGH_CUBE.get())
-            < Units.degreesToRadians(4)) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE;
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE;
 
     // General states (zones) defined by region
     if (elevatorPositionMeters <= ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
@@ -231,10 +231,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       else assumedZone = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
     }
     if (ELEVATOR.THRESHOLD.BETA_MIN.get() < elevatorPositionMeters
-        && elevatorPositionMeters <= ELEVATOR.THRESHOLD.BETA_MAX.get()) {
+        && elevatorPositionMeters < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
       if (WRIST.THRESHOLD.BETA_MIN.get() < wristPositionRadians
           && wristPositionRadians <= WRIST.THRESHOLD.BETA_MAX.get())
-        return SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+        return SUPERSTRUCTURE_STATE.BETA_ZONE;
       else assumedZone = SUPERSTRUCTURE_STATE.BETA_ZONE;
     }
     if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < elevatorPositionMeters
@@ -277,18 +277,17 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           }
         } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
           // BETA -> GAMMA
-          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
-              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
+          // if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
+          //     && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
             return;
-          }
+          // }
         }
         break;
       case 3: // GAMMA
         // GAMMA -> BETA
-        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
-          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
-              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
+        if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get() && m_elevator.getHeightMeters() > ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
+          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
             return;
           }
@@ -329,7 +328,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             && currentWristPosition <= universalWristUpperLimitRadians)) {
       m_elevator.setDesiredPositionMeters(
           MathUtil.clamp(
-              m_elevatorDesiredSetpointMeters, elevatorLowerLimitMeters, elevatorUpperLimitMeters));
+              m_elevatorDesiredSetpointMeters, ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(), ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()));
     }
   }
 

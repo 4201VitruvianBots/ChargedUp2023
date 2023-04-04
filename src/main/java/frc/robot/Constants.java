@@ -150,8 +150,8 @@ public final class Constants {
       ALPHA_MIN(ABSOLUTE_MIN.get()),
       ALPHA_MAX(Units.inchesToMeters(4)),
       BETA_MIN(Units.inchesToMeters(3.5)),
-      BETA_MAX(Units.inchesToMeters(28)),
-      GAMMA_MIN(Units.inchesToMeters(27.5)),
+      BETA_MAX(Units.inchesToMeters(29)),
+      GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
 
       private final double value;
