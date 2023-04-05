@@ -30,8 +30,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.Constants.SWERVE_MODULE;
 import frc.robot.utils.CtreUtils;
@@ -185,7 +185,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     if (isOpenLoop) {
       double percentOutput =
-          desiredState.speedMetersPerSecond / Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
+          desiredState.speedMetersPerSecond / SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
       m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
       double velocity =
@@ -199,7 +199,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.01))
+                <= (SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
                 .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents

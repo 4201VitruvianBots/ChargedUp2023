@@ -17,7 +17,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   private static boolean isIntakingCube = false;
 
-  private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
+  private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
 
   // Log setup
@@ -52,8 +52,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.enableVoltageCompensation(true);
 
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    intakeMotor.config_kF(0, Constants.INTAKE.kF);
-    intakeMotor.config_kP(0, Constants.INTAKE.kP);
+    intakeMotor.config_kF(0, INTAKE.kF);
+    intakeMotor.config_kP(0, INTAKE.kP);
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and

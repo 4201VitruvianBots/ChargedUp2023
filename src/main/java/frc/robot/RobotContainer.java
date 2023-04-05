@@ -111,9 +111,9 @@ public class RobotContainer implements AutoCloseable {
   private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
+  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
   public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
   public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons

@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER;
@@ -77,8 +76,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final SetpointSolver m_setpointSolver;
 
   private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
-  private final SendableChooser<Constants.SCORING_STATE> m_scoringStateChooser =
-      new SendableChooser<>();
+  private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_currentZonePub;
   private DoublePublisher m_elevatorHeightMetersPub,
@@ -121,11 +119,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void initializeScoringChooser() {
-    for (Constants.SCORING_STATE state : Constants.SCORING_STATE.values()) {
+    for (SCORING_STATE state : SCORING_STATE.values()) {
       m_scoringStateChooser.addOption(state.toString(), state);
     }
 
-    m_scoringStateChooser.setDefaultOption("STOWED", Constants.SCORING_STATE.STOWED);
+    m_scoringStateChooser.setDefaultOption("STOWED", SCORING_STATE.STOWED);
 
     SmartDashboard.putData("Scoring State Selector", m_scoringStateChooser);
   }

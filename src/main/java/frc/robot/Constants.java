@@ -374,11 +374,9 @@ public final class Constants {
         WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
     public static final TrapezoidProfile.Constraints slowConstraints =
-        new TrapezoidProfile.Constraints(
-            Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+        new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
     public static final TrapezoidProfile.Constraints fastConstraints =
-        new TrapezoidProfile.Constraints(
-            Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+        new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
@@ -570,11 +568,6 @@ public final class Constants {
     MID_CUBE,
     HIGH_CONE,
     HIGH_CUBE,
-  }
-
-  public enum CAN_UTIL_LIMIT {
-    NORMAL,
-    LIMITED
   }
 
   private static void initBeta() {

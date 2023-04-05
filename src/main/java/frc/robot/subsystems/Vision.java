@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
@@ -523,18 +522,18 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     m_leftLocalizerPositionPub.set(
         new double[] {
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
           0,
           0,
           0
         });
     m_rightLocalizerPositionPub.set(
         new double[] {
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
           0,
           0,
           0

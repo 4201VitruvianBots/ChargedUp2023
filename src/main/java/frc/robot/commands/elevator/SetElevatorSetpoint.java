@@ -7,7 +7,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
@@ -33,7 +33,7 @@ public class SetElevatorSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setClosedLoopControlMode(Constants.CONTROL_MODE.CLOSED_LOOP);
+    m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
