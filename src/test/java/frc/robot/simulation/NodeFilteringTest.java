@@ -1,16 +1,16 @@
 package frc.robot.simulation;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
+import frc.robot.Constants.SCORING_STATE;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.SwerveDrive;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled
 public class NodeFilteringTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
@@ -36,13 +36,13 @@ public class NodeFilteringTest {
   public void updateValidNodesTiming() {
     Timer m_timer = new Timer();
 
-    Constants.SCORING_STATE[] states = {
-      Constants.SCORING_STATE.LOW,
-      Constants.SCORING_STATE.MID_CONE,
-      Constants.SCORING_STATE.MID_CUBE,
-      Constants.SCORING_STATE.HIGH_CONE,
-      Constants.SCORING_STATE.HIGH_CUBE,
-      Constants.SCORING_STATE.STOWED
+    SCORING_STATE[] states = {
+      SCORING_STATE.LOW,
+      SCORING_STATE.MID_CONE,
+      SCORING_STATE.MID_CUBE,
+      SCORING_STATE.HIGH_CONE,
+      SCORING_STATE.HIGH_CUBE,
+      SCORING_STATE.STOWED
     };
     double[] durations = new double[states.length];
     double totalTime = 0;
@@ -57,6 +57,7 @@ public class NodeFilteringTest {
     }
     double average = totalTime / states.length;
 
-    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
+    //    System.out.println("Avg. Duration: " + average * 1000.0 + "ms");
+    assertTrue(average < 0.020);
   }
 }

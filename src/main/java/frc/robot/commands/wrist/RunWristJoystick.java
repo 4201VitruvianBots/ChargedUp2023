@@ -6,13 +6,14 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {
-  private Wrist m_wrist;
-  private DoubleSupplier m_joystickY;
+  private final Wrist m_wrist;
+  private final DoubleSupplier m_joystickY;
+
   /** Creates a new RunWristJoystick. */
   public RunWristJoystick(Wrist wrist, DoubleSupplier joystickY) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,21 +33,13 @@ public class RunWristJoystick extends CommandBase {
     // Deadbands joystick X so joystick Xs below 0.05 won't be registered
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
-    if (Math.abs(joystickYDeadbandOutput) != 0) {
-      //      m_wrist.setControlState(
-      //          m_wrist.getClosedLoopState()
-      //              ? WRIST.STATE.CLOSED_LOOP_MANUAL
-      //              : WRIST.STATE.OPEN_LOOP_MANUAL);
-      if (m_wrist.getControlState() == WRIST.STATE.USER_SETPOINT) {
-        m_wrist.setUserInput(-joystickYDeadbandOutput);
-      } else {
-        m_wrist.setControlState(WRIST.STATE.OPEN_LOOP_MANUAL);
-        m_wrist.setUserInput(-joystickYDeadbandOutput);
-      }
+    if (joystickYDeadbandOutput != 0.0) {
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
+      m_wrist.setUserInput(-joystickYDeadbandOutput);
     }
-    if (joystickYDeadbandOutput == 0 && m_wrist.getControlState() == WRIST.STATE.OPEN_LOOP_MANUAL) {
-      m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
-      m_wrist.resetState();
+    if (joystickYDeadbandOutput == 0 && m_wrist.getClosedLoopControl() == CONTROL_MODE.OPEN_LOOP) {
+      m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
+      m_wrist.resetTrapezoidState();
     }
   }
 

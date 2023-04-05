@@ -10,8 +10,12 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,25 +26,38 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.*;
-import frc.robot.commands.auto.*;
+import frc.robot.commands.Intake.AutoRunIntakeCone;
+import frc.robot.commands.Intake.AutoRunIntakeCube;
+import frc.robot.commands.Intake.IntakeVisionAlignment;
+import frc.robot.commands.Intake.RunIntakeCone;
+import frc.robot.commands.Intake.RunIntakeCube;
+import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.JustBalance;
+import frc.robot.commands.auto.OnePiece;
+import frc.robot.commands.auto.PlaceOneBalance;
+import frc.robot.commands.auto.TwoPiece;
+import frc.robot.commands.auto.TwoPieceTest;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
+import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.ResetElevatorHeight;
+import frc.robot.commands.elevator.SetElevatorSetpoint;
+import frc.robot.commands.elevator.ToggleElevatorControlMode;
 // import frc.robot.commands.auto.RedTopTwoBalance;
-import frc.robot.commands.elevator.*;
 import frc.robot.commands.led.GetSubsystemStates;
-import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
-import frc.robot.commands.swerve.AutoBalance;
-import frc.robot.commands.swerve.ResetOdometry;
-import frc.robot.commands.swerve.SetRollOffset;
-import frc.robot.commands.swerve.SetSwerveCoastMode;
-import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
-import frc.robot.commands.util.ToggleCanUtilization;
-import frc.robot.commands.wrist.*;
+import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.*;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
+import frc.robot.commands.wrist.RunWristJoystick;
+import frc.robot.commands.wrist.SetWristSetpoint;
+import frc.robot.commands.wrist.ToggleWristControlMode;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
@@ -81,18 +98,15 @@ public class RobotContainer implements AutoCloseable {
   private final StateHandler m_stateHandler =
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
 
-  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
-  // private final DistanceSensor m_distanceSensor = new DistanceSensor();
-
   HashMap<String, Command> m_eventMap = new HashMap<>();
   private SwerveAutoBuilder m_autoBuilder;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(Constants.USB.leftJoystick);
+  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(Constants.USB.rightJoystick);
+  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
   public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
   public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
@@ -118,11 +132,10 @@ public class RobotContainer implements AutoCloseable {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_controls, m_stateHandler, m_intake));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_stateHandler));
 
-    SmartDashboard.putData(new ResetElevatorHeightMeters(m_elevator, 0));
-    SmartDashboard.putData(new ResetAngleDegrees(m_wrist, -15.0));
-    SmartDashboard.putData(new ToggleCanUtilization(m_stateHandler));
+    SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
   }
 
   /**
@@ -139,7 +152,7 @@ public class RobotContainer implements AutoCloseable {
 
     leftJoystickTriggers[0].whileTrue(
         new SetSwerveMaxTranslationVeolcity(
-            m_swerveDrive, Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.750));
+            m_swerveDrive, Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.750));
 
     leftJoystickTriggers[1].whileTrue(
         new IntakeVisionAlignment(
@@ -198,14 +211,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new SetElevatorDesiredSetpoint(
-                m_elevator, ELEVATOR.SETPOINT.STOWED.get(), xboxController::getLeftY));
-    xboxController
-        .x()
-        .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.STOWED.get(), xboxController::getRightY));
-
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
     // High
     xboxController
         .y()
@@ -228,40 +234,34 @@ public class RobotContainer implements AutoCloseable {
     // Toggle elevator, wrist control state
     xboxController
         .povUp()
-        .onTrue(
-            new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_EXTENDED.get()));
-    xboxController
-        .povUp()
-        .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_EXTENDED.get()));
+        .whileTrue(
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_EXTENDED));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
     xboxController.start().onTrue(new ToggleWristControlMode(m_wrist));
-    xboxController.rightBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CONE));
     xboxController
         .rightBumper()
         .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
-    xboxController.leftBumper().whileTrue(new SetPieceTypeIntent(m_led, INTAKING_STATES.CUBE));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CONE));
     xboxController
         .leftBumper()
         .whileTrue(
-            new SetWristDesiredSetpoint(
-                m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), xboxController::getRightY));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CUBE));
 
-    // Will switch our target node on the field sim to the adjacent node on D-pad press
+    // Will switch our target node on the field sim to the adjacent node on D-pad
+    // press
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
-    SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+    SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
 
     initTestController();
   }
 
-  private void initTestController() {
+  private void initTestController() { // TODO: Rewrite this to use the new Statehandler system
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
@@ -270,26 +270,26 @@ public class RobotContainer implements AutoCloseable {
           .axisGreaterThan(3, 0.1)
           .whileTrue(
               new ConditionalCommand(
-                  new SetWristDesiredSetpoint(
-                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
-                  new SetWristDesiredSetpoint(
+                  new SetWristSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get(), testController::getRightY),
+                  new SetWristSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().getZone()
-                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                      m_stateHandler.getCurrentState().getZone()
+                          == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
               new ConditionalCommand(
-                  new SetWristDesiredSetpoint(
-                      m_wrist, WRIST.SETPOINT.INTAKING_LOW.get(), testController::getRightY),
-                  new SetWristDesiredSetpoint(
+                  new SetWristSetpoint(
+                      m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get(), testController::getRightY),
+                  new SetWristSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
                   () ->
-                      m_stateHandler.getCurrentZone().getZone()
-                          == SUPERSTRUCTURE_STATE.LOW_ZONE.getZone()));
+                      m_stateHandler.getCurrentState().getZone()
+                          == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
       // Score button Bindings
 
@@ -336,14 +336,7 @@ public class RobotContainer implements AutoCloseable {
       // Stowed
       testController
           .square()
-          .whileTrue(
-              new SetElevatorDesiredSetpoint(
-                  m_elevator, ELEVATOR.SETPOINT.STOWED.get(), testController::getLeftY));
-      testController
-          .square()
-          .whileTrue(
-              new SetWristDesiredSetpoint(
-                  m_wrist, WRIST.SETPOINT.STOWED.get(), testController::getRightY));
+          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.STOWED));
 
       // High
       testController
@@ -372,10 +365,8 @@ public class RobotContainer implements AutoCloseable {
       // Toggle elevator, wrist control state
       testController
           .povDown()
-          .onTrue(new SetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
-      testController
-          .povDown()
-          .onTrue(new SetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+          .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
+      testController.povDown().onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
 
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -389,21 +380,18 @@ public class RobotContainer implements AutoCloseable {
 
   public void teleopInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
-    m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
-    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
-    m_wrist.resetState();
-    m_swerveDrive.resetState();
+    m_elevator.teleopInit();
+    m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
+    m_wrist.resetTrapezoidState();
     m_stateHandler.init();
   }
 
   public void autonomousInit() {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-    m_elevator.resetState();
-    m_wrist.setDesiredPositionRadians(m_wrist.getPositionRadians());
-    m_wrist.resetState();
-    m_swerveDrive.resetState();
+    m_elevator.resetTrapezoidState();
+    m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
+    m_wrist.resetTrapezoidState();
     m_stateHandler.init();
   }
 
@@ -420,64 +408,59 @@ public class RobotContainer implements AutoCloseable {
     m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
     m_eventMap.put(
         "SetWristIntaking",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW.get()).withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorIntaking",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristStowed",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorStowed",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get())
-            .withTimeout(1));
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()).withTimeout(1));
     m_eventMap.put(
         "SetWristLowConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristMidConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorMidConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristHighConeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorHighConeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
             .withTimeout(1));
     m_eventMap.put(
         "SetWristLowReverseCubeNode",
-        new AutoSetWristDesiredSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
+        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
     m_eventMap.put(
         "SetElevatorLowReverseCubeNode",
-        new AutoSetElevatorDesiredSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
+        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             .withTimeout(1));
 
     m_autoBuilder =
         new SwerveAutoBuilder(
             m_swerveDrive::getPoseMeters,
             m_swerveDrive::setOdometry,
-            Constants.SWERVEDRIVE.kSwerveKinematics,
+            Constants.SWERVE_DRIVE.kSwerveKinematics,
             new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Translation,
-                Constants.SWERVEDRIVE.kI_Translation,
-                Constants.SWERVEDRIVE.kD_Translation),
+                Constants.SWERVE_DRIVE.kP_Translation,
+                Constants.SWERVE_DRIVE.kI_Translation,
+                Constants.SWERVE_DRIVE.kD_Translation),
             new PIDConstants(
-                Constants.SWERVEDRIVE.kP_Rotation,
-                Constants.SWERVEDRIVE.kI_Rotation,
-                Constants.SWERVEDRIVE.kD_Rotation),
+                Constants.SWERVE_DRIVE.kP_Rotation,
+                Constants.SWERVE_DRIVE.kI_Rotation,
+                Constants.SWERVE_DRIVE.kD_Rotation),
             m_swerveDrive::setSwerveModuleStatesAuto,
             m_eventMap,
             true,
@@ -642,6 +625,7 @@ public class RobotContainer implements AutoCloseable {
     //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
+
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     if (RobotBase.isSimulation()) {
@@ -694,6 +678,14 @@ public class RobotContainer implements AutoCloseable {
 
   public Controls getControls() {
     return m_controls;
+  }
+
+  public LEDSubsystem getLEDs() {
+    return m_led;
+  }
+
+  public StateHandler getStateHandler() {
+    return m_stateHandler;
   }
 
   public FieldSim getFieldSim() {

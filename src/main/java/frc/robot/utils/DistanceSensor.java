@@ -7,8 +7,13 @@ package frc.robot.utils;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.*;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -36,9 +41,9 @@ public class DistanceSensor implements AutoCloseable {
   private DatagramSocket socket;
   private String receivedData = "";
 
-  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
-  private Random rand = new Random();
+  private final Random rand = new Random();
   private Object obj;
 
   // Shuffleboard setup
@@ -100,7 +105,7 @@ public class DistanceSensor implements AutoCloseable {
     try {
       String sensorName = "sensor" + sensor + ".mm";
 
-      // parsing string from recieved data
+      // parsing string from received data
       obj = new JSONParser().parse(new StringReader(receivedData));
 
       // typecasting obj to JSONObject

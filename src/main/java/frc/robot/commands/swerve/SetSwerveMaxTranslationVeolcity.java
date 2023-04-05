@@ -1,7 +1,7 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.subsystems.SwerveDrive;
 
 /** Sets the drivetrain to neutral (coast/brake) */
@@ -36,7 +36,7 @@ public class SetSwerveMaxTranslationVeolcity extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_swerveDrive.setMaxVelocity(Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
+    m_swerveDrive.setMaxVelocity(SWERVE_DRIVE.kMaxSpeedMetersPerSecond);
   }
 
   // Returns true when the command should end.
