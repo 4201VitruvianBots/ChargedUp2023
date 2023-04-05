@@ -87,6 +87,8 @@ public final class Constants {
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
+    public static final double carriageDistance = Units.inchesToMeters(6.5);
+    public static final int angleDegrees = 35;
 
     // PID
     public static double kMaxVel = Units.inchesToMeters(30);
@@ -183,6 +185,8 @@ public final class Constants {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+    public static final double length = Units.inchesToMeters(12);
+
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
     public static final int cubeSensorId = 2;
@@ -345,6 +349,7 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
+    public static final double fourbarLength = Units.inchesToMeters(15);
     public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
@@ -365,18 +370,34 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
+    public static final int simEncoderSign =
+        WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
+
+    public static final TrapezoidProfile.Constraints slowConstraints =
+        new TrapezoidProfile.Constraints(
+            Constants.WRIST.kMaxSlowVel, Constants.WRIST.kMaxSlowAccel);
+    public static final TrapezoidProfile.Constraints fastConstraints =
+        new TrapezoidProfile.Constraints(
+            Constants.WRIST.kMaxFastVel, Constants.WRIST.kMaxFastAccel);
+
+    public static final double kMaxPercentOutput = 1.0;
+    public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
+
     public enum STATE {
       OPEN_LOOP_MANUAL,
-      CLOSED_LOOP_MANUAL,
-      TEST_SETPOINT,
-      CLOSED_LOOP,
-      AUTO_SETPOINT
+      CLOSED_LOOP
+    }
+
+    public enum WRIST_SPEED {
+      SLOW,
+      FAST
     }
 
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(104.0)),
-      INTAKING_LOW(Units.degreesToRadians(-14.5)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.5)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
@@ -458,7 +479,7 @@ public final class Constants {
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
-    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(100);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(115);
 
     public static boolean limitCanUtilization = true;
 
@@ -467,7 +488,8 @@ public final class Constants {
       DANGER_ZONE(undefinedOrdinal),
       // LOWs
       STOWED(alphaOrdinal),
-      INTAKE_LOW(alphaOrdinal),
+      INTAKE_LOW_CONE(alphaOrdinal),
+      INTAKE_LOW_CUBE(alphaOrdinal),
       SCORE_LOW_REVERSE(alphaOrdinal),
       SCORE_LOW(alphaOrdinal),
       SCORE_LOW_CONE(alphaOrdinal),
@@ -505,7 +527,10 @@ public final class Constants {
       SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(
           ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
-      INTAKING_LOW(ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW.get());
+      INTAKING_LOW_CONE(
+          ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW_CONE.get()),
+      INTAKING_LOW_CUBE(
+          ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW_CUBE.get());
 
       private final double elevatorSetpointMeters;
       private final double wristSetpointRadians;

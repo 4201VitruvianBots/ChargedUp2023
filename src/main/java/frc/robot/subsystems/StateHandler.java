@@ -28,7 +28,6 @@ import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
 import frc.robot.simulation.FieldSim;
-import frc.robot.subsystems.Wrist.WRIST_SPEED;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -183,8 +182,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       return SUPERSTRUCTURE_STATE.STOWED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_LOW.get())
             < elevatorSetpointTolerance
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW.get())
-            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_LOW;
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW_CONE.get())
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE;
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_LOW.get())
+            < elevatorSetpointTolerance
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_LOW_CUBE.get())
+            < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get())
             < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
@@ -461,9 +464,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.FAST);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.FAST);
     } else {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST_SPEED.SLOW);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.SLOW);
     }
 
     // TODO: Update this based on Intake sensors
