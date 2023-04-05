@@ -185,7 +185,7 @@ public final class Constants {
       TwinkleOff,
       Solid
     }
-
+    //These color are channels passed in the setPattern() method in the LED subsystem
     public static final Color8Bit red = new Color8Bit(255, 0, 0);
     public static final Color8Bit green = new Color8Bit(0, 255, 0);
     public static final Color8Bit blue = new Color8Bit(0, 0, 255);

@@ -77,10 +77,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
 
   /**
    * //will set LED color and animation type
-   *
-   * @param red
-   * @param green
-   * @param blue
+   * @param Color8Bit the color channel
    * @param white
    * @param speed
    * @param toChange
