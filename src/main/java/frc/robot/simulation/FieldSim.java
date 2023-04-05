@@ -37,6 +37,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private final Controls m_controls;
 
   private final Field2d m_field2d = new Field2d();
+  private List<PathPlannerTrajectory> m_displayedTrajectories = new ArrayList<>();
 
   private ArrayList<Pose2d> m_displayedNodes = new ArrayList<>();
   private Pose2d m_highlightedNode = new Pose2d(0, 0, new Rotation2d(0));
@@ -86,20 +87,19 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
-    List<Pose2d> trajectoryPoses = new ArrayList<>();
+    if(!m_displayedTrajectories.equals(trajectories)) {
+      List<Pose2d> trajectoryPoses = new ArrayList<>();
 
-    for (var trajectory : trajectories) {
-      trajectoryPoses.addAll(
-          trajectory.getStates().stream()
-              .map(state -> state.poseMeters)
-              .collect(Collectors.toList()));
+      for (var trajectory : trajectories) {
+        trajectoryPoses.addAll(
+                trajectory.getStates().stream()
+                        .map(state -> state.poseMeters)
+                        .collect(Collectors.toList()));
+      }
+
+      m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
+      m_displayedTrajectories = trajectories;
     }
-
-    m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
-  }
-
-  public void setTrajectory(PathPlannerTrajectory trajectory) {
-    m_field2d.getObject("trajectory").setTrajectory(trajectory);
   }
 
   public void resetRobotPose(Pose2d pose) {

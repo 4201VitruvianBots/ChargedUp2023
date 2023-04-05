@@ -624,6 +624,8 @@ public class RobotContainer implements AutoCloseable {
   public void simulationPeriodic() {
     m_elevator.simulationPeriodic();
     m_memorylog.simulationPeriodic();
+
+    // TODO: Fix overwrite
     m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
