@@ -29,14 +29,14 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.CAN;
 import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.*;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
-  private final CANdle m_candle = new CANdle(Constants.CAN.CANdle); // LED In constants)
+  private final CANdle m_candle = new CANdle(CAN.CANdle); // LED In constants)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
   int blue = 0;
