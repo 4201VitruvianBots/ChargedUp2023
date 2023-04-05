@@ -464,7 +464,7 @@ public final class Constants {
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
-    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(115);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
     public static boolean limitCanUtilization = true;
 
