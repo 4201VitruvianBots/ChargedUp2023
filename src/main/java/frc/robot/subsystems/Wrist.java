@@ -38,7 +38,7 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.THRESHOLD;
-import frc.robot.Constants.WRIST.WRIST_SPEED;
+import frc.robot.Constants.WRIST.SPEED;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
@@ -291,7 +291,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         < Units.degreesToRadians(0.5);
   }
 
-  public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
+  public void updateTrapezoidProfileConstraints(SPEED speed) {
     switch (speed) {
       case FAST:
         m_currentConstraints = WRIST.fastConstraints;

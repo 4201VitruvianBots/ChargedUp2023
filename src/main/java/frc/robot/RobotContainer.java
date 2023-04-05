@@ -54,12 +54,7 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.led.SetPieceTypeIntent;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
-import frc.robot.commands.swerve.AutoBalance;
-import frc.robot.commands.swerve.ResetOdometry;
-import frc.robot.commands.swerve.SetRollOffset;
-import frc.robot.commands.swerve.SetSwerveCoastMode;
-import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
+import frc.robot.commands.swerve.*;
 import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
@@ -222,7 +217,7 @@ public class RobotContainer implements AutoCloseable {
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
-    SmartDashboard.putData(new SetSwerveCoastMode(m_swerveDrive));
+    SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
 
     initTestController();

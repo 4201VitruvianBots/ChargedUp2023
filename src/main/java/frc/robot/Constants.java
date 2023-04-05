@@ -177,7 +177,7 @@ public final class Constants {
       }
     }
 
-    public enum ELEVATOR_SPEED {
+    public enum SPEED {
       NORMAL,
       LIMITED
     }
@@ -381,12 +381,7 @@ public final class Constants {
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
 
-    public enum STATE {
-      OPEN_LOOP_MANUAL,
-      CLOSED_LOOP
-    }
-
-    public enum WRIST_SPEED {
+    public enum SPEED {
       SLOW,
       FAST
     }

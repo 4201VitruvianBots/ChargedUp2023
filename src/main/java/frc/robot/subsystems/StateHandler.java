@@ -462,9 +462,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.FAST);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.SPEED.FAST);
     } else {
-      m_wrist.updateTrapezoidProfileConstraints(WRIST.WRIST_SPEED.SLOW);
+      m_wrist.updateTrapezoidProfileConstraints(WRIST.SPEED.SLOW);
     }
 
     // TODO: Update this based on Intake sensors
