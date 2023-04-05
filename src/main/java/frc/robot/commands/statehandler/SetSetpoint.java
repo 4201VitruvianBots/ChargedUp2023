@@ -35,7 +35,7 @@ public class SetSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP); 
+    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
     m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_wrist.setUserSetpoint(true);
     m_elevator.setUserSetpoint(true);
