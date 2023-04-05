@@ -12,13 +12,11 @@ import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class SetSetpoint extends CommandBase {
-  /** Creates a new SetStatehandlerstate. */
-  // TODO: Specify end condition in autos and make it hold position within this command
-  private Elevator m_elevator;
-
-  private Wrist m_wrist;
-  private StateHandler m_StateHandler;
-  private STATEHANDLER.SETPOINT m_desiredState;
+  /** Creates a new SetStateHandlerState. */
+  private final Elevator m_elevator;
+  private final Wrist m_wrist;
+  private final StateHandler m_StateHandler;
+  private final STATEHANDLER.SETPOINT m_desiredState;
 
   public SetSetpoint(
       StateHandler stateHandler,

@@ -12,9 +12,9 @@ import java.util.function.DoubleSupplier;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. This is our default command */
-  private DoubleSupplier m_joystickY;
+  private final Elevator m_elevator;
 
-  private Elevator m_elevator;
+  private final DoubleSupplier m_joystickY;
 
   public IncrementElevatorHeight(Elevator elevator, DoubleSupplier joystickY) {
 
