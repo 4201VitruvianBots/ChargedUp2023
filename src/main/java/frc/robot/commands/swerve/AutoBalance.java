@@ -59,7 +59,6 @@ public class AutoBalance extends CommandBase {
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
-    // TODO; set a way to initialize pitch to 0
 
     states =
         new SwerveModuleState[] {

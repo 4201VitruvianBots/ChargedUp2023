@@ -596,8 +596,7 @@ public final class Constants {
       }
       mac = String.join(":", hex);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+//      e.printStackTrace();
     }
     if (mac.equals(alphaRobotMAC)) {
       initAlpha();

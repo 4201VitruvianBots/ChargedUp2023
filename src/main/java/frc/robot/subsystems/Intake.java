@@ -118,8 +118,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateLog();
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
-    // hold
-    // the game piece in.
+    // hold the game piece in.
     if (!isIntakingCone && !isIntakingCube) {
       if (getConeDistance() > 0) {
         m_percentOutput = 0;

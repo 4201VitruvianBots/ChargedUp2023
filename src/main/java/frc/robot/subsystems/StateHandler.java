@@ -176,7 +176,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       double elevatorPositionMeters, double wristPositionRadians) {
     SUPERSTRUCTURE_STATE assumedZone = SUPERSTRUCTURE_STATE.DANGER_ZONE;
 
-    // TODO: Update all of these comparisions with constants
     // Specific states defined by elevator/wrist setpoints
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.STOWED.get())
             < elevatorSetpointTolerance
