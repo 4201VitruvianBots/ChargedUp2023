@@ -15,6 +15,8 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -269,6 +271,15 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_joystickInput = m_joystickY;
   }
 
+  public void  setTalonPIDvalues(double f,double p, double i,double d, double izone){
+    elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx,f);
+    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx,d);
+    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx,p);
+    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx,i);
+    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx,izone);
+    
+    
+  }
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
