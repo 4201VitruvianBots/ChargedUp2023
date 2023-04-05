@@ -309,15 +309,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateCommandedSetpoints() {
-    double currentWristPosition = m_wrist.getPositionRadians();
-    setElevatorCommandedSetpoint(currentWristPosition);
+    setElevatorCommandedSetpoint();
     setWristCommandedSetpoint();
   }
 
-  private void setElevatorCommandedSetpoint(double currentWristPosition) {
+  private void setElevatorCommandedSetpoint() {
     if ((m_currentState.getZone() == m_desiredState.getZone())
-        || (currentWristPosition >= universalWristLowerLimitRadians
-            && currentWristPosition <= universalWristUpperLimitRadians)) {
+        || (m_wrist.getPositionRadians() >= universalWristLowerLimitRadians
+            && m_wrist.getPositionRadians() <= universalWristUpperLimitRadians)) {
       m_elevator.setDesiredPositionMeters(
           MathUtil.clamp(
               m_elevatorDesiredSetpointMeters,
@@ -457,6 +456,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
+    }
+
+    // Updates the constraints of the elevator
+    if (m_elevatorDesiredSetpointMeters - m_elevator.getHeightMeters() > 0) {
+      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.FAST);
+    } else if (m_elevator.getHeightMeters() < Units.inchesToMeters(3.0)) {
+      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.HALT);
+    } else {
+      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.SLOW);
     }
 
     // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking

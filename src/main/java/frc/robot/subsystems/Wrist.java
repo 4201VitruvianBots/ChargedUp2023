@@ -38,7 +38,6 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.SPEED;
-import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
@@ -47,9 +46,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
 
   private double m_desiredSetpointRadians;
-  private double m_commandedAngleRadians;
-  private double m_lowerLimitRadians = THRESHOLD.ABSOLUTE_MIN.get();
-  private double m_upperLimitRadians = THRESHOLD.ABSOLUTE_MAX.get();
+  private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
@@ -67,7 +65,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
-  public ArmFeedforward m_feedforward =
+  public ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
@@ -86,8 +84,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           WRIST.gearRatio,
           SingleJointedArmSim.estimateMOI(WRIST.length, WRIST.mass),
           WRIST.length,
-          THRESHOLD.ABSOLUTE_MIN.get(),
-          THRESHOLD.ABSOLUTE_MAX.get(),
+          WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
+          WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
@@ -216,7 +214,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
-    return (m_feedforward.calculate(state.position, state.velocity) / 12.0);
+    return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
   // Sets the setpoint of the wrist to its current position so it will remain in place
@@ -232,10 +230,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public double getDesiredPositionRadians() {
     return m_desiredSetpointRadians;
-  }
-
-  public double getCommandedPositionRadians() {
-    return m_commandedAngleRadians;
   }
 
   public double getPositionRadians() {
@@ -286,23 +280,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (getPositionDegrees() > 170);
   }
 
-  public boolean atSetpoint() {
-    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
-        < Units.degreesToRadians(0.5);
-  }
-
-  public void updateTrapezoidProfileConstraints(SPEED speed) {
-    switch (speed) {
-      case FAST:
-        m_currentConstraints = WRIST.fastConstraints;
-        break;
-      default:
-      case SLOW:
-        m_currentConstraints = WRIST.slowConstraints;
-        break;
-    }
-  }
-
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
@@ -333,6 +310,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     if (m_currentKI != m_newKI) {
       wristMotor.config_kI(0, m_newKI);
       m_currentKI = m_newKI;
+    }
+  }
+
+  public void updateTrapezoidProfileConstraints(SPEED speed) {
+    switch (speed) {
+      case FAST:
+        m_currentConstraints = WRIST.fastConstraints;
+        break;
+      default:
+      case SLOW:
+        m_currentConstraints = WRIST.slowConstraints;
+        break;
     }
   }
 
@@ -439,7 +428,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     voltageEntry.append(getMotorOutputVoltage());
     currentEntry.append(getMotorOutputCurrent());
     desiredPositionEntry.append(getDesiredPositionRadians());
-    commandedPositionEntry.append(getCommandedPositionRadians());
     positionDegreesEntry.append(getPositionDegrees());
   }
 
