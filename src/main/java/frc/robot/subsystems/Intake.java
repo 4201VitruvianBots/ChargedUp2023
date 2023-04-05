@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   // control mode function
   public boolean getIntakeState() {
-    return isIntaking;
+    return isIntakingCone || isIntakingCube;
   }
 
   public boolean getIntakeStateCone() {
@@ -93,8 +93,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Shuffleboard or SmartDashboard function
 
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
-    SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
+    SmartDashboard.putBoolean("Intaking Cone", getIntakeStateCone());
+    SmartDashboard.putBoolean("Intaking Cube", getIntakeCubeState());
   }
 
   public void updateLog() {
@@ -109,7 +109,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
     // hold
     // the game piece in.
-    if (!isIntaking) {
+    if (!getIntakeState()) {
       if (m_distanceSensor.getConeDistanceInches() > 0) {
         m_percentOutput = 0;
       } else if (m_distanceSensor.getCubeDistanceInches() > 0) {

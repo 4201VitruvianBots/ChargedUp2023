@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -41,7 +40,7 @@ public class DistanceSensor implements AutoCloseable {
   private DatagramSocket socket;
   private String receivedData = "";
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   private final Random rand = new Random();
   private Object obj;
@@ -210,10 +209,6 @@ public class DistanceSensor implements AutoCloseable {
     return getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE.CUBE);
   }
 
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    limitCanUtil = limitCan;
-  }
-
   // Returns a pose where the center of the gamepiece should be
   public Pose2d getGamepiecePose(Pose2d intakePose) {
     return new Pose2d(
@@ -242,41 +237,36 @@ public class DistanceSensor implements AutoCloseable {
     cubeLig.setColor(new Color8Bit(128, 0, 128));
   }
 
-  public void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
-    
-    switch (limitCan) {
-      case NORMAL:
-        // Put not required stuff here
-        SmartDashboard.putData("Intake Sim", mech2d);
-        sensor1MMPub.set(getSensorValueMillimeters(1));
-        sensor2MMPub.set(getSensorValueMillimeters(2));
-        sensor3MMPub.set(getSensorValueMillimeters(3));
-        sensor1InchPub.set(getSensorValueInches(1));
-        sensor2InchPub.set(getSensorValueInches(2));
-        sensor3InchPub.set(getSensorValueInches(3));
-        coneInchesPub.set(getConeDistanceInches());
-        cubeInchesPub.set(getCubeDistanceInches());
-        rawStringPub.set(receivedData);
-        gamePiecePub.set(getHeldGamepiece().name());
+  public void updateSmartDashboard() {
+    if (!m_limitCanUtil) {
+      // Put not required stuff here
+      SmartDashboard.putData("Intake Sim", mech2d);
+      sensor1MMPub.set(getSensorValueMillimeters(1));
+      sensor2MMPub.set(getSensorValueMillimeters(2));
+      sensor3MMPub.set(getSensorValueMillimeters(3));
+      sensor1InchPub.set(getSensorValueInches(1));
+      sensor2InchPub.set(getSensorValueInches(2));
+      sensor3InchPub.set(getSensorValueInches(3));
+      coneInchesPub.set(getConeDistanceInches());
+      cubeInchesPub.set(getCubeDistanceInches());
+      rawStringPub.set(receivedData);
+      gamePiecePub.set(getHeldGamepiece().name());
 
-        // Mech2d updates
-        coneRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
-          Constants.INTAKE.innerIntakeWidth * 0.1);
-        cubeRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
-          Constants.INTAKE.innerIntakeWidth * 0.9);
-        coneLig.setLength(getConeWidthMeters());
-        coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
-        cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
-      default:
-      case LIMITED:
-        break;
+      // Mech2d updates
+      coneRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
+        Constants.INTAKE.innerIntakeWidth * 0.1);
+      cubeRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
+        Constants.INTAKE.innerIntakeWidth * 0.9);
+      coneLig.setLength(getConeWidthMeters());
+      coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
+      cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
     }
   }
 
   public void pollDistanceSensors() {
     // This method will be called once per scheduler run
     // testParserTab.setInteger(testParser());
-    updateSmartDashboard(limitCanUtil);
+    updateSmartDashboard();
     try {
       if (RobotBase.isSimulation()) {
         //simulationPeriodic();
