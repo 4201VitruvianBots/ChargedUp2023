@@ -37,8 +37,8 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
-import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.Constants.WRIST.SPEED;
+import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
