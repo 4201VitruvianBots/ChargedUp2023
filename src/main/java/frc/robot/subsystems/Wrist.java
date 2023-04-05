@@ -34,7 +34,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.WRIST;
+import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.Constants.WRIST.WRIST_SPEED;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
@@ -45,11 +47,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private double m_desiredSetpointRadians;
   private double m_commandedAngleRadians;
-  private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
-  private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
+  private double m_lowerLimitRadians = THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitRadians = THRESHOLD.ABSOLUTE_MAX.get();
 
-  // TODO: Consolidate Enum definition
-  private WRIST.STATE m_controlState = WRIST.STATE.CLOSED_LOOP;
+  private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
   private double m_joystickInput;
   private boolean m_userSetpoint;
@@ -81,12 +82,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // Simulation setup
   private final SingleJointedArmSim m_armSim =
       new SingleJointedArmSim(
-          Constants.WRIST.gearBox,
-          Constants.WRIST.gearRatio,
-          SingleJointedArmSim.estimateMOI(Constants.WRIST.length, Constants.WRIST.mass),
-          Constants.WRIST.length,
-          WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-          WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
+          WRIST.gearBox,
+          WRIST.gearRatio,
+          SingleJointedArmSim.estimateMOI(WRIST.length, WRIST.mass),
+          WRIST.length,
+          THRESHOLD.ABSOLUTE_MIN.get(),
+          THRESHOLD.ABSOLUTE_MAX.get(),
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
@@ -142,7 +143,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
-    // Give some time for the CANcoder to recognize the wrist before starting
+    // Give some time for the CANCoder to recognize the wrist before starting
     if (RobotBase.isReal()) Timer.delay(2);
 
     resetAngleDegrees(-15.0);
@@ -164,16 +165,16 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return m_joystickInput != 0 && !m_userSetpoint;
   }
 
-  public void setClosedLoopControl(WRIST.STATE state) {
-    m_controlState = state;
+  public void setClosedLoopControlMode(CONTROL_MODE mode) {
+    m_controlMode = mode;
   }
 
-  public WRIST.STATE getClosedLoopControl() {
-    return m_controlState;
+  public CONTROL_MODE getClosedLoopControl() {
+    return m_controlMode;
   }
 
   public boolean isClosedLoopControl() {
-    return m_controlState == WRIST.STATE.CLOSED_LOOP;
+    return m_controlMode == CONTROL_MODE.CLOSED_LOOP;
   }
 
   public void setPercentOutput(double output) {
@@ -219,7 +220,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   // Sets the setpoint of the wrist to its current position so it will remain in place
-  public void haltPosition() {
+  public void resetTrapezoidState() {
     m_setpoint =
         new TrapezoidProfile.State(
             getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
@@ -281,6 +282,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return m_upperLimitRadians;
   }
 
+  public boolean isScoring() {
+    return (getPositionDegrees() > 170);
+  }
+
+  public boolean atSetpoint() {
+    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
+        < Units.degreesToRadians(0.5);
+  }
+
   public void updateTrapezoidProfileConstraints(WRIST_SPEED speed) {
     switch (speed) {
       case FAST:
@@ -298,8 +308,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
   }
 
-  // Do not remove. WIP for auto scoring
-  public Translation2d getHorzTranslation2d() {
+  public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
@@ -315,7 +324,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       horizontalDistance =
           //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;
-    return new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+    m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
+  }
+
+  public Translation2d getHorizontalTranslation() {
+    return m_wristHorizontalTranslation;
   }
 
   private void updateIValue() {
@@ -436,46 +449,14 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     positionDegreesEntry.append(getPositionDegrees());
   }
 
-  public boolean isScoring() {
-    return (getPositionDegrees() > 170);
-  }
-
-  public void updateHorizontalTranslation() {
-    // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
-    // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
-    // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
-    // Cone: f(x)=-0.270347*t+16.8574;
-    double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CUBE)
-      horizontalDistance =
-          0.00000913468 * Math.pow(getPositionDegrees(), 3)
-              - 0.00232508 * Math.pow(getPositionDegrees(), 2)
-              - 0.0894341 * getPositionDegrees()
-              + 16.1239;
-    else if (m_intake.getHeldGamepiece() == Constants.INTAKE.HELD_GAMEPIECE.CONE)
-      horizontalDistance =
-          //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
-          -0.270347 * getPositionDegrees() + 16.8574;
-    m_wristHorizontalTranslation = new Translation2d(Units.inchesToMeters(horizontalDistance), 0);
-  }
-
-  public Translation2d getHorizontalTranslation() {
-    return m_wristHorizontalTranslation;
-  }
-
-  public boolean atSetpoint() {
-    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
-        < Units.degreesToRadians(0.5);
-  }
-
   @Override
   public void periodic() {
     updateIValue();
     updateSmartDashboard();
     updateLog();
 
-    switch (m_controlState) {
-      case OPEN_LOOP_MANUAL:
+    switch (m_controlMode) {
+      case OPEN_LOOP:
         double percentOutput = m_joystickInput * Constants.WRIST.kPercentOutputMultiplier;
         setPercentOutput(percentOutput, true);
         break;

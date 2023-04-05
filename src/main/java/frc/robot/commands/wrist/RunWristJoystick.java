@@ -6,7 +6,7 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
@@ -34,13 +34,12 @@ public class RunWristJoystick extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-      m_wrist.setClosedLoopControl(WRIST.STATE.OPEN_LOOP_MANUAL);
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
       m_wrist.setUserInput(-joystickYDeadbandOutput);
     }
-    if (joystickYDeadbandOutput == 0
-        && m_wrist.getClosedLoopControl() == WRIST.STATE.OPEN_LOOP_MANUAL) {
+    if (joystickYDeadbandOutput == 0 && m_wrist.getClosedLoopControl() == CONTROL_MODE.OPEN_LOOP) {
       m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
-      m_wrist.haltPosition();
+      m_wrist.resetTrapezoidState();
     }
   }
 

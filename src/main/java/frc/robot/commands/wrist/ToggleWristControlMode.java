@@ -5,7 +5,7 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 
 public class ToggleWristControlMode extends CommandBase {
@@ -27,10 +27,10 @@ public class ToggleWristControlMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_wrist.getClosedLoopControl() == WRIST.STATE.CLOSED_LOOP)
-      m_wrist.setClosedLoopControl(WRIST.STATE.OPEN_LOOP_MANUAL);
-    else if (m_wrist.getClosedLoopControl() == WRIST.STATE.OPEN_LOOP_MANUAL)
-      m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
+    if (m_wrist.getClosedLoopControl() != CONTROL_MODE.OPEN_LOOP)
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
+    else if (m_wrist.getClosedLoopControl() != CONTROL_MODE.CLOSED_LOOP)
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

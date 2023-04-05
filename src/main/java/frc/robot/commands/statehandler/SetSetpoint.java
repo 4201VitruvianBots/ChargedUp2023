@@ -7,7 +7,6 @@ package frc.robot.commands.statehandler;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
@@ -35,7 +34,7 @@ public class SetSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
+    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_wrist.setUserSetpoint(true);
     m_elevator.setUserSetpoint(true);

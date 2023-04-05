@@ -6,7 +6,7 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
@@ -40,7 +40,7 @@ public class SetWristSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setClosedLoopControl(WRIST.STATE.CLOSED_LOOP);
+    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_wrist.setSetpointPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);

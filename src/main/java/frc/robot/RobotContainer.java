@@ -301,7 +301,7 @@ public class RobotContainer implements AutoCloseable {
     m_swerveDrive.setNeutralMode(NeutralMode.Brake);
     m_elevator.teleopInit();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
-    m_wrist.haltPosition();
+    m_wrist.resetTrapezoidState();
     m_stateHandler.init();
   }
 
@@ -310,7 +310,7 @@ public class RobotContainer implements AutoCloseable {
     m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
     m_elevator.resetTrapezoidState();
     m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());
-    m_wrist.haltPosition();
+    m_wrist.resetTrapezoidState();
     m_stateHandler.init();
   }
 
