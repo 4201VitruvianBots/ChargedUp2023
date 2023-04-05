@@ -87,14 +87,14 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
-    if(!m_displayedTrajectories.equals(trajectories)) {
+    if (!m_displayedTrajectories.equals(trajectories)) {
       List<Pose2d> trajectoryPoses = new ArrayList<>();
 
       for (var trajectory : trajectories) {
         trajectoryPoses.addAll(
-                trajectory.getStates().stream()
-                        .map(state -> state.poseMeters)
-                        .collect(Collectors.toList()));
+            trajectory.getStates().stream()
+                .map(state -> state.poseMeters)
+                .collect(Collectors.toList()));
       }
 
       m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
