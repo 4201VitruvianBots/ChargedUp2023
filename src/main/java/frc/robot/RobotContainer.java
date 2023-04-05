@@ -27,7 +27,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;

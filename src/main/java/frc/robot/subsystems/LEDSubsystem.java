@@ -19,8 +19,6 @@ import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
-
-import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,10 +30,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.*;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
@@ -48,14 +44,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean setSolid;
   private Animation m_toAnimate = null;
 
-
   private final StringPublisher ledStatePub;
 
-   // Mechanism2d visualization setup
-   public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
-   public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
-   public MechanismLigament2d m_ligament2d =
-       m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+  // Mechanism2d visualization setup
+  public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+  public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
+  public MechanismLigament2d m_ligament2d = m_root2d.append(new MechanismLigament2d("LED", 2, 90));
 
   // Create LED strip
   public LEDSubsystem(Controls controls) {
@@ -82,13 +76,14 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     ledStatePub = nt_instance.getStringTopic("LED State").publish();
 
-     // Initialize visualization
-     m_ligament2d.setLineWeight(1000); // making the line THICK
-     SmartDashboard.putData("LED Sim", m_mech2d);
+    // Initialize visualization
+    m_ligament2d.setLineWeight(1000); // making the line THICK
+    SmartDashboard.putData("LED Sim", m_mech2d);
   }
 
   /**
    * //will set LED color and animation type
+   *
    * @param Color8Bit the color channel
    * @param white
    * @param speed
@@ -96,8 +91,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
    */
 
   // will create LED patterns
-  public void setPattern(
-      Color8Bit color, int white, double speed, ANIMATION_TYPE toChange) {
+  public void setPattern(Color8Bit color, int white, double speed, ANIMATION_TYPE toChange) {
     int red = color.red;
     int green = color.green;
     int blue = color.blue;
@@ -127,7 +121,8 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         break;
       case Twinkle: // random leds turning on and off with certain color
         m_toAnimate =
-            new TwinkleAnimation(red, green, blue, white, speed, LED.LEDcount, TwinklePercent.Percent6);
+            new TwinkleAnimation(
+                red, green, blue, white, speed, LED.LEDcount, TwinklePercent.Percent6);
         break;
       case TwinkleOff: // twinkle in reverse
         m_toAnimate =
@@ -152,42 +147,42 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   public void expressState(SUPERSTRUCTURE_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
-        case INTAKE_LOW_CONE: 
+        case INTAKE_LOW_CONE:
           setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Solid);
           break;
         case INTAKE_LOW_CUBE:
           setPattern(LED.purple, 0, 0, ANIMATION_TYPE.Solid);
           break;
-        case ALPHA_ZONE: 
-        case SCORE_LOW_REVERSE: 
+        case ALPHA_ZONE:
+        case SCORE_LOW_REVERSE:
         case SCORE_LOW:
         case SCORE_LOW_CONE:
         case SCORE_LOW_CUBE:
-            setPattern(LED.white, 0, 0, ANIMATION_TYPE.Solid); // Solid White
+          setPattern(LED.white, 0, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
-        case BETA_ZONE: 
+        case BETA_ZONE:
         case SCORE_MID:
         case SCORE_MID_CONE:
         case SCORE_MID_CUBE:
-            setPattern(LED.blue, 15, 0, ANIMATION_TYPE.Solid); // Solid Blue
+          setPattern(LED.blue, 15, 0, ANIMATION_TYPE.Solid); // Solid Blue
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
-            setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
+          setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
           break;
         case DISABLED:
-            setPattern(LED.red, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
+          setPattern(LED.red, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
           break;
         case ENABLED:
-            setPattern(LED.green, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
+          setPattern(LED.green, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
           break;
         case LOW_BATTERY:
-            setPattern(LED.yellow, 0, 1, ANIMATION_TYPE.Strobe); // Flashing Yellow
+          setPattern(LED.yellow, 0, 1, ANIMATION_TYPE.Strobe); // Flashing Yellow
           break;
-          default:
+        default:
           break;
       }
       currentRobotState = state;
@@ -198,7 +193,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     m_ligament2d.setColor(new Color8Bit(this.red, this.green, this.blue));
   }
-  
+
   @Override
   public void periodic() {
     // null indicates that the animation is "Solid"
@@ -210,15 +205,15 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
 
-    if(DriverStation.isDisabled()) {
-    if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
-      expressState(SUPERSTRUCTURE_STATE.LOW_BATTERY);
+    if (DriverStation.isDisabled()) {
+      if (RobotController.getBatteryVoltage()
+          < 10) { // calling battery to let driver know that it is low
+        expressState(SUPERSTRUCTURE_STATE.LOW_BATTERY);
+      }
     }
-  }
 
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
-
 
   @Override
   public void close() throws Exception {}
