@@ -28,7 +28,6 @@ import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
-  private INTAKING_STATES pieceIntent = INTAKING_STATES.NONE;
   private final CANdle m_candle = new CANdle(Constants.CAN.CANdle); // LED In constants)
   int red = 0;
   int green = 0; // setting all LED colors to none: there is no color when robot activates
@@ -89,8 +88,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
 
   // will create LED patterns
   public void setPattern(
-      int red, int green, int blue, int white, double speed, ANIMATION_TYPE toChange) {
-
+      Color8Bit color, int white, double speed, ANIMATION_TYPE toChange) {
+    int red = color.red;
+    int green = color.green;
+    int blue = color.blue;
     switch (toChange) {
       case ColorFlow: // stripe of color flowing through the led strip
         m_toAnimate =
@@ -148,33 +149,32 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case SCORE_LOW:
         case SCORE_LOW_CONE:
         case SCORE_LOW_CUBE:
-            setPattern(247, 116, 40, 0, 0, ANIMATION_TYPE.Solid); // Solid Orange
+            setPattern(LED.orange, 0, 0, ANIMATION_TYPE.Solid); // Solid Orange
           break;
-        //   break;
         case MID_ZONE:
         case SCORE_MID:
         case SCORE_MID_CONE:
         case SCORE_MID_CUBE:
-            setPattern(125, 125, 125, 15, 0, ANIMATION_TYPE.Solid); // Solid White
+            setPattern(LED.white, 15, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
         case HIGH_ZONE:
-            setPattern(255, 117, 140, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
+            setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
           break;
         case EXTENDED_ZONE:
         case INTAKE_EXTENDED:
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
-            setPattern(0, 0, 255, 0, 0, ANIMATION_TYPE.Solid); // Solid White
+            setPattern(LED.blue, 0, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
         case DISABLED:
-            setPattern(255, 0, 0, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
+            setPattern(LED.red, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
           break;
         case ENABLED:
-            setPattern(0, 255, 0, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
+            setPattern(LED.green, 0, 0, ANIMATION_TYPE.Solid); // Solid Green
           break;
         case LOW_BATTERY:
-            setPattern(255, 255, 0, 0, 1, ANIMATION_TYPE.Strobe); // Flashing Yellow
+            setPattern(LED.yellow, 0, 1, ANIMATION_TYPE.Strobe); // Flashing Yellow
           break;
           default:
           break;

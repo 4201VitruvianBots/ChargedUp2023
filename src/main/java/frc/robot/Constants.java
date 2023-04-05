@@ -11,6 +11,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -185,12 +186,14 @@ public final class Constants {
       Solid
     }
 
-    /** Different robot states */
-    public enum LED_STATE {
-      DISABLED,
-      ENABLED,
-      LOW_BATTERY
-    }
+    public static final Color8Bit red = new Color8Bit(255, 0, 0);
+    public static final Color8Bit green = new Color8Bit(0, 255, 0);
+    public static final Color8Bit blue = new Color8Bit(0, 0, 255);
+    public static final Color8Bit yellow = new Color8Bit(150, 120, 0);
+    public static final Color8Bit purple = new Color8Bit(128, 0, 128);
+    public static final Color8Bit orange = new Color8Bit(247, 116, 40);
+    public static final Color8Bit pink = new Color8Bit(255, 117, 140);
+    public static final Color8Bit white = new Color8Bit(125, 125, 125);
   }
 
   public static final class SWERVEDRIVE {
