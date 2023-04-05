@@ -6,9 +6,6 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
-import frc.robot.Constants.LED.LED_STATE;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -33,9 +30,7 @@ public class GetSubsystemStates extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    var currentState = m_stateHandler.getCurrentZone();
-  }
+  public void initialize() {}
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -44,8 +39,8 @@ public class GetSubsystemStates extends CommandBase {
     // highest priority 
     if (DriverStation.isDisabled()) {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
-    } else if (!DriverStation.isDisabled()) {
-          switch (m_stateHandler.getDesiredZone()) {
+    } else {
+      switch (m_stateHandler.getDesiredZone()) {
             case LOW_ZONE:
             case INTAKE_LOW:
             case SCORE_LOW_REVERSE: 
@@ -73,7 +68,7 @@ public class GetSubsystemStates extends CommandBase {
               default:
                 m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
               break;
-        }
+      }
     }
   } 
   // Called once the command ends or is interrupted.
