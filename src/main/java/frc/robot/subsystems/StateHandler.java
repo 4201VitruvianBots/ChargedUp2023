@@ -36,20 +36,20 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
    * Beta is when elevator height is between 3.5-28 inches Gamma is when elevator height is between
    * 27.5-50 inches
    */
-  public SCORING_STATE m_scoringState = SCORING_STATE.STOWED;
+  private SCORING_STATE m_scoringState = SCORING_STATE.STOWED;
 
-  public INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
+  private INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
-  public SUPERSTRUCTURE_STATE m_currentState = SUPERSTRUCTURE_STATE.STOWED;
-  public SUPERSTRUCTURE_STATE m_lastState = m_currentState;
-  public SUPERSTRUCTURE_STATE m_desiredState = m_currentState;
-  public ZONE m_currentZone = ZONE.UNDEFINED;
+  private SUPERSTRUCTURE_STATE m_currentState = SUPERSTRUCTURE_STATE.STOWED;
+  private SUPERSTRUCTURE_STATE m_lastState = m_currentState;
+  private SUPERSTRUCTURE_STATE m_desiredState = m_currentState;
+  private ZONE m_currentZone = ZONE.UNDEFINED;
 
   private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
-  public Pose2d targetNode;
+  private Pose2d targetNode;
 
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
@@ -257,6 +257,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
               && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
+            m_currentZone = ZONE.BETA;
             return;
           }
         }
@@ -268,11 +269,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (WRIST.THRESHOLD.ALPHA_MIN.get() < m_wrist.getPositionRadians()
               && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
+            m_currentZone = ZONE.ALPHA;
             return;
           }
         } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
           // BETA -> GAMMA
           m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+          m_currentZone = ZONE.GAMMA;
           return;
         }
         break;
@@ -281,6 +284,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
           if (WRIST.THRESHOLD.BETA_MAX.get() > m_wrist.getPositionRadians()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
+            m_currentZone = ZONE.BETA;
             return;
           }
         }

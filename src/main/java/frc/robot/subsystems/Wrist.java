@@ -65,7 +65,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
-  public ArmFeedforward m_feedForward =
+  private final ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic

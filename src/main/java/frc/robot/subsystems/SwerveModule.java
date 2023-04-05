@@ -49,7 +49,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
-  SimpleMotorFeedforward feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
           SWERVE_MODULE.ksDriveVoltSecondsPerMeter,
           SWERVE_MODULE.kvDriveVoltSecondsSquaredPerMeter,

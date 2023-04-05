@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Controls extends SubsystemBase implements AutoCloseable {
-  StringPublisher allianceString;
-  BooleanPublisher allianceBoolean;
+  private StringPublisher allianceString;
+  private BooleanPublisher allianceBoolean;
 
   private boolean isInit;
   private static DriverStation.Alliance allianceColor = DriverStation.Alliance.Red;

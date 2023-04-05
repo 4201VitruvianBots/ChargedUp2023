@@ -37,9 +37,9 @@ import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final CANdle m_candle = new CANdle(CAN.CANdle); // LED In constants)
-  int red = 0;
-  int green = 0; // setting all LED colors to none: there is no color when robot activates
-  int blue = 0;
+  private int red = 0;
+  private int green = 0; // setting all LED colors to none: there is no color when robot activates
+  private int blue = 0;
   private SUPERSTRUCTURE_STATE currentRobotState = SUPERSTRUCTURE_STATE.STOWED;
   private boolean setSolid;
   private Animation m_toAnimate = null;
