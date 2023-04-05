@@ -59,7 +59,7 @@ public class DistanceSensor implements AutoCloseable {
         socket.setReceiveBufferSize(512);
         socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
-//        socketFail.printStackTrace();
+        //        socketFail.printStackTrace();
       }
     }
     initSmartDashboard();
@@ -199,13 +199,13 @@ public class DistanceSensor implements AutoCloseable {
       }
     } catch (SocketTimeoutException ex) {
       System.out.println("DistanceSensor-SocketTimeoutError");
-//      ex.printStackTrace();
+      //      ex.printStackTrace();
     } catch (IOException ex) {
       System.out.println("DistanceSensor-IOError");
-//      ex.printStackTrace();
+      //      ex.printStackTrace();
     } catch (Exception ex) {
       System.out.println("DistanceSensor-UnknownError");
-//      ex.printStackTrace();
+      //      ex.printStackTrace();
     }
   }
 
