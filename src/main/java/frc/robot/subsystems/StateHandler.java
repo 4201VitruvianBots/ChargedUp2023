@@ -268,7 +268,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           if (WRIST.THRESHOLD.ALPHA_MIN.get() < m_wrist.getPositionRadians()
               && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
-            System.out.println("Requirement hit");
             return;
           }
         } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
