@@ -127,7 +127,7 @@ public class ChargedUpNodeMaskTest {
   @Test
   public void TestRedGetRedNodes() {
     setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
-    m_controls.updateAllianceColor();
+    m_controls.periodic();
 
     Pose2d robotPose = new Pose2d(14, 1, Rotation2d.fromDegrees(0));
     SCORING_STATE state;
