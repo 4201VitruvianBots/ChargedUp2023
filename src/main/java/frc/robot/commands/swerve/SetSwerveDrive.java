@@ -25,8 +25,9 @@ public class SetSwerveDrive extends CommandBase {
     m_throttleInput = throttleInput;
     m_strafeInput = strafeInput;
     m_rotationInput = rotationInput;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDriveSubsystem);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.

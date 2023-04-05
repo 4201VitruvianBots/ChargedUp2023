@@ -6,21 +6,21 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 import java.util.function.DoubleSupplier;
 
-public class SetWristDesiredSetpoint extends CommandBase {
+public class SetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
-  private double m_setpoint;
   private final DoubleSupplier m_input;
+  private final double m_setpoint;
 
-  public SetWristDesiredSetpoint(Wrist wrist, double setpoint) {
+  public SetWristSetpoint(Wrist wrist, double setpoint) {
     this(wrist, setpoint, () -> 0);
   }
 
   /** Creates a new RunWrist. */
-  public SetWristDesiredSetpoint(Wrist wrist, double setpoint, DoubleSupplier input) {
+  public SetWristSetpoint(Wrist wrist, double setpoint, DoubleSupplier input) {
     m_wrist = wrist;
     m_setpoint = setpoint;
     m_input = input;
@@ -40,8 +40,8 @@ public class SetWristDesiredSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
+    m_wrist.setSetpointPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
     m_wrist.setUserInput(-joystickDeadbandOutput);
@@ -51,7 +51,7 @@ public class SetWristDesiredSetpoint extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_wrist.setUserSetpoint(false);
-    //    m_wrist.setControlState(WRIST.STATE.AUTO_SETPOINT);
+    //    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
     //    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
   }
 

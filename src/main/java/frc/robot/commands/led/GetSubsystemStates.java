@@ -40,30 +40,32 @@ public class GetSubsystemStates extends CommandBase {
     if (DriverStation.isDisabled()) {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
     } else {
-      switch (m_stateHandler.getDesiredZone()) {
-            case LOW_ZONE:
-            case INTAKE_LOW:
+      switch (m_stateHandler.getDesiredState()) {
+            case INTAKE_LOW_CONE:
+              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+              break; 
+            case INTAKE_LOW_CUBE:
+              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+              break; 
+            case ALPHA_ZONE: 
             case SCORE_LOW_REVERSE: 
             case SCORE_LOW:
             case SCORE_LOW_CONE:
             case SCORE_LOW_CUBE:
-                m_led.expressState(SUPERSTRUCTURE_STATE.LOW_ZONE); // Solid Orange
+                m_led.expressState(SUPERSTRUCTURE_STATE.ALPHA_ZONE); // Solid Orange
               break;
-            case MID_ZONE:
+            case BETA_ZONE: 
             case SCORE_MID_CONE:
             case SCORE_MID_CUBE:
             case SCORE_MID:
-                m_led.expressState(SUPERSTRUCTURE_STATE.MID_ZONE);; // Solid White
+                m_led.expressState(SUPERSTRUCTURE_STATE.BETA_ZONE);; // Solid Blue
               break;
-            case HIGH_ZONE:
-                m_led.expressState(SUPERSTRUCTURE_STATE.HIGH_ZONE);; // Solid Pink
-              break;
-            case EXTENDED_ZONE:
+            case GAMMA_ZONE:
             case INTAKE_EXTENDED:
             case SCORE_HIGH:
             case SCORE_HIGH_CONE:
             case SCORE_HIGH_CUBE:
-                m_led.expressState(SUPERSTRUCTURE_STATE.EXTENDED_ZONE);; // Solid White
+                m_led.expressState(SUPERSTRUCTURE_STATE.GAMMA_ZONE);; // Solid White
               break;
               default:
                 m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);

@@ -36,7 +36,7 @@ public class SetSwerveMaxTranslationVeolcity extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_swerveDrive.setMaxVelocity(Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond);
+    m_swerveDrive.setMaxVelocity(Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond);
   }
 
   // Returns true when the command should end.

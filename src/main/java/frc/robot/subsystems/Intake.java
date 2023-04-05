@@ -22,13 +22,10 @@ import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
-  private static boolean isIntaking = false;
-
   private static boolean isIntakingCone = false;
+
   private static boolean isIntakingCube = false;
 
-  private final double kF = 0;
-  private final double kP = 0.2;
   private final TalonFX intakeMotor = new TalonFX(Constants.CAN.intakeMotor);
   private double m_percentOutput;
 
@@ -46,8 +43,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
     // set current limit on talonfx motors
-    intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30, 0.1));
-    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 30, 0.1));
+    intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 30, 0.1));
+    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
@@ -55,8 +52,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.enableVoltageCompensation(true);
 
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-    intakeMotor.config_kF(0, kF);
-    intakeMotor.config_kP(0, kP);
+    intakeMotor.config_kF(0, Constants.INTAKE.kF);
+    intakeMotor.config_kP(0, Constants.INTAKE.kP);
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and
@@ -70,12 +67,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return 0;
   }
 
-  // control mode function
-  public boolean getIntakeState() {
-    return isIntaking;
-  }
-
-  public boolean getIntakeStateCone() {
+  public boolean getIntakeConeState() {
     return isIntakingCone;
   }
 
@@ -83,7 +75,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     isIntakingCone = state;
   }
 
-  public boolean getIntakeStateCube() {
+  public boolean getIntakeCubeState() {
     return isIntakingCube;
   }
 
@@ -105,10 +97,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return intakeMotor.getStatorCurrent();
   }
 
-  public void setBooleanState(boolean state) {
-    isIntaking = state;
-  }
-
   // set percent output function
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
@@ -116,7 +104,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Shuffleboard or SmartDashboard function
 
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Intake", getIntakeState());
+    SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
+    SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
   }
 
   public void updateLog() {
@@ -129,9 +118,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateLog();
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
-    // hold
-    // the game piece in.
-    if (!isIntaking) {
+    // hold the game piece in.
+    if (!isIntakingCone && !isIntakingCube) {
       if (getConeDistance() > 0) {
         m_percentOutput = 0;
       } else if (getCubeDistance() > 0) {

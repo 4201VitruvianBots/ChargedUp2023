@@ -32,14 +32,14 @@ public class MemoryLog {
       File newFile = new File(logPath);
       newFile.createNewFile();
     } catch (IOException e) {
-      e.printStackTrace();
+      //      e.printStackTrace();
     }
 
     try {
       final FileWriter clearFile = new FileWriter(logPath, false);
       clearFile.close();
     } catch (IOException clearFailed) {
-      clearFailed.printStackTrace();
+      //      clearFailed.printStackTrace();
     }
   }
 

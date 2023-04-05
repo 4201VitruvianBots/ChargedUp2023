@@ -21,7 +21,7 @@ public class DynamicPathGeneration extends CommandBase {
 
     TrajectoryConfig config =
         new TrajectoryConfig(Units.feetToMeters(3), Units.feetToMeters(3))
-            .setKinematics(Constants.SWERVEDRIVE.kSwerveKinematics);
+            .setKinematics(Constants.SWERVE_DRIVE.kSwerveKinematics);
 
     Trajectory trajectory =
         TrajectoryGenerator.generateTrajectory(

@@ -1,11 +1,23 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.led.*;
+import com.ctre.phoenix.led.Animation;
+import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.CANdleConfiguration;
+import com.ctre.phoenix.led.CANdleStatusFrame;
+import com.ctre.phoenix.led.ColorFlowAnimation;
 import com.ctre.phoenix.led.ColorFlowAnimation.Direction;
+import com.ctre.phoenix.led.FireAnimation;
+import com.ctre.phoenix.led.LarsonAnimation;
 import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
+import com.ctre.phoenix.led.RainbowAnimation;
+import com.ctre.phoenix.led.RgbFadeAnimation;
+import com.ctre.phoenix.led.SingleFadeAnimation;
+import com.ctre.phoenix.led.StrobeAnimation;
+import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
+import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 
 import edu.wpi.first.math.trajectory.Trajectory.State;
@@ -140,29 +152,31 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   public void expressState(SUPERSTRUCTURE_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
-        case LOW_ZONE:
-        case INTAKE_LOW:
+        case INTAKE_LOW_CONE: 
+          setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Solid);
+          break;
+        case INTAKE_LOW_CUBE:
+          setPattern(LED.purple, 0, 0, ANIMATION_TYPE.Solid);
+          break;
+        case ALPHA_ZONE: 
         case SCORE_LOW_REVERSE: 
         case SCORE_LOW:
         case SCORE_LOW_CONE:
         case SCORE_LOW_CUBE:
-            setPattern(LED.orange, 0, 0, ANIMATION_TYPE.Solid); // Solid Orange
+            setPattern(LED.white, 0, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
-        case MID_ZONE:
+        case BETA_ZONE: 
         case SCORE_MID:
         case SCORE_MID_CONE:
         case SCORE_MID_CUBE:
-            setPattern(LED.white, 15, 0, ANIMATION_TYPE.Solid); // Solid White
+            setPattern(LED.blue, 15, 0, ANIMATION_TYPE.Solid); // Solid Blue
           break;
-        case HIGH_ZONE:
-            setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
-          break;
-        case EXTENDED_ZONE:
+        case GAMMA_ZONE:
         case INTAKE_EXTENDED:
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
-            setPattern(LED.blue, 0, 0, ANIMATION_TYPE.Solid); // Solid White
+            setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
           break;
         case DISABLED:
             setPattern(LED.red, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
@@ -196,9 +210,11 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       m_candle.animate(m_toAnimate); // setting the candle animation to m_animation if not null
     }
 
+    if(DriverStation.isDisabled()) {
     if(RobotController.getBatteryVoltage() < 10) {// calling battery to let driver know that it is low
       expressState(SUPERSTRUCTURE_STATE.LOW_BATTERY);
     }
+  }
 
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }

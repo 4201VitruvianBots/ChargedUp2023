@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -42,22 +42,22 @@ public class BottomDriveForward extends SequentialCommandGroup {
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(0.3),
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         autoPath,
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(0.3),
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
