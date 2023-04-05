@@ -201,7 +201,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     try {
       SmartDashboard.putData("Field2d", m_field2d);
     } catch (NullPointerException e) {
-      e.printStackTrace();
+      //      e.printStackTrace();
     }
   }
 

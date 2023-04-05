@@ -90,7 +90,7 @@ public class DistanceSensor implements AutoCloseable {
       return sensorValue;
     } catch (Exception e) {
       System.out.println("Boo hoo I can't read the file :_(");
-      e.printStackTrace();
+      //      e.printStackTrace();
       return -1;
     }
   }
