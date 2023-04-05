@@ -15,7 +15,6 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -142,7 +141,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       motor.config_kP(ELEVATOR.kSlotIdx, ELEVATOR.kP, ELEVATOR.kTimeoutMs);
       motor.config_kI(ELEVATOR.kSlotIdx, ELEVATOR.kI, ELEVATOR.kTimeoutMs);
       motor.config_kD(ELEVATOR.kSlotIdx, ELEVATOR.kD, ELEVATOR.kTimeoutMs);
-      
+
       // Setting hard limits as to how fast the elevator can move forward and backward
       motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
       motor.configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
@@ -195,7 +194,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-            calculateFeedforward(state));
+        calculateFeedforward(state));
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
