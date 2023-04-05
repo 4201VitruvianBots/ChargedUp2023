@@ -14,7 +14,7 @@ import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
+import frc.robot.commands.wrist.AutoSetWristSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -45,13 +45,13 @@ public class PlaceOneBalance extends SequentialCommandGroup {
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new ParallelCommandGroup(
             new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         new WaitCommand(0.1),
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(0.5),
         new ParallelCommandGroup(
             new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
         autoPath,
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

@@ -71,7 +71,8 @@ public class GetSubsystemStates extends CommandBase {
       }
     } else {
       switch (desiredState) {
-        case INTAKE_LOW:
+        case INTAKE_LOW_CONE:
+        case INTAKE_LOW_CUBE: 
         case INTAKE_EXTENDED:
           m_led.expressState(LED_STATE.INTAKING);
           break;
