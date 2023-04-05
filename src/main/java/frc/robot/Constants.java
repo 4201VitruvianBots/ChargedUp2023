@@ -176,11 +176,6 @@ public final class Constants {
         return value;
       }
     }
-
-    public enum SPEED {
-      NORMAL,
-      LIMITED
-    }
   }
 
   public static final class INTAKE {

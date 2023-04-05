@@ -303,11 +303,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  private TrapezoidProfile.State limitDesiredSetpointRadians(TrapezoidProfile.State state) {
-    return new TrapezoidProfile.State(
-        MathUtil.clamp(state.position, m_lowerLimitRadians, m_upperLimitRadians), state.velocity);
-  }
-
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
@@ -459,7 +454,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         double percentOutput = m_joystickInput * WRIST.kPercentOutputMultiplier;
         setPercentOutput(percentOutput, true);
         break;
-
       case CLOSED_LOOP:
       default:
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
@@ -468,10 +462,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
 
-        TrapezoidProfile.State commandedSetpoint = limitDesiredSetpointRadians(m_setpoint);
-        m_commandedAngleRadians = commandedSetpoint.position;
-        kDesiredAngleDegreesPub.set(commandedSetpoint.position);
-        setSetpointTrapezoidState(commandedSetpoint);
+        setSetpointTrapezoidState(m_setpoint);
         break;
     }
   }
