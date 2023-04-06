@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.utils.ChargedUpNodeMask;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -36,13 +35,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData(CommandScheduler.getInstance());
     DataLogManager.start();
     //    addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
-    addPeriodic(
-        () ->
-            ChargedUpNodeMask.updateNodeMask(
-                m_robotContainer.getSwerveDrive().getPoseMeters(),
-                m_robotContainer.getStateHandler().getCurrentScoringState()),
-        0.04,
-        0.01);
+    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
     // Same as color sensors in RapidReact2022
     //    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.02, 0.01);
   }

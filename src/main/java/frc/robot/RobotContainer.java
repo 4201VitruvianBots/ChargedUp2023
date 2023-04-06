@@ -81,15 +81,14 @@ public class RobotContainer implements AutoCloseable {
   private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
-  private final FieldSim m_fieldSim =
-      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
-  private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
-
   private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led, m_vision);
+  private final FieldSim m_fieldSim =
+      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
 
+  private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
   HashMap<String, Command> m_eventMap = new HashMap<>();
   private SwerveAutoBuilder m_autoBuilder;
 

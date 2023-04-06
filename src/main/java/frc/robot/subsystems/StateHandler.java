@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.STATEHANDLER.elevatorSetpointTolerance;
 import static frc.robot.Constants.STATEHANDLER.wristSetpointTolerance;
+import static frc.robot.utils.ChargedUpNodeMask.getTargetNode;
+import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,7 +28,6 @@ import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
-import frc.robot.simulation.FieldSim;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -50,7 +51,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private boolean m_smartScoringEnabled;
   private boolean m_isOnTarget;
-  private Pose2d targetNode;
 
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
@@ -70,7 +70,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Intake m_intake;
   private final Wrist m_wrist;
   private final SwerveDrive m_drive;
-  private final FieldSim m_fieldSim;
   private final Elevator m_elevator;
   private final LEDSubsystem m_led;
   private final Vision m_vision;
@@ -91,13 +90,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       Intake intake,
       Wrist wrist,
       SwerveDrive swerveDrive,
-      FieldSim fieldSim,
       Elevator elevator,
       LEDSubsystem led,
       Vision vision) {
     m_intake = intake;
     m_drive = swerveDrive;
-    m_fieldSim = fieldSim;
     m_elevator = elevator;
     m_led = led;
     m_vision = vision;
@@ -158,12 +155,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_currentZone;
   }
 
-  public SCORING_STATE getCurrentScoringState() {
-    return m_scoringState;
-  }
+  private void updateScoringState() {}
 
-  public void setCurrentScoringState(SCORING_STATE state) {
-    m_scoringState = state;
+  public SCORING_STATE getScoringState() {
+    return m_scoringState;
   }
 
   public void enableSmartScoring(boolean enabled) {
@@ -424,9 +419,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  // TODO: Fix this
   public void switchTargetNode(boolean left) {
-    ArrayList<Translation2d> possibleNodes = m_fieldSim.getValidNodes();
-    targetNode = m_fieldSim.getAdjacentNode(targetNode, possibleNodes, left);
+    ArrayList<Translation2d> possibleNodes = getValidNodes();
   }
 
   @Override
@@ -434,7 +429,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateZoneLimits();
     updateCommandedSetpoints();
-    // targetNode = m_fieldSim.getTargetNode(currentIntakeState, scoringState);
+    updateScoringState();
 
     //     Determine current zone based on elevator/wrist position
 
@@ -506,11 +501,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     if (m_smartScoringEnabled) {
+      var targetNode = getTargetNode(m_drive.getPoseMeters(), 0);
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
 
       m_setpointSolver.solveSetpoints(
           m_drive.getPoseMeters(),
-          m_fieldSim.getTargetNode(),
+          targetNode,
           m_wrist.getHorizontalTranslation().getX(),
           m_scoringState);
       m_wrist.setSetpointPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
@@ -539,7 +535,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void testPeriodic() {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentState = m_mainStateChooser.getSelected();
-    m_fieldSim.getTargetNode();
   }
 
   @Override

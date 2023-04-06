@@ -1,5 +1,6 @@
 package frc.robot.simulation;
 
+import static frc.robot.utils.ChargedUpNodeMask.updateNodeMask;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
@@ -51,7 +52,7 @@ public class NodeFilteringTest {
       m_timer.reset();
       m_timer.start();
       double m_timestamp = m_timer.get();
-      m_fieldSim.updateValidNodes(states[i]);
+      updateNodeMask(m_swerveDrive.getPoseMeters(), states[i]);
       durations[i] = m_timer.get() - m_timestamp;
       totalTime += durations[i];
     }
