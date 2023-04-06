@@ -10,12 +10,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,6 +56,7 @@ import frc.robot.commands.wrist.SetWristSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
@@ -553,8 +550,16 @@ public class RobotContainer implements AutoCloseable {
         "RedDriveForward"
       };
       for (var auto : autos) {
-        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
-        autoPlotter.addOption(auto, trajectory);
+        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+
+        var isRedPath = auto.startsWith("Red");
+        List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        if (isRedPath) {
+          ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
+        } else {
+          ppTrajectories.addAll(trajectories);
+        }
+        autoPlotter.addOption(auto, ppTrajectories);
       }
 
       SmartDashboard.putData("Auto Visualizer", autoPlotter);

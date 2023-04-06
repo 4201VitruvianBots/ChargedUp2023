@@ -8,6 +8,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.SimConstants;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,18 +32,14 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
     var isRedPath = m_pathName.startsWith("Red");
     if (isRedPath) {
-      ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-      for (var trajectory : m_trajectories) {
-        ppTrajectories.add(
-            PathPlannerTrajectory.transformTrajectoryForAlliance(
-                trajectory, DriverStation.Alliance.Red));
-      }
-      m_fieldSim.setTrajectory(ppTrajectories);
+      ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
     } else {
-      m_fieldSim.setTrajectory(m_trajectories);
+      ppTrajectories.addAll(m_trajectories);
     }
+    m_fieldSim.setTrajectory(m_trajectories);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

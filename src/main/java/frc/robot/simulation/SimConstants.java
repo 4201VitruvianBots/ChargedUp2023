@@ -7,16 +7,21 @@
 
 package frc.robot.simulation;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.subsystems.Controls;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
@@ -276,6 +281,60 @@ public final class SimConstants {
     } else {
       return translation;
     }
+  }
+
+  public static List<PathPlannerTrajectory> absoluteFlip(List<PathPlannerTrajectory> trajectories) {
+    List<PathPlannerTrajectory> flippedTrajectories = new ArrayList<>();
+    for (var trajectory : trajectories) {
+      List<Trajectory.State> trajectoryStates = new ArrayList<>();
+
+      trajectoryStates.addAll(
+          trajectory.getStates().stream()
+              .map(state -> SimConstants.absoluteFlip(state))
+              .collect(Collectors.toList()));
+
+      var flippedTrajectory =
+          new PathPlannerTrajectory(
+              trajectoryStates,
+              trajectory.getMarkers(),
+              trajectory.getStartStopEvent(),
+              trajectory.getEndStopEvent(),
+              false);
+
+      flippedTrajectories.add(flippedTrajectory);
+    }
+    return flippedTrajectories;
+  }
+
+  public static PathPlannerTrajectory.Waypoint absoluteFlip(
+      PathPlannerTrajectory.Waypoint waypoint) {
+    var newAnchorPoint = absoluteFlip(waypoint.anchorPoint);
+    var newHolonomicRotation = waypoint.holonomicRotation.rotateBy(Rotation2d.fromDegrees(180));
+    return new PathPlannerTrajectory.Waypoint(
+        newAnchorPoint,
+        waypoint.prevControl,
+        waypoint.nextControl,
+        waypoint.velOverride,
+        newHolonomicRotation,
+        waypoint.isReversal,
+        waypoint.isStopPoint,
+        waypoint.stopEvent);
+  }
+
+  public static PathPlannerTrajectory.State absoluteFlip(Trajectory.State state) {
+    var newPose = absoluteFlip(state.poseMeters);
+    return new PathPlannerTrajectory.State(
+        state.timeSeconds,
+        state.velocityMetersPerSecond,
+        state.accelerationMetersPerSecondSq,
+        newPose,
+        state.curvatureRadPerMeter);
+  }
+
+  public static Pose2d absoluteFlip(Pose2d pose) {
+    return new Pose2d(
+            absoluteFlip(pose.getTranslation()),
+            new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
   }
 
   public static Translation2d absoluteFlip(Translation2d translation) {

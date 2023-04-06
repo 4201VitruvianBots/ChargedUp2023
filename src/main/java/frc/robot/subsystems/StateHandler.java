@@ -447,8 +447,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     // Displayed state for easier debugging
     m_currentDisplayedState =
-            determineSuperStructureState(
-                    m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+        determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
 
     // Determine desired zone based on elevator/wrist setpoints
     m_desiredState =
