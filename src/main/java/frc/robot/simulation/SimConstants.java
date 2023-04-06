@@ -333,8 +333,8 @@ public final class SimConstants {
 
   public static Pose2d absoluteFlip(Pose2d pose) {
     return new Pose2d(
-            absoluteFlip(pose.getTranslation()),
-            new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+        absoluteFlip(pose.getTranslation()),
+        new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
   }
 
   public static Translation2d absoluteFlip(Translation2d translation) {
