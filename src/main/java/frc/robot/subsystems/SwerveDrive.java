@@ -29,9 +29,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
-import frc.robot.Constants.SWERVEDRIVE;
-import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.CAN;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,16 +89,16 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final TrapezoidProfile.Constraints m_constraints =
       new TrapezoidProfile.Constraints(
-          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecond,
-          Constants.SWERVEDRIVE.kMaxRotationRadiansPerSecondSquared);
+          Constants.SWERVE_DRIVE.kMaxRotationRadiansPerSecond,
+          Constants.SWERVE_DRIVE.kMaxRotationRadiansPerSecondSquared);
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private PIDController m_xController =
-      new PIDController(SWERVEDRIVE.kP_X, SWERVEDRIVE.kI_X, SWERVEDRIVE.kD_X);
+      new PIDController(SWERVE_DRIVE.kP_X, SWERVE_DRIVE.kI_X, SWERVE_DRIVE.kD_X);
   private PIDController m_yController =
-      new PIDController(SWERVEDRIVE.kP_Y, SWERVEDRIVE.kI_Y, SWERVEDRIVE.kD_Y);
+      new PIDController(SWERVE_DRIVE.kP_Y, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
   private PIDController m_turnController =
-      new PIDController(SWERVEDRIVE.kP_Theta, SWERVEDRIVE.kI_Theta, SWERVEDRIVE.kD_Theta);
+      new PIDController(SWERVE_DRIVE.kP_Theta, SWERVE_DRIVE.kI_Theta, SWERVE_DRIVE.kD_Theta);
 
   private double m_rotationOutput;
 

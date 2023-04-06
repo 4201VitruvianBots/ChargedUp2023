@@ -55,6 +55,8 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    /** Negative & 90 degrees for Facing Bump Side */
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());

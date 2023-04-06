@@ -7,15 +7,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.STATEHANDLER.SETPOINT;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
-import frc.robot.commands.wrist.AutoSetWristDesiredSetpoint;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -50,7 +47,7 @@ public class PlaceOneBalance extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH),
+            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)),
 
         /** Outakes cone */
@@ -59,13 +56,7 @@ public class PlaceOneBalance extends SequentialCommandGroup {
 
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
-
-        /** Stows Wrist, Elevator, and Stops intake */
-        new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.STOWED.get()),
+            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
             new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
         swerveCommands.get(0),
         new AutoBalance(swerveDrive),

@@ -80,7 +80,7 @@ public class TrajectoryUtils {
           new PPSwerveControllerCommand(
               trajectory,
               swerveDrive::getPoseMeters,
-              Constants.SWERVEDRIVE.kSwerveKinematics,
+              Constants.SWERVE_DRIVE.kSwerveKinematics,
               swerveDrive.getXPidController(),
               swerveDrive.getYPidController(),
               swerveDrive.getThetaPidController(),

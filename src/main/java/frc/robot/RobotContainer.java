@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.*;
@@ -30,7 +31,6 @@ import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.auto.BottomDriveForward;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.OnePiece;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.elevator.IncrementElevatorHeight;
@@ -44,11 +44,10 @@ import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
-import frc.robot.commands.swerve.SetSwerveCoastMode;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
-import frc.robot.commands.util.ToggleCanUtilization;
-import frc.robot.commands.wrist.ResetAngleDegrees;
+import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristSetpoint;
 import frc.robot.commands.wrist.ToggleWristControlMode;
@@ -58,6 +57,9 @@ import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
+import frc.robot.utils.TrajectoryUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -302,12 +304,26 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "TwoPiece",
         new TwoPiece(
-            "TwoPiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+            "TwoPiece",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "PlaceOneBalance",
         new PlaceOneBalance(
-            "PlaceOneBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision, m_stateHandler));
+            "PlaceOneBalance",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "JustBalance",
@@ -323,36 +339,37 @@ public class RobotContainer implements AutoCloseable {
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator, m_stateHandler));
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
-        "DriveForward", new DriveForward("DriveForward", m_swerveDrive, m_fieldSim, m_wrist));
+        "DriveForward", new DriveForward("DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
-    if (RobotBase.isSimulation()) {
-      // TODO: Fix this; broke after rewrite
-      //      autoPlotter = new SendableChooser<>();
-      //      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
-      //      dummy.add(new PathPlannerTrajectory());
-      //      autoPlotter.setDefaultOption("None", dummy);
-      //      String[] autos = {
-      //        "BlueTwoPiece",
-      //        "BlueOnePiece",
-      //        "RedTwoPiece",
-      //        "BlueBottomDriveForward",
-      //        "RedBottomDriveForward",
-      //        "BlueDriveForward",
-      //        "RedDriveForward"
-      //      };
-      //      for (var auto : autos) {
-      //        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
-      //        autoPlotter.addOption(auto, trajectory);
-      //      }
-      //
-      //      SmartDashboard.putData("Auto Visualizer", autoPlotter);
-    }
+    // if (RobotBase.isSimulation()) {
+    //   // TODO: Fix this; broke after rewrite
+    //        autoPlotter = new SendableChooser<>();
+    //        List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+    //        dummy.add(new PathPlannerTrajectory());
+    //        autoPlotter.setDefaultOption("None", dummy);
+    //        String[] autos = {
+    //          "TwoPiece",
+    //          "BlueOnePiece",
+    //          "RedTwoPiece",
+    //          "BlueBottomDriveForward",
+    //          "RedBottomDriveForward",
+    //          "BlueDriveForward",
+    //          "RedDriveForward"
+    //        };
+    //        for (var auto : autos) {
+    //          var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+    //          autoPlotter.addOption(auto, trajectory);
+    //        }
+      
+    //        SmartDashboard.putData("Auto Visualizer", autoPlotter);
+    // }
   }
 
   public Command getAutonomousCommand() {
@@ -420,7 +437,7 @@ public class RobotContainer implements AutoCloseable {
     m_memorylog.simulationPeriodic();
 
     // TODO: Fix overwrite
-    m_fieldSim.setTrajectory(autoPlotter.getSelected());
+    // m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   @Override

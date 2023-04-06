@@ -580,14 +580,14 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    // SWERVEDRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
-    // SWERVEDRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
-    // SWERVEDRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
-    // SWERVEDRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVEDRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVEDRIVE.frontRightCANCoderOffset = 186.855; // 41.748;
-    SWERVEDRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
-    SWERVEDRIVE.backRightCANCoderOffset = 32.915;
+    // SWERVE_DRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
+    // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
+    // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
+    // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 186.855; // 41.748;
+    SWERVE_DRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
+    SWERVE_DRIVE.backRightCANCoderOffset = 32.915;
   }
 
   private static void initAlpha() {
