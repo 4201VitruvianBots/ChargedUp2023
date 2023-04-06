@@ -466,7 +466,7 @@ public final class Constants {
     public static final int betaOrdinal = ZONE.BETA.ordinal();
     public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
 
-    public static final double elevatorSetpointTolerance = Units.inchesToMeters(1);
+    public static final double elevatorSetpointTolerance = Units.inchesToMeters(2);
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
@@ -517,6 +517,7 @@ public final class Constants {
       // Units are in meters
       STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
       SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
+      SCORE_LOW_REVERSE(ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get(), WRIST.SETPOINT.SCORE_LOW_REVERSE.get()),
       SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
       SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(

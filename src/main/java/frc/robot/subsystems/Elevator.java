@@ -310,7 +310,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
-    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
+    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height Inches").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
     kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
@@ -351,7 +351,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     kClosedLoopModePub.set(getClosedLoopControlMode().toString());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
-    kDesiredHeightPub.set(getDesiredPositionMeters());
+    kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
     lowerLimitSwitchPub.set(getLimitSwitch());
 
     if (!m_limitCanUtil) {

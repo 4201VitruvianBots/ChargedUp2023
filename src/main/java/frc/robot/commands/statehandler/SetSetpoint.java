@@ -28,6 +28,8 @@ public class SetSetpoint extends CommandBase {
     m_wrist = Wrist;
     m_StateHandler = stateHandler;
     m_desiredState = desiredState;
+
+    addRequirements(m_elevator, m_wrist, m_StateHandler);
   }
 
   // Called when the command is initially scheduled.

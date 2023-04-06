@@ -41,6 +41,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
   private double m_wristOffset = 0;
   private SUPERSTRUCTURE_STATE m_currentState = SUPERSTRUCTURE_STATE.STOWED;
+  private SUPERSTRUCTURE_STATE m_currentDisplayedState = m_currentState;
   private SUPERSTRUCTURE_STATE m_lastState = m_currentState;
   private SUPERSTRUCTURE_STATE m_desiredState = m_currentState;
   private ZONE m_currentZone = ZONE.UNDEFINED;
@@ -143,6 +144,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_currentState;
   }
 
+  public SUPERSTRUCTURE_STATE getCurrentDisplayedState() {
+    return m_currentDisplayedState;
+  }
+
   // returns the desired zone or state
   public SUPERSTRUCTURE_STATE getDesiredState() {
     return m_desiredState;
@@ -168,6 +173,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public boolean isOnTarget() {
     return m_isOnTarget;
   }
+
   // Determines the current state based off current wrist/elevator positions.
   public SUPERSTRUCTURE_STATE determineSuperStructureState(
       double elevatorPositionMeters, double wristPositionRadians) {
@@ -267,22 +273,26 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         // BETA -> ALPHA
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
           if (WRIST.THRESHOLD.ALPHA_MIN.get() < m_wrist.getPositionRadians()
-              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
+              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.ALPHA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.ALPHA_ZONE;
             m_currentZone = ZONE.ALPHA;
             return;
           }
         } else if (ELEVATOR.THRESHOLD.GAMMA_MIN.get() < m_elevator.getHeightMeters()) {
-          // BETA -> GAMMA
-          m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
-          m_currentZone = ZONE.GAMMA;
-          return;
+          if (WRIST.THRESHOLD.GAMMA_MIN.get() < m_wrist.getPositionRadians()
+              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.GAMMA_MAX.get()) {
+            // BETA -> GAMMA
+            m_currentState = SUPERSTRUCTURE_STATE.GAMMA_ZONE;
+            m_currentZone = ZONE.GAMMA;
+            return;
+          }
         }
         break;
       case 3: // GAMMA
         // GAMMA -> BETA
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
-          if (WRIST.THRESHOLD.BETA_MAX.get() > m_wrist.getPositionRadians()) {
+          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
+              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
             m_currentZone = ZONE.BETA;
             return;
@@ -400,7 +410,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentState().toString());
 
-    m_currentStatePub.set(getCurrentState().toString());
+    m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());
     m_elevatorHeightMetersPub.set(Units.metersToInches(m_elevator.getHeightMeters()));
@@ -435,10 +445,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       m_lastState = m_currentState;
     }
 
+    // Displayed state for easier debugging
+    m_currentDisplayedState =
+            determineSuperStructureState(
+                    m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+
     // Determine desired zone based on elevator/wrist setpoints
     m_desiredState =
         determineSuperStructureState(
-            m_elevator.getDesiredPositionMeters(), m_wrist.getDesiredPositionRadians());
+            m_elevatorDesiredSetpointMeters, m_wristDesiredSetpointRadians);
 
     // Limit wrist/elevator setpoints to safe thresholds based on where you are and where you want
     // to go
