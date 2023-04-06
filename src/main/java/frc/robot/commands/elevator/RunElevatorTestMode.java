@@ -4,7 +4,6 @@
 
 package frc.robot.commands.elevator;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.BooleanPublisher;
@@ -16,8 +15,8 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
-
 
 public class RunElevatorTestMode extends CommandBase {
   private DoubleSubscriber kSetpointSub;
@@ -32,18 +31,17 @@ public class RunElevatorTestMode extends CommandBase {
   private DoubleSubscriber kVSub;
   private DoubleSubscriber kASub;
   private double testKP;
-  private double testKI,
-      kEncoderCountsPub,
-      kDesiredHeightPub,
-      kHeightInchesPub;
-    private final Elevator m_elevator;
+  private double testKI;
+  private double testKA;
+  private double testKV, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub;
+  private final Elevator m_elevator;
   private StringPublisher kDesiredStatePub, kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
-
+  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
   /** Creates a new RunElevatorTestMode. */
   public RunElevatorTestMode(Elevator elevator) {
-m_elevator = elevator;
-addRequirements(m_elevator);
+    m_elevator = elevator;
+    addRequirements(m_elevator);
   }
 
   // Called when the command is initially scheduled.
@@ -52,13 +50,14 @@ addRequirements(m_elevator);
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
-    //initialize Test Values
+    // initialize Test Values
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(Constants.ELEVATOR.kP);
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(Constants.ELEVATOR.kI);
     kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(Constants.ELEVATOR.kD);
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(Constants.ELEVATOR.kMaxVel);
-    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(Constants.ELEVATOR.kMaxAccel);
+    kMaxAccelSub =
+        elevatorNtTab.getDoubleTopic("Max Accel").subscribe(Constants.ELEVATOR.kMaxAccel);
     kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(Constants.ELEVATOR.kG);
     kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(Constants.ELEVATOR.kV);
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(Constants.ELEVATOR.kA);
@@ -67,7 +66,7 @@ addRequirements(m_elevator);
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
- 
+
     DriverStation.reportWarning("USING WRIST TEST MODE!", false);
     double maxVel = kMaxVelSub.get(0);
     double maxAccel = kMaxAccelSub.get(0);
@@ -76,16 +75,26 @@ addRequirements(m_elevator);
     double kV = kVSub.get(Constants.ELEVATOR.kV);
     double kA = kASub.get(Constants.ELEVATOR.kA);
     double newTestKP = kPSub.get(0);
+
     if (testKP != newTestKP) {
-     m_elevator.setTalonPIDvalues(0,0,0);
+      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
       testKP = newTestKP;
-  m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
-      
+      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
     }
     double newTestKI = kISub.get(0);
-    if (testKI != newTestKI) {
-      wristMotor.config_kI(0, newTestKI);
+    if (testKP != newTestKP) {
+      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
       testKI = newTestKI;
+    }
+    double newTestKV = kVSub.get(0);
+    if (testKI != newTestKI) {
+      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
+      testKV = newTestKV;
+    }
+    double newTestKA = kASub.get(0);
+    if (testKI != newTestKI) {
+      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
+      testKA = newTestKA;
     }
   }
 
