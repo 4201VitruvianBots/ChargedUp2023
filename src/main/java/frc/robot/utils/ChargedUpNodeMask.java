@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.Controls;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Step 1: Define all nodes in an ArrayList Step 2: Use bit masks Step 3: ??? Step 4: Profit */
+/** Step 1: Define all nodes in a Map Step 2: Use bit masks Step 3: ??? Step 4: Profit */
 public class ChargedUpNodeMask {
   private static final Map<Integer, Translation2d> blueNodes = new HashMap<>();
   private static final Map<Integer, Translation2d> redNodes = new HashMap<>();
@@ -19,12 +20,10 @@ public class ChargedUpNodeMask {
 
   /** Node Definitions */
   // Starting with Blue Nodes, numbering starts at 0 with the rightmost LOW_HYBRID node, closest to
-  // the Red Substations
-  // and 26 is the leftmost HIGH_CONE node. 27 is the Blue single substation, 28 is the left Blue
-  // double substation and
-  // 29 is the right Blue double substation.
+  // the Red Substations and 26 is the leftmost HIGH_CONE node. 27 is the Blue single substation,
+  // 28 is the left Blue double substation and 29 is the right Blue double substation.
   // Red Node numbering is mirrored from blue nodes given the same pattern from above.
-  private static final int nodes = 0b0000_0111_1111_1111_1111_1111_1111_1111;
+  private static final int gridNodes = 0b0000_0111_1111_1111_1111_1111_1111_1111;
 
   private static final int hybridNodes = 0b0000_0000_0000_0000_0000_0001_1111_1111;
   private static final int midConeNodes = 0b0000_0000_0000_0010_1101_1010_0000_0000;
@@ -33,6 +32,7 @@ public class ChargedUpNodeMask {
   private static final int highCubeNodes = 0b0000_0010_0100_1000_0000_0000_0000_0000;
 
   private static final int coopertitionNodes = 0b0000_0000_1110_0000_0111_0000_0011_1000;
+
   private static final int coneNodes = hybridNodes | midConeNodes | highConeNodes;
   private static final int cubeNodes = hybridNodes | midCubeNodes | highCubeNodes;
 
@@ -87,22 +87,18 @@ public class ChargedUpNodeMask {
 
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       if (robotPose.getX() > SimConstants.fieldLength / 2) {
-        validNodeMask = nodes;
-        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        validNodeMask = gridNodes & ~ignoredRedNodes;
         currentNodes = redNodes;
       } else {
-        validNodeMask = coopertitionNodes;
-        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        validNodeMask = coopertitionNodes & ~ignoredBlueNodes;
         currentNodes = blueNodes;
       }
     } else {
       if (robotPose.getX() < SimConstants.fieldLength / 2) {
-        validNodeMask = nodes;
-        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        validNodeMask = gridNodes & ~ignoredBlueNodes;
         currentNodes = blueNodes;
       } else {
-        validNodeMask = coopertitionNodes;
-        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        validNodeMask = coopertitionNodes & ~ignoredRedNodes;
         currentNodes = redNodes;
       }
     }
@@ -141,9 +137,13 @@ public class ChargedUpNodeMask {
       return new Pose2d(robotPose.getTranslation().nearest(validNodes), Rotation2d.fromDegrees(0));
   }
 
-  // TODO: change second argument to an enum
-  public static Pose2d getTargetNode(Pose2d robotPose, int gamePieceType) {
-    validNodeMask = validNodeMask & ~(gamePieceType == 0 ? coneNodes : cubeNodes);
+  public static Pose2d getTargetNode(Pose2d robotPose, INTAKE_STATE intakeState) {
+    if (intakeState == INTAKE_STATE.CONE) {
+      validNodeMask = validNodeMask & ~coneNodes;
+    }
+    if (intakeState == INTAKE_STATE.CUBE) {
+      validNodeMask = validNodeMask & ~cubeNodes;
+    }
     var validNodes = getValidNodes();
     if (validNodes.size() == 0) return new Pose2d();
     else

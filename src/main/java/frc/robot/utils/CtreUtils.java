@@ -20,9 +20,7 @@ public final class CtreUtils {
     motorConfig.slot0.kD = 12; // 0.0;
     motorConfig.slot0.allowableClosedloopError = 0.0;
 
-    SupplyCurrentLimitConfiguration supplyCurrentLimit =
-        new SupplyCurrentLimitConfiguration(true, 25, 40, 0.1);
-    motorConfig.supplyCurrLimit = supplyCurrentLimit;
+    motorConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, 25, 40, 0.1);
 
     motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
 
@@ -37,9 +35,7 @@ public final class CtreUtils {
     motorConfig.slot0.kI = 0.0;
     motorConfig.slot0.kD = 0.0;
 
-    SupplyCurrentLimitConfiguration supplyCurrentLimit =
-        new SupplyCurrentLimitConfiguration(true, 35, 60, 0.1);
-    motorConfig.supplyCurrLimit = supplyCurrentLimit;
+    motorConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, 35, 60, 0.1);
 
     motorConfig.openloopRamp = 0.25;
     motorConfig.closedloopRamp = 0.1;
@@ -68,7 +64,7 @@ public final class CtreUtils {
     double delta = targetAngle - currentAngle.getDegrees();
     if (Math.abs(delta) > 90) {
       targetSpeed = -targetSpeed;
-      targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
+      targetAngle = delta > 90 ? targetAngle - 180 : targetAngle + 180;
     }
     return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
   }

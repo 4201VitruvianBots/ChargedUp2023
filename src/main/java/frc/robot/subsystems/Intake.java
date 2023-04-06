@@ -84,13 +84,13 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   // True if Cube is detected, otherwise assume Cone
-  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
+  public INTAKE.INTAKE_STATE getHeldGamepiece() {
     if (getConeDistance() > Units.inchesToMeters(15)
-        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.HELD_GAMEPIECE.NONE;
-    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.HELD_GAMEPIECE.CONE;
-    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.HELD_GAMEPIECE.CUBE;
+        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.INTAKE_STATE.NONE;
+    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.INTAKE_STATE.CONE;
+    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.INTAKE_STATE.CUBE;
 
-    return INTAKE.HELD_GAMEPIECE.NONE;
+    return INTAKE.INTAKE_STATE.NONE;
   }
 
   public double getMotorOutputCurrent() {

@@ -194,8 +194,9 @@ public final class Constants {
     public static double kF = 0;
     public static double kP = 0.2;
 
-    public enum HELD_GAMEPIECE {
+    public enum INTAKE_STATE {
       NONE,
+      INTAKING,
       CUBE,
       CONE
     }
@@ -456,13 +457,6 @@ public final class Constants {
   }
 
   public static class STATE_HANDLER {
-
-    public enum INTAKING_STATES {
-      NONE,
-      INTAKING,
-      CONE,
-      CUBE
-    }
 
     public enum ZONE {
       UNDEFINED, // Danger

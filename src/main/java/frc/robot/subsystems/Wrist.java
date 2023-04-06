@@ -290,13 +290,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
     // Cone: f(x)=-0.270347*t+16.8574;
     double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == INTAKE.HELD_GAMEPIECE.CUBE)
+    if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.CUBE)
       horizontalDistance =
           0.00000913468 * Math.pow(getPositionDegrees(), 3)
               - 0.00232508 * Math.pow(getPositionDegrees(), 2)
               - 0.0894341 * getPositionDegrees()
               + 16.1239;
-    else if (m_intake.getHeldGamepiece() == INTAKE.HELD_GAMEPIECE.CONE)
+    else if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.CONE)
       horizontalDistance =
           //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;

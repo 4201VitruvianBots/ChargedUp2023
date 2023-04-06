@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.*;
@@ -40,7 +41,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
    */
   private SCORING_STATE m_scoringState = SCORING_STATE.STOWED;
 
-  private INTAKING_STATES currentIntakeState = INTAKING_STATES.NONE;
+  private INTAKE_STATE m_currentIntakeState = INTAKE_STATE.NONE;
   private double m_wristOffset = 0;
   private SUPERSTRUCTURE_STATE m_currentState = SUPERSTRUCTURE_STATE.STOWED;
   private SUPERSTRUCTURE_STATE m_currentDisplayedState = m_currentState;
@@ -499,7 +500,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     // TODO: Update this based on Intake sensors
-    switch (currentIntakeState) {
+    switch (m_currentIntakeState) {
       case CONE:
         break;
       case CUBE:
@@ -512,14 +513,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     if (m_smartScoringEnabled) {
-      var targetNode = getTargetNode(m_drive.getPoseMeters(), 0);
+      var targetNode = getTargetNode(m_drive.getPoseMeters(), m_intake.getHeldGamepiece());
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
-
+      m_wristOffset = m_wrist.getHorizontalTranslation().getX();
       m_setpointSolver.solveSetpoints(
-          m_drive.getPoseMeters(),
-          targetNode,
-          m_wrist.getHorizontalTranslation().getX(),
-          m_scoringState);
+          m_drive.getPoseMeters(), targetNode, m_wristOffset, m_scoringState);
       m_canScore = m_setpointSolver.canScore();
       m_wrist.setSetpointPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setDesiredPositionMeters(m_setpointSolver.getElevatorSetpointMeters());

@@ -49,7 +49,14 @@ public class AutoTest {
     double blueTrajectoryMaxY = SimConstants.fieldWidth - Units.inchesToMeters(90);
     var blueAuto =
         new OnePiece(
-            "BlueOnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator);
+            "BlueTwoPiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator);
     var blueTrajectories = blueAuto.getTrajectory();
     for (var segment : blueTrajectories) {
       for (var state : segment.getStates()) {
@@ -71,7 +78,14 @@ public class AutoTest {
 
     var redAuto =
         new OnePiece(
-            "RedOnePiece", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator);
+            "RedTwoPiece",
+            m_autoBuilder,
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator);
     var redTrajectories = redAuto.getTrajectory();
     for (var segment : redTrajectories) {
       for (var state : segment.getStates()) {
