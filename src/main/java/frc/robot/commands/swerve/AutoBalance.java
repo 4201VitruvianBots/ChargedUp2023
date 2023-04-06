@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.SWERVEDRIVE;
+import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.subsystems.SwerveDrive;
 
 public class AutoBalance extends CommandBase {
@@ -58,7 +58,6 @@ public class AutoBalance extends CommandBase {
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
-    // TODO; set a way to initialize pitch to 0
 
     states =
         new SwerveModuleState[] {
@@ -86,13 +85,13 @@ public class AutoBalance extends CommandBase {
     states =
         new SwerveModuleState[] {
           new SwerveModuleState(
-              SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
+              SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(
-              SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),
+              SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),
           new SwerveModuleState(
-              SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
+              SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(
-              SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),
+              SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
   }

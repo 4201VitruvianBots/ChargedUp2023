@@ -6,15 +6,15 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
 public class IncrementElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. This is our default command */
-  private DoubleSupplier m_joystickY;
+  private final Elevator m_elevator;
 
-  private Elevator m_elevator;
+  private final DoubleSupplier m_joystickY;
 
   public IncrementElevatorHeight(Elevator elevator, DoubleSupplier joystickY) {
 
@@ -26,9 +26,7 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_elevator.setIsElevating(true);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -40,18 +38,13 @@ public class IncrementElevatorHeight extends CommandBase {
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {
-
-      if (m_elevator.getControlState() == ELEVATOR.STATE.USER_SETPOINT) {
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
-      } else {
-        m_elevator.setControlState(ELEVATOR.STATE.OPEN_LOOP_MANUAL);
-        m_elevator.setJoystickY(-joystickYDeadbandOutput);
-      }
+      m_elevator.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
+      m_elevator.setJoystickY(-joystickYDeadbandOutput);
     }
     if (joystickYDeadbandOutput == 0
-        && m_elevator.getControlState() == ELEVATOR.STATE.OPEN_LOOP_MANUAL) {
+        && m_elevator.getClosedLoopControlMode() == CONTROL_MODE.OPEN_LOOP) {
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
-      m_elevator.resetState();
+      m_elevator.resetTrapezoidState();
     }
     // This else if statement will automatically set the elevator to the STOWED position once the
     // joystick is let go
@@ -62,9 +55,7 @@ public class IncrementElevatorHeight extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_elevator.setIsElevating(false);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

@@ -30,9 +30,10 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
-import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.SWERVE_MODULE;
 import frc.robot.utils.CtreUtils;
 
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
@@ -46,28 +47,28 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
 
-  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  SimpleMotorFeedforward feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
-          Constants.SWERVEMODULE.ksDriveVoltSecondsPerMeter,
-          Constants.SWERVEMODULE.kvDriveVoltSecondsSquaredPerMeter,
-          Constants.SWERVEMODULE.kaDriveVoltSecondsSquaredPerMeter);
+          SWERVE_MODULE.ksDriveVoltSecondsPerMeter,
+          SWERVE_MODULE.kvDriveVoltSecondsSquaredPerMeter,
+          SWERVE_MODULE.kaDriveVoltSecondsSquaredPerMeter);
 
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
-          Constants.SWERVEMODULE.kTurnGearbox,
-          Constants.SWERVEMODULE.kTurningMotorGearRatio,
+          SWERVE_MODULE.kTurnGearbox,
+          SWERVE_MODULE.kTurningMotorGearRatio,
           VecBuilder.fill(0));
 
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
           LinearSystemId.identifyVelocitySystem(1.5, 0.6),
-          Constants.SWERVEMODULE.kDriveGearbox,
-          Constants.SWERVEMODULE.kDriveMotorGearRatio);
+          SWERVE_MODULE.kDriveGearbox,
+          SWERVE_MODULE.kDriveMotorGearRatio);
 
   private double m_drivePercentOutput;
   private double m_turnPercentOutput;
@@ -75,8 +76,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private double m_turnMotorSimDistance;
   private final Timer m_simTimer = new Timer();
   private double m_lastSimTime = 0;
-  private final double m_driveEncoderSimDirection;
-  private final double m_turnEncoderSimDirection;
+  private final int m_driveEncoderSimSign;
+  private final int m_turnEncoderSimSign;
 
   // Logging setup
 
@@ -105,12 +106,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_turnMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
     m_turnMotor.setInverted(true);
     m_turnMotor.setSelectedSensorPosition(0);
-    m_turnEncoderSimDirection = m_turnMotor.getInverted() ? -1.0 : 1.0;
+    m_turnEncoderSimSign = m_turnMotor.getInverted() ? -1 : 1;
 
     m_driveMotor.configFactoryDefault();
     m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
     m_driveMotor.setInverted(false);
-    m_driveEncoderSimDirection = m_driveMotor.getInverted() ? -1.0 : 1.0;
+    m_driveEncoderSimSign = m_driveMotor.getInverted() ? -1 : 1;
 
     // m_angleEncoder.configMagnetOffset(m_angleOffset);
     m_lastAngle = getHeadingDegrees();
@@ -140,7 +141,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     resetAngleToAbsolute();
 
     // Check if the offset was applied properly. Delay to give it some time to set
-    // TODO: This doesn't cover all edge cases
     if (RobotBase.isReal()) {
       Timer.delay(0.1);
       m_initSuccess =
@@ -159,13 +159,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   public void resetAngleToAbsolute() {
     double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset;
-    m_turnMotor.setSelectedSensorPosition(
-        angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
+    m_turnMotor.setSelectedSensorPosition(angle / SWERVE_MODULE.kTurningMotorDistancePerPulse);
   }
 
   public double getHeadingDegrees() {
-    return m_turnMotor.getSelectedSensorPosition()
-        * Constants.SWERVEMODULE.kTurningMotorDistancePerPulse;
+    return m_turnMotor.getSelectedSensorPosition() * SWERVE_MODULE.kTurningMotorDistancePerPulse;
   }
 
   public Rotation2d getHeadingRotation2d() {
@@ -174,13 +172,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   public double getVelocityMetersPerSecond() {
     return m_driveMotor.getSelectedSensorVelocity()
-        * Constants.SWERVEMODULE.kDriveMotorDistancePerPulse
+        * SWERVE_MODULE.kDriveMotorDistancePerPulse
         * 10;
   }
 
   public double getDriveMeters() {
-    return m_driveMotor.getSelectedSensorPosition()
-        * Constants.SWERVEMODULE.kDriveMotorDistancePerPulse;
+    return m_driveMotor.getSelectedSensorPosition() * SWERVE_MODULE.kDriveMotorDistancePerPulse;
   }
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -188,12 +185,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     if (isOpenLoop) {
       double percentOutput =
-          desiredState.speedMetersPerSecond / Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond;
+          desiredState.speedMetersPerSecond / SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
       m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
     } else {
       double velocity =
-          desiredState.speedMetersPerSecond
-              / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10);
+          desiredState.speedMetersPerSecond / (SWERVE_MODULE.kDriveMotorDistancePerPulse * 10);
       m_driveMotor.set(
           ControlMode.Velocity,
           velocity,
@@ -203,13 +199,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
     double angle =
         (Math.abs(desiredState.speedMetersPerSecond)
-                <= (Constants.SWERVEDRIVE.kMaxSpeedMetersPerSecond * 0.01))
+                <= (SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.01))
             ? m_lastAngle
             : desiredState.angle
                 .getDegrees(); // Prevent rotating module if speed is less than 1%. Prevents
     // Jittering.
-    m_turnMotor.set(
-        ControlMode.Position, angle / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse);
+    m_turnMotor.set(ControlMode.Position, angle / SWERVE_MODULE.kTurningMotorDistancePerPulse);
     m_lastAngle = angle;
 
     m_drivePercentOutput = m_driveMotor.getMotorOutputPercent();
@@ -226,10 +221,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   public void setModulePose(Pose2d pose) {
     m_pose = pose;
-  }
-
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    limitCanUtil = limitCan;
   }
 
   public Pose2d getModulePose() {
@@ -259,16 +250,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
   }
 
-  private void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
-    switch (limitCan) {
-      case NORMAL:
-        moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
-        moduleMotorHeadingPub.set(getHeadingDegrees());
-        moduleEncoderHealthPub.set(getInitSuccess());
-        break;
-      default:
-      case LIMITED:
-        break;
+  private void updateSmartDashboard() {
+    moduleMotorHeadingPub.set(getHeadingDegrees());
+    moduleEncoderHealthPub.set(getInitSuccess());
+    if (!m_limitCanUtil) {
+      moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
     }
   }
 
@@ -279,7 +265,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    updateSmartDashboard(limitCanUtil);
+    updateSmartDashboard();
     //    updateLog();
   }
 
@@ -291,43 +277,45 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
     var currentTime = m_simTimer.get();
-    m_turnMotorSim.update(currentTime - m_lastSimTime);
-    m_driveMotorSim.update(currentTime - m_lastSimTime);
+    double dt = currentTime - m_lastSimTime;
+    m_turnMotorSim.update(dt);
+    m_driveMotorSim.update(dt);
+
+    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * dt;
+    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * dt;
+
     m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
 
-    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
-    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
-
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (m_turnEncoderSimDirection
+                (m_turnEncoderSimSign
                     * m_turnMotorSimDistance
-                    / Constants.SWERVEMODULE.kTurningMotorDistancePerPulse));
+                    / SWERVE_MODULE.kTurningMotorDistancePerPulse));
     m_turnMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (m_turnEncoderSimDirection
+                (m_turnEncoderSimSign
                     * m_turnMotorSim.getAngularVelocityRadPerSec()
-                    / (Constants.SWERVEMODULE.kTurningMotorDistancePerPulse * 10)));
+                    / (SWERVE_MODULE.kTurningMotorDistancePerPulse * 10)));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (m_driveEncoderSimDirection
+                (m_driveEncoderSimSign
                     * m_driveMotorSimDistance
-                    / Constants.SWERVEMODULE.kDriveMotorDistancePerPulse));
+                    / SWERVE_MODULE.kDriveMotorDistancePerPulse));
     m_driveMotor
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (m_driveEncoderSimDirection
+                (m_driveEncoderSimSign
                     * m_driveMotorSim.getAngularVelocityRadPerSec()
-                    / (Constants.SWERVEMODULE.kDriveMotorDistancePerPulse * 10)));
+                    / (SWERVE_MODULE.kDriveMotorDistancePerPulse * 10)));
   }
 
   @Override

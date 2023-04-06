@@ -1,6 +1,6 @@
 package frc.robot.utils;
 
-import frc.robot.Constants.SWERVEDRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

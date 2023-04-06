@@ -68,7 +68,7 @@ public class MemoryLog {
       logFile.write(string);
       logFile.close();
     } catch (IOException writeFailed) {
-      writeFailed.printStackTrace();
+      //      writeFailed.printStackTrace();
     }
   }
 

@@ -5,34 +5,41 @@
 package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.SETPOINT;
+import frc.robot.Constants.CONTROL_MODE;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class SetSetpoint extends CommandBase {
-  /** Creates a new SetStatehandlerstate. */
-  private Elevator m_Elevator;
+  /** Creates a new SetStateHandlerState. */
+  private final Elevator m_elevator;
 
-  private Wrist m_Wrist;
-  private StateHandler m_StateHandler;
-  private STATEHANDLER.SETPOINT m_desiredState;
+  private final Wrist m_wrist;
+  private final StateHandler m_StateHandler;
+  private final STATE_HANDLER.SETPOINT m_desiredState;
 
   public SetSetpoint(
       StateHandler stateHandler,
       Elevator elevator,
       Wrist Wrist,
-      STATEHANDLER.SETPOINT desiredState) {
-    m_Elevator = elevator;
-    m_Wrist = Wrist;
+      STATE_HANDLER.SETPOINT desiredState) {
+    m_elevator = elevator;
+    m_wrist = Wrist;
     m_StateHandler = stateHandler;
     m_desiredState = desiredState;
+
+    addRequirements(m_elevator, m_wrist, m_StateHandler);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
+    m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
+    m_wrist.setUserSetpoint(true);
+    m_elevator.setUserSetpoint(true);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -43,7 +50,8 @@ public class SetSetpoint extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_StateHandler.setDesiredSetpoint(SETPOINT.STOWED);
+    m_wrist.setUserSetpoint(false);
+    m_elevator.setUserSetpoint(false);
   }
 
   // Returns true when the command should end.

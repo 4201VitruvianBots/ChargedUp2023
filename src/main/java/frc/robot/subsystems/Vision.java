@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
@@ -179,7 +178,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   /*
-   * The pipeline’s latency contribution (ms). Add to "cl" to get total latency.
+   * The pipeline's latency contribution (ms). Add to "cl" to get total latency.
    */
   public double getCameraLatency(CAMERA_SERVER location) {
     switch (location) {
@@ -277,11 +276,11 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
     if (getPipeline(location) == 1.0
-        && m_intakeSub.getIntakeStateCube()) { // CUBE and if we're looking for cube
+        && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
     } else if (getPipeline(location) == 2.0
-        && m_intakeSub.getIntakeStateCone()) { // CONE and if we're looking for cone
+        && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
       return getValidTargetType(location) == 1.0
           && getTargetArea(location) > 3.0; // target read within threshold
     }
@@ -315,7 +314,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
-    if (m_intakeSub.getIntakeState()) {
+    if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
@@ -523,18 +522,18 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     m_leftLocalizerPositionPub.set(
         new double[] {
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getY(),
+          VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getZ(),
           0,
           0,
           0
         });
     m_rightLocalizerPositionPub.set(
         new double[] {
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
-          Constants.VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getX(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getY(),
+          VISION.LOCALIZER_CAMERA_POSITION[1].getTranslation().getZ(),
           0,
           0,
           0

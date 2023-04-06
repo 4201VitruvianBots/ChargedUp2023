@@ -11,7 +11,7 @@ import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
-import frc.robot.commands.elevator.AutoSetElevatorDesiredSetpoint;
+import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
@@ -50,8 +50,8 @@ public class OnePiece extends SequentialCommandGroup {
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
         new ParallelCommandGroup(
-            new AutoSetElevatorDesiredSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristDesiredSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
+            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
         new WaitCommand(0.5),
         new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(1.5),

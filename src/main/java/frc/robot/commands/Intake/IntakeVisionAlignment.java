@@ -14,9 +14,9 @@ import java.util.function.DoubleSupplier;
 
 public class IntakeVisionAlignment extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Vision m_vision;
-
   private final SwerveDrive m_swerve;
+
+  private final Vision m_vision;
 
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
 

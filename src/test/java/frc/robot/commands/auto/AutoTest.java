@@ -8,10 +8,7 @@ import frc.robot.RobotContainer;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 @Disabled("WIP")
 public class AutoTest {

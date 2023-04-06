@@ -5,34 +5,34 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.Wrist;
 
-public class AutoSetWristDesiredSetpoint extends CommandBase {
+public class ResetWristAngleDegrees extends CommandBase {
   private final Wrist m_wrist;
-  private double m_setpoint;
+  private final double m_angle;
 
   /** Creates a new RunWrist. */
-  public AutoSetWristDesiredSetpoint(Wrist wrist, double setpoint) {
+  public ResetWristAngleDegrees(Wrist wrist, double angle) {
     m_wrist = wrist;
-    m_setpoint = setpoint;
+    m_angle = angle;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(wrist);
   }
 
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
+
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-
-    m_wrist.setUserSetpoint(true);
-    m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_wrist.setDesiredPositionRadians(m_setpoint);
+    m_wrist.resetAngleDegrees(m_angle);
   }
 
   // Called once the command ends or is interrupted.
@@ -42,7 +42,6 @@ public class AutoSetWristDesiredSetpoint extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // 1 degree = 0.017453293 radians
-    return (Math.abs(m_wrist.getPositionRadians() - m_setpoint) < 0.017453293);
+    return true;
   }
 }

@@ -9,9 +9,9 @@ import frc.robot.subsystems.StateHandler;
 
 public class SwitchTargetNode extends CommandBase {
   /** Creates a new SwitchTargetNode. */
-  private StateHandler m_stateHandler;
+  private final StateHandler m_stateHandler;
 
-  private boolean m_left;
+  private final boolean m_left;
 
   public SwitchTargetNode(StateHandler stateHandler, boolean left) {
     m_stateHandler = stateHandler;

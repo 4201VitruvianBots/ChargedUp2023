@@ -25,7 +25,7 @@ public class RunIntakeCube extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setBooleanState(true);
+    m_intake.setIntakeStateCube(true);
     m_intake.setIntakeStateCube(true);
   }
 
@@ -49,7 +49,7 @@ public class RunIntakeCube extends CommandBase {
     m_intake.setPercentOutput(0);
     m_intake.setIntakeStateCube(false);
     // m_swerve.enableHeadingTarget(false);
-    m_intake.setBooleanState(false);
+    m_intake.setIntakeStateCube(false);
   }
 
   // Returns true when the command should end.

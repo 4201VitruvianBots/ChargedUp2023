@@ -5,11 +5,12 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 
 public class ToggleElevatorControlMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
-  private Elevator m_elevator;
+  private final Elevator m_elevator;
 
   public ToggleElevatorControlMode(Elevator elevator) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -26,8 +27,10 @@ public class ToggleElevatorControlMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setControlMode(!m_elevator.getClosedLoopState());
-    //    m_elevator.setSetpointState(ELEVATOR.SETPOINT.JOYSTICK);
+    if (m_elevator.getClosedLoopControlMode() != CONTROL_MODE.OPEN_LOOP)
+      m_elevator.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
+    else if (m_elevator.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP)
+      m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -7,11 +7,11 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
-public class SetElevatorDesiredSetpoint extends CommandBase {
+public class SetElevatorSetpoint extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
   private final Elevator m_elevator;
 
@@ -19,12 +19,11 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
 
   private final double m_setpoint;
 
-  public SetElevatorDesiredSetpoint(Elevator elevator, double setpoint) {
+  public SetElevatorSetpoint(Elevator elevator, double setpoint) {
     this(elevator, setpoint, () -> 0);
   }
 
-  public SetElevatorDesiredSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public SetElevatorSetpoint(Elevator elevator, double setpoint, DoubleSupplier input) {
     m_elevator = elevator;
     m_setpoint = setpoint;
     m_input = input;
@@ -34,16 +33,13 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_elevator.setIsElevating(true);
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
+    m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
     m_elevator.setDesiredPositionMeters(m_setpoint);
-    m_elevator.setUserSetpoint(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator.setControlState(ELEVATOR.STATE.USER_SETPOINT);
     m_elevator.setDesiredPositionMeters(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
@@ -52,12 +48,7 @@ public class SetElevatorDesiredSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_elevator.setUserSetpoint(false);
-    m_elevator.setIsElevating(false);
-    //    m_elevator.setControlState(ELEVATOR.STATE.AUTO_SETPOINT);
-    //    m_elevator.setDesiredPositionMeters(ELEVATOR.SETPOINT.STOWED.get());
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

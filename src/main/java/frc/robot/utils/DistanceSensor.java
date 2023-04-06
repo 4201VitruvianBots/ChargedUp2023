@@ -10,9 +10,9 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.Constants;
-import frc.robot.Constants.CAN_UTIL_LIMIT;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.STATE_HANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,9 +36,9 @@ public class DistanceSensor implements AutoCloseable {
   private double sensor2DistanceMeters;
   private double sensor3DistanceMeters;
 
-  private CAN_UTIL_LIMIT limitCanUtil = CAN_UTIL_LIMIT.NORMAL;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  private Random rand = new Random();
+  private final Random rand = new Random();
   private Object obj;
 
   // Shuffleboard setup
@@ -59,7 +59,7 @@ public class DistanceSensor implements AutoCloseable {
         socket.setReceiveBufferSize(512);
         socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
-        socketFail.printStackTrace();
+        //        socketFail.printStackTrace();
       }
     }
     initSmartDashboard();
@@ -75,7 +75,7 @@ public class DistanceSensor implements AutoCloseable {
     try {
       String sensorName = "sensor" + sensor + ".mm";
 
-      // parsing string from recieved data
+      // parsing string from received data
       obj = new JSONParser().parse(new StringReader(receivedData));
 
       // typecasting obj to JSONObject
@@ -90,7 +90,7 @@ public class DistanceSensor implements AutoCloseable {
       return sensorValue;
     } catch (Exception e) {
       System.out.println("Boo hoo I can't read the file :_(");
-      e.printStackTrace();
+      //      e.printStackTrace();
       return -1;
     }
   }
@@ -118,24 +118,23 @@ public class DistanceSensor implements AutoCloseable {
 
     switch (intakeState) {
       case CONE:
-        int leftSensorId = Constants.INTAKE.leftConeSensorId;
-        int rightSensorId = Constants.INTAKE.rightConeSensorId;
+        int leftSensorId = INTAKE.leftConeSensorId;
+        int rightSensorId = INTAKE.rightConeSensorId;
 
         double leftSensorValue = getSensorValueMillimeters(leftSensorId) / 1000.0;
         double rightSensorValue = getSensorValueMillimeters(rightSensorId) / 1000.0;
 
         distanceMeters =
             leftSensorValue
-                + ((Constants.INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2)
-                - (Constants.INTAKE.innerIntakeWidth / 2);
+                + ((INTAKE.innerIntakeWidth + leftSensorValue - rightSensorValue) / 2)
+                - (INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
-        int sensorId = Constants.INTAKE.cubeSensorId;
+        int sensorId = INTAKE.cubeSensorId;
 
         double sensorValue = getSensorValueMillimeters(sensorId) / 1000.0;
 
-        distanceMeters =
-            sensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+        distanceMeters = sensorValue + (SimConstants.cubeWidth / 2) - (INTAKE.innerIntakeWidth / 2);
         break;
       default:
       case NONE:
@@ -161,10 +160,6 @@ public class DistanceSensor implements AutoCloseable {
     return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
   }
 
-  public void setReduceCanUtilization(CAN_UTIL_LIMIT limitCan) {
-    limitCanUtil = limitCan;
-  }
-
   private void initSmartDashboard() {
     var distanceSensorTab =
         NetworkTableInstance.getDefault().getTable("Suffleboard").getSubTable("Distance Sensor");
@@ -177,20 +172,15 @@ public class DistanceSensor implements AutoCloseable {
     cubeInchesPub = distanceSensorTab.getDoubleTopic("Cube Distance Inches").publish();
   }
 
-  public void updateSmartDashboard(CAN_UTIL_LIMIT limitCan) {
-    switch (limitCan) {
-      case NORMAL:
-        // Put not required stuff here
-        sensor1MMPub.set(getSensorValueMillimeters(1));
-        sensor2MMPub.set(getSensorValueMillimeters(2));
-        sensor1InchPub.set(getSensorValueInches(1));
-        sensor2InchPub.set(getSensorValueInches(2));
-        coneInchesPub.set(getConeDistanceInches());
-        cubeInchesPub.set(getCubeDistanceInches());
-        rawStringPub.set(receivedData);
-      default:
-      case LIMITED:
-        break;
+  public void updateSmartDashboard() {
+    if (!m_limitCanUtil) {
+      sensor1MMPub.set(getSensorValueMillimeters(1));
+      sensor2MMPub.set(getSensorValueMillimeters(2));
+      sensor1InchPub.set(getSensorValueInches(1));
+      sensor2InchPub.set(getSensorValueInches(2));
+      coneInchesPub.set(getConeDistanceInches());
+      cubeInchesPub.set(getCubeDistanceInches());
+      rawStringPub.set(receivedData);
     }
   }
 
@@ -208,13 +198,14 @@ public class DistanceSensor implements AutoCloseable {
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
     } catch (SocketTimeoutException ex) {
-      System.out.println("error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-SocketTimeoutError");
+      //      ex.printStackTrace();
     } catch (IOException ex) {
-      System.out.println("Client error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-IOError");
+      //      ex.printStackTrace();
     } catch (Exception ex) {
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-UnknownError");
+      //      ex.printStackTrace();
     }
   }
 

@@ -11,7 +11,7 @@ import frc.robot.subsystems.Controls;
 /** An example command that uses an example subsystem. */
 public class OverrideAllianceColor extends CommandBase {
   private final Controls m_controls;
-  private DriverStation.Alliance m_color;
+  private final DriverStation.Alliance m_color;
 
   /**
    * Creates a new ExampleCommand.

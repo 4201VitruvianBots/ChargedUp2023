@@ -54,7 +54,7 @@ public class LogManager {
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        //        e.printStackTrace();
       }
     }
   }

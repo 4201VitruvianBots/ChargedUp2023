@@ -18,6 +18,7 @@ public class AutoRunIntakeCone extends CommandBase {
 
   private double m_PercentOutput;
 
+  // TODO: Consolidate AutoRunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
   public AutoRunIntakeCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
@@ -32,7 +33,7 @@ public class AutoRunIntakeCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setBooleanState(true);
+    m_intake.setIntakeStateCone(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -52,7 +53,7 @@ public class AutoRunIntakeCone extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // m_intake.setIntakeStateCone(false);
+    m_intake.setIntakeStateCone(false);
     // m_intake.setPercentOutput(0);
     // m_intake.setBooleanState(false);
     // m_swerve.enableHeadingTarget(false);
