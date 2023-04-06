@@ -513,7 +513,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     if (m_smartScoringEnabled) {
-      var targetNode = getTargetNode(m_drive.getPoseMeters(), 0);
+      var targetNode = getTargetNode(m_drive.getPoseMeters(), m_intake.getHeldGamepiece());
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
       m_wristOffset = m_wrist.getHorizontalTranslation().getX();
       m_setpointSolver.solveSetpoints(
