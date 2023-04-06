@@ -2,7 +2,6 @@ package frc.robot.commands.auto;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
@@ -18,9 +17,9 @@ public class AutoTest {
   protected Elevator m_elevator;
   protected Wrist m_wrist;
   protected Intake m_intake;
+  protected StateHandler m_stateHandler;
   protected Vision m_vision;
   protected FieldSim m_fieldSim;
-  protected SwerveAutoBuilder m_autoBuilder;
 
   @BeforeEach
   // this method will run before each test
@@ -31,9 +30,9 @@ public class AutoTest {
     m_elevator = m_robotContainer.getElevator();
     m_wrist = m_robotContainer.getWrist();
     m_intake = m_robotContainer.getIntake();
+    m_stateHandler = m_robotContainer.getStateHandler();
     m_vision = m_robotContainer.getVision();
     m_fieldSim = m_robotContainer.getFieldSim();
-    m_autoBuilder = m_robotContainer.getAutoBuilder();
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -51,16 +50,16 @@ public class AutoTest {
     double blueTrajectoryMinY = 0;
     double blueTrajectoryMaxY = SimConstants.fieldWidth - Units.inchesToMeters(90);
     var blueAuto =
-        new OnePiece(
+        new TwoPiece(
             "BlueTwoPiece",
-            m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator);
-    var blueTrajectories = blueAuto.getTrajectory();
+            m_elevator,
+            m_stateHandler);
+    var blueTrajectories = blueAuto.getTrajectories();
     for (var segment : blueTrajectories) {
       for (var state : segment.getStates()) {
         assertTrue(
@@ -80,16 +79,16 @@ public class AutoTest {
     //        var test = TrajectoryUtils.readTrajectory("RedOnePiece", new PathConstraints(1, 1));
 
     var redAuto =
-        new OnePiece(
+        new TwoPiece(
             "RedTwoPiece",
-            m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator);
-    var redTrajectories = redAuto.getTrajectory();
+            m_elevator,
+            m_stateHandler);
+    var redTrajectories = redAuto.getTrajectories();
     for (var segment : redTrajectories) {
       for (var state : segment.getStates()) {
         assertTrue(

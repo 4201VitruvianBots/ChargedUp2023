@@ -16,11 +16,7 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "SetElevatorStowed",
-          "SetWristStowed",
-          "StopIntake"
-        ],
+        "names": [],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -28,16 +24,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.509418071467722,
-        "y": 0.8705087585613768
+        "x": 3.417558692260242,
+        "y": 0.45807177328640375
       },
       "prevControl": {
-        "x": 3.455008488964346,
-        "y": 0.9793279235681279
+        "x": 3.227221050990948,
+        "y": 0.3629029526517569
       },
       "nextControl": {
-        "x": 3.625548510293046,
-        "y": 0.638247880910731
+        "x": 3.6179650930730434,
+        "y": 0.5582749736928041
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -53,16 +49,16 @@
     },
     {
       "anchorPoint": {
-        "x": 4.1895378527599165,
-        "y": 0.8705087585613768
+        "x": 4.290758010087449,
+        "y": 0.47238651620160466
       },
       "prevControl": {
-        "x": 4.107923479004853,
-        "y": 0.7526213298040634
+        "x": 4.033092637613847,
+        "y": 0.5296454878624047
       },
       "nextControl": {
-        "x": 4.27115222651498,
-        "y": 0.9883961873186902
+        "x": 4.502220986372544,
+        "y": 0.4253947436938062
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -86,16 +82,20 @@
         "y": 0.9158500773141907
       },
       "nextControl": {
-        "x": 7.27544512983777,
+        "x": 6.70455487016223,
         "y": 0.9158500773141907
       },
       "holonomicAngle": 0.0,
-      "isReversal": false,
+      "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "SetWristIntaking",
+          "SetElevatorIntaking",
+          "RunIntakeCube"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
@@ -103,16 +103,16 @@
     },
     {
       "anchorPoint": {
-        "x": 4.19,
-        "y": 0.87
+        "x": 4.319387495917849,
+        "y": 0.9877172611488084
       },
       "prevControl": {
-        "x": 4.262128524257049,
-        "y": 1.002032004064008
+        "x": 4.547252051727488,
+        "y": 1.1327219784822153
       },
       "nextControl": {
-        "x": 4.117871475742952,
-        "y": 0.7379679959359919
+        "x": 4.004463151783447,
+        "y": 0.7873108603360066
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -128,16 +128,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.51,
-        "y": 0.87
+        "x": 3.4318734351754423,
+        "y": 1.0163467469792091
       },
       "prevControl": {
-        "x": 3.739733671045895,
-        "y": 0.9986528438716407
+        "x": 3.7545222300152448,
+        "y": 0.8696882038702104
       },
       "nextControl": {
-        "x": 3.2600965201930405,
-        "y": 0.7300518886752065
+        "x": 3.2744112631082407,
+        "y": 1.0879204615552087
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -153,12 +153,12 @@
     },
     {
       "anchorPoint": {
-        "x": 1.83,
-        "y": 1.588936463587213
+        "x": 1.78,
+        "y": 1.0306614898944086
       },
       "prevControl": {
-        "x": 1.83,
-        "y": 0.8301447970175344
+        "x": 2.7304510323306364,
+        "y": 0.9161435465728075
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -176,34 +176,11 @@
   ],
   "markers": [
     {
-      "position": 2.29,
+      "position": 2.2909090909090915,
       "names": [
         "SetWristIntaking",
         "SetElevatorIntaking",
         "RunIntakeCube"
-      ]
-    },
-    {
-      "position": 2.727272727272727,
-      "names": [
-        "RunIntakeCube",
-        "SetWristIntaking",
-        "SetElevatorIntaking"
-      ]
-    },
-    {
-      "position": 3.3272727272727267,
-      "names": [
-        "SetWristStowed",
-        "SetElevatorStowed",
-        "IntakeHoldCone"
-      ]
-    },
-    {
-      "position": 5.454545454545444,
-      "names": [
-        "SetElevatorMidConeNode",
-        "SetWristMidConeNode"
       ]
     }
   ]

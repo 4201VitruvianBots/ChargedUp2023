@@ -7,8 +7,11 @@ package frc.robot.utils;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.SwerveDrive;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +58,39 @@ public class TrajectoryUtils {
 
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
-        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
+        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, false);
         return new ArrayList<>();
       }
     }
+  }
+
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, String pathName, PathConstraints constraints) {
+    var trajectories = readTrajectory(pathName, constraints);
+
+    return generatePPSwerveControllerCommand(swerveDrive, trajectories);
+  }
+
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, List<PathPlannerTrajectory> trajectories) {
+    var commands = new ArrayList<PPSwerveControllerCommand>();
+
+    for (var trajectory : trajectories) {
+      PPSwerveControllerCommand swerveCommand =
+          new PPSwerveControllerCommand(
+              trajectory,
+              swerveDrive::getPoseMeters,
+              Constants.SWERVE_DRIVE.kSwerveKinematics,
+              swerveDrive.getXPidController(),
+              swerveDrive.getYPidController(),
+              swerveDrive.getThetaPidController(),
+              swerveDrive::setSwerveModuleStatesAuto,
+              false,
+              swerveDrive);
+
+      commands.add(swerveCommand);
+    }
+    return commands;
   }
 }
 

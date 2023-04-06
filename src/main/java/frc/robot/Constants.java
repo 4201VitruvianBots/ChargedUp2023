@@ -250,7 +250,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.7715;
-    public static double frontRightCANCoderOffset = 203.8625;
+    public static double frontRightCANCoderOffset = 5.889;
     public static double backLeftCANCoderOffset = 190.591;
     public static double backRightCANCoderOffset = 32.915;
 
@@ -258,12 +258,16 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_Translation = 0.6;
-    public static final double kI_Translation = 0;
-    public static final double kD_Translation = 0;
-    public static final double kP_Rotation = 4;
-    public static final double kI_Rotation = 0;
-    public static final double kD_Rotation = 0.01;
+    public static final double kP_X = 0.6;
+    public static final double kI_X = 0;
+    public static final double kD_X = 0;
+    public static final double kP_Y = 0.6;
+    public static final double kI_Y = 0;
+    public static final double kD_Y = 0;
+
+    public static final double kP_Theta = 4.0;
+    public static final double kI_Theta = 0;
+    public static final double kD_Theta = 0.01;
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,
@@ -560,8 +564,12 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
+    // SWERVE_DRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
+    // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
+    // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
+    // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 186.855; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 32.915;
   }

@@ -3,63 +3,58 @@ package frc.robot.commands.auto;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
-import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.AutoSetWristSetpoint;
+import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
+// TODO: Rewrite without AutoBuilder
 public class OnePiece extends SequentialCommandGroup {
-  private List<PathPlannerTrajectory> m_trajectory;
+  private List<PathPlannerTrajectory> m_trajectories;
 
   public OnePiece(
       String pathName,
-      SwerveAutoBuilder autoBuilder,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,
       Intake intake,
       Vision vision,
-      Elevator elevator) {
+      Elevator elevator,
+      StateHandler stateHandler) {
 
-    m_trajectory =
+    m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
-
-    var autoPath = autoBuilder.fullAuto(m_trajectory);
+            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+    var swerveCommands =
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
-        //        new SetSwerveOdometry(swerveDrive, trajectory.get(0).getInitialHolonomicPose(),
-        // fieldSim),
-
+        new SetSwerveOdometry(
+            swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new AutoRunIntakeCone(intake, 0, vision, swerveDrive),
-        new PlotAutoTrajectory(fieldSim, pathName, m_trajectory),
-        new ParallelCommandGroup(
-            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get()),
-            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get())),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
+        new SetSetpoint(
+            stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
         new WaitCommand(0.5),
         new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(1),
         new WaitCommand(1.5),
-        new ParallelCommandGroup(
-            new AutoSetElevatorSetpoint(elevator, ELEVATOR.SETPOINT.STOWED.get()),
-            new AutoSetWristSetpoint(wrist, WRIST.SETPOINT.STOWED.get())),
-        autoPath,
+        new SetSetpoint(
+            stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
+        // autoPath,
         new AutoBalance(swerveDrive),
 
         // new AutoRunIntakeCone(intake, 0.2, vision, swerveDrive)),
@@ -84,6 +79,6 @@ public class OnePiece extends SequentialCommandGroup {
   }
 
   public List<PathPlannerTrajectory> getTrajectory() {
-    return m_trajectory;
+    return m_trajectories;
   }
 }

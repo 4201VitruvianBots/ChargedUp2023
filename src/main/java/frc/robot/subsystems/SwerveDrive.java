@@ -10,7 +10,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -86,16 +85,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private boolean useHeadingTarget = false;
   private double m_desiredHeadingRadians;
 
-  private final TrapezoidProfile.Constraints m_constraints =
-      new TrapezoidProfile.Constraints(
-          SWERVE_DRIVE.kMaxRotationRadiansPerSecond,
-          SWERVE_DRIVE.kMaxRotationRadiansPerSecondSquared);
-  private final ProfiledPIDController m_rotationController =
-      new ProfiledPIDController(
-          SWERVE_DRIVE.kP_Rotation,
-          SWERVE_DRIVE.kI_Rotation,
-          SWERVE_DRIVE.kD_Rotation,
-          m_constraints);
+  private final PIDController m_xController =
+      new PIDController(SWERVE_DRIVE.kP_X, SWERVE_DRIVE.kI_X, SWERVE_DRIVE.kD_X);
+  private final PIDController m_yController =
+      new PIDController(SWERVE_DRIVE.kP_Y, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
+  private final PIDController m_turnController =
+      new PIDController(SWERVE_DRIVE.kP_Theta, SWERVE_DRIVE.kI_Theta, SWERVE_DRIVE.kD_Theta);
+
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
@@ -136,6 +132,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     strafe *= m_maxVelocity;
     rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
 
+    /** Setting field vs Robot Relative */
     if (useHeadingTarget) {
       rotation = m_rotationOutput;
       chassisSpeeds =
@@ -170,8 +167,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     if (Math.abs(getHeadingRotation2d().getRadians() - m_desiredHeadingRadians)
         > Units.degreesToRadians(1))
       m_rotationOutput =
-          m_rotationController.calculate(
-              getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
+          m_turnController.calculate(getHeadingRotation2d().getRadians(), m_desiredHeadingRadians);
     else m_rotationOutput = 0;
   }
 
@@ -268,6 +264,18 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       }
     }
     return true;
+  }
+
+  public PIDController getXPidController() {
+    return m_xController;
+  }
+
+  public PIDController getYPidController() {
+    return m_yController;
+  }
+
+  public PIDController getThetaPidController() {
+    return m_turnController;
   }
 
   public void setNeutralMode(NeutralMode mode) {
