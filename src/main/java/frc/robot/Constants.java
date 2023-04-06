@@ -161,8 +161,8 @@ public final class Constants {
       // Beta 3.5 - 28 inches
       // Gamma 27.5 - 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.inchesToMeters(4)),
-      BETA_MIN(Units.inchesToMeters(3.5)),
+      ALPHA_MAX(Units.inchesToMeters(3.5)),
+      BETA_MIN(Units.inchesToMeters(3.0)),
       BETA_MAX(Units.inchesToMeters(29)),
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());

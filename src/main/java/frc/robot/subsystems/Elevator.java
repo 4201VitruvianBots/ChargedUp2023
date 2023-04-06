@@ -83,6 +83,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
+  private double m_feedForwardResult;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
   private static int simEncoderSign = 1;
@@ -190,11 +191,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+//    m_feedForwardResult = calculateFeedforward(state);
+    m_feedForwardResult = 0;
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-        calculateFeedforward(state));
+        m_feedForwardResult);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {

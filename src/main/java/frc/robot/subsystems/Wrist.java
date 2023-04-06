@@ -67,6 +67,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   private final ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
+  private double m_feedForwardResult;
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
   // run
@@ -206,11 +207,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Sets the setpoint of the wrist using a state calculated in periodic
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+//    m_feedForwardResult = calculateFeedforward(state);
     wristMotor.set(
         ControlMode.Position,
         Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
         DemandType.ArbitraryFeedForward,
-        calculateFeedforward(state));
+        m_feedForwardResult);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -459,7 +461,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
-            wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
+                wristMotor.getMotorOutputPercent()  * RobotController.getBatteryVoltage(), -12, 12));
     double currentTime = m_timer.get();
     m_armSim.update(currentTime - m_lastSimTimestamp);
     m_lastSimTimestamp = currentTime;

@@ -28,6 +28,7 @@ import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATEHANDLER;
 import frc.robot.Constants.STATEHANDLER.*;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -50,6 +51,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
 
   private boolean m_smartScoringEnabled;
+  private boolean m_canScore;
   private boolean m_isOnTarget;
 
   private final Timer m_inactiveTimer = new Timer();
@@ -108,6 +110,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       initializeScoringChooser();
       initializeMainStateChooser();
+      SmartDashboard.putData(new ToggleSmartScoring(this));
     }
   }
 
@@ -161,8 +164,16 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_scoringState;
   }
 
-  public void enableSmartScoring(boolean enabled) {
+  public boolean isSmartScoring() {
+    return m_smartScoringEnabled;
+  }
+
+  public void setSmartScoring(boolean enabled) {
     m_smartScoringEnabled = enabled;
+  }
+
+  public boolean canScore() {
+    return m_canScore;
   }
 
   public boolean isOnTarget() {
@@ -509,6 +520,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           targetNode,
           m_wrist.getHorizontalTranslation().getX(),
           m_scoringState);
+      m_canScore = m_setpointSolver.canScore();
       m_wrist.setSetpointPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setDesiredPositionMeters(m_setpointSolver.getElevatorSetpointMeters());
       // TODO: Add this to the SwerveDrive

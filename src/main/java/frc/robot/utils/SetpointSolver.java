@@ -4,8 +4,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
+import frc.robot.subsystems.Elevator;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;
@@ -31,6 +34,11 @@ public class SetpointSolver {
   public void solveSetpoints(
       Pose2d currentRobotPose, Pose2d targetPose, double wristOffset, SCORING_STATE scoringState) {
     solveSetpoints(currentRobotPose, targetPose, wristOffset, scoringState, 0);
+  }
+
+  public boolean canScore() {
+    return ELEVATOR.THRESHOLD.ALPHA_MIN.get() <= elevatorSetpointMeters && elevatorSetpointMeters <= ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() &&
+            Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MIN.get()) <= wristSetpointDegrees && wristSetpointDegrees <= Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MAX.get());
   }
 
   /**
