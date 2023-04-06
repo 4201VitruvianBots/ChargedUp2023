@@ -19,10 +19,8 @@ public class ChargedUpNodeMask {
 
   /** Node Definitions */
   // Starting with Blue Nodes, numbering starts at 0 with the rightmost LOW_HYBRID node, closest to
-  // the Red Substations
-  // and 26 is the leftmost HIGH_CONE node. 27 is the Blue single substation, 28 is the left Blue
-  // double substation and
-  // 29 is the right Blue double substation.
+  // the Red Substations and 26 is the leftmost HIGH_CONE node. 27 is the Blue single substation,
+  // 28 is the left Blue double substation and 29 is the right Blue double substation.
   // Red Node numbering is mirrored from blue nodes given the same pattern from above.
   private static final int nodes = 0b0000_0111_1111_1111_1111_1111_1111_1111;
 
@@ -87,22 +85,18 @@ public class ChargedUpNodeMask {
 
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
       if (robotPose.getX() > SimConstants.fieldLength / 2) {
-        validNodeMask = nodes;
-        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        validNodeMask = nodes & ~ignoredRedNodes;
         currentNodes = redNodes;
       } else {
-        validNodeMask = coopertitionNodes;
-        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        validNodeMask = coopertitionNodes & ~ignoredBlueNodes;
         currentNodes = blueNodes;
       }
     } else {
       if (robotPose.getX() < SimConstants.fieldLength / 2) {
-        validNodeMask = nodes;
-        validNodeMask = validNodeMask & ~ignoredBlueNodes;
+        validNodeMask = nodes & ~ignoredBlueNodes;
         currentNodes = blueNodes;
       } else {
-        validNodeMask = coopertitionNodes;
-        validNodeMask = validNodeMask & ~ignoredRedNodes;
+        validNodeMask = coopertitionNodes & ~ignoredRedNodes;
         currentNodes = redNodes;
       }
     }

@@ -5,16 +5,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
+import frc.robot.Constants.WRIST;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;
   private Pose2d m_currentRobotPose;
   private Pose2d m_targetPose;
   private double m_targetTangentalOffset;
-  private double m_wristOffset;
 
   private Rotation2d chassisSetpointDegrees;
   private double elevatorHorizontalSetpointMeters;
@@ -38,10 +37,8 @@ public class SetpointSolver {
   public boolean canScore() {
     return ELEVATOR.THRESHOLD.ALPHA_MIN.get() <= elevatorSetpointMeters
         && elevatorSetpointMeters <= ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()
-        && Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MIN.get())
-            <= wristSetpointDegrees
-        && wristSetpointDegrees
-            <= Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MAX.get());
+        && Units.radiansToDegrees(WRIST.THRESHOLD.ABSOLUTE_MIN.get()) <= wristSetpointDegrees
+        && wristSetpointDegrees <= Units.radiansToDegrees(WRIST.THRESHOLD.ABSOLUTE_MAX.get());
   }
 
   /**
@@ -74,6 +71,7 @@ public class SetpointSolver {
                     ? Rotation2d.fromDegrees(180)
                     : Rotation2d.fromDegrees(0));
 
+    // TODO: Calculate wrist offset? Otherwise use fixed offset by measured setpoints
     elevatorHorizontalSetpointMeters = correctedSolution.getTranslation().getNorm() - wristOffset;
     elevatorSetpointMeters =
         Math.cos(ELEVATOR.mountAngleRadians.getRadians()) * elevatorHorizontalSetpointMeters;
