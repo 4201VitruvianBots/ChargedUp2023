@@ -6,7 +6,7 @@ package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
@@ -17,13 +17,13 @@ public class SetSetpoint extends CommandBase {
 
   private final Wrist m_wrist;
   private final StateHandler m_StateHandler;
-  private final STATEHANDLER.SETPOINT m_desiredState;
+  private final STATE_HANDLER.SETPOINT m_desiredState;
 
   public SetSetpoint(
       StateHandler stateHandler,
       Elevator elevator,
       Wrist Wrist,
-      STATEHANDLER.SETPOINT desiredState) {
+      STATE_HANDLER.SETPOINT desiredState) {
     m_elevator = elevator;
     m_wrist = Wrist;
     m_StateHandler = stateHandler;

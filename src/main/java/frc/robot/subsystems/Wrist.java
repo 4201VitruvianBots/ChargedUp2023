@@ -67,7 +67,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   private final ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
-  private double m_feedForwardResult;
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
   // run
@@ -90,6 +89,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
+  private static int m_simEncoderSign = 1;
+
   private MechanismLigament2d fourbarLigament2d;
   private MechanismLigament2d intakeLigament2d;
 
@@ -150,6 +151,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     initSmartDashboard();
     m_timer.reset();
     m_timer.start();
+
+    m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
   }
 
   public void setUserInput(double input) {
@@ -207,12 +210,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Sets the setpoint of the wrist using a state calculated in periodic
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-    //    m_feedForwardResult = calculateFeedforward(state);
     wristMotor.set(
         ControlMode.Position,
         Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
         DemandType.ArbitraryFeedForward,
-        m_feedForwardResult);
+        calculateFeedforward(state));
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -473,7 +475,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (WRIST.simEncoderSign
+                (m_simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getAngleRads())
                     / WRIST.encoderUnitsToDegrees));
 
@@ -481,7 +483,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (WRIST.simEncoderSign
+                (m_simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / WRIST.encoderUnitsToDegrees
                     * 10.0));

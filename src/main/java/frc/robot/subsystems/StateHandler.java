@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.STATEHANDLER.elevatorSetpointTolerance;
-import static frc.robot.Constants.STATEHANDLER.wristSetpointTolerance;
+import static frc.robot.Constants.STATE_HANDLER.elevatorSetpointTolerance;
+import static frc.robot.Constants.STATE_HANDLER.wristSetpointTolerance;
 import static frc.robot.utils.ChargedUpNodeMask.getTargetNode;
 import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 
@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
-import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.*;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.STATE_HANDLER.*;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.utils.SetpointSolver;
@@ -48,7 +48,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private SUPERSTRUCTURE_STATE m_desiredState = m_currentState;
   private ZONE m_currentZone = ZONE.UNDEFINED;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private boolean m_smartScoringEnabled;
   private boolean m_canScore;
@@ -65,9 +65,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private double wristLowerLimitRadians;
   private double wristUpperLimitRadians;
   private final double universalWristLowerLimitRadians =
-      STATEHANDLER.universalWristLowerLimitRadians;
+      STATE_HANDLER.universalWristLowerLimitRadians;
   private final double universalWristUpperLimitRadians =
-      STATEHANDLER.universalWristUpperLimitRadians;
+      STATE_HANDLER.universalWristUpperLimitRadians;
 
   private final Intake m_intake;
   private final Wrist m_wrist;
@@ -315,16 +315,16 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   // Sets desired setpoint from setpoint enums created, clamps the setpoints before settings based
   // on local limits which are based on the current zone
-  public void setDesiredSetpoint(STATEHANDLER.SETPOINT desiredState) {
+  public void setDesiredSetpoint(STATE_HANDLER.SETPOINT desiredState) {
     SetElevatorDesiredSetpoint(desiredState);
     SetWristDesiredSetpoint(desiredState);
   }
 
-  public void SetWristDesiredSetpoint(STATEHANDLER.SETPOINT desiredState) {
+  public void SetWristDesiredSetpoint(STATE_HANDLER.SETPOINT desiredState) {
     m_wristDesiredSetpointRadians = desiredState.getWristSetpointRadians();
   }
 
-  public void SetElevatorDesiredSetpoint(STATEHANDLER.SETPOINT desiredState) {
+  public void SetElevatorDesiredSetpoint(STATE_HANDLER.SETPOINT desiredState) {
     m_elevatorDesiredSetpointMeters = desiredState.getElevatorSetpointMeters();
   }
 
@@ -354,22 +354,22 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void updateZoneLimits() {
     switch (m_currentState.getZone()) {
       case 1: // ALPHA
-        elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MIN.get();
-        elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.ALPHA_MAX.get();
-        wristLowerLimitRadians = WRIST.THRESHOLD.ALPHA_MIN.get();
-        wristUpperLimitRadians = WRIST.THRESHOLD.ALPHA_MAX.get();
+        setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.ALPHA_MIN.get());
+        setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.ALPHA_MAX.get());
+        setWristLowerLimitRadians(WRIST.THRESHOLD.ALPHA_MIN.get());
+        setWristUpperLimitRadians(WRIST.THRESHOLD.ALPHA_MAX.get());
         break;
       case 2: // BETA
-        elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.BETA_MIN.get();
-        elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.BETA_MAX.get();
-        wristLowerLimitRadians = WRIST.THRESHOLD.BETA_MIN.get();
-        wristUpperLimitRadians = WRIST.THRESHOLD.BETA_MAX.get();
+        setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.BETA_MIN.get());
+        setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.BETA_MAX.get());
+        setWristLowerLimitRadians(WRIST.THRESHOLD.BETA_MIN.get());
+        setWristUpperLimitRadians(WRIST.THRESHOLD.BETA_MAX.get());
         break;
       case 3: // GAMMA
-        elevatorLowerLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MIN.get();
-        elevatorUpperLimitMeters = ELEVATOR.THRESHOLD.GAMMA_MAX.get();
-        wristLowerLimitRadians = WRIST.THRESHOLD.GAMMA_MIN.get();
-        wristUpperLimitRadians = WRIST.THRESHOLD.GAMMA_MAX.get();
+        setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.GAMMA_MIN.get());
+        setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.GAMMA_MAX.get());
+        setWristLowerLimitRadians(WRIST.THRESHOLD.GAMMA_MIN.get());
+        setWristUpperLimitRadians(WRIST.THRESHOLD.GAMMA_MAX.get());
         break;
       case 0:
       default:
@@ -528,19 +528,19 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  public void setElevatorLowerLimitMeters(double lowerLimitMeters) {
+  private void setElevatorLowerLimitMeters(double lowerLimitMeters) {
     elevatorLowerLimitMeters = lowerLimitMeters;
   }
 
-  public void setElevatorUpperLimitMetersMeters(double upperLimitMeters) {
+  private void setElevatorUpperLimitMeters(double upperLimitMeters) {
     elevatorUpperLimitMeters = upperLimitMeters;
   }
 
-  public void setWristLowerLimitRadians(double lowerLimitRadians) {
+  private void setWristLowerLimitRadians(double lowerLimitRadians) {
     wristLowerLimitRadians = lowerLimitRadians;
   }
 
-  public void setWristUpperLimitRadians(double upperLimitRadians) {
+  private void setWristUpperLimitRadians(double upperLimitRadians) {
     wristUpperLimitRadians = upperLimitRadians;
   }
 

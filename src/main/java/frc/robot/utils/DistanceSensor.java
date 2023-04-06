@@ -11,8 +11,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.STATE_HANDLER.INTAKING_STATES;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,7 +36,7 @@ public class DistanceSensor implements AutoCloseable {
   private double sensor2DistanceMeters;
   private double sensor3DistanceMeters;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private final Random rand = new Random();
   private Object obj;

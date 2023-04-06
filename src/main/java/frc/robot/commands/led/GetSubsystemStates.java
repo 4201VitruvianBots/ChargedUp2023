@@ -6,7 +6,7 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
 /*scoring = flashing white, intakingcube = blue,

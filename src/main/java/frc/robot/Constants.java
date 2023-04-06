@@ -72,7 +72,6 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerLimitSwitch = 9;
-    public static final int wristLowerSwitch = 0;
   }
 
   public static final class CONSTANTS {
@@ -368,9 +367,6 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
-    public static final int simEncoderSign =
-        WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
-
     public static final TrapezoidProfile.Constraints slowConstraints =
         new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
     public static final TrapezoidProfile.Constraints fastConstraints =
@@ -445,7 +441,7 @@ public final class Constants {
     }
   }
 
-  public static class STATEHANDLER {
+  public static class STATE_HANDLER {
 
     public enum INTAKING_STATES {
       NONE,
@@ -625,7 +621,7 @@ public final class Constants {
     }
 
     if (!DriverStation.isFMSAttached()) {
-      STATEHANDLER.limitCanUtilization = false;
+      STATE_HANDLER.limitCanUtilization = false;
     }
 
     SmartDashboard.putString("Robot Name", robotName);

@@ -19,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -30,7 +29,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.utils.ModuleMap;
@@ -73,9 +72,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private double m_rollOffset;
-  private Trajectory m_trajectory;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private final SwerveDrivePoseEstimator m_odometry;
   private boolean m_simOverride = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
@@ -230,10 +228,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
-  public Pigeon2 getPigeon() {
-    return m_pigeon;
-  }
-
   public Pose2d getPoseMeters() {
     return m_odometry.getEstimatedPosition();
   }
@@ -278,7 +272,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   public void setNeutralMode(NeutralMode mode) {
     for (SwerveModule module : m_swerveModules.values()) {
-      module.setDriveNeutralMode(mode);
+      //      module.setDriveNeutralMode(mode);
       module.setTurnNeutralMode(mode);
     }
   }

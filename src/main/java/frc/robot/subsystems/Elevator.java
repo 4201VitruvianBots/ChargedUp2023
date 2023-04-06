@@ -42,7 +42,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
@@ -62,7 +62,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
   // This is used in limiting the elevator's speed once we reach the top of the elevator
@@ -81,12 +81,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private SimpleMotorFeedforward m_feedForward =
+  private final SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
-  private double m_feedForwardResult;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
-  private static int simEncoderSign = 1;
+  private static int m_simEncoderSign = 1;
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
   private double m_lastSimTimestamp = 0;
@@ -162,7 +161,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_timer.reset();
     m_timer.start();
 
-    simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
+    m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
   }
 
   // Elevator's motor output as a percentage
@@ -191,13 +190,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+    // TODO: Investigate why this is no longer needed?
     //    m_feedForwardResult = calculateFeedforward(state);
-    m_feedForwardResult = 0;
+    double m_m_feedForwardResult = 0;
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-        m_feedForwardResult);
+        m_m_feedForwardResult);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -468,7 +468,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (simEncoderSign
+                (m_simEncoderSign
                     * elevatorSim.getPositionMeters()
                     / ELEVATOR.encoderCountsToMeters));
 
@@ -478,7 +478,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign
+                (m_simEncoderSign
                     * elevatorSim.getVelocityMetersPerSecond()
                     / ELEVATOR.encoderCountsToMeters
                     * 10));

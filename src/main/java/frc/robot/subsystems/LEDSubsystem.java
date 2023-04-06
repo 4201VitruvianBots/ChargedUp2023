@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.*;
-import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
@@ -96,11 +96,11 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     int green = color.green;
     int blue = color.blue;
     switch (toChange) {
-      case ColorFlow: // stripe of color flowing through the led strip
+      case ColorFlow: // stripe of color flowing through the LED strip
         m_toAnimate =
             new ColorFlowAnimation(red, green, blue, white, speed, LED.LEDcount, Direction.Forward);
         break;
-      case Fire: // red and orange leds flaming up and down the led strip
+      case Fire: // red and orange LEDs flaming up and down the LED strip
         m_toAnimate = new FireAnimation(0.5, 0.7, LED.LEDcount, 0.7, 0.5);
         break;
       case Larson: // a line bouncing back and forth with its width determined by size
@@ -113,13 +113,13 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       case RgbFade: // cycling between red, greed, and blue
         m_toAnimate = new RgbFadeAnimation(1, speed, LED.LEDcount);
         break;
-      case SingleFade: // slowly turn all leds from solid color to off
+      case SingleFade: // slowly turn all LEDs from solid color to off
         m_toAnimate = new SingleFadeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
       case Strobe: // switching between solid color and full off at high speed
         m_toAnimate = new StrobeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
-      case Twinkle: // random leds turning on and off with certain color
+      case Twinkle: // random LEDs turning on and off with certain color
         m_toAnimate =
             new TwinkleAnimation(
                 red, green, blue, white, speed, LED.LEDcount, TwinklePercent.Percent6);
