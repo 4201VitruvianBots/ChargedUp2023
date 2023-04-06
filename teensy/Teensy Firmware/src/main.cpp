@@ -30,6 +30,8 @@ VL53L0X sensor1;
 VL53L0X sensor2;
 VL53L0X sensor3;
 
+StaticJsonDocument<1000> doc;
+
 void setup() {
     Serial.begin(115200);
     while (!Serial && millis() < 4000) {
@@ -70,6 +72,7 @@ void setup() {
     sensor1.setTimeout(500);
     if (!sensor1.init()) {
         Serial.println("Failed to detect and initialize sensor1!");
+        doc["sensor1.status"] = "disconnected";
     }
     sensor1.startContinuous();
 
@@ -77,6 +80,7 @@ void setup() {
     sensor2.setTimeout(500);
     if (!sensor2.init()) {
         Serial.println("Failed to detect and initialize sensor2!");
+        doc["sensor2.status"] = "disconnected";
     }
     sensor2.startContinuous();
 
@@ -84,29 +88,43 @@ void setup() {
     sensor3.setTimeout(500);
     if (!sensor3.init()) {
         Serial.println("Failed to detect and initialize sensor3!");
+        doc["sensor3.status"] = "disconnected";
     }
     sensor3.startContinuous();
 }
-
-StaticJsonDocument<1000> doc;
 
 uint8_t i = 0;
 void loop() {
     int distance = sensor1.readRangeContinuousMillimeters();
     if (sensor1.timeoutOccurred()) {
         Serial.print(" TIMEOUT");
+        doc["sensor1.status"] = "timeout";
+    } else if (distance == -1 || distance == 65535) {
+        doc["sensor1.status"] = "failed";
+    } else {
+        doc["sensor1.status"] = "connected";
     }
     doc["sensor1.mm"] = distance;
 
     int distance2 = sensor2.readRangeContinuousMillimeters();
     if (sensor2.timeoutOccurred()) {
         Serial.print(" TIMEOUT");
+        doc["sensor2.status"] = "timeout";
+    } else if (distance2 == -1 || distance2 == 65535) {
+        doc["sensor2.status"] = "failed";
+    } else {
+        doc["sensor2.status"] = "connected";
     }
     doc["sensor2.mm"] = distance2;
 
     int distance3 = sensor3.readRangeContinuousMillimeters();
     if (sensor3.timeoutOccurred()) {
         Serial.print(" TIMEOUT");
+        doc["sensor3.status"] = "timeout";
+    } else if (distance3 == -1 || distance3 == 65535) {
+        doc["sensor3.status"] = "failed";
+    } else {
+        doc["sensor3.status"] = "connected";
     }
     doc["sensor3.mm"] = distance3;
 

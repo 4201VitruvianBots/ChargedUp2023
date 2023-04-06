@@ -269,7 +269,7 @@ public class DistanceSensor implements AutoCloseable {
     updateSmartDashboard();
     try {
       if (RobotBase.isSimulation()) {
-        //simulationPeriodic();
+        simulationPeriodic();
       } else {
         buffer = new byte[512];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
