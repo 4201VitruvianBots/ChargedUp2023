@@ -58,7 +58,6 @@ import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +83,8 @@ public class RobotContainer implements AutoCloseable {
       new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led, m_vision);
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
+
+  private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
@@ -343,33 +344,42 @@ public class RobotContainer implements AutoCloseable {
             m_stateHandler));
 
     m_autoChooser.addOption(
-        "DriveForward", new DriveForward("DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
+        "DriveForward",
+        new DriveForward(
+            "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
-    // if (RobotBase.isSimulation()) {
-    //   // TODO: Fix this; broke after rewrite
-    //        autoPlotter = new SendableChooser<>();
-    //        List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
-    //        dummy.add(new PathPlannerTrajectory());
-    //        autoPlotter.setDefaultOption("None", dummy);
-    //        String[] autos = {
-    //          "TwoPiece",
-    //          "BlueOnePiece",
-    //          "RedTwoPiece",
-    //          "BlueBottomDriveForward",
-    //          "RedBottomDriveForward",
-    //          "BlueDriveForward",
-    //          "RedDriveForward"
-    //        };
-    //        for (var auto : autos) {
-    //          var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
-    //          autoPlotter.addOption(auto, trajectory);
-    //        }
-      
-    //        SmartDashboard.putData("Auto Visualizer", autoPlotter);
-    // }
+    if (RobotBase.isSimulation()) {
+      autoPlotter = new SendableChooser<>();
+      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+      dummy.add(new PathPlannerTrajectory());
+      autoPlotter.setDefaultOption("None", dummy);
+      String[] autos = {
+        "BlueTopTwoCone",
+        "BlueOnePiece",
+        "RedTopTwoCone",
+        "BlueBottomDriveForward",
+        "RedBottomDriveForward",
+        "BlueDriveForward",
+        "RedDriveForward"
+      };
+      for (var auto : autos) {
+        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+
+        var isRedPath = auto.startsWith("Red");
+        List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        if (isRedPath) {
+          ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
+        } else {
+          ppTrajectories.addAll(trajectories);
+        }
+        autoPlotter.addOption(auto, ppTrajectories);
+      }
+
+      SmartDashboard.putData("Auto Visualizer", autoPlotter);
+    }
   }
 
   public Command getAutonomousCommand() {

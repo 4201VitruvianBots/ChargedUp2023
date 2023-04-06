@@ -6,8 +6,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
@@ -47,7 +45,11 @@ public class PlaceOneBalance extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
+            new SetSetpoint(
+                stateHandler,
+                elevator,
+                wrist,
+                frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)),
 
         /** Outakes cone */
@@ -56,7 +58,8 @@ public class PlaceOneBalance extends SequentialCommandGroup {
 
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
+            new SetSetpoint(
+                stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
             new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
         swerveCommands.get(0),
         new AutoBalance(swerveDrive),

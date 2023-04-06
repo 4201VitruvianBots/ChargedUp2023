@@ -9,8 +9,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.WRIST;
 import frc.robot.commands.Intake.AutoRunIntakeCone;
 import frc.robot.commands.Intake.AutoRunIntakeCube;
 import frc.robot.commands.statehandler.SetSetpoint;
@@ -29,6 +27,8 @@ import java.util.List;
 // TODO: Rewrite without AutoBuilder
 public class TwoPiece extends SequentialCommandGroup {
 
+  List<PathPlannerTrajectory> m_trajectories;
+
   public TwoPiece(
       String pathName,
       SwerveDrive swerveDrive,
@@ -39,21 +39,26 @@ public class TwoPiece extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    List<PathPlannerTrajectory> trajectories =
+    m_trajectories =
         TrajectoryUtils.readTrajectory(
             pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
 
     List<PPSwerveControllerCommand> swerveCommands =
-        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
         /** Setting Up Auto Zeros robot to path flips path if nessesary */
-        new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
-        new PlotAutoTrajectory(fieldSim, pathName, trajectories),
+        new SetSwerveOdometry(
+            swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
+        new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelDeadlineGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
+            new SetSetpoint(
+                stateHandler,
+                elevator,
+                wrist,
+                frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive)),
 
         /** Outakes cone */
@@ -64,8 +69,16 @@ public class TwoPiece extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new ParallelDeadlineGroup(
                     new WaitCommand(3),
-                    new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)),
-                new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE))),
+                    new SetSetpoint(
+                        stateHandler,
+                        elevator,
+                        wrist,
+                        frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)),
+                new SetSetpoint(
+                    stateHandler,
+                    elevator,
+                    wrist,
+                    frc.robot.Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE))),
 
         // /** Stows Wrist, Elevator, and Stops intake */
         // new ParallelCommandGroup(
@@ -101,12 +114,20 @@ public class TwoPiece extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             swerveCommands.get(1),
             new ParallelCommandGroup(
-                new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
+                new SetSetpoint(
+                    stateHandler,
+                    elevator,
+                    wrist,
+                    frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
                 new AutoRunIntakeCube(intake, 0.2, vision, swerveDrive))),
 
         /** Brings elevator & wrist to High */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)),
+            new SetSetpoint(
+                stateHandler,
+                elevator,
+                wrist,
+                frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)),
 
         /** Places Cube */
         new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive),
@@ -114,9 +135,14 @@ public class TwoPiece extends SequentialCommandGroup {
 
         /** Stows and Stops Intake */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
+            new SetSetpoint(
+                stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
             new AutoRunIntakeCone(intake, 0, vision, swerveDrive)),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public List<PathPlannerTrajectory> getTrajectories() {
+    return m_trajectories;
   }
 }
