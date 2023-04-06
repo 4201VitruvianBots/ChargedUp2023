@@ -52,7 +52,7 @@ public class AutoTest {
     double blueTrajectoryMaxY = SimConstants.fieldWidth - Units.inchesToMeters(90);
     var blueAuto =
         new OnePiece(
-            "BlueOnePiece",
+            "BlueTwoPiece",
             m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
@@ -81,7 +81,7 @@ public class AutoTest {
 
     var redAuto =
         new OnePiece(
-            "RedOnePiece",
+            "RedTwoPiece",
             m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,

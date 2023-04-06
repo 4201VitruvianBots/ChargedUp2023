@@ -328,7 +328,7 @@ public final class SimConstants {
         state.velocityMetersPerSecond,
         state.accelerationMetersPerSecondSq,
         newPose,
-        state.curvatureRadPerMeter);
+        -state.curvatureRadPerMeter);
   }
 
   public static Pose2d absoluteFlip(Pose2d pose) {
@@ -338,7 +338,7 @@ public final class SimConstants {
   }
 
   public static Translation2d absoluteFlip(Translation2d translation) {
-    return new Translation2d(fieldLength - translation.getX(), translation.getY());
+    return new Translation2d(fieldLength - translation.getX(), fieldWidth - translation.getY());
   }
 
   /**
