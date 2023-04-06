@@ -207,7 +207,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Sets the setpoint of the wrist using a state calculated in periodic
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-//    m_feedForwardResult = calculateFeedforward(state);
+    //    m_feedForwardResult = calculateFeedforward(state);
     wristMotor.set(
         ControlMode.Position,
         Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
@@ -461,7 +461,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
-                wristMotor.getMotorOutputPercent()  * RobotController.getBatteryVoltage(), -12, 12));
+            wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
     double currentTime = m_timer.get();
     m_armSim.update(currentTime - m_lastSimTimestamp);
     m_lastSimTimestamp = currentTime;

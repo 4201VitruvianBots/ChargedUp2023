@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.commands.sim.fieldsim.ToggleTestIntakeState;
-import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.subsystems.*;
 import frc.robot.utils.ChargedUpNodeMask;
 import frc.robot.utils.ModuleMap;
@@ -211,13 +210,20 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
         m_field2d.getObject("RobotToNodeF").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
         m_field2d.getObject("RobotToNodeT").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
       } else {
-        if(m_stateHandler.canScore()) {
-          m_field2d.getObject("RobotToNodeT").setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
-          m_field2d.getObject("RobotToNodeF").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
-        }
-        else {
-          m_field2d.getObject("RobotToNodeF").setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
-          m_field2d.getObject("RobotToNodeT").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+        if (m_stateHandler.canScore()) {
+          m_field2d
+              .getObject("RobotToNodeT")
+              .setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
+          m_field2d
+              .getObject("RobotToNodeF")
+              .setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+        } else {
+          m_field2d
+              .getObject("RobotToNodeF")
+              .setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
+          m_field2d
+              .getObject("RobotToNodeT")
+              .setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
         }
       }
     }

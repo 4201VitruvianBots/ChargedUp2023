@@ -8,7 +8,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.SCORING_STATE;
-import frc.robot.subsystems.Elevator;
 
 public class SetpointSolver {
   private static SetpointSolver m_instance;
@@ -37,8 +36,12 @@ public class SetpointSolver {
   }
 
   public boolean canScore() {
-    return ELEVATOR.THRESHOLD.ALPHA_MIN.get() <= elevatorSetpointMeters && elevatorSetpointMeters <= ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() &&
-            Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MIN.get()) <= wristSetpointDegrees && wristSetpointDegrees <= Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MAX.get());
+    return ELEVATOR.THRESHOLD.ALPHA_MIN.get() <= elevatorSetpointMeters
+        && elevatorSetpointMeters <= ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()
+        && Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MIN.get())
+            <= wristSetpointDegrees
+        && wristSetpointDegrees
+            <= Units.radiansToDegrees(Constants.WRIST.THRESHOLD.ABSOLUTE_MAX.get());
   }
 
   /**

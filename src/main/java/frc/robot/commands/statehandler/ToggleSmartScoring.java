@@ -5,7 +5,6 @@
 package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.StateHandler;
 
 public class ToggleSmartScoring extends CommandBase {

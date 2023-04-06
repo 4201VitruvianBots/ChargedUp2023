@@ -191,7 +191,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-//    m_feedForwardResult = calculateFeedforward(state);
+    //    m_feedForwardResult = calculateFeedforward(state);
     m_feedForwardResult = 0;
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
