@@ -4,26 +4,17 @@
 
 package frc.robot.commands.wrist;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
-import java.util.function.DoubleSupplier;
 
-public class SetWristSetpoint extends CommandBase {
+// Limit the percent output of the wrist joystick when the stick is pressed down to make small
+// adjustments
+public class LimitWristJoystickInput extends CommandBase {
   private final Wrist m_wrist;
-  private final DoubleSupplier m_input;
-  private final double m_setpoint;
 
-  public SetWristSetpoint(Wrist wrist, double setpoint) {
-    this(wrist, setpoint, () -> 0);
-  }
-
-  /** Creates a new RunWrist. */
-  public SetWristSetpoint(Wrist wrist, double setpoint, DoubleSupplier input) {
+  /** Creates a new LimitwristJoystickInput. */
+  public LimitWristJoystickInput(Wrist wrist) {
     m_wrist = wrist;
-    m_setpoint = setpoint;
-    m_input = input;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_wrist);
@@ -32,23 +23,17 @@ public class SetWristSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setUserSetpoint(true);
+    m_wrist.setJoystickLimit(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
-    m_wrist.setSetpointPositionRadians(m_setpoint);
-
-    double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
-    m_wrist.setJoystickInput(-joystickDeadbandOutput);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_wrist.setUserSetpoint(false);
+    m_wrist.setJoystickLimit(false);
   }
 
   // Returns true when the command should end.
