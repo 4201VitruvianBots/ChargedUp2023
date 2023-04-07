@@ -8,7 +8,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
-import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
@@ -36,8 +35,8 @@ public class DriveForward extends SequentialCommandGroup {
 
     addCommands(
         new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
-        new AutoSetSetpoint(
-            stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.STOWED).withTimeout(1),
+        new AutoSetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.STOWED)
+            .withTimeout(1),
         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
         swerveCommands.get(0),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

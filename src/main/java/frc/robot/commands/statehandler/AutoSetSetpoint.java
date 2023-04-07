@@ -58,7 +58,9 @@ public class AutoSetSetpoint extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(m_elevator.getHeightMeters() - m_desiredState.getElevatorSetpointMeters()) < Units.inchesToMeters(1) &&
-            Math.abs(m_wrist.getPositionRadians() - m_desiredState.getWristSetpointRadians()) < Units.degreesToRadians(4);
+    return Math.abs(m_elevator.getHeightMeters() - m_desiredState.getElevatorSetpointMeters())
+            < Units.inchesToMeters(1)
+        && Math.abs(m_wrist.getPositionRadians() - m_desiredState.getWristSetpointRadians())
+            < Units.degreesToRadians(4);
   }
 }
