@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -543,6 +544,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void testPeriodic() {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentState = m_mainStateChooser.getSelected();
+  }
+  
+  public void simulationPeriodic() {
+    // Update the angle of the mech2d
+    MechanismLigament2d[] ligaments = m_elevator.getLigaments();
+    ligaments[0].setLength(m_elevator.getHeightMeters());
+    ligaments[1].setAngle(180 - ligaments[0].getAngle() - m_wrist.getPositionDegrees());
+    ligaments[2].setAngle(ligaments[1].getAngle() * -1.5);
   }
 
   @SuppressWarnings("RedundantThrows")

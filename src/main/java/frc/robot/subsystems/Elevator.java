@@ -28,7 +28,11 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -42,8 +46,10 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.WRIST;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -121,7 +127,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
               "Elevator", getHeightMeters() + ELEVATOR.carriageDistance, ELEVATOR.angleDegrees));
   public final MechanismLigament2d robotBase2d =
       root2d.append(new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
-
+  public final MechanismLigament2d fourbarLigament2d =
+      elevatorLigament2d
+        .append(
+            new MechanismLigament2d(
+                "Fourbar",
+                WRIST.fourbarLength,
+                180 - elevatorLigament2d.getAngle()));
+  public final MechanismLigament2d intakeLigament2d =
+      fourbarLigament2d.append(
+          new MechanismLigament2d("Intake", INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
+  
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
@@ -293,9 +309,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
-  // Returns the ligament of the elevator so the wrist ligament can be attached to it
-  public MechanismLigament2d getLigament2d() {
-    return elevatorLigament2d;
+  // Returns the ligaments of the elevator so they can be updated in the state handler
+  public MechanismLigament2d[] getLigaments() {
+    MechanismLigament2d[] ligaments = {elevatorLigament2d, fourbarLigament2d, intakeLigament2d};
+    return ligaments;
   }
 
   // Initializes shuffleboard values. Does not update them
@@ -308,8 +325,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
-    // Change the color of the robot base mech2d
+    // Change the color of the mech2d
     robotBase2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
+    fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
@@ -486,10 +505,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // Sets the simulated voltage of the roboRio based on our current draw from the elevator
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
-
-    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
-    // directly setting the length to meters
-    elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
   @SuppressWarnings("RedundantThrows")
