@@ -24,6 +24,8 @@ public class RunElevatorTestMode extends CommandBase {
   private DoubleSubscriber kPSub;
   private DoubleSubscriber kISub;
   private DoubleSubscriber kDSub;
+  private DoubleSubscriber kFSub;
+  private DoubleSubscriber KizoneSub;
   private DoublePublisher kHeightPub;
   private DoubleSubscriber kMaxVelSub;
   private DoubleSubscriber kSSub;
@@ -32,7 +34,8 @@ public class RunElevatorTestMode extends CommandBase {
   private DoubleSubscriber kASub;
   private double testKP;
   private double testKI;
-  private double testKA;
+  private double testKF;
+  private double testizone;
   private double testKV, kEncoderCountsPub, kDesiredHeightPub, kHeightInchesPub;
   private final Elevator m_elevator;
   private StringPublisher kDesiredStatePub, kClosedLoopModePub, currentCommandStatePub;
@@ -74,27 +77,22 @@ public class RunElevatorTestMode extends CommandBase {
     double kS = kSSub.get(Constants.ELEVATOR.kG);
     double kV = kVSub.get(Constants.ELEVATOR.kV);
     double kA = kASub.get(Constants.ELEVATOR.kA);
-    double newTestKP = kPSub.get(0);
-
-    if (testKP != newTestKP) {
-      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
-      testKP = newTestKP;
-      m_feedForward = new SimpleMotorFeedforward(kS, kV, kA);
-    }
     double newTestKI = kISub.get(0);
-    if (testKP != newTestKP) {
-      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
+    double newTestKD = kDSub.get(0);
+    double newTestKF = kFSub.get(0);
+    double newTestKP = kPSub.get(0);
+    double newTestizone = KizoneSub.get(0);
+
+    if (testKF != newTestKF
+        || (testKP != newTestKP
+            || testKI != newTestKP
+            || testKI != newTestKI
+            || newTestizone != newTestizone)) {
+      m_elevator.setTalonPIDvalues(newTestKF, newTestKP, newTestKI, newTestKD, newTestizone);
+      testKF = newTestKF;
+      testKP = newTestKP;
       testKI = newTestKI;
-    }
-    double newTestKV = kVSub.get(0);
-    if (testKI != newTestKI) {
-      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
-      testKV = newTestKV;
-    }
-    double newTestKA = kASub.get(0);
-    if (testKI != newTestKI) {
-      m_elevator.setTalonPIDvalues(0, 0, 0, 0, 0);
-      testKA = newTestKA;
+      testizone = newTestizone;
     }
   }
 
