@@ -17,10 +17,9 @@ public class AutoSetElevatorSetpoint extends CommandBase {
   private final double m_setpoint;
 
   public AutoSetElevatorSetpoint(Elevator elevator, double setpoint) {
-
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_setpoint = setpoint;
+
     addRequirements(m_elevator);
   }
 
@@ -38,11 +37,7 @@ public class AutoSetElevatorSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // if (m_elevator.getElevatorState() == m_elevatorState) {
-    //   interrupted = true;
-    // }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

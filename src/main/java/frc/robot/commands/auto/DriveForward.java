@@ -6,7 +6,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.commands.statehandler.AutoSetSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
@@ -34,8 +35,8 @@ public class DriveForward extends SequentialCommandGroup {
 
     addCommands(
         new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
-        new SetSetpoint(
-            stateHandler, elevator, wrist, frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED),
+        new AutoSetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.STOWED)
+            .withTimeout(1),
         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
         swerveCommands.get(0),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

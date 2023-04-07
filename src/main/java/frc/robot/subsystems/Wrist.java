@@ -95,14 +95,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private MechanismLigament2d intakeLigament2d;
 
   // Logging setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
-  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
-  public DoubleLogEntry desiredPositionEntry =
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
+  private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
+  private final DoubleLogEntry desiredPositionEntry =
       new DoubleLogEntry(log, "/wrist/desiredPositionDegrees");
-  public DoubleLogEntry commandedPositionEntry =
+  private final DoubleLogEntry commandedPositionEntry =
       new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
-  public DoubleLogEntry positionDegreesEntry = new DoubleLogEntry(log, "/wrist/positionDegrees");
+  private final DoubleLogEntry positionDegreesEntry =
+      new DoubleLogEntry(log, "/wrist/positionDegrees");
 
   private DoubleSubscriber kPSub,
       kISub,
@@ -143,7 +144,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
-    // Give some time for the CANCoder to recognize the wrist before starting
+    // Give some time for the CANCoder to recognize the wrist before resetting the angle
     if (RobotBase.isReal()) Timer.delay(2);
 
     resetAngleDegrees(-15.0);
@@ -221,7 +222,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  // Sets the setpoint of the wrist to its current position so it will remain in place
+  // Sets the setpoint of the wrist to its current position to keep it in place
   public void resetTrapezoidState() {
     m_setpoint =
         new TrapezoidProfile.State(
@@ -493,6 +494,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     intakeLigament2d.setAngle(fourbarLigament2d.getAngle() * -1.5);
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

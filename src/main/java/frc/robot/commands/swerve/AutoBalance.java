@@ -20,7 +20,7 @@ public class AutoBalance extends CommandBase {
 
   SwerveModuleState[] states;
 
-  PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private final PIDController outputCalculator = new PIDController(0.02, 0, 0);
   private double m_output = 0;
 
   /**
@@ -30,6 +30,7 @@ public class AutoBalance extends CommandBase {
    */
   public AutoBalance(SwerveDrive swerveDriveSubsystem) {
     m_swerveDrive = swerveDriveSubsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_swerveDrive);
   }
@@ -56,7 +57,7 @@ public class AutoBalance extends CommandBase {
   @Override
   public void execute() {
 
-    /** Negative & 90 degrees for Facing Bump Side */
+    // Negative & 90 degrees for Facing Bump Side
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());

@@ -318,6 +318,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                     / (SWERVE_MODULE.kDriveMotorDistancePerPulse * 10)));
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

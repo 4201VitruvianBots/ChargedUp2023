@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Step 1: Define all nodes in a Map Step 2: Use bit masks Step 3: ??? Step 4: Profit */
+/** Step 1: Define all nodes in a Map Step 2: Use bitmasks Step 3: ??? Step 4: Profit */
 public class ChargedUpNodeMask {
   private static final Map<Integer, Translation2d> blueNodes = new HashMap<>();
   private static final Map<Integer, Translation2d> redNodes = new HashMap<>();

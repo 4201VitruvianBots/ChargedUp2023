@@ -43,7 +43,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
-  SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
+  private final SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
   private boolean m_testScoringState = false;
 
   public FieldSim(
@@ -91,7 +91,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   /**
    * Initialize arrays with all the scoring positions on the field based on alliance color, game
-   * piece type, and if it is a cooperatition node. Ideally, this is a pre-processing step that we
+   * piece type, and if it is a coopertition node. Ideally, this is a pre-processing step that we
    * only need to do once to improve robot code performance by avoiding unnecessary repeated calls.
    */
   private void initializeScoringNodes() {
@@ -123,10 +123,10 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Based on the current robot's state and the list of valid nodes, return the nearest nearest node
-   * for scoring
+   * Based on the current robot's state and the list of valid nodes, return the nearest node for
+   * scoring
    *
-   * @return
+   * @return {@link Pose2d} Nearest Pose to robot
    */
   public Pose2d getTargetNode() {
     return ChargedUpNodeMask.getTargetNode(m_swerveDrive.getPoseMeters());
@@ -244,6 +244,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   public void simulationPeriodic() {}
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

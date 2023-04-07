@@ -112,14 +112,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
-  public MechanismRoot2d root2d =
+  public final Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
+  public final MechanismRoot2d root2d =
       mech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
-  public MechanismLigament2d elevatorLigament2d =
+  public final MechanismLigament2d elevatorLigament2d =
       root2d.append(
           new MechanismLigament2d(
               "Elevator", getHeightMeters() + ELEVATOR.carriageDistance, ELEVATOR.angleDegrees));
-  public MechanismLigament2d robotBase2d =
+  public final MechanismLigament2d robotBase2d =
       root2d.append(new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
 
   // Logging setup
@@ -290,7 +290,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns a translation of the elevator's position in relation to the robot's position.
   public Translation2d getField2dTranslation() {
     return new Translation2d(
-        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) + centerOffset, 0);
+        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
   // Returns the ligament of the elevator so the wrist ligament can be attached to it
@@ -492,6 +492,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   // Safely closes the subsystem
   public void close() throws Exception {

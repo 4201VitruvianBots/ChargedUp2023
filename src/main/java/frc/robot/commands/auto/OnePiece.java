@@ -6,8 +6,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
+import frc.robot.commands.intake.AutoRunIntakeCone;
+import frc.robot.commands.intake.AutoRunIntakeCube;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
@@ -24,7 +24,7 @@ import java.util.List;
 
 // TODO: Rewrite without AutoBuilder
 public class OnePiece extends SequentialCommandGroup {
-  private List<PathPlannerTrajectory> m_trajectories;
+  private final List<PathPlannerTrajectory> m_trajectories;
 
   public OnePiece(
       String pathName,

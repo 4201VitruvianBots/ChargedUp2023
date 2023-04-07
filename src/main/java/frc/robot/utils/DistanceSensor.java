@@ -209,6 +209,7 @@ public class DistanceSensor implements AutoCloseable {
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
     if (socket != null) socket.close();

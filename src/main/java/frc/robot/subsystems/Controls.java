@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+@SuppressWarnings("RedundantThrows")
 public class Controls extends SubsystemBase implements AutoCloseable {
   private StringPublisher allianceString;
   private BooleanPublisher allianceBoolean;
@@ -88,6 +89,7 @@ public class Controls extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run during simulation
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

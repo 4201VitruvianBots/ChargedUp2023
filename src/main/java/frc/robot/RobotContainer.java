@@ -21,13 +21,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.IntakeVisionAlignment;
-import frc.robot.commands.Intake.RunIntakeCone;
-import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.auto.BottomDriveForward;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
@@ -38,6 +34,9 @@ import frc.robot.commands.elevator.ResetElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 // import frc.robot.commands.auto.RedTopTwoBalance;
+import frc.robot.commands.intake.IntakeVisionAlignment;
+import frc.robot.commands.intake.RunIntakeCone;
+import frc.robot.commands.intake.RunIntakeCube;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
@@ -96,13 +95,14 @@ public class RobotContainer implements AutoCloseable {
   private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
+  private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
+  private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
+  private final CommandXboxController xboxController =
+      new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
-  public Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
+  private final Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
+  private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
 
   public RobotContainer() {
     initializeSubsystems();
@@ -183,7 +183,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .povUp()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_EXTENDED));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -191,11 +192,13 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .rightBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CONE));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CONE));
     xboxController
         .leftBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CUBE));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
@@ -245,22 +248,28 @@ public class RobotContainer implements AutoCloseable {
       testController
           .cross()
           .whileTrue(
-              new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CONE));
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CONE));
 
       // Score MID Setpoints
       testController
           .circle()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_MID));
+          .whileTrue(
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID));
 
       // Stowed
       testController
           .square()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.STOWED));
+          .whileTrue(
+              new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));
 
       // High
       testController
           .triangle()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_HIGH));
+          .whileTrue(
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
 
       // Toggle elevator, wrist control state
       testController
@@ -348,6 +357,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
+    // Auto trajectory visualizer for testing/debugging
     if (RobotBase.isSimulation()) {
       autoPlotter = new SendableChooser<>();
       List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
@@ -365,16 +375,14 @@ public class RobotContainer implements AutoCloseable {
       };
       for (var auto : autos) {
         var isRedPath = auto.startsWith("Red");
-        auto = auto.replace("Red", "");
-        auto = auto.replace("Blue", "");
-        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+        var fileName = auto.replace("Red", "");
+        fileName = fileName.replace("Blue", "");
+        var trajectories = TrajectoryUtils.readTrajectory(fileName, new PathConstraints(1, 1));
 
         List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        if (isRedPath) {
-          ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
-        } else {
-          ppTrajectories.addAll(trajectories);
-        }
+        if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
+        else ppTrajectories.addAll(trajectories);
+
         autoPlotter.addOption(auto, ppTrajectories);
       }
 
@@ -434,9 +442,7 @@ public class RobotContainer implements AutoCloseable {
     // m_logManager.periodic();
   }
 
-  public void disabledPeriodic() {
-    m_swerveDrive.disabledPeriodic();
-  }
+  public void disabledPeriodic() {}
 
   public void testPeriodic() {
     m_stateHandler.testPeriodic();

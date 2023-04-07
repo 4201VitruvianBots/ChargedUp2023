@@ -47,9 +47,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final StringPublisher ledStatePub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
-  public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
-  public MechanismLigament2d m_ligament2d = m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+  public final Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+  public final MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
+  public final MechanismLigament2d m_ligament2d =
+      m_root2d.append(new MechanismLigament2d("LED", 2, 90));
 
   // Create LED strip
   public LEDSubsystem(Controls controls) {
@@ -82,12 +83,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * //will set LED color and animation type
+   * Will set LED color and animation type
    *
-   * @param Color8Bit the color channel
-   * @param white
-   * @param speed
-   * @param toChange
+   * @param color the color channel
+   * @param white LED intensity
+   * @param speed Animation Speed
+   * @param toChange AnimationType to use
    */
 
   // will create LED patterns
@@ -215,6 +216,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

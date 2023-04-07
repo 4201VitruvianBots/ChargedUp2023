@@ -12,32 +12,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
-  FieldSim m_fieldSim;
-  List<PathPlannerTrajectory> m_trajectories;
-  PathPlannerTrajectory m_trajectory;
-  private String m_pathName;
-  boolean useList = false;
+  private final FieldSim m_fieldSim;
+  private final List<PathPlannerTrajectory> m_trajectories;
+  private final String m_pathName;
 
   public PlotAutoTrajectory(
       FieldSim fieldSim, String pathName, List<PathPlannerTrajectory> trajectories) {
     m_fieldSim = fieldSim;
     m_pathName = pathName;
     m_trajectories = trajectories;
-    useList = true;
+
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_fieldSim);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+    List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
     var isRedPath = m_pathName.startsWith("Red");
-    if (isRedPath) {
-      ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
-    } else {
-      ppTrajectories.addAll(m_trajectories);
-    }
-    m_fieldSim.setTrajectory(m_trajectories);
+    if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
+    else ppTrajectories.addAll(m_trajectories);
+
+    m_fieldSim.setTrajectory(ppTrajectories);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

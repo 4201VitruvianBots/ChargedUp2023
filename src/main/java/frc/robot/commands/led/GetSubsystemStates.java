@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
-/*scoring = flashing white, intakingcube = blue,
-intakingcone = orange, locked on = flashing green,
+/*scoring = flashing white, intakingCube = blue,
+intakingCone = orange, locked on = flashing green,
 enable = green, disabled = red,
-cubebutton = purple, conebutton = yellow */
+cubeButton = purple, coneButton = yellow */
 
 /** Sets the LED based on the subsystems' statuses */
 public class GetSubsystemStates extends CommandBase {
@@ -20,17 +20,19 @@ public class GetSubsystemStates extends CommandBase {
   private final LEDSubsystem m_led;
 
   private final StateHandler m_stateHandler;
+
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(LEDSubsystem led, StateHandler stateHandler) {
     m_led = led;
     m_stateHandler = stateHandler;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(led);
+
+    addRequirements(m_led);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {}
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -38,9 +40,11 @@ public class GetSubsystemStates extends CommandBase {
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (DriverStation.isDisabled()) {
+      // TODO: Add an isReady state
       m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
     } else {
       switch (m_stateHandler.getDesiredState()) {
+          // TODO: Add states for substation intaking
         case INTAKE_LOW_CONE:
           m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
           break;
@@ -59,7 +63,7 @@ public class GetSubsystemStates extends CommandBase {
         case SCORE_MID_CUBE:
         case SCORE_MID:
           m_led.expressState(SUPERSTRUCTURE_STATE.BETA_ZONE);
-          ; // Solid Blue
+          // Solid Blue
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
@@ -67,7 +71,7 @@ public class GetSubsystemStates extends CommandBase {
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
           m_led.expressState(SUPERSTRUCTURE_STATE.GAMMA_ZONE);
-          ; // Solid White
+          // Solid White
           break;
         default:
           m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
@@ -75,6 +79,7 @@ public class GetSubsystemStates extends CommandBase {
       }
     }
   }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

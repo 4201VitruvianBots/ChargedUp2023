@@ -10,6 +10,7 @@ import frc.robot.subsystems.Wrist;
 
 public class AutoSetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
+
   private final double m_setpoint;
 
   /** Creates a new RunWrist. */
@@ -18,7 +19,7 @@ public class AutoSetWristSetpoint extends CommandBase {
     m_setpoint = setpoint;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(wrist);
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.

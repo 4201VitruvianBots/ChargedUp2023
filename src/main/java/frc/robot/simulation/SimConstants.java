@@ -272,7 +272,7 @@ public final class SimConstants {
 
   /**
    * Flips a translation to the correct side of the field based on the current alliance color. By
-   * default, all translations and poses in {@link FieldConstants} are stored with the origin at the
+   * default, all translations and poses in {@link SimConstants} are stored with the origin at the
    * rightmost point on the BLUE ALLIANCE wall.
    */
   public static Translation2d allianceFlip(Translation2d translation) {
@@ -286,12 +286,11 @@ public final class SimConstants {
   public static List<PathPlannerTrajectory> absoluteFlip(List<PathPlannerTrajectory> trajectories) {
     List<PathPlannerTrajectory> flippedTrajectories = new ArrayList<>();
     for (var trajectory : trajectories) {
-      List<Trajectory.State> trajectoryStates = new ArrayList<>();
 
-      trajectoryStates.addAll(
+      List<Trajectory.State> trajectoryStates =
           trajectory.getStates().stream()
-              .map(state -> SimConstants.absoluteFlip(state))
-              .collect(Collectors.toList()));
+              .map(state -> absoluteFlip(state))
+              .collect(Collectors.toList());
 
       var flippedTrajectory =
           new PathPlannerTrajectory(
@@ -338,13 +337,13 @@ public final class SimConstants {
   }
 
   public static Translation2d absoluteFlip(Translation2d translation) {
-    return new Translation2d(fieldLength - translation.getX(), fieldWidth - translation.getY());
+    return new Translation2d(fieldLength - translation.getX(), translation.getY());
   }
 
   /**
    * Flips a pose to the correct side of the field based on the current alliance color. By default,
-   * all translations and poses in {@link FieldConstants} are stored with the origin at the
-   * rightmost point on the BLUE ALLIANCE wall.
+   * all translations and poses in {@link SimConstants} are stored with the origin at the rightmost
+   * point on the BLUE ALLIANCE wall.
    */
   public static Pose2d allianceFlip(Pose2d pose) {
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {

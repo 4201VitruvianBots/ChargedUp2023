@@ -12,8 +12,8 @@ public class ToggleSmartScoring extends CommandBase {
   private final StateHandler m_stateHandler;
 
   public ToggleSmartScoring(StateHandler stateHandler) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_stateHandler = stateHandler;
+
     addRequirements(m_stateHandler);
   }
 

@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {
   private final Wrist m_wrist;
+
   private final DoubleSupplier m_joystickY;
 
   /** Creates a new RunWristJoystick. */
@@ -19,6 +20,7 @@ public class RunWristJoystick extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     m_wrist = wrist;
     m_joystickY = joystickY;
+
     addRequirements(m_wrist);
   }
 

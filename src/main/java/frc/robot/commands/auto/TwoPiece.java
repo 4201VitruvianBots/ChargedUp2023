@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
+import frc.robot.commands.intake.AutoRunIntakeCone;
+import frc.robot.commands.intake.AutoRunIntakeCube;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
@@ -24,10 +24,9 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
-// TODO: Rewrite without AutoBuilder
 public class TwoPiece extends SequentialCommandGroup {
 
-  List<PathPlannerTrajectory> m_trajectories;
+  private final List<PathPlannerTrajectory> m_trajectories;
 
   public TwoPiece(
       String pathName,
