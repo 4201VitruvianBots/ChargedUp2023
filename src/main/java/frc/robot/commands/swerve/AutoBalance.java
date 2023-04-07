@@ -30,6 +30,7 @@ public class AutoBalance extends CommandBase {
    */
   public AutoBalance(SwerveDrive swerveDriveSubsystem) {
     m_swerveDrive = swerveDriveSubsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_swerveDrive);
   }

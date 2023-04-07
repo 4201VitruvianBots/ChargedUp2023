@@ -12,26 +12,26 @@ public class SetSwerveDriveBalance extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
-  SwerveModuleState[] states;
-
   PIDController outputCalculator = new PIDController(0.05, 0, 0);
+  SwerveModuleState[] states;
 
   /**
    * Creates a new ExampleCommand.
    *
-   * @param swerveDriveSubsystem The subsystem used by this command.
+   * @param swerveDrive The subsystem used by this command.
    */
   public SetSwerveDriveBalance(
-      SwerveDrive swerveDriveSubsystem,
+      SwerveDrive swerveDrive,
       DoubleSupplier throttleInput,
       DoubleSupplier strafeInput,
       DoubleSupplier rotationInput) {
-    m_swerveDrive = swerveDriveSubsystem;
+    m_swerveDrive = swerveDrive;
     m_throttleInput = throttleInput;
     m_strafeInput = strafeInput;
     m_rotationInput = rotationInput;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDriveSubsystem);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.

@@ -19,6 +19,7 @@ public class SetSwerveOdometry extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final FieldSim m_fieldSim;
+
   private final Pose2d m_pose2d;
 
   /**
@@ -47,7 +48,7 @@ public class SetSwerveOdometry extends CommandBase {
     m_fieldSim = fieldSim;
     m_pose2d = pose2d;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.

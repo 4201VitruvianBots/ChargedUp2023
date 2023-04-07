@@ -12,8 +12,9 @@ public class ToggleTestIntakeState extends CommandBase {
   private final FieldSim m_fieldSim;
 
   public ToggleTestIntakeState(FieldSim fieldSim) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_fieldSim = fieldSim;
+
+    addRequirements(m_fieldSim);
   }
 
   @Override

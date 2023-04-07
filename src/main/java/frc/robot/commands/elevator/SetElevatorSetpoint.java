@@ -27,6 +27,7 @@ public class SetElevatorSetpoint extends CommandBase {
     m_elevator = elevator;
     m_setpoint = setpoint;
     m_input = input;
+
     addRequirements(m_elevator);
   }
 

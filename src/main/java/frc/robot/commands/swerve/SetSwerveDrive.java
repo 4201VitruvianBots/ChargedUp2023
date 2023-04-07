@@ -14,14 +14,14 @@ public class SetSwerveDrive extends CommandBase {
   /**
    * Creates a new ExampleCommand.
    *
-   * @param swerveDriveSubsystem The subsystem used by this command.
+   * @param swerveDrive The subsystem used by this command.
    */
   public SetSwerveDrive(
-      SwerveDrive swerveDriveSubsystem,
+      SwerveDrive swerveDrive,
       DoubleSupplier throttleInput,
       DoubleSupplier strafeInput,
       DoubleSupplier rotationInput) {
-    m_swerveDrive = swerveDriveSubsystem;
+    m_swerveDrive = swerveDrive;
     m_throttleInput = throttleInput;
     m_strafeInput = strafeInput;
     m_rotationInput = rotationInput;

@@ -17,6 +17,7 @@ public class SetSetpoint extends CommandBase {
 
   private final Wrist m_wrist;
   private final StateHandler m_StateHandler;
+
   private final STATE_HANDLER.SETPOINT m_desiredState;
 
   public SetSetpoint(

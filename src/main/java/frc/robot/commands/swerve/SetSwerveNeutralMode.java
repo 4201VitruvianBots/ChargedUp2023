@@ -20,8 +20,9 @@ public class SetSwerveNeutralMode extends CommandBase {
   public SetSwerveNeutralMode(SwerveDrive swerveDrive, NeutralMode mode) {
     m_swerveDrive = swerveDrive;
     m_mode = mode;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive);
+    addRequirements(m_swerveDrive);
   }
 
   @Override

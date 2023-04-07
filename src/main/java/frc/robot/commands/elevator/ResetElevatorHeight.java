@@ -15,10 +15,9 @@ public class ResetElevatorHeight extends CommandBase {
   private final double m_meters;
 
   public ResetElevatorHeight(Elevator elevator, double meters) {
-
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_meters = meters;
+
     addRequirements(m_elevator);
   }
 

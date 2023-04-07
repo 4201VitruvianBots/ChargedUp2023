@@ -10,6 +10,7 @@ public class SetSwerveMaxTranslationVelocity extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final double m_velocityMps;
+
   /**
    * Sets the drivetrain neutral mode (coast/brake).
    *
@@ -19,8 +20,9 @@ public class SetSwerveMaxTranslationVelocity extends CommandBase {
   public SetSwerveMaxTranslationVelocity(SwerveDrive swerveDrive, double velocityMps) {
     m_swerveDrive = swerveDrive;
     m_velocityMps = velocityMps;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.

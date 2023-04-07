@@ -17,10 +17,9 @@ public class AutoSetElevatorSetpoint extends CommandBase {
   private final double m_setpoint;
 
   public AutoSetElevatorSetpoint(Elevator elevator, double setpoint) {
-
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_setpoint = setpoint;
+
     addRequirements(m_elevator);
   }
 

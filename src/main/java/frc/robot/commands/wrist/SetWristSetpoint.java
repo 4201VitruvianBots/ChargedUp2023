@@ -26,7 +26,7 @@ public class SetWristSetpoint extends CommandBase {
     m_input = input;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(wrist);
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.

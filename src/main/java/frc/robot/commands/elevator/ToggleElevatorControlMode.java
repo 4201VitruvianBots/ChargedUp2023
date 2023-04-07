@@ -13,7 +13,6 @@ public class ToggleElevatorControlMode extends CommandBase {
   private final Elevator m_elevator;
 
   public ToggleElevatorControlMode(Elevator elevator) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
 
     addRequirements(m_elevator);

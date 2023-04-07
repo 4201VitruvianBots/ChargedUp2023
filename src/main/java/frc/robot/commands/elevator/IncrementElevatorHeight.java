@@ -17,10 +17,9 @@ public class IncrementElevatorHeight extends CommandBase {
   private final DoubleSupplier m_joystickY;
 
   public IncrementElevatorHeight(Elevator elevator, DoubleSupplier joystickY) {
-
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
     m_joystickY = joystickY;
+
     addRequirements(m_elevator);
   }
 
@@ -31,9 +30,6 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.STOWED' to this if
-    // statement to prioritize shortcut buttons
-
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
