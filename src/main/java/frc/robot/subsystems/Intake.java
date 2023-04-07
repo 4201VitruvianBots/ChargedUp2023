@@ -104,6 +104,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Shuffleboard or SmartDashboard function
 
   public void updateSmartDashboard() {
+    // TODO: Consolidate this using the INTAKE_STATE enum
     SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
     SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
   }

@@ -25,8 +25,6 @@ public class ChargedUpNodeMaskTest {
   protected RobotContainer m_robotContainer;
   protected Controls m_controls;
 
-  private static final ArrayList<Translation2d> validNodes = new ArrayList<>();
-
   private static final ArrayList<Translation2d> blueNodes = new ArrayList<>();
   private static final ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
   private static final ArrayList<Translation2d> blueMidConeNodes = new ArrayList<>();
@@ -134,7 +132,6 @@ public class ChargedUpNodeMaskTest {
 
     state = SCORING_STATE.STOWED;
     updateNodeMask(robotPose, state);
-    var test = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redNodes));
 
     state = SCORING_STATE.LOW;
@@ -167,7 +164,6 @@ public class ChargedUpNodeMaskTest {
 
     state = SCORING_STATE.STOWED;
     updateNodeMask(robotPose, state);
-    var a = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueNodes));
 
     state = SCORING_STATE.LOW;

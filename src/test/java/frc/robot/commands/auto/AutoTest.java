@@ -43,7 +43,7 @@ public class AutoTest {
   }
 
   @Test
-  public void testAutoPathFipping() {
+  public void testAutoPathFlipping() {
     System.out.println("Starting Test...");
     double blueTrajectoryMinX = 0;
     double blueTrajectoryMaxX = SimConstants.fieldLength / 2;
