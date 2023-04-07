@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import java.util.function.BooleanSupplier;
 
 /**
- * Runs a command until a condition is met, then interrupts it to run another commnd. If the first
+ * Runs a command until a condition is met, then interrupts it to run another command. If the first
  * command finishes, this command will end without running the other command.
  */
 public class InterruptingCommand extends CommandBase {
@@ -16,7 +16,7 @@ public class InterruptingCommand extends CommandBase {
   private boolean hasInterrupted = false;
 
   /**
-   * Runs a command until a condition is met, then interrupts it to run another commnd
+   * Runs a command until a condition is met, then interrupts it to run another command
    *
    * @param interruptible The command to run initially that will be interrupted
    * @param interrupt The command that interrupts the first command

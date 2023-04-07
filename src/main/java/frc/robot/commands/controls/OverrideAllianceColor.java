@@ -16,7 +16,7 @@ public class OverrideAllianceColor extends CommandBase {
   /**
    * Creates a new ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param controls The subsystem used by this command.
    */
   public OverrideAllianceColor(Controls controls, DriverStation.Alliance color) {
     m_controls = controls;

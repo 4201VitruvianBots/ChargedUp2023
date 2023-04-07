@@ -3,7 +3,6 @@ package frc.robot.commands.swerve;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDrive;
 import java.util.function.DoubleSupplier;
@@ -62,7 +61,7 @@ public class SetSwerveDriveBalance extends CommandBase {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
-    SmartDashboard.putNumber("Balence output", output);
+    //    SmartDashboard.putNumber("Balance output", output);
   }
 
   // Called once the command ends or is interrupted.

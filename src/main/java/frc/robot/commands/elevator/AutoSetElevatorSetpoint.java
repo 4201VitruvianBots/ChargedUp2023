@@ -38,11 +38,7 @@ public class AutoSetElevatorSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // if (m_elevator.getElevatorState() == m_elevatorState) {
-    //   interrupted = true;
-    // }
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

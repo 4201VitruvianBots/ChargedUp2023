@@ -56,7 +56,7 @@ public class AutoBalance extends CommandBase {
   @Override
   public void execute() {
 
-    /** Negative & 90 degrees for Facing Bump Side */
+    // Negative & 90 degrees for Facing Bump Side
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());

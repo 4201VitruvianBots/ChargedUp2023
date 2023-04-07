@@ -46,11 +46,6 @@ public class IncrementElevatorHeight extends CommandBase {
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.resetTrapezoidState();
     }
-    // This else if statement will automatically set the elevator to the STOWED position once the
-    // joystick is let go
-    // Uncomment if you want to reenable this
-    // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-    // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
   }
 
   // Called once the command ends or is interrupted.

@@ -5,7 +5,7 @@ import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.subsystems.SwerveDrive;
 
 /** Sets the drivetrain to neutral (coast/brake) */
-public class SetSwerveMaxTranslationVeolcity extends CommandBase {
+public class SetSwerveMaxTranslationVelocity extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerveDrive;
 
@@ -13,10 +13,10 @@ public class SetSwerveMaxTranslationVeolcity extends CommandBase {
   /**
    * Sets the drivetrain neutral mode (coast/brake).
    *
-   * @param driveTrain The driveTrain used by this command.
-   * @param mode {@link DriveTrainNeutralMode}: COAST, BRAKE, or HALF_BRAKE.
+   * @param swerveDrive The driveTrain used by this command.
+   * @param velocityMps Max Velocity in meters per second.
    */
-  public SetSwerveMaxTranslationVeolcity(SwerveDrive swerveDrive, double velocityMps) {
+  public SetSwerveMaxTranslationVelocity(SwerveDrive swerveDrive, double velocityMps) {
     m_swerveDrive = swerveDrive;
     m_velocityMps = velocityMps;
     // Use addRequirements() here to declare subsystem dependencies.

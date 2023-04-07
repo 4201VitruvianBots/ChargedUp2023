@@ -51,7 +51,7 @@ public class VitruvianPPHolonomicDriveController {
   }
 
   /**
-   * Sets the pose error whic is considered tolerance for use with atReference()
+   * Sets the pose error which is considered tolerance for use with atReference()
    *
    * @param tolerance The pose error which is tolerable
    */

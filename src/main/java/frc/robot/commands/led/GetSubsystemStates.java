@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
-/*scoring = flashing white, intakingcube = blue,
-intakingcone = orange, locked on = flashing green,
+/*scoring = flashing white, intakingCube = blue,
+intakingCone = orange, locked on = flashing green,
 enable = green, disabled = red,
-cubebutton = purple, conebutton = yellow */
+cubeButton = purple, coneButton = yellow */
 
 /** Sets the LED based on the subsystems' statuses */
 public class GetSubsystemStates extends CommandBase {
@@ -59,7 +59,7 @@ public class GetSubsystemStates extends CommandBase {
         case SCORE_MID_CUBE:
         case SCORE_MID:
           m_led.expressState(SUPERSTRUCTURE_STATE.BETA_ZONE);
-          ; // Solid Blue
+          // Solid Blue
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
@@ -67,7 +67,7 @@ public class GetSubsystemStates extends CommandBase {
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
           m_led.expressState(SUPERSTRUCTURE_STATE.GAMMA_ZONE);
-          ; // Solid White
+          // Solid White
           break;
         default:
           m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);

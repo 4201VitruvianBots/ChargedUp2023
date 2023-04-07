@@ -20,7 +20,7 @@ public class SetSwerveOdometry extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final FieldSim m_fieldSim;
-  private Pose2d m_pose2d;
+  private final Pose2d m_pose2d;
 
   /**
    * Sets the robot's position
