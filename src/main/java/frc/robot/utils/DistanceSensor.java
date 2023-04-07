@@ -13,6 +13,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.INTAKE.SENSOR_STATUS;
 import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -83,7 +84,7 @@ public class DistanceSensor implements AutoCloseable {
 
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
-    if (RobotBase.isReal()) {
+    // if (RobotBase.isReal()) {
       try {
         InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
         socket = new DatagramSocket(socketPort, address);
@@ -92,7 +93,7 @@ public class DistanceSensor implements AutoCloseable {
       } catch (SocketException | UnknownHostException socketFail) {
         socketFail.printStackTrace();
       }
-    }
+    // }
     initSmartDashboard();
   }
 
@@ -138,6 +139,12 @@ public class DistanceSensor implements AutoCloseable {
             + rand.nextInt(394)
             + ",\"test\":"
             + rand.nextInt(100)
+            + ",\"sensor1.status\":"
+            + "connected"
+            + ",\"sensor2.status\":"
+            + "connected"
+            + ",\"sensor3.status\":"
+            + "connected"
             + "}";
   }
 
@@ -235,6 +242,39 @@ public class DistanceSensor implements AutoCloseable {
     cubeIntakeLig.setColor(new Color8Bit(128, 0, 0));
     coneLig.setColor(new Color8Bit(255, 255, 0));
     cubeLig.setColor(new Color8Bit(128, 0, 128));
+  }
+
+  public INTAKE.SENSOR_STATUS getSensorStatus(int sensor) {
+    try {
+      String sensorName = "sensor" + sensor + ".status";
+
+      // parsing string from received data
+      obj = new JSONParser().parse(new StringReader(receivedData));
+
+      // typecasting obj to JSONObject
+      JSONObject jo = (JSONObject) obj;
+
+      // getting sensor status
+      String status = (String) jo.get(sensorName);
+
+      switch (status) {
+        case "failed":
+          return SENSOR_STATUS.FAILED;
+        case "disconnected":
+          return SENSOR_STATUS.DISCONNECTED;
+        case "timeout":
+          return SENSOR_STATUS.TIMEOUT;
+        case "connected":
+          return SENSOR_STATUS.CONNECTED;
+        default:
+          return SENSOR_STATUS.UNREPORTED;
+      }
+
+    } catch (Exception e) {
+      System.out.println("Boo hoo I can't read the file :_(");
+      e.printStackTrace();
+      return SENSOR_STATUS.UNREPORTED;
+    }
   }
 
   public void updateSmartDashboard() {

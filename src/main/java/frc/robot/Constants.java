@@ -194,6 +194,14 @@ public final class Constants {
       CUBE,
       CONE
     }
+
+    public enum SENSOR_STATUS {
+      UNREPORTED, // No status from the teensy is being reported
+      DISCONNECTED, // The teensy failed to initalize the sensor
+      TIMEOUT, // The sensor is connected, but failed to report a value in time
+      FAILED, // The sensor reading is an obviously incorrect value (not between 0-8192)
+      CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
+    }
   }
 
   public static final class LED {
