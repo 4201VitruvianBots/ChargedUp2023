@@ -451,8 +451,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       case OPEN_LOOP:
         double percentOutput = m_joystickInput * WRIST.kPercentOutputMultiplier;
 
-        // Limit the percent output of the wrist joystick when the stick is pressed down to make small adjustments
-        if (m_limitJoystickInput) percentOutput = m_joystickInput * WRIST.kLimitedPercentOutputMultiplier;
+        // Limit the percent output of the wrist joystick when the stick is pressed down to make
+        // small adjustments
+        if (m_limitJoystickInput)
+          percentOutput = m_joystickInput * WRIST.kLimitedPercentOutputMultiplier;
 
         setPercentOutput(percentOutput, true);
         break;
