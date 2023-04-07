@@ -132,6 +132,7 @@ public class ChargedUpNodeMaskTest {
 
     state = SCORING_STATE.STOWED;
     updateNodeMask(robotPose, state);
+    // Use HashSet to ignore list order
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redNodes));
 
     state = SCORING_STATE.LOW;

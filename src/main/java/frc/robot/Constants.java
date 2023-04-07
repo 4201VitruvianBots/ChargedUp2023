@@ -124,6 +124,12 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints m_fastConstraints =
         new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
+    public enum SPEED {
+      HALT,
+      SLOW,
+      FAST
+    }
+
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
@@ -156,9 +162,9 @@ public final class Constants {
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
-      // Alpha 0<x<4 inches
-      // Beta 3.5 - 28 inches
-      // Gamma 27.5 - 50 inches
+      // Alpha 0 < x < 3.5 inches
+      // Beta 3 < x < 28 inches
+      // Gamma 27.5 < x < 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
       ALPHA_MAX(Units.inchesToMeters(3.5)),
       BETA_MIN(Units.inchesToMeters(3.0)),
@@ -175,12 +181,6 @@ public final class Constants {
       public double get() {
         return value;
       }
-    }
-
-    public enum SPEED {
-      HALT,
-      SLOW,
-      FAST
     }
   }
 
@@ -308,11 +308,10 @@ public final class Constants {
     }
 
     public enum CAMERA_SERVER {
-      INTAKE("10.42.1.10"),
-      OUTTAKE("10.42.1.10"),
-      LEFT_LOCALIZER("10.42.1.11"),
-      RIGHT_LOCALIZER("10.42.1.12"),
-      FUSED_LOCALIZER("10.42.1.11");
+      INTAKE("10.42.1.11"),
+      LEFT_LOCALIZER("10.42.1.12"),
+      RIGHT_LOCALIZER("10.42.1.13"),
+      FUSED_LOCALIZER("10.42.1.12");
 
       private final String ip;
 
@@ -450,12 +449,14 @@ public final class Constants {
 
     public enum ZONE {
       UNDEFINED, // Danger
+      STATUS, // Danger
       ALPHA,
       BETA,
       GAMMA,
     }
 
     public static final int undefinedOrdinal = ZONE.UNDEFINED.ordinal();
+    public static final int statusOrdinal = ZONE.STATUS.ordinal();
     public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
     public static final int betaOrdinal = ZONE.BETA.ordinal();
     public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
@@ -469,11 +470,12 @@ public final class Constants {
     public static boolean limitCanUtilization = true;
 
     public enum SUPERSTRUCTURE_STATE {
-      DISABLED(0),
-      ENABLED(0),
-      LOW_BATTERY(0),
       // UNDEFINED
       DANGER_ZONE(undefinedOrdinal),
+      // STATUS
+      DISABLED(statusOrdinal),
+      ENABLED(statusOrdinal),
+      LOW_BATTERY(statusOrdinal),
       // LOWs
       STOWED(alphaOrdinal),
       INTAKE_LOW_CONE(alphaOrdinal),
@@ -508,7 +510,7 @@ public final class Constants {
     }
 
     public enum SETPOINT {
-      // Units are in meters
+      // Units are in meters, radians
       STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
       SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
       SCORE_LOW_REVERSE(

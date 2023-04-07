@@ -290,7 +290,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns a translation of the elevator's position in relation to the robot's position.
   public Translation2d getField2dTranslation() {
     return new Translation2d(
-        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) + centerOffset, 0);
+        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
   // Returns the ligament of the elevator so the wrist ligament can be attached to it

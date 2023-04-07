@@ -443,8 +443,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     updateCommandedSetpoints();
     updateScoringState();
 
-    //     Determine current zone based on elevator/wrist position
-
     // Undefined behavior, use previous zone as a backup
     if (m_currentState.getZone() == SUPERSTRUCTURE_STATE.DANGER_ZONE.getZone()) {
       m_currentState = m_lastState;
@@ -483,7 +481,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
     }
 
-    // Updates the constraints of the elevator
+    // Updates the trapezoidal constraints of the elevator
     if (m_elevatorDesiredSetpointMeters - m_elevator.getHeightMeters() > 0) {
       m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.FAST);
     } else if (m_elevator.getHeightMeters() < Units.inchesToMeters(3.0)) {
@@ -492,7 +490,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.SLOW);
     }
 
-    // If the elevator is low, use the fast Wrist Trapezoid profile for faster intaking
+    // If the elevator is low, use the fast Wrist Trapezoid profile for faster intake deploy
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
       m_wrist.updateTrapezoidProfileConstraints(WRIST.SPEED.FAST);
     } else {

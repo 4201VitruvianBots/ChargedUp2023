@@ -91,7 +91,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   /**
    * Initialize arrays with all the scoring positions on the field based on alliance color, game
-   * piece type, and if it is a cooperatition node. Ideally, this is a pre-processing step that we
+   * piece type, and if it is a coopertition node. Ideally, this is a pre-processing step that we
    * only need to do once to improve robot code performance by avoiding unnecessary repeated calls.
    */
   private void initializeScoringNodes() {
