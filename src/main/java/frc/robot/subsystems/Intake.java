@@ -30,8 +30,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private double m_percentOutput;
 
   // Log setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   public Intake() {
     // one or two motors
@@ -132,6 +132,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

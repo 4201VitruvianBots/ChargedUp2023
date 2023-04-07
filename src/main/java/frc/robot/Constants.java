@@ -91,8 +91,8 @@ public final class Constants {
     public static final int angleDegrees = 35;
 
     // PID
-    public static double kMaxVel = Units.inchesToMeters(30);
-    public static double kMaxAccel = Units.inchesToMeters(15);
+    public static final double kMaxVel = Units.inchesToMeters(30);
+    public static final double kMaxAccel = Units.inchesToMeters(15);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -191,8 +191,8 @@ public final class Constants {
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
     public static final int cubeSensorId = 2;
-    public static double kF = 0;
-    public static double kP = 0.2;
+    public static final double kF = 0;
+    public static final double kP = 0.2;
 
     public enum INTAKE_STATE {
       NONE,
@@ -325,7 +325,7 @@ public final class Constants {
       }
     }
 
-    public static Transform3d[] LOCALIZER_CAMERA_POSITION = {
+    public static final Transform3d[] LOCALIZER_CAMERA_POSITION = {
       // Robot Center to Left Camera
       new Transform3d(
           new Translation3d(

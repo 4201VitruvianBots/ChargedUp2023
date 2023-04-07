@@ -545,6 +545,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentState = m_mainStateChooser.getSelected();
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

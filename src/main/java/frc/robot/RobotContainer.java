@@ -24,9 +24,6 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.IntakeVisionAlignment;
-import frc.robot.commands.Intake.RunIntakeCone;
-import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.auto.BottomDriveForward;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
@@ -37,6 +34,9 @@ import frc.robot.commands.elevator.ResetElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
 // import frc.robot.commands.auto.RedTopTwoBalance;
+import frc.robot.commands.intake.IntakeVisionAlignment;
+import frc.robot.commands.intake.RunIntakeCone;
+import frc.robot.commands.intake.RunIntakeCube;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
@@ -96,13 +96,14 @@ public class RobotContainer implements AutoCloseable {
   private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
+  private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
+  private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
+  private final CommandXboxController xboxController =
+      new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
-  public Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
+  private final Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
+  private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
 
   public RobotContainer() {
     initializeSubsystems();
@@ -444,9 +445,7 @@ public class RobotContainer implements AutoCloseable {
     // m_logManager.periodic();
   }
 
-  public void disabledPeriodic() {
-    m_swerveDrive.disabledPeriodic();
-  }
+  public void disabledPeriodic() {}
 
   public void testPeriodic() {
     m_stateHandler.testPeriodic();

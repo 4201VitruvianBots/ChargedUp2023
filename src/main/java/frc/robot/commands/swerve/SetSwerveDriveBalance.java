@@ -12,7 +12,7 @@ public class SetSwerveDriveBalance extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
-  PIDController outputCalculator = new PIDController(0.05, 0, 0);
+  private final PIDController outputCalculator = new PIDController(0.05, 0, 0);
   SwerveModuleState[] states;
 
   /**

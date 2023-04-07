@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
-  FieldSim m_fieldSim;
-  List<PathPlannerTrajectory> m_trajectories;
+  private final FieldSim m_fieldSim;
+  private final List<PathPlannerTrajectory> m_trajectories;
   private final String m_pathName;
 
   public PlotAutoTrajectory(

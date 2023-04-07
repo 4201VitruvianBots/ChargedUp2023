@@ -43,7 +43,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
-  SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
+  private final SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
   private boolean m_testScoringState = false;
 
   public FieldSim(
@@ -244,6 +244,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   public void simulationPeriodic() {}
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

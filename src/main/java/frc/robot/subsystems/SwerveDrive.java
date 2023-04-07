@@ -75,7 +75,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private final SwerveDrivePoseEstimator m_odometry;
+
+  @SuppressWarnings("CanBeFinal")
   private boolean m_simOverride = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
+
   private final Timer m_simTimer = new Timer();
   private double m_lastSimTime = 0;
   private double m_simYaw;
@@ -339,8 +342,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
     }
   }
-
-  public void disabledPeriodic() {}
 
   @Override
   public void periodic() {
