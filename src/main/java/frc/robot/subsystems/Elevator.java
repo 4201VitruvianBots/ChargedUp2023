@@ -128,16 +128,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public final MechanismLigament2d robotBase2d =
       root2d.append(new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
   public final MechanismLigament2d fourbarLigament2d =
-      elevatorLigament2d
-        .append(
-            new MechanismLigament2d(
-                "Fourbar",
-                WRIST.fourbarLength,
-                180 - elevatorLigament2d.getAngle()));
+      elevatorLigament2d.append(
+          new MechanismLigament2d(
+              "Fourbar", WRIST.fourbarLength, 180 - elevatorLigament2d.getAngle()));
   public final MechanismLigament2d intakeLigament2d =
       fourbarLigament2d.append(
           new MechanismLigament2d("Intake", INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
-  
+
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");

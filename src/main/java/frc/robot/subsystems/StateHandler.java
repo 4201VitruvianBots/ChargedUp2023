@@ -545,7 +545,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentState = m_mainStateChooser.getSelected();
   }
-  
+
   public void simulationPeriodic() {
     // Update the angle of the mech2d
     MechanismLigament2d[] ligaments = m_elevator.getLigaments();
