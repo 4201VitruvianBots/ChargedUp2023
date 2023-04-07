@@ -45,7 +45,6 @@ import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
-import frc.robot.commands.swerve.SetSwerveMaxTranslationVeolcity;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
@@ -142,9 +141,7 @@ public class RobotContainer implements AutoCloseable {
     for (int i = 0; i < rightJoystickTriggers.length; i++)
       rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    leftJoystickTriggers[0].whileTrue(
-        new SetSwerveMaxTranslationVeolcity(
-            m_swerveDrive, Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.750));
+    leftJoystickTriggers[0].whileTrue(new AutoBalance(m_swerveDrive));
 
     leftJoystickTriggers[1].whileTrue(
         new IntakeVisionAlignment(
