@@ -29,11 +29,11 @@ import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.RunElevatorJoystick;
+import frc.robot.commands.elevator.LimitElevatorJoystickInput;
 import frc.robot.commands.elevator.ResetElevatorHeight;
 import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
-// import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.RunIntakeCube;
@@ -45,6 +45,7 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.wrist.LimitWristJoystickInput;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristSetpoint;
@@ -60,9 +61,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer implements AutoCloseable {
@@ -77,10 +81,10 @@ public class RobotContainer implements AutoCloseable {
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
-  private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led, m_vision);
-  private final FieldSim m_fieldSim =
-      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
+  private final StateHandler m_stateHandler = new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led,
+      m_vision);
+  private final FieldSim m_fieldSim = new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler,
+      m_controls);
 
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
@@ -94,12 +98,13 @@ public class RobotContainer implements AutoCloseable {
   private final LogManager m_logManager = new LogManager();
   private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
   private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  private final CommandXboxController xboxController =
-      new CommandXboxController(USB.xBoxController);
+  private final CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
 
   private final Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
   private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
@@ -121,7 +126,7 @@ public class RobotContainer implements AutoCloseable {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
+    m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_stateHandler));
 
@@ -130,9 +135,11 @@ public class RobotContainer implements AutoCloseable {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureBindings() {
@@ -205,6 +212,11 @@ public class RobotContainer implements AutoCloseable {
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
+    // Will limit the speed of our elevator or wrist when the corresponding joystick
+    // is being pressed down
+    xboxController.leftStick().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+    xboxController.rightStick().whileTrue(new LimitWristJoystickInput(m_wrist));
+
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
@@ -225,9 +237,7 @@ public class RobotContainer implements AutoCloseable {
                       m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get(), testController::getRightY),
                   new SetWristSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
-                  () ->
-                      m_stateHandler.getCurrentState().getZone()
-                          == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
+                  () -> m_stateHandler.getCurrentState().getZone() == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
       testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
       testController
@@ -238,9 +248,7 @@ public class RobotContainer implements AutoCloseable {
                       m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get(), testController::getRightY),
                   new SetWristSetpoint(
                       m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get(), testController::getRightY),
-                  () ->
-                      m_stateHandler.getCurrentState().getZone()
-                          == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
+                  () -> m_stateHandler.getCurrentState().getZone() == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
       // Score button Bindings
 
@@ -276,6 +284,10 @@ public class RobotContainer implements AutoCloseable {
           .povDown()
           .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
       testController.povDown().onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+
+      // Will limit the speed of our elevator or wrist when the corresponding joystick is being pressed down
+      testController.L3().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+      testController.R3().whileTrue(new LimitWristJoystickInput(m_wrist));
 
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -360,18 +372,19 @@ public class RobotContainer implements AutoCloseable {
     // Auto trajectory visualizer for testing/debugging
     if (RobotBase.isSimulation()) {
       autoPlotter = new SendableChooser<>();
-      List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
+      List<PathPlannerTrajectory> dummy = new ArrayList<>() {
+      };
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
       String[] autos = {
-        "BlueOnePiece",
-        "BlueTwoPiece",
-        "RedOnePiece",
-        "RedTwoPiece",
-        "BlueDriveForward",
-        "BlueBottomDriveForward",
-        "RedDriveForward",
-        "RedBottomDriveForward"
+          "BlueOnePiece",
+          "BlueTwoPiece",
+          "RedOnePiece",
+          "RedTwoPiece",
+          "BlueDriveForward",
+          "BlueBottomDriveForward",
+          "RedDriveForward",
+          "RedBottomDriveForward"
       };
       for (var auto : autos) {
         var isRedPath = auto.startsWith("Red");
@@ -380,8 +393,10 @@ public class RobotContainer implements AutoCloseable {
         var trajectories = TrajectoryUtils.readTrajectory(fileName, new PathConstraints(1, 1));
 
         List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
-        else ppTrajectories.addAll(trajectories);
+        if (isRedPath)
+          ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
+        else
+          ppTrajectories.addAll(trajectories);
 
         autoPlotter.addOption(auto, ppTrajectories);
       }
@@ -442,7 +457,8 @@ public class RobotContainer implements AutoCloseable {
     // m_logManager.periodic();
   }
 
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   public void testPeriodic() {
     m_stateHandler.testPeriodic();
