@@ -123,10 +123,10 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Based on the current robot's state and the list of valid nodes, return the nearest nearest node
-   * for scoring
+   * Based on the current robot's state and the list of valid nodes, return the nearest node for
+   * scoring
    *
-   * @return
+   * @return {@link Pose2d} Nearest Pose to robot
    */
   public Pose2d getTargetNode() {
     return ChargedUpNodeMask.getTargetNode(m_swerveDrive.getPoseMeters());

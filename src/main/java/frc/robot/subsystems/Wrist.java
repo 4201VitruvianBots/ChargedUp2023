@@ -221,7 +221,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  // Sets the setpoint of the wrist to its current position so it will remain in place
+  // Sets the setpoint of the wrist to its current position to keep it in place
   public void resetTrapezoidState() {
     m_setpoint =
         new TrapezoidProfile.State(

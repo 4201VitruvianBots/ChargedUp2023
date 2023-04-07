@@ -1,7 +1,6 @@
 package frc.robot.utils;
 
 import static frc.robot.utils.ChargedUpNodeMask.*;
-import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.TestUtils.setPrivateField;
 

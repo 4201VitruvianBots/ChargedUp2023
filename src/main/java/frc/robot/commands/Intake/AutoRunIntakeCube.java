@@ -16,7 +16,7 @@ public class AutoRunIntakeCube extends CommandBase {
   private final Vision m_vision;
   private final SwerveDrive m_swerve;
 
-  private double m_PercentOutput;
+  private final double m_PercentOutput;
 
   /** Creates a new RunIntake. */
   public AutoRunIntakeCube(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {

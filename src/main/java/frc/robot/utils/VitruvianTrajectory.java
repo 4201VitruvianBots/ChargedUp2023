@@ -59,7 +59,7 @@ public class VitruvianTrajectory extends PathPlannerTrajectory {
   }
 
   /**
-   * Get all of the markers in the path
+   * Get all markers in the path
    *
    * @return List of the markers
    */

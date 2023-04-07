@@ -11,7 +11,7 @@ public class RunIntakeCube extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
-  private double m_PercentOutput;
+  private final double m_PercentOutput;
 
   /** Creates a new RunIntake. */
   public RunIntakeCube(Intake intake, double PercentOutput) {

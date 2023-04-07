@@ -24,7 +24,7 @@ import java.util.List;
 
 // TODO: Rewrite without AutoBuilder
 public class OnePiece extends SequentialCommandGroup {
-  private List<PathPlannerTrajectory> m_trajectories;
+  private final List<PathPlannerTrajectory> m_trajectories;
 
   public OnePiece(
       String pathName,
