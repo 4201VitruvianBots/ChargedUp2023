@@ -140,7 +140,7 @@ public final class Constants {
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(Units.inchesToMeters(19.13));
+      INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 
       private final double value;
 
