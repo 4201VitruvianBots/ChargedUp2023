@@ -23,11 +23,11 @@ public class SetSetpoint extends CommandBase {
       StateHandler stateHandler,
       Elevator elevator,
       Wrist Wrist,
-      frc.robot.Constants.STATE_HANDLER.SETPOINT intakingLowCube) {
+      STATE_HANDLER.SETPOINT desiredState) {
     m_elevator = elevator;
     m_wrist = Wrist;
     m_StateHandler = stateHandler;
-    m_desiredState = intakingLowCube;
+    m_desiredState = desiredState;
 
     addRequirements(m_elevator, m_wrist, m_StateHandler);
   }
