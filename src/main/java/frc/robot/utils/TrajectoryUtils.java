@@ -10,7 +10,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.Constants;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.SwerveDrive;
 import java.io.File;
 import java.util.ArrayList;
@@ -43,13 +44,7 @@ public class TrajectoryUtils {
 
         var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
 
-        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        for (var trajectory : pathGroup) {
-          ppTrajectories.add(
-              PathPlannerTrajectory.transformTrajectoryForAlliance(
-                  trajectory, DriverStation.Alliance.Red));
-        }
-        return ppTrajectories;
+        return SimConstants.absoluteFlip(pathGroup);
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
@@ -73,14 +68,14 @@ public class TrajectoryUtils {
 
   public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
       SwerveDrive swerveDrive, List<PathPlannerTrajectory> trajectories) {
-    var commands = new ArrayList<PPSwerveControllerCommand>();
+    List<PPSwerveControllerCommand> commands = new ArrayList<>();
 
     for (var trajectory : trajectories) {
       PPSwerveControllerCommand swerveCommand =
           new PPSwerveControllerCommand(
               trajectory,
               swerveDrive::getPoseMeters,
-              Constants.SWERVE_DRIVE.kSwerveKinematics,
+              SWERVE_DRIVE.kSwerveKinematics,
               swerveDrive.getXPidController(),
               swerveDrive.getYPidController(),
               swerveDrive.getThetaPidController(),

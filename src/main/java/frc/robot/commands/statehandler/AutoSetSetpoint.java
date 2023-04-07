@@ -4,6 +4,7 @@
 
 package frc.robot.commands.statehandler;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.STATE_HANDLER;
@@ -11,7 +12,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
-public class SetSetpoint extends CommandBase {
+public class AutoSetSetpoint extends CommandBase {
   /** Creates a new SetStateHandlerState. */
   private final Elevator m_elevator;
 
@@ -19,7 +20,7 @@ public class SetSetpoint extends CommandBase {
   private final StateHandler m_StateHandler;
   private final STATE_HANDLER.SETPOINT m_desiredState;
 
-  public SetSetpoint(
+  public AutoSetSetpoint(
       StateHandler stateHandler,
       Elevator elevator,
       Wrist Wrist,
@@ -57,6 +58,7 @@ public class SetSetpoint extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return Math.abs(m_elevator.getHeightMeters() - m_desiredState.getElevatorSetpointMeters()) < Units.inchesToMeters(1) &&
+            Math.abs(m_wrist.getPositionRadians() - m_desiredState.getWristSetpointRadians()) < Units.degreesToRadians(4);
   }
 }

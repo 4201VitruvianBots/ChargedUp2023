@@ -30,14 +30,14 @@ public class PlotAutoTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+    List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
     var isRedPath = m_pathName.startsWith("Red");
     if (isRedPath) {
       ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
     } else {
       ppTrajectories.addAll(m_trajectories);
     }
-    m_fieldSim.setTrajectory(m_trajectories);
+    m_fieldSim.setTrajectory(ppTrajectories);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

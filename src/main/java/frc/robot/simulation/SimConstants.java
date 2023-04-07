@@ -290,7 +290,7 @@ public final class SimConstants {
 
       trajectoryStates.addAll(
           trajectory.getStates().stream()
-              .map(state -> SimConstants.absoluteFlip(state))
+              .map(state -> absoluteFlip(state))
               .collect(Collectors.toList()));
 
       var flippedTrajectory =
@@ -338,7 +338,7 @@ public final class SimConstants {
   }
 
   public static Translation2d absoluteFlip(Translation2d translation) {
-    return new Translation2d(fieldLength - translation.getX(), fieldWidth - translation.getY());
+    return new Translation2d(fieldLength - translation.getX(), translation.getY());
   }
 
   /**

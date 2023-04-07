@@ -368,9 +368,9 @@ public class RobotContainer implements AutoCloseable {
       };
       for (var auto : autos) {
         var isRedPath = auto.startsWith("Red");
-        auto = auto.replace("Red", "");
-        auto = auto.replace("Blue", "");
-        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
+        var fileName = auto.replace("Red", "");
+        fileName = fileName.replace("Blue", "");
+        var trajectories = TrajectoryUtils.readTrajectory(fileName, new PathConstraints(1, 1));
 
         List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
         if (isRedPath) {
