@@ -57,10 +57,15 @@ import java.util.List;
 public class RobotContainer implements AutoCloseable {
   private final DataLog m_logger = DataLogManager.getLog();
 
+  // Initialize used utils
+  private final MemoryLog m_memorylog = new MemoryLog();
+  private final LogManager m_logManager = new LogManager();
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+
   // The robot's subsystems and commands are defined here...
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator();
-  private final Intake m_intake = new Intake();
+  private final Intake m_intake = new Intake(m_distanceSensor);
   private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
@@ -77,11 +82,6 @@ public class RobotContainer implements AutoCloseable {
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-
-  // Initialize used utils
-  private final MemoryLog m_memorylog = new MemoryLog();
-  private final LogManager m_logManager = new LogManager();
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final Joystick leftJoystick = new Joystick(USB.leftJoystick);

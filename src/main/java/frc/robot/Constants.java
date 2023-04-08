@@ -192,19 +192,27 @@ public final class Constants implements AutoCloseable {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+    public static final int leftConeSensorId = 1;
+    public static final int rightConeSensorId = 2;
+    public static final int cubeSensorId = 3;
     public static final double length = Units.inchesToMeters(9.5);
 
-    public static final int leftConeSensorId = 0;
-    public static final int rightConeSensorId = 1;
-    public static final int cubeSensorId = 2;
-    public static final double kF = 0;
-    public static final double kP = 0.2;
+    public static double kF = 0;
+    public static double kP = 0.2;
 
     public enum INTAKE_STATE {
       NONE,
       INTAKING,
       CUBE,
       CONE
+    }
+
+    public enum SENSOR_STATUS {
+      UNREPORTED, // No status from the teensy is being reported
+      DISCONNECTED, // The teensy failed to initalize the sensor
+      TIMEOUT, // The sensor is connected, but failed to report a value in time
+      FAILED, // The sensor reading is an obviously incorrect value (not between 0-8192)
+      CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
     }
   }
 
