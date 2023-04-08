@@ -29,11 +29,7 @@ import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
-import frc.robot.commands.elevator.LimitElevatorJoystickInput;
-import frc.robot.commands.elevator.ResetElevatorHeight;
-import frc.robot.commands.elevator.RunElevatorJoystick;
-import frc.robot.commands.elevator.SetElevatorSetpoint;
-import frc.robot.commands.elevator.ToggleElevatorControlMode;
+import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.RunIntakeCube;
@@ -128,6 +124,10 @@ public class RobotContainer implements AutoCloseable {
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+
+    if(RobotBase.isSimulation()) {
+     SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator));
+    }
   }
 
   /**

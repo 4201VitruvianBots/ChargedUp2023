@@ -6,7 +6,6 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 
@@ -36,8 +35,7 @@ public class ToggleElevatorTestMode extends CommandBase {
       m_lastcontrolmode = m_elevator.getClosedLoopControlMode();
       m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
       m_defultCommand = m_elevator.getDefaultCommand();
-      m_elevator.setDefaultCommand(new WaitCommand(0));
-
+      m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator));
     } else {
       m_elevator.setClosedLoopControlMode(m_lastcontrolmode);
       m_elevator.setDefaultCommand(m_defultCommand);

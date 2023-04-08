@@ -22,7 +22,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -81,17 +80,20 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   // Trapezoid profile setup
+  private TrapezoidProfile m_currentProfile;
   private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
-  private SimpleMotorFeedforward m_currentFeedforward = m_feedForward;
+  private SimpleMotorFeedforward m_currentFeedForward = m_feedForward;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
   private static int simEncoderSign = 1;
   private final Timer m_timer = new Timer();
+  private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
+  private double m_currentTimestamp = 0;
   private double m_lastSimTimestamp = 0;
 
   // Simulation setup
@@ -106,7 +108,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           true);
 
   // Shuffleboard setup
-  private DoubleSubscriber kSetpointSub;
   private DoublePublisher kHeightPub,
       kEncoderCountsPub,
       kDesiredHeightPub,
@@ -200,7 +201,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-        (m_currentFeedforward.calculate(state.velocity) / 12.0));
+        (m_currentFeedForward.calculate(state.velocity) / 12.0));
   }
 
   // Sets the setpoint to our current height, effectively keeping the elevator in place.
@@ -281,8 +282,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
   }
 
-  public void SimpleMotorFeedforward(double s, double v, double a) {
-    m_currentFeedforward = new SimpleMotorFeedforward(s, v, a);
+  public void setSimpleMotorFeedForward(double g, double v, double a) {
+    m_currentFeedForward = new SimpleMotorFeedforward(g, v, a);
+  }
+
+  public void setTrapezoidalConstraints(double maxVel, double maxAccel) {
+    m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
   }
 
   public void setJoystickLimit(boolean limit) {
@@ -292,7 +297,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
-    return m_joystickInput != 0 && m_userSetpoint == false;
+    return m_joystickInput != 0 && !m_userSetpoint;
   }
 
   public void setUserSetpoint(boolean bool) {
@@ -347,31 +352,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
-    // TODO: Rewrite test interface
-    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
-
-    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
-    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
-    elevatorNtTab.getDoubleTopic("kS").publish().set(ELEVATOR.kG);
-    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
-    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
-
     elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-
-    // Initialize Test Values
-    // kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
-    // kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
-    // kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
-
-    // kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
-    // kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    // kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kG);
-    // kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
-    // kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
-
-    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
   public void updateShuffleboard() {
@@ -469,6 +450,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
+      case CLOSED_LOOP_TEST:
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
+
+        setSetpointTrapezoidState(m_setpoint);
+        break;
       default:
       case CLOSED_LOOP:
         // Updates the constraints of the elevator
@@ -483,10 +475,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // Updates our trapezoid profile state based on the time since our last periodic and our
         // recorded change in height
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        double currentTime = m_timer.get();
-        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
-        m_lastTimestamp = currentTime;
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
 
         setSetpointTrapezoidState(m_setpoint);
         break;
@@ -499,9 +491,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
 
     // Next, we update it. The standard loop time is 20ms.
-    double currentTime = m_timer.get();
-    elevatorSim.update(currentTime - m_lastSimTimestamp);
-    m_lastSimTimestamp = currentTime;
+    if (!m_unitTestBoolean) m_currentTimestamp = m_timer.get();
+    elevatorSim.update(m_currentTimestamp - m_lastSimTimestamp);
+    m_lastSimTimestamp = m_currentTimestamp;
 
     // Internally sets the position of the motors in encoder counts based on our current height in
     // meters
