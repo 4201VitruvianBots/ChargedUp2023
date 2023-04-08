@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -73,15 +75,46 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  public INTAKE.INTAKE_STATE getHeldGamepiece() {
+    double leftConeSensorValue = m_distanceSensor.getSensorValueMillimeters(INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue = m_distanceSensor.getSensorValueMillimeters(INTAKE.rightConeSensorId) / 1000.0;
+    double cubeSensorValue = m_distanceSensor.getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
+
+    if (leftConeSensorValue + rightConeSensorValue <= INTAKE.innerIntakeWidth) {
+      return INTAKE.INTAKE_STATE.CONE;
+    }
+    else if (cubeSensorValue <= INTAKE.innerIntakeWidth - 1) {
+      return INTAKE.INTAKE_STATE.CUBE;
+    }
+    else {
+      return INTAKE.INTAKE_STATE.NONE;
+    }
+
+  }
+  
+  // Returns a pose where the center of the gamepiece should be
+  public Pose2d getGamepiecePose(Pose2d intakePose) {
+    return new Pose2d(
+        intakePose.getX(),
+        intakePose.getY() + getGamepieceDistanceInches(),
+        intakePose.getRotation());
+  }
+  
+
   public MechanismLigament2d getLigament() {
     return m_intakeLigament2d;
   }
+
+  public double getGamepieceDistanceInches() {
+    return m_distanceSensor.getGamepieceDistanceInches(getHeldGamepiece());
+  }
+
   // control mode function
   public boolean getIntakeState() {
     return isIntakingCone || isIntakingCube;
   }
 
-  public boolean getIntakeStateCone() {
+  public boolean getIntakeConeState() {
     return isIntakingCone;
   }
 

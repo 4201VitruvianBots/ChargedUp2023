@@ -5,16 +5,14 @@
 package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.INTAKE.SENSOR_STATUS;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -41,13 +39,13 @@ public class DistanceSensor implements AutoCloseable {
   private DatagramSocket socket;
   private String receivedData = "";
 
-  private boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private final Random rand = new Random();
   private Object obj;
 
   // Shuffleboard setup
-  StringPublisher rawStringPub, gamePiecePub;
+  StringPublisher rawStringPub;
   DoublePublisher sensor1InchPub,
       sensor2InchPub,
       sensor3InchPub,
@@ -84,16 +82,14 @@ public class DistanceSensor implements AutoCloseable {
 
   /** Creates a new DistanceSensor. */
   public DistanceSensor() {
-    // if (RobotBase.isReal()) {
-      try {
-        InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
-        socket = new DatagramSocket(socketPort, address);
-        socket.setReceiveBufferSize(512);
-        socket.setSoTimeout(10);
-      } catch (SocketException | UnknownHostException socketFail) {
-        //        socketFail.printStackTrace();
-      }
-    // }
+    try {
+      InetAddress address = InetAddress.getByName("10.42.1.2"); // 239.42.01.1
+      socket = new DatagramSocket(socketPort, address);
+      socket.setReceiveBufferSize(512);
+      socket.setSoTimeout(10);
+    } catch (SocketException | UnknownHostException socketFail) {
+      //        socketFail.printStackTrace();
+    }
     initSmartDashboard();
   }
 
@@ -119,7 +115,7 @@ public class DistanceSensor implements AutoCloseable {
 
       return sensorValue;
     } catch (Exception e) {
-      System.out.println("Boo hoo I can't read the file :_(");
+      System.out.println("Failed to get sensor "+Integer.toString(sensor)+" value");
       //      e.printStackTrace();
       return -1;
     }
@@ -148,26 +144,9 @@ public class DistanceSensor implements AutoCloseable {
             + "}";
   }
 
-  public Constants.INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
-    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
-    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
-    double cubeSensorValue = getSensorValueMillimeters(Constants.INTAKE.cubeSensorId) / 1000.0;
-
-    if (leftConeSensorValue + rightConeSensorValue <= Constants.INTAKE.innerIntakeWidth) {
-      return Constants.INTAKE.HELD_GAMEPIECE.CONE;
-    }
-    else if (cubeSensorValue <= Constants.INTAKE.innerIntakeWidth - 1) {
-      return Constants.INTAKE.HELD_GAMEPIECE.CUBE;
-    }
-    else {
-      return Constants.INTAKE.HELD_GAMEPIECE.NONE;
-    }
-
-  }
-
   // Returns the distance in inches from the left of the intake to the center of the game piece.
   // Works off 3 sensors, 2 for cone and 1 for cube
-  public double getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE gamePiece) {
+  public double getGamepieceDistanceInches(Constants.INTAKE.INTAKE_STATE gamePiece) {
     double distanceMeters;
 
     double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
@@ -198,10 +177,6 @@ public class DistanceSensor implements AutoCloseable {
     return Units.metersToInches(distanceMeters);
   }
 
-  public double getGamepieceDistanceInches() {
-    return getGamepieceDistanceInches(getHeldGamepiece());
-  }
-
   public double getConeWidthMeters() {
     double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
     double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
@@ -209,26 +184,17 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE.CONE);
+    return getGamepieceDistanceInches(Constants.INTAKE.INTAKE_STATE.CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(Constants.INTAKE.HELD_GAMEPIECE.CUBE);
-  }
-
-  // Returns a pose where the center of the gamepiece should be
-  public Pose2d getGamepiecePose(Pose2d intakePose) {
-    return new Pose2d(
-        intakePose.getX(),
-        intakePose.getY() + getGamepieceDistanceInches(),
-        intakePose.getRotation());
+    return getGamepieceDistanceInches(Constants.INTAKE.INTAKE_STATE.CUBE);
   }
 
   private void initSmartDashboard() {
     var distanceSensorTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Distance Sensor");
     rawStringPub = distanceSensorTab.getStringTopic("Raw String Data").publish();
-    gamePiecePub = distanceSensorTab.getStringTopic("Detected Gamepiece").publish();
     sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor 1 MM").publish();
     sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor 2 MM").publish();
     sensor3MMPub = distanceSensorTab.getDoubleTopic("Sensor 3 MM").publish();
@@ -290,7 +256,6 @@ public class DistanceSensor implements AutoCloseable {
       coneInchesPub.set(getConeDistanceInches());
       cubeInchesPub.set(getCubeDistanceInches());
       rawStringPub.set(receivedData);
-      gamePiecePub.set(getHeldGamepiece().name());
 
       // Mech2d updates
       coneRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,

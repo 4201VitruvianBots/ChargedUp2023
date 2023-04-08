@@ -38,8 +38,6 @@ import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.SPEED;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
-import frc.robot.commands.wrist.ResetAngleDegrees;
-import frc.robot.utils.DistanceSensor;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
 
