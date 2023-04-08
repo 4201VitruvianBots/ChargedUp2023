@@ -346,7 +346,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
-
+    
     m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
 
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
