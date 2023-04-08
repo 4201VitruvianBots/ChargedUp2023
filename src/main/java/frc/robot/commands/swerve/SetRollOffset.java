@@ -12,8 +12,8 @@ public class SetRollOffset extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   public SetRollOffset(SwerveDrive swerveDrive) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_swerveDrive = swerveDrive;
+
     addRequirements(m_swerveDrive);
   }
 

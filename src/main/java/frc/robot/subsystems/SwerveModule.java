@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.STATEHANDLER;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.Constants.SWERVE_MODULE;
@@ -47,9 +47,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private Pose2d m_pose;
   private boolean m_initSuccess = false;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  SimpleMotorFeedforward feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(
           SWERVE_MODULE.ksDriveVoltSecondsPerMeter,
           SWERVE_MODULE.kvDriveVoltSecondsSquaredPerMeter,
@@ -318,6 +318,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
                     / (SWERVE_MODULE.kDriveMotorDistancePerPulse * 10)));
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

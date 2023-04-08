@@ -8,9 +8,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+@SuppressWarnings("RedundantThrows")
 public class Controls extends SubsystemBase implements AutoCloseable {
-  StringPublisher allianceString;
-  BooleanPublisher allianceBoolean;
+  private StringPublisher allianceString;
+  private BooleanPublisher allianceBoolean;
 
   private boolean isInit;
   private static DriverStation.Alliance allianceColor = DriverStation.Alliance.Red;
@@ -64,7 +65,7 @@ public class Controls extends SubsystemBase implements AutoCloseable {
    * is disabled to avoid a bug where the robot tries to get the alliance color before it is
    * connected to a driver station.
    */
-  public void updateAllianceColor() {
+  private void updateAllianceColor() {
     allianceColor = DriverStation.getAlliance();
   }
 
@@ -88,6 +89,7 @@ public class Controls extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run during simulation
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

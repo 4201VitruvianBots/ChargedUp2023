@@ -11,7 +11,7 @@ import frc.robot.utils.LogManager;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class DeleteAllLogs extends InstantCommand {
-  private LogManager m_logManager;
+  private final LogManager m_logManager;
 
   public DeleteAllLogs(LogManager logManager) {
     m_logManager = logManager;

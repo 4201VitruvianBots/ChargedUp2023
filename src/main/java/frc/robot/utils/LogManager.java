@@ -17,14 +17,14 @@ import java.util.ArrayList;
 public class LogManager {
   private final String mainPath = new File("").getAbsolutePath();
 
-  private ArrayList<String> logFilePaths = new ArrayList<String>();
+  private ArrayList<String> logFilePaths = new ArrayList<>();
 
   public LogManager() {
     SmartDashboard.putData("Delete All Logs", new DeleteAllLogs(this));
   }
 
   public ArrayList<String> getLogFilePaths() {
-    ArrayList<String> filePaths = new ArrayList<String>();
+    ArrayList<String> filePaths = new ArrayList<>();
 
     File folder = new File(mainPath);
     File[] allFiles = folder.listFiles();
@@ -54,7 +54,7 @@ public class LogManager {
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        //        e.printStackTrace();
       }
     }
   }

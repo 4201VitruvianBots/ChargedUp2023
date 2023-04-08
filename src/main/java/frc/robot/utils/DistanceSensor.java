@@ -11,8 +11,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.INTAKING_STATES;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,7 +36,7 @@ public class DistanceSensor implements AutoCloseable {
   private double sensor2DistanceMeters;
   private double sensor3DistanceMeters;
 
-  private final boolean m_limitCanUtil = STATEHANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   private final Random rand = new Random();
   private Object obj;
@@ -59,7 +59,7 @@ public class DistanceSensor implements AutoCloseable {
         socket.setReceiveBufferSize(512);
         socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
-        socketFail.printStackTrace();
+        //        socketFail.printStackTrace();
       }
     }
     initSmartDashboard();
@@ -90,7 +90,7 @@ public class DistanceSensor implements AutoCloseable {
       return sensorValue;
     } catch (Exception e) {
       System.out.println("Boo hoo I can't read the file :_(");
-      e.printStackTrace();
+      //      e.printStackTrace();
       return -1;
     }
   }
@@ -113,7 +113,7 @@ public class DistanceSensor implements AutoCloseable {
   // Returns the distance in inches from the left of the intake to the center of the game
   // piece. Negative if to the left, positive if to the right
   // Works off 3 sensors, 2 for cone and 1 for cube
-  public double getGamepieceDistanceInches(INTAKING_STATES intakeState) {
+  public double getGamepieceDistanceInches(INTAKE_STATE intakeState) {
     double distanceMeters;
 
     switch (intakeState) {
@@ -145,7 +145,7 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   // Returns a pose where the center of the gamepiece should be
-  public Pose2d getGamepiecePose(INTAKING_STATES intakeState, Pose2d intakePose) {
+  public Pose2d getGamepiecePose(INTAKE_STATE intakeState, Pose2d intakePose) {
     return new Pose2d(
         intakePose.getX(),
         intakePose.getY() + getGamepieceDistanceInches(intakeState),
@@ -153,11 +153,11 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKING_STATES.CONE);
+    return getGamepieceDistanceInches(INTAKE_STATE.CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKING_STATES.CUBE);
+    return getGamepieceDistanceInches(INTAKE_STATE.CUBE);
   }
 
   private void initSmartDashboard() {
@@ -198,16 +198,18 @@ public class DistanceSensor implements AutoCloseable {
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
     } catch (SocketTimeoutException ex) {
-      System.out.println("error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-SocketTimeoutError");
+      //      ex.printStackTrace();
     } catch (IOException ex) {
-      System.out.println("Client error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-IOError");
+      //      ex.printStackTrace();
     } catch (Exception ex) {
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-UnknownError");
+      //      ex.printStackTrace();
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
     if (socket != null) socket.close();

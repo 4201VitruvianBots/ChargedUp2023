@@ -55,11 +55,11 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   private targetType targetFound = targetType.NONE;
 
-  Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
+  private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
-  double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0, 0};
+  private final double[] defaultDoubleArray = {0, 0, 0, 0, 0, 0, 0};
 
-  int[] tagIds = new int[10];
+  private final int[] tagIds = new int[10];
   double[] robotPosX = new double[10];
   double[] robotPosY = new double[10];
   double[] robotPosYaw = new double[10];
@@ -125,8 +125,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tv").getDouble(0);
-      case OUTTAKE:
-        return outtake.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
@@ -156,8 +154,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return -m_intakeNet.getEntry("tx").getDouble(0);
-      case OUTTAKE:
-        return -outtake.getEntry("tx").getDouble(0);
       default:
         return 0;
     }
@@ -170,8 +166,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ty").getDouble(0);
-      case OUTTAKE:
-        return outtake.getEntry("ty").getDouble(0);
       default:
         return 0;
     }
@@ -184,8 +178,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("tl").getDouble(0);
-      case OUTTAKE:
-        return outtake.getEntry("tl").getDouble(0);
       default:
         return 0;
     }
@@ -198,8 +190,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNet.getEntry("ta").getDouble(0);
-      case OUTTAKE:
-        return outtake.getEntry("ta").getDouble(0);
       default:
         return 0;
     }
@@ -347,7 +337,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Collects transformation/rotation data from limelight
    */
   public double[] getBotPose(CAMERA_SERVER location) {
-    DriverStation.Alliance allianceColor = m_controls.getAllianceColor();
+    DriverStation.Alliance allianceColor = Controls.getAllianceColor();
     double[] botPose = new double[0];
     switch (location) {
       case LEFT_LOCALIZER:
@@ -418,7 +408,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     if (getValidTarget(location)) {
       switch (location) {
         case INTAKE:
-        case OUTTAKE:
           break;
         case RIGHT_LOCALIZER:
           localizer = m_rightLocalizer;
@@ -490,8 +479,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
           rawTags = m_fLocalizer.getEntry("tid").getDoubleArray(new double[] {});
           tags = DoubleStream.of(rawTags).mapToInt(d -> (int) d).toArray();
           break;
+        default:
         case INTAKE:
-        case OUTTAKE:
           break;
       }
     }
@@ -507,7 +496,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   private void logData() {
     limelightTargetValid.append(getValidTargetType(CAMERA_SERVER.INTAKE));
-    leftLocalizerTargetValid.append(getValidTargetType(CAMERA_SERVER.OUTTAKE));
   }
 
   public void initSmartDashboard() {
@@ -550,6 +538,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     // This method will be called once per scheduler run during simulation
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

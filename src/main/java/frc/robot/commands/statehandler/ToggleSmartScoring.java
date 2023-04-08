@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.swerve;
+package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.StateHandler;
 
-public class ResetOdometry extends CommandBase {
-  /** Creates a new ResetGyro. */
-  private final SwerveDrive m_swerveDrive;
+public class ToggleSmartScoring extends CommandBase {
+  /** Creates a new SetElevatorControlLoop. */
+  private final StateHandler m_stateHandler;
 
-  public ResetOdometry(SwerveDrive swerveDrive) {
-    m_swerveDrive = swerveDrive;
+  public ToggleSmartScoring(StateHandler stateHandler) {
+    m_stateHandler = stateHandler;
 
-    addRequirements(m_swerveDrive);
+    addRequirements(m_stateHandler);
   }
 
   @Override
@@ -25,7 +25,7 @@ public class ResetOdometry extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_swerveDrive.resetGyro();
+    m_stateHandler.setSmartScoring(!m_stateHandler.isSmartScoring());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

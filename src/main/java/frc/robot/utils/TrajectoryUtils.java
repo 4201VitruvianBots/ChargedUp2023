@@ -7,8 +7,12 @@ package frc.robot.utils;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.simulation.SimConstants;
+import frc.robot.subsystems.SwerveDrive;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +44,7 @@ public class TrajectoryUtils {
 
         var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
 
-        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        for (var trajectory : pathGroup) {
-          ppTrajectories.add(
-              PathPlannerTrajectory.transformTrajectoryForAlliance(
-                  trajectory, DriverStation.Alliance.Red));
-        }
-        return ppTrajectories;
+        return SimConstants.absoluteFlip(pathGroup);
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
@@ -55,77 +53,38 @@ public class TrajectoryUtils {
 
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
-        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
+        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, false);
         return new ArrayList<>();
       }
     }
   }
-}
 
-// TODO: Fix after L.A.
-// public class TrajectoryUtils {
-//  public static List<PathPlannerTrajectory> readTrajectory(
-//      String fileName, PathConstraints segmentConstraints) {
-//    return readTrajectory(fileName, segmentConstraints, segmentConstraints);
-//  }
-//
-//  public static List<PathPlannerTrajectory> readTrajectory(
-//      String fileName, PathConstraints pathConstraint, PathConstraints... segmentConstraints) {
-//
-//    if (pathConstraint.maxVelocity == 0 || pathConstraint.maxAcceleration == 0) {
-//      DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
-//    }
-//    for (var c : segmentConstraints) {
-//      if (c.maxVelocity == 0 || c.maxAcceleration == 0) {
-//        DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
-//      }
-//    }
-//
-//    if (fileName.startsWith("Red")) {
-//      var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
-//      if (!file.exists()) {
-//        DriverStation.reportWarning(
-//            "TrajectoryUtils::readTrajectory failed for " + fileName, false);
-//        fileName = fileName.replace("Red", "Blue");
-//      }
-//
-//      var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
-//
-//      return flipTrajectory(pathGroup);
-//    } else {
-//      try {
-//        var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
-//
-//        return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
-//      } catch (Exception e) {
-//        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-//        return new ArrayList<>();
-//      }
-//    }
-//  }
-//
-//  public static List<PathPlannerTrajectory> flipTrajectory(List<PathPlannerTrajectory> trajectory)
-// {
-//    return trajectory.stream()
-//        .map(TrajectoryUtils::transformTrajectoryForAlliance)
-//        .collect(Collectors.toList());
-//  }
-//
-//  public static PathPlannerTrajectory transformTrajectoryForAlliance(
-//      PathPlannerTrajectory trajectory) {
-//    List<Trajectory.State> transformedStates = new ArrayList<>();
-//
-//    for (Trajectory.State s : trajectory.getStates()) {
-//      PathPlannerTrajectory.PathPlannerState state = (PathPlannerTrajectory.PathPlannerState) s;
-//
-//      transformedStates.add(transformStateForAlliance(state));
-//    }
-//
-//    return new PathPlannerTrajectory(
-//        transformedStates,
-//        trajectory.getMarkers(),
-//        trajectory.getStartStopEvent(),
-//        trajectory.getEndStopEvent(),
-//        trajectory.fromGUI);
-//  }
-// }
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, String pathName, PathConstraints constraints) {
+    var trajectories = readTrajectory(pathName, constraints);
+
+    return generatePPSwerveControllerCommand(swerveDrive, trajectories);
+  }
+
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, List<PathPlannerTrajectory> trajectories) {
+    List<PPSwerveControllerCommand> commands = new ArrayList<>();
+
+    for (var trajectory : trajectories) {
+      PPSwerveControllerCommand swerveCommand =
+          new PPSwerveControllerCommand(
+              trajectory,
+              swerveDrive::getPoseMeters,
+              SWERVE_DRIVE.kSwerveKinematics,
+              swerveDrive.getXPidController(),
+              swerveDrive.getYPidController(),
+              swerveDrive.getThetaPidController(),
+              swerveDrive::setSwerveModuleStatesAuto,
+              false,
+              swerveDrive);
+
+      commands.add(swerveCommand);
+    }
+    return commands;
+  }
+}

@@ -5,18 +5,16 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 
-public class AutoSetWristSetpoint extends CommandBase {
+// Limit the percent output of the wrist joystick when the stick is pressed down to make small
+// adjustments
+public class LimitWristJoystickInput extends CommandBase {
   private final Wrist m_wrist;
 
-  private final double m_setpoint;
-
-  /** Creates a new RunWrist. */
-  public AutoSetWristSetpoint(Wrist wrist, double setpoint) {
+  /** Creates a new LimitwristJoystickInput. */
+  public LimitWristJoystickInput(Wrist wrist) {
     m_wrist = wrist;
-    m_setpoint = setpoint;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_wrist);
@@ -25,23 +23,22 @@ public class AutoSetWristSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
+    m_wrist.setJoystickLimit(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_wrist.setSetpointPositionRadians(m_setpoint);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_wrist.setJoystickLimit(false);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // 1 degree = 0.017453293 radians
-    return (Math.abs(m_wrist.getPositionRadians() - m_setpoint) < 0.017453293);
+    return false;
   }
 }

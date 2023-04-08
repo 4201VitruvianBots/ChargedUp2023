@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.swerve;
+package frc.robot.commands.sim.fieldsim;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.simulation.FieldSim;
 
-public class ResetOdometry extends CommandBase {
-  /** Creates a new ResetGyro. */
-  private final SwerveDrive m_swerveDrive;
+public class ToggleTestIntakeState extends CommandBase {
+  /** Creates a new SetElevatorControlLoop. */
+  private final FieldSim m_fieldSim;
 
-  public ResetOdometry(SwerveDrive swerveDrive) {
-    m_swerveDrive = swerveDrive;
+  public ToggleTestIntakeState(FieldSim fieldSim) {
+    m_fieldSim = fieldSim;
 
-    addRequirements(m_swerveDrive);
+    addRequirements(m_fieldSim);
   }
 
   @Override
@@ -25,7 +25,7 @@ public class ResetOdometry extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_swerveDrive.resetGyro();
+    m_fieldSim.setTestScoringState(!m_fieldSim.getTestScoringState());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

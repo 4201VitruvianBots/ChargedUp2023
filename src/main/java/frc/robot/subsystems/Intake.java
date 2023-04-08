@@ -15,23 +15,29 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
-  private static boolean isIntakingCone = false;
+  private boolean isIntakingCone = false;
 
-  private static boolean isIntakingCube = false;
+  private boolean isIntakingCube = false;
 
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
 
   // Log setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+
+  // Mech2d setup
+  public final MechanismLigament2d m_ligament2d =
+      new MechanismLigament2d("Intake", INTAKE.length, 0);
 
   public Intake() {
     // one or two motors
@@ -42,7 +48,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-    // set current limit on talonfx motors
+    // set current limit on TalonFX motors
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 30, 0.1));
     intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
@@ -54,6 +60,12 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     intakeMotor.config_kF(0, INTAKE.kF);
     intakeMotor.config_kP(0, INTAKE.kP);
+
+    initSmartDashboard();
+  }
+
+  public MechanismLigament2d getLigament() {
+    return m_ligament2d;
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and
@@ -84,13 +96,13 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   // True if Cube is detected, otherwise assume Cone
-  public INTAKE.HELD_GAMEPIECE getHeldGamepiece() {
+  public INTAKE.INTAKE_STATE getHeldGamepiece() {
     if (getConeDistance() > Units.inchesToMeters(15)
-        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.HELD_GAMEPIECE.NONE;
-    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.HELD_GAMEPIECE.CONE;
-    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.HELD_GAMEPIECE.CUBE;
+        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.INTAKE_STATE.NONE;
+    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.INTAKE_STATE.CONE;
+    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.INTAKE_STATE.CUBE;
 
-    return INTAKE.HELD_GAMEPIECE.NONE;
+    return INTAKE.INTAKE_STATE.NONE;
   }
 
   public double getMotorOutputCurrent() {
@@ -101,9 +113,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
+
   // Shuffleboard or SmartDashboard function
+  public void initSmartDashboard() {
+    m_ligament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+  }
 
   public void updateSmartDashboard() {
+    // TODO: Consolidate this using the INTAKE_STATE enum
     SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
     SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
   }
@@ -131,6 +148,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

@@ -10,17 +10,16 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
-public class IncrementElevatorHeight extends CommandBase {
+public class RunElevatorJoystick extends CommandBase {
   /** Creates a new IncrementElevatorHeight. This is our default command */
-  private DoubleSupplier m_joystickY;
+  private final Elevator m_elevator;
 
-  private Elevator m_elevator;
+  private final DoubleSupplier m_joystickY;
 
-  public IncrementElevatorHeight(Elevator elevator, DoubleSupplier joystickY) {
-
-    // Use addRequirements() here to declare subsystem dependencies.
+  public RunElevatorJoystick(Elevator elevator, DoubleSupplier joystickY) {
     m_elevator = elevator;
     m_joystickY = joystickY;
+
     addRequirements(m_elevator);
   }
 
@@ -31,9 +30,6 @@ public class IncrementElevatorHeight extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // add '&& Elevator.getElevatorDesiredHeightState() == elevatorHeights.STOWED' to this if
-    // statement to prioritize shortcut buttons
-
     // Deadbands joystick Y so joystick Ys below 0.05 won't be registered
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
@@ -46,11 +42,6 @@ public class IncrementElevatorHeight extends CommandBase {
       m_elevator.setDesiredPositionMeters(m_elevator.getHeightMeters());
       m_elevator.resetTrapezoidState();
     }
-    // This else if statement will automatically set the elevator to the STOWED position once the
-    // joystick is let go
-    // Uncomment if you want to reenable this
-    // } else if (m_elevator.getElevatorDesiredHeightState() == elevatorHeights.JOYSTICK) {
-    // m_elevator.setElevatorDesiredHeightState(elevatorHeights.STOWED);
   }
 
   // Called once the command ends or is interrupted.

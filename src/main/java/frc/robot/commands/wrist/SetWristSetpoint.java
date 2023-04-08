@@ -26,14 +26,12 @@ public class SetWristSetpoint extends CommandBase {
     m_input = input;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(wrist);
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // m_wrist.setControlState(WRIST.STATE.USER_SETPOINT);
-    // m_wrist.setDesiredPositionRadians(m_setpoint);
     m_wrist.setUserSetpoint(true);
   }
 
@@ -44,15 +42,13 @@ public class SetWristSetpoint extends CommandBase {
     m_wrist.setSetpointPositionRadians(m_setpoint);
 
     double joystickDeadbandOutput = MathUtil.applyDeadband(m_input.getAsDouble(), 0.1);
-    m_wrist.setUserInput(-joystickDeadbandOutput);
+    m_wrist.setJoystickInput(-joystickDeadbandOutput);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_wrist.setUserSetpoint(false);
-    //    m_wrist.setControlState(WRIST.STATE.CLOSED_LOOP);
-    //    m_wrist.setDesiredPositionRadians(WRIST.SETPOINT.STOWED.get());
   }
 
   // Returns true when the command should end.

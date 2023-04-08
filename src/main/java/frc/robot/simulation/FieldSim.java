@@ -18,11 +18,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
-import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
+import frc.robot.commands.sim.fieldsim.ToggleTestIntakeState;
+import frc.robot.subsystems.*;
 import frc.robot.utils.ChargedUpNodeMask;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
@@ -34,9 +31,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private final Vision m_vision;
   private final Elevator m_elevator;
   private final Wrist m_wrist;
+  private final StateHandler m_stateHandler;
   private final Controls m_controls;
 
   private final Field2d m_field2d = new Field2d();
+  private List<PathPlannerTrajectory> m_displayedTrajectories = new ArrayList<>();
 
   private ArrayList<Pose2d> m_displayedNodes = new ArrayList<>();
   private Pose2d m_highlightedNode = new Pose2d(0, 0, new Rotation2d(0));
@@ -44,15 +43,21 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   private Pose2d robotPose = new Pose2d(0, 0, new Rotation2d(0));
   private Pose2d intakePose;
 
-  SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
-  private boolean testScoringState = false;
+  private final SendableChooser<SCORING_STATE> scoringStateChooser = new SendableChooser<>();
+  private boolean m_testScoringState = false;
 
   public FieldSim(
-      SwerveDrive swerveDrive, Vision vision, Elevator elevator, Wrist wrist, Controls controls) {
+      SwerveDrive swerveDrive,
+      Vision vision,
+      Elevator elevator,
+      Wrist wrist,
+      StateHandler stateHandler,
+      Controls controls) {
     m_swerveDrive = swerveDrive;
     m_vision = vision;
     m_elevator = elevator;
     m_wrist = wrist;
+    m_stateHandler = stateHandler;
     m_controls = controls;
 
     initSim();
@@ -67,8 +72,8 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
         scoringStateChooser.addOption(
             SCORING_STATE.values()[i].toString(), SCORING_STATE.values()[i]);
       }
+      SmartDashboard.putData("Toggle Scoring State", new ToggleTestIntakeState(this));
       SmartDashboard.putData("Test Scoring State", scoringStateChooser);
-      testScoringState = true;
     }
   }
 
@@ -76,9 +81,17 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     return m_field2d;
   }
 
+  public void setTestScoringState(boolean state) {
+    m_testScoringState = state;
+  }
+
+  public boolean getTestScoringState() {
+    return m_testScoringState;
+  }
+
   /**
    * Initialize arrays with all the scoring positions on the field based on alliance color, game
-   * piece type, and if it is a cooperatition node. Ideally, this is a pre-processing step that we
+   * piece type, and if it is a coopertition node. Ideally, this is a pre-processing step that we
    * only need to do once to improve robot code performance by avoiding unnecessary repeated calls.
    */
   private void initializeScoringNodes() {
@@ -86,20 +99,19 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
-    List<Pose2d> trajectoryPoses = new ArrayList<>();
+    if (!m_displayedTrajectories.equals(trajectories)) {
+      List<Pose2d> trajectoryPoses = new ArrayList<>();
 
-    for (var trajectory : trajectories) {
-      trajectoryPoses.addAll(
-          trajectory.getStates().stream()
-              .map(state -> state.poseMeters)
-              .collect(Collectors.toList()));
+      for (var trajectory : trajectories) {
+        trajectoryPoses.addAll(
+            trajectory.getStates().stream()
+                .map(state -> state.poseMeters)
+                .collect(Collectors.toList()));
+      }
+
+      m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
+      m_displayedTrajectories = trajectories;
     }
-
-    m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
-  }
-
-  public void setTrajectory(PathPlannerTrajectory trajectory) {
-    m_field2d.getObject("trajectory").setTrajectory(trajectory);
   }
 
   public void resetRobotPose(Pose2d pose) {
@@ -111,10 +123,10 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * Based on the current robot's state and the list of valid nodes, return the nearest nearest node
-   * for scoring
+   * Based on the current robot's state and the list of valid nodes, return the nearest node for
+   * scoring
    *
-   * @return
+   * @return {@link Pose2d} Nearest Pose to robot
    */
   public Pose2d getTargetNode() {
     return ChargedUpNodeMask.getTargetNode(m_swerveDrive.getPoseMeters());
@@ -136,7 +148,11 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
    * our alliance or coopertition grid. [2] - Node takes our current game piece. [3] - Node is on
    * the same level as our elevator. [4] - Node is closest to our robot
    */
-  public void updateValidNodes(SCORING_STATE scoringState) {
+  public void updateValidNodes() {
+    var scoringState = m_stateHandler.getScoringState();
+    if (m_testScoringState) {
+      scoringState = scoringStateChooser.getSelected();
+    }
     updateNodeMask(m_swerveDrive.getPoseMeters(), scoringState);
   }
 
@@ -189,6 +205,27 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
       m_field2d
           .getObject("Swerve Modules")
           .setPoses(ModuleMap.orderedValues(m_swerveDrive.getModulePoses(), new Pose2d[0]));
+
+      if (getTargetNode().equals(new Pose2d())) {
+        m_field2d.getObject("RobotToNodeF").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+        m_field2d.getObject("RobotToNodeT").setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+      } else {
+        if (m_stateHandler.canScore()) {
+          m_field2d
+              .getObject("RobotToNodeT")
+              .setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
+          m_field2d
+              .getObject("RobotToNodeF")
+              .setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+        } else {
+          m_field2d
+              .getObject("RobotToNodeF")
+              .setPoses(m_swerveDrive.getPoseMeters(), getTargetNode());
+          m_field2d
+              .getObject("RobotToNodeT")
+              .setPoses(new Pose2d(-5, -5, Rotation2d.fromDegrees(0)));
+        }
+      }
     }
   }
 
@@ -201,12 +238,13 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     try {
       SmartDashboard.putData("Field2d", m_field2d);
     } catch (NullPointerException e) {
-      e.printStackTrace();
+      //      e.printStackTrace();
     }
   }
 
   public void simulationPeriodic() {}
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

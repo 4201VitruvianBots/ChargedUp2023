@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {
   private final Wrist m_wrist;
+
   private final DoubleSupplier m_joystickY;
 
   /** Creates a new RunWristJoystick. */
@@ -19,6 +20,7 @@ public class RunWristJoystick extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     m_wrist = wrist;
     m_joystickY = joystickY;
+
     addRequirements(m_wrist);
   }
 
@@ -35,7 +37,7 @@ public class RunWristJoystick extends CommandBase {
 
     if (joystickYDeadbandOutput != 0.0) {
       m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
-      m_wrist.setUserInput(-joystickYDeadbandOutput);
+      m_wrist.setJoystickInput(-joystickYDeadbandOutput);
     }
     if (joystickYDeadbandOutput == 0 && m_wrist.getClosedLoopControl() == CONTROL_MODE.OPEN_LOOP) {
       m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());

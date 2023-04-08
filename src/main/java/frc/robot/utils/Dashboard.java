@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Dashboard {
   private Dashboard instance;
-  private Map<String, NetworkTable> ntMap = new HashMap<>();
+  private final Map<String, NetworkTable> ntMap = new HashMap<>();
 
   private Dashboard() {}
 
