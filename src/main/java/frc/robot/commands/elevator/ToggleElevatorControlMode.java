@@ -10,10 +10,9 @@ import frc.robot.subsystems.Elevator;
 
 public class ToggleElevatorControlMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
-  private Elevator m_elevator;
+  private final Elevator m_elevator;
 
   public ToggleElevatorControlMode(Elevator elevator) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
 
     addRequirements(m_elevator);

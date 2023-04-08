@@ -15,7 +15,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
@@ -23,9 +25,9 @@ import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
-  private static boolean isIntakingCone = false;
+  private boolean isIntakingCone = false;
 
-  private static boolean isIntakingCube = false;
+  private boolean isIntakingCube = false;
 
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
@@ -33,12 +35,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DistanceSensor m_distanceSensor;
 
   // Log setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+
+  // Mech2d setup
+  private MechanismLigament2d m_intakeLigament2d;
 
   public Intake(DistanceSensor distanceSensor) {
     m_distanceSensor = distanceSensor;
-
     // one or two motors
 
     // factory default configs
@@ -47,7 +51,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     intakeMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 
-    // set current limit on talonfx motors
+    // set current limit on TalonFX motors
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 30, 0.1));
     intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
@@ -59,8 +63,19 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     intakeMotor.config_kF(0, INTAKE.kF);
     intakeMotor.config_kP(0, INTAKE.kP);
+
+    initSmartDashboard();
+    try {
+      m_intakeLigament2d = new MechanismLigament2d("Intake", INTAKE.length, 0);
+      m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
   }
 
+  public MechanismLigament2d getLigament() {
+    return m_intakeLigament2d;
+  }
   // control mode function
   public boolean getIntakeState() {
     return isIntakingCone || isIntakingCube;
@@ -90,11 +105,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
+
   // Shuffleboard or SmartDashboard function
+  public void initSmartDashboard() {}
 
   public void updateSmartDashboard() {
-    SmartDashboard.putBoolean("Intaking Cone", getIntakeStateCone());
-    SmartDashboard.putBoolean("Intaking Cube", getIntakeCubeState());
+    // TODO: Consolidate this using the INTAKE_STATE enum
+    SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
+    SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
   }
 
   public void updateLog() {
@@ -121,6 +139,9 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    m_intakeLigament2d.close();
+  }
 }

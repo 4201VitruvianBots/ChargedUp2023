@@ -5,68 +5,41 @@
 package frc.robot.commands.auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.SimConstants;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
-  FieldSim m_fieldSim;
-  List<PathPlannerTrajectory> m_trajectories;
-  PathPlannerTrajectory m_trajectory;
-  private String m_pathName;
-  boolean useList = false;
+  private final FieldSim m_fieldSim;
+  private final List<PathPlannerTrajectory> m_trajectories;
+  private final String m_pathName;
 
   public PlotAutoTrajectory(
       FieldSim fieldSim, String pathName, List<PathPlannerTrajectory> trajectories) {
     m_fieldSim = fieldSim;
     m_pathName = pathName;
     m_trajectories = trajectories;
-    useList = true;
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-  /** Creates a new PlotAutoTrajectory. */
-  public PlotAutoTrajectory(FieldSim fieldSim, String pathName, PathPlannerTrajectory trajectory) {
-    m_fieldSim = fieldSim;
-    m_pathName = pathName;
-    m_trajectory = trajectory;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_fieldSim);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //    var isRedPath = m_pathName.startsWith("Red");
-    var isRedPath = false;
+    List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+    var isRedPath = m_pathName.startsWith("Red");
+    if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
+    else ppTrajectories.addAll(m_trajectories);
 
-    if (m_trajectories != null) {
-      //      for(int i =0; i < m_trajectories.size(); i++) {
-      //        m_fieldSim.getField2d().getObject("Trajectory " + i + "
-      // InitPose").setPose(m_trajectories.get(i).getInitialHolonomicPose());
-      //        m_fieldSim.getField2d().getObject("Trajectory " + i + "
-      // EndPose").setPose(m_trajectories.get(i).getEndState().poseMeters);
-      //      }
-      if (isRedPath) {
-        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        for (var trajectory : m_trajectories) {
-          ppTrajectories.add(
-              PathPlannerTrajectory.transformTrajectoryForAlliance(
-                  trajectory, DriverStation.Alliance.Red));
-        }
-        m_fieldSim.setTrajectory(ppTrajectories);
-      } else {
-        m_fieldSim.setTrajectory(m_trajectories);
-      }
-    } else {
-      if (isRedPath) {
-        m_trajectory =
-            PathPlannerTrajectory.transformTrajectoryForAlliance(
-                m_trajectory, DriverStation.Alliance.Red);
-      }
-      m_fieldSim.setTrajectory(m_trajectory);
-    }
+    m_fieldSim.setTrajectory(ppTrajectories);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

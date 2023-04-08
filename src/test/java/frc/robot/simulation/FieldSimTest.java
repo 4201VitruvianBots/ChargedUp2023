@@ -1,5 +1,6 @@
 package frc.robot.simulation;
 
+import static frc.robot.utils.ChargedUpNodeMask.updateNodeMask;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,17 +41,17 @@ public class FieldSimTest {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);
     TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
     m_swerveDrive.setOdometry(new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(0)));
-    m_fieldSim.updateValidNodes(SCORING_STATE.LOW);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
     assertEquals(m_fieldSim.getValidNodes().size(), 9);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CONE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CONE);
     assertEquals(m_fieldSim.getValidNodes().size(), 6);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CUBE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CUBE);
     assertEquals(m_fieldSim.getValidNodes().size(), 3);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);
@@ -62,17 +63,18 @@ public class FieldSimTest {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);
     TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
     m_swerveDrive.setOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-    m_fieldSim.updateValidNodes(SCORING_STATE.LOW);
+
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
     assertEquals(m_fieldSim.getValidNodes().size(), 3);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CONE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CONE);
     assertEquals(m_fieldSim.getValidNodes().size(), 2);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CUBE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CUBE);
     assertEquals(m_fieldSim.getValidNodes().size(), 1);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
@@ -84,17 +86,20 @@ public class FieldSimTest {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Blue);
     TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
     m_swerveDrive.setOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
-    m_fieldSim.updateValidNodes(SCORING_STATE.LOW);
+
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
     assertEquals(m_fieldSim.getValidNodes().size(), 9);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CONE);
+
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CONE);
     assertEquals(m_fieldSim.getValidNodes().size(), 6);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CUBE);
+
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CUBE);
     assertEquals(m_fieldSim.getValidNodes().size(), 3);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() < SimConstants.fieldLength / 2);
@@ -102,21 +107,22 @@ public class FieldSimTest {
   }
 
   @Test
-  public void testBlueALlianceRedCooperatitionNodes() {
+  public void testBlueAllianceRedCoopertitionNodes() {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Blue);
     TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
     m_swerveDrive.setOdometry(new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(0)));
-    m_fieldSim.updateValidNodes(SCORING_STATE.LOW);
+
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
     assertEquals(m_fieldSim.getValidNodes().size(), 3);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CONE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CONE);
     assertEquals(m_fieldSim.getValidNodes().size(), 2);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);
     }
-    m_fieldSim.updateValidNodes(SCORING_STATE.MID_CUBE);
+    updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.MID_CUBE);
     assertEquals(m_fieldSim.getValidNodes().size(), 1);
     for (var node : m_fieldSim.getValidNodes()) {
       assertTrue(node.getX() > SimConstants.fieldLength / 2);

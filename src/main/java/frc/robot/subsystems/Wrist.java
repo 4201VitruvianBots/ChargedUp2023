@@ -18,7 +18,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -38,7 +37,6 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.SPEED;
-import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.ResetAngleDegrees;
 import frc.robot.utils.DistanceSensor;
@@ -49,13 +47,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
 
   private double m_desiredSetpointRadians;
-  private double m_commandedAngleRadians;
-  private double m_lowerLimitRadians = THRESHOLD.ABSOLUTE_MIN.get();
-  private double m_upperLimitRadians = THRESHOLD.ABSOLUTE_MAX.get();
+  private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
   private double m_joystickInput;
+  private boolean m_limitJoystickInput;
   private boolean m_userSetpoint;
 
   private final Intake m_intake;
@@ -69,8 +67,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
 
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
-  public ArmFeedforward m_feedforward =
+  private final ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
+  private ArmFeedforward m_currentFeedForward = m_feedForward;
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
   // run
@@ -88,34 +87,27 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           WRIST.gearRatio,
           SingleJointedArmSim.estimateMOI(WRIST.length, WRIST.mass),
           WRIST.length,
-          THRESHOLD.ABSOLUTE_MIN.get(),
-          THRESHOLD.ABSOLUTE_MAX.get(),
+          WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
+          WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
-  private MechanismLigament2d fourbarLigament2d;
-  private MechanismLigament2d intakeLigament2d;
+  private static int m_simEncoderSign = 1;
+
+  // Mech2d setup
+  private MechanismLigament2d m_wristLigament2d;
 
   // Logging setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
-  public DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
-  public DoubleLogEntry desiredPositionEntry =
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
+  private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/wrist/current");
+  private final DoubleLogEntry desiredPositionEntry =
       new DoubleLogEntry(log, "/wrist/desiredPositionDegrees");
-  public DoubleLogEntry commandedPositionEntry =
+  private final DoubleLogEntry commandedPositionEntry =
       new DoubleLogEntry(log, "/wrist/commandedPositionDegrees");
-  public DoubleLogEntry positionDegreesEntry = new DoubleLogEntry(log, "/wrist/positionDegrees");
+  private final DoubleLogEntry positionDegreesEntry =
+      new DoubleLogEntry(log, "/wrist/positionDegrees");
 
-  private DoubleSubscriber kPSub,
-      kISub,
-      kDSub,
-      kMaxVelSub,
-      kMaxAccelSub,
-      kSSub,
-      kGSub,
-      kVSub,
-      kASub,
-      kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
   private DoublePublisher kDesiredAngleDegreesPub;
   private DoublePublisher kCurrentAngleDegreesPub;
@@ -145,7 +137,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
-    // Give some time for the CANCoder to recognize the wrist before starting
+    // Give some time for the CANCoder to recognize the wrist before resetting the angle
     if (RobotBase.isReal()) Timer.delay(2);
 
     resetAngleDegrees(-15.0);
@@ -153,10 +145,28 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     initSmartDashboard();
     m_timer.reset();
     m_timer.start();
+
+    m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
+
+    try {
+      m_wristLigament2d =
+          new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
+      m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
+  }
+
+  public MechanismLigament2d getLigament() {
+    return m_wristLigament2d;
   }
 
   public void setUserInput(double input) {
     m_joystickInput = input;
+  }
+
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
   }
 
   public void setUserSetpoint(boolean bool) {
@@ -171,7 +181,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_controlMode = mode;
   }
 
-  public CONTROL_MODE getClosedLoopControl() {
+  public CONTROL_MODE getClosedLoopControlMode() {
     return m_controlMode;
   }
 
@@ -218,10 +228,26 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
-    return (m_feedforward.calculate(state.position, state.velocity) / 12.0);
+    return (m_currentFeedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  // Sets the setpoint of the wrist to its current position so it will remain in place
+  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+    wristMotor.config_kF(WRIST.kSlotIdx, f);
+    wristMotor.config_kP(WRIST.kSlotIdx, d);
+    wristMotor.config_kI(WRIST.kSlotIdx, p);
+    wristMotor.config_kD(WRIST.kSlotIdx, i);
+    wristMotor.config_IntegralZone(WRIST.kSlotIdx, izone);
+  }
+
+  public void setArmMotorFeedForward(double s, double g, double v, double a) {
+    m_currentFeedForward = new ArmFeedforward(s, g, v, a);
+  }
+
+  public void setTrapezoidalConstraints(double maxVel, double maxAccel) {
+    m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+  }
+
+  // Sets the setpoint of the wrist to its current position to keep it in place
   public void resetTrapezoidState() {
     m_setpoint =
         new TrapezoidProfile.State(
@@ -234,10 +260,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public double getDesiredPositionRadians() {
     return m_desiredSetpointRadians;
-  }
-
-  public double getCommandedPositionRadians() {
-    return m_commandedAngleRadians;
   }
 
   public double getPositionRadians() {
@@ -288,36 +310,19 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (getPositionDegrees() > 170);
   }
 
-  public boolean atSetpoint() {
-    return Math.abs(getPositionRadians() - getCommandedPositionRadians())
-        < Units.degreesToRadians(0.5);
-  }
-
-  public void updateTrapezoidProfileConstraints(SPEED speed) {
-    switch (speed) {
-      case FAST:
-        m_currentConstraints = WRIST.fastConstraints;
-        break;
-      default:
-      case SLOW:
-        m_currentConstraints = WRIST.slowConstraints;
-        break;
-    }
-  }
-
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
     // Cone: f(x)=-0.270347*t+16.8574;
     double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == INTAKE.HELD_GAMEPIECE.CUBE)
+    if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.CUBE)
       horizontalDistance =
           0.00000913468 * Math.pow(getPositionDegrees(), 3)
               - 0.00232508 * Math.pow(getPositionDegrees(), 2)
               - 0.0894341 * getPositionDegrees()
               + 16.1239;
-    else if (m_intake.getHeldGamepiece() == INTAKE.HELD_GAMEPIECE.CONE)
+    else if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.CONE)
       horizontalDistance =
           //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;
@@ -338,6 +343,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  public void updateTrapezoidProfileConstraints(SPEED speed) {
+    switch (speed) {
+      case FAST:
+        m_currentConstraints = WRIST.fastConstraints;
+        break;
+      default:
+      case SLOW:
+        m_currentConstraints = WRIST.slowConstraints;
+        break;
+    }
+  }
+
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
     SmartDashboard.putData("Reset90", new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
@@ -351,97 +368,21 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
-
-    fourbarLigament2d =
-        m_elevator
-            .getLigament2d()
-            .append(
-                new MechanismLigament2d(
-                    "Fourbar",
-                    WRIST.fourbarLength,
-                    180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
-    fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-
-    intakeLigament2d =
-        fourbarLigament2d.append(
-            new MechanismLigament2d("Intake", INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
-    intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
-
-    // // Initialize Test Values
-    // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
-    // wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
-    // wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
-    // wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
-    // wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
-    // wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
-    // wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
-    // wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
-    // wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-    // wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
-
-    // kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
-    // kMaxAccelSub =
-    //     wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
-    // kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
-    // kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
-    // kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
-    // kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
-    // kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
-    // kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
-    // kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-    // kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   public void updateSmartDashboard() {
-    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControl().name());
+    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControlMode().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
-    currentCommandStatePub.set(getClosedLoopControl().toString());
+    currentCommandStatePub.set(getClosedLoopControlMode().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
     kCurrentAngleDegreesPub.set(getPositionDegrees());
-
-    // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
-    // currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
-
-    // Testing Code
-    // setControlState(STATE.TEST_SETPOINT);
-    // if (m_controlState != STATE.TEST_SETPOINT) {
-    //   return;
-    // }
-
-    // DriverStation.reportWarning("USING WRIST TEST MODE!", false);
-    // double maxVel = kMaxVelSub.get(0);
-    // double maxAccel = kMaxAccelSub.get(0);
-    // m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    // double kS = kSSub.get(Constants.WRIST.FFkS);
-    // double kG = kGSub.get(Constants.WRIST.kG);
-    // double kV = kVSub.get(Constants.WRIST.FFkV);
-    // double kA = kASub.get(Constants.WRIST.kA);
-
-    // m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-
-    // double newTestKP = kPSub.get(0);
-    // if (testKP != newTestKP) {
-    //   wristMotor.config_kP(0, newTestKP);
-    //   testKP = newTestKP;
-    // }
-    // double newTestKI = kISub.get(0);
-    // if (testKI != newTestKI) {
-    //   wristMotor.config_kI(0, newTestKI);
-    //   testKI = newTestKI;
-    // }
-    // double newTestKD = kDSub.get(0);
-    // if (testKD != newTestKD) {
-    //   wristMotor.config_kD(0, newTestKD);
-    //   testKD = newTestKD;
-    // }
   }
 
   public void updateLog() {
     voltageEntry.append(getMotorOutputVoltage());
     currentEntry.append(getMotorOutputCurrent());
     desiredPositionEntry.append(getDesiredPositionRadians());
-    commandedPositionEntry.append(getCommandedPositionRadians());
     positionDegreesEntry.append(getPositionDegrees());
   }
 
@@ -454,6 +395,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     switch (m_controlMode) {
       case OPEN_LOOP:
         double percentOutput = m_joystickInput * WRIST.kPercentOutputMultiplier;
+
+        // Limit the percent output of the wrist joystick when the stick is pressed down to make
+        // small adjustments
+        if (m_limitJoystickInput)
+          percentOutput = m_joystickInput * WRIST.kLimitedPercentOutputMultiplier;
+
         setPercentOutput(percentOutput, true);
         break;
       case CLOSED_LOOP:
@@ -485,7 +432,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (WRIST.simEncoderSign
+                (m_simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getAngleRads())
                     / WRIST.encoderUnitsToDegrees));
 
@@ -493,16 +440,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (WRIST.simEncoderSign
+                (m_simEncoderSign
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / WRIST.encoderUnitsToDegrees
                     * 10.0));
-
-    // Update the angle of the mech2d
-    fourbarLigament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
-    intakeLigament2d.setAngle(fourbarLigament2d.getAngle() * -1.5);
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    m_wristLigament2d.close();
+  }
 }

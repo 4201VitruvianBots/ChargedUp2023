@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Intake;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
@@ -16,7 +16,7 @@ public class AutoRunIntakeCube extends CommandBase {
   private final Vision m_vision;
   private final SwerveDrive m_swerve;
 
-  private double m_PercentOutput;
+  private final double m_PercentOutput;
 
   /** Creates a new RunIntake. */
   public AutoRunIntakeCube(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {

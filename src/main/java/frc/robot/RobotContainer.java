@@ -7,15 +7,9 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.PIDConstants;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,46 +20,36 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.STATEHANDLER;
-import frc.robot.Constants.STATEHANDLER.SETPOINT;
-import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.Intake.AutoRunIntakeCone;
-import frc.robot.commands.Intake.AutoRunIntakeCube;
-import frc.robot.commands.Intake.IntakeVisionAlignment;
-import frc.robot.commands.Intake.RunIntakeCone;
-import frc.robot.commands.Intake.RunIntakeCube;
 import frc.robot.commands.auto.BottomDriveForward;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.OnePiece;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
-import frc.robot.commands.auto.TwoPieceTest;
-import frc.robot.commands.elevator.AutoSetElevatorSetpoint;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
-import frc.robot.commands.elevator.ResetElevatorHeight;
-import frc.robot.commands.elevator.SetElevatorSetpoint;
-import frc.robot.commands.elevator.ToggleElevatorControlMode;
-// import frc.robot.commands.auto.RedTopTwoBalance;
+import frc.robot.commands.elevator.*;
+import frc.robot.commands.intake.IntakeVisionAlignment;
+import frc.robot.commands.intake.RunIntakeCone;
+import frc.robot.commands.intake.RunIntakeCube;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
-import frc.robot.commands.swerve.*;
-import frc.robot.commands.wrist.AutoSetWristSetpoint;
-import frc.robot.commands.wrist.ResetWristAngleDegrees;
-import frc.robot.commands.wrist.RunWristJoystick;
-import frc.robot.commands.wrist.SetWristSetpoint;
-import frc.robot.commands.wrist.ToggleWristControlMode;
+import frc.robot.commands.swerve.AutoBalance;
+import frc.robot.commands.swerve.ResetOdometry;
+import frc.robot.commands.swerve.SetRollOffset;
+import frc.robot.commands.swerve.SetSwerveDrive;
+import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -89,35 +73,35 @@ public class RobotContainer implements AutoCloseable {
   private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
-  private final FieldSim m_fieldSim =
-      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_controls);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
+  private final StateHandler m_stateHandler =
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led, m_vision);
+  private final FieldSim m_fieldSim =
+      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
+
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
-  private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_fieldSim, m_elevator, m_led, m_vision);
-
-  HashMap<String, Command> m_eventMap = new HashMap<>();
-  private SwerveAutoBuilder m_autoBuilder;
+  // private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  static Joystick leftJoystick = new Joystick(USB.leftJoystick);
+  private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
 
-  static Joystick rightJoystick = new Joystick(USB.rightJoystick);
-  public CommandXboxController xboxController = new CommandXboxController(USB.xBoxController);
+  private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
+  private final CommandXboxController xboxController =
+      new CommandXboxController(USB.xBoxController);
 
-  public Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
-  public Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
+  private final Trigger[] leftJoystickTriggers = new Trigger[2]; // left joystick buttons
+  private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
 
   public RobotContainer() {
     initializeSubsystems();
     m_logger.pause();
     configureBindings();
 
-    initAutoBuilder();
     initializeAutoChooser();
   }
 
@@ -130,12 +114,17 @@ public class RobotContainer implements AutoCloseable {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
+    m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_stateHandler));
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
+
+    if (RobotBase.isSimulation()) {
+      SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator));
+      SmartDashboard.putData(new ToggleWristTestMode(m_wrist));
+    }
   }
 
   /**
@@ -150,9 +139,7 @@ public class RobotContainer implements AutoCloseable {
     for (int i = 0; i < rightJoystickTriggers.length; i++)
       rightJoystickTriggers[i] = new JoystickButton(rightJoystick, (i + 1));
 
-    leftJoystickTriggers[0].whileTrue(
-        new SetSwerveMaxTranslationVeolcity(
-            m_swerveDrive, Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.750));
+    leftJoystickTriggers[0].whileTrue(new AutoBalance(m_swerveDrive));
 
     leftJoystickTriggers[1].whileTrue(
         new IntakeVisionAlignment(
@@ -171,29 +158,31 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .a()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_LOW));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_LOW));
 
     // Score MID Setpoints
     xboxController
         .b()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_MID));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID));
 
     // Stowed
     xboxController
         .x()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.STOWED));
+            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));
     // High
     xboxController
         .y()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATEHANDLER.SETPOINT.SCORE_HIGH));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
     // Toggle elevator, wrist control state
     xboxController
         .povUp()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_EXTENDED));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -201,16 +190,23 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .rightBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CONE));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CONE));
     xboxController
         .leftBumper()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CUBE));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
+
+    // Will limit the speed of our elevator or wrist when the corresponding joystick
+    // is being pressed down
+    xboxController.leftStick().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+    xboxController.rightStick().whileTrue(new LimitWristJoystickInput(m_wrist));
 
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
@@ -219,7 +215,7 @@ public class RobotContainer implements AutoCloseable {
     initTestController();
   }
 
-  private void initTestController() { // TODO: Rewrite this to use the new Statehandler system
+  private void initTestController() { // TODO: Rewrite this to use the new StateHandler system
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
@@ -255,28 +251,39 @@ public class RobotContainer implements AutoCloseable {
       testController
           .cross()
           .whileTrue(
-              new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.INTAKING_LOW_CONE));
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CONE));
 
       // Score MID Setpoints
       testController
           .circle()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_MID));
+          .whileTrue(
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID));
 
       // Stowed
       testController
           .square()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.STOWED));
+          .whileTrue(
+              new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));
 
       // High
       testController
           .triangle()
-          .whileTrue(new SetSetpoint(m_stateHandler, m_elevator, m_wrist, SETPOINT.SCORE_HIGH));
+          .whileTrue(
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
 
       // Toggle elevator, wrist control state
       testController
           .povDown()
           .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
       testController.povDown().onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+
+      // Will limit the speed of our elevator or wrist when the corresponding joystick is being
+      // pressed down
+      testController.L3().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+      testController.R3().whileTrue(new LimitWristJoystickInput(m_wrist));
 
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -305,256 +312,86 @@ public class RobotContainer implements AutoCloseable {
     m_stateHandler.init();
   }
 
-  private void initAutoBuilder() {
-    m_eventMap.put("wait", new WaitCommand(1));
-    m_eventMap.put("RunIntakeCone", new AutoRunIntakeCone(m_intake, 0.9, m_vision, m_swerveDrive));
-    m_eventMap.put("RunIntakeCube", new AutoRunIntakeCube(m_intake, 0.6, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "RunIntakeConeReverse", new AutoRunIntakeCone(m_intake, -0.8, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "RunIntakeCubeReverse", new AutoRunIntakeCube(m_intake, -0.5, m_vision, m_swerveDrive));
-    m_eventMap.put("IntakeHoldCone", new AutoRunIntakeCone(m_intake, 0.2, m_vision, m_swerveDrive));
-    m_eventMap.put("IntakeHoldCube", new AutoRunIntakeCube(m_intake, 0.2, m_vision, m_swerveDrive));
-    m_eventMap.put("StopIntake", new AutoRunIntakeCube(m_intake, 0, m_vision, m_swerveDrive));
-    m_eventMap.put(
-        "SetWristIntaking",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.INTAKING_LOW_CONE.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorIntaking",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.INTAKING_LOW.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristStowed",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorStowed",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetWristLowConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorLowConeNode",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristMidConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_MID_CONE.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorMidConeNode",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_MID_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristHighConeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_HIGH_CONE.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorHighConeNode",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get())
-            .withTimeout(1));
-    m_eventMap.put(
-        "SetWristLowReverseCubeNode",
-        new AutoSetWristSetpoint(m_wrist, WRIST.SETPOINT.SCORE_LOW_CONE.get()).withTimeout(1));
-    m_eventMap.put(
-        "SetElevatorLowReverseCubeNode",
-        new AutoSetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
-            .withTimeout(1));
-
-    m_autoBuilder =
-        new SwerveAutoBuilder(
-            m_swerveDrive::getPoseMeters,
-            m_swerveDrive::setOdometry,
-            Constants.SWERVE_DRIVE.kSwerveKinematics,
-            new PIDConstants(
-                Constants.SWERVE_DRIVE.kP_Translation,
-                Constants.SWERVE_DRIVE.kI_Translation,
-                Constants.SWERVE_DRIVE.kD_Translation),
-            new PIDConstants(
-                Constants.SWERVE_DRIVE.kP_Rotation,
-                Constants.SWERVE_DRIVE.kI_Rotation,
-                Constants.SWERVE_DRIVE.kD_Rotation),
-            m_swerveDrive::setSwerveModuleStatesAuto,
-            m_eventMap,
-            true,
-            m_swerveDrive);
-  }
-
-  public SwerveAutoBuilder getAutoBuilder() {
-    return m_autoBuilder;
-  }
-
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
     m_autoChooser.addOption(
-        "BlueOnePiece",
-        new OnePiece(
-            "BlueOnePiece",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator));
-
-    m_autoChooser.addOption(
         "TwoPiece",
         new TwoPiece(
             "TwoPiece",
-            m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator));
-
-    m_autoChooser.addOption(
-        "MasonOnTheGrind",
-        new TwoPieceTest(
-            "TwoPieceTest",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator));
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "PlaceOneBalance",
         new PlaceOneBalance(
             "PlaceOneBalance",
-            m_autoBuilder,
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
             m_intake,
             m_elevator,
-            m_vision));
-
-    // m_autoChooser.addOption(
-    //     "BlueOnePieceNoBalance",
-    //     new OnePieceNoBalance(
-    //         "BlueOnePieceNoBalance",
-    //         m_autoBuilder,
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_intake,
-    //         m_vision,
-    //         m_elevator));
-
-    // m_autoChooser.addOption(
-    //     "RedOnePieceNoBalance",
-    //     new OnePieceNoBalance(
-    //         "BlueOnePieceNoBalance",
-    //         m_autoBuilder,
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_intake,
-    //         m_vision,
-    //         m_elevator));
-
-    // m_autoChooser.addOption(
-    //     "RedOnePiece",
-    //     new OnePiece(
-    //         "BlueOnePiece",
-    //         m_autoBuilder,
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_intake,
-    //         m_vision,
-    //         m_elevator));
+            m_vision,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "JustBalance",
         new JustBalance(
-            "TestJustBalance",
-            m_autoBuilder,
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision));
-
-    // m_autoChooser.addOption(
-    //     "RedTopTwoBalance", new RedTopTwoBalance("RedTopTwoCone", m_autoBuilder, m_swerveDrive,
-    // m_fieldSim));
+            "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     m_autoChooser.addOption(
         "BlueBottomDriveForward",
         new BottomDriveForward(
-            "BlueBottomDriveForward",
-            m_autoBuilder,
+            "BottomDriveForward",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
             m_intake,
             m_vision,
-            m_elevator));
-
-    // m_autoChooser.addOption("test", new test(m_autoBuilder, m_swerveDrive, m_fieldSim));
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "DriveForward",
-        new DriveForward("BlueDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
-
-    // m_autoChooser.addOption(
-    //     "RedDriveForward",
-    //     new DriveForward("RedDriveForward", m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
-
-    // m_autoChooser.setDefaultOption(
-    //     "BlueTopDriveForward",
-    //     new TopDriveForward(
-    //         "BlueTopDriveForward",
-    //         m_autoBuilder,
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_elevator,
-    //         m_intake,
-    //         m_vision));
-
-    // m_autoChooser.addOption(
-    //     "RedTopDriveForward",
-    //     new TopDriveForward(
-    //         "RedTopDriveForward",
-    //         m_autoBuilder,
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_elevator,
-    //         m_intake,
-    //         m_vision));
-
-    // m_autoChooser.addOption(
-    //     "BlueJustBalance", new JustBalance(m_autoBuilder, m_swerveDrive, m_fieldSim, m_wrist));
+        new DriveForward(
+            "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
-
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
+    // Auto trajectory visualizer for testing/debugging
     if (RobotBase.isSimulation()) {
       autoPlotter = new SendableChooser<>();
       List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
       String[] autos = {
-        "BlueTopTwoCone",
         "BlueOnePiece",
-        "RedTopTwoCone",
-        "BlueBottomDriveForward",
-        "RedBottomDriveForward",
+        "BlueTwoPiece",
+        "RedOnePiece",
+        "RedTwoPiece",
         "BlueDriveForward",
-        "RedDriveForward"
+        "BlueBottomDriveForward",
+        "RedDriveForward",
+        "RedBottomDriveForward"
       };
       for (var auto : autos) {
-        var trajectory = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
-        autoPlotter.addOption(auto, trajectory);
+        var isRedPath = auto.startsWith("Red");
+        var fileName = auto.replace("Red", "");
+        fileName = fileName.replace("Blue", "");
+        var trajectories = TrajectoryUtils.readTrajectory(fileName, new PathConstraints(1, 1));
+
+        List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+        if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
+        else ppTrajectories.addAll(trajectories);
+
+        autoPlotter.addOption(auto, ppTrajectories);
       }
 
       SmartDashboard.putData("Auto Visualizer", autoPlotter);
@@ -613,17 +450,16 @@ public class RobotContainer implements AutoCloseable {
     // m_logManager.periodic();
   }
 
-  public void disabledPeriodic() {
-    m_swerveDrive.disabledPeriodic();
-  }
+  public void disabledPeriodic() {}
 
   public void testPeriodic() {
     m_stateHandler.testPeriodic();
   }
 
   public void simulationPeriodic() {
-    m_elevator.simulationPeriodic();
     m_memorylog.simulationPeriodic();
+
+    // TODO: Fix overwrite of currently running auto?
     m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 

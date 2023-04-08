@@ -1,7 +1,6 @@
 package frc.robot.utils;
 
 import static frc.robot.utils.ChargedUpNodeMask.*;
-import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.TestUtils.setPrivateField;
 
@@ -24,8 +23,6 @@ import org.junit.jupiter.api.Test;
 public class ChargedUpNodeMaskTest {
   protected RobotContainer m_robotContainer;
   protected Controls m_controls;
-
-  private static final ArrayList<Translation2d> validNodes = new ArrayList<>();
 
   private static final ArrayList<Translation2d> blueNodes = new ArrayList<>();
   private static final ArrayList<Translation2d> blueHybridNodes = new ArrayList<>();
@@ -127,14 +124,14 @@ public class ChargedUpNodeMaskTest {
   @Test
   public void TestRedGetRedNodes() {
     setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
-    m_controls.updateAllianceColor();
+    m_controls.periodic();
 
     Pose2d robotPose = new Pose2d(14, 1, Rotation2d.fromDegrees(0));
     SCORING_STATE state;
 
     state = SCORING_STATE.STOWED;
     updateNodeMask(robotPose, state);
-    var test = getValidNodes();
+    // Use HashSet to ignore list order
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(redNodes));
 
     state = SCORING_STATE.LOW;
@@ -167,7 +164,6 @@ public class ChargedUpNodeMaskTest {
 
     state = SCORING_STATE.STOWED;
     updateNodeMask(robotPose, state);
-    var a = getValidNodes();
     assertEquals(new HashSet<>(getValidNodes()), new HashSet<>(blueNodes));
 
     state = SCORING_STATE.LOW;

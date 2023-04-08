@@ -1,7 +1,6 @@
 package frc.robot.commands.swerve;
 
 import static frc.robot.Constants.AUTO.kAutoBalanceAngleThresholdDegrees;
-import static frc.robot.Constants.AUTO.kAutoBalanceTimeout;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +20,7 @@ public class AutoBalance extends CommandBase {
 
   SwerveModuleState[] states;
 
-  PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private final PIDController outputCalculator = new PIDController(0.02, 0, 0);
   private double m_output = 0;
 
   /**
@@ -31,6 +30,7 @@ public class AutoBalance extends CommandBase {
    */
   public AutoBalance(SwerveDrive swerveDriveSubsystem) {
     m_swerveDrive = swerveDriveSubsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_swerveDrive);
   }
@@ -56,6 +56,8 @@ public class AutoBalance extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    // Negative & 90 degrees for Facing Bump Side
     m_output =
         -outputCalculator.calculate(
             m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
@@ -100,11 +102,7 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (timerStart) {
-      return (m_timer.get() - timestamp) > kAutoBalanceTimeout;
-    } else {
-      return false;
-    }
+    return m_timer.get() - timestamp > 2;
   }
 
   public double getOutput() {

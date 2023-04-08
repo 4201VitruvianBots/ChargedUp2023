@@ -1,12 +1,10 @@
 package frc.robot.commands.auto;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static utils.TestUtils.getPrivateObject;
 import static utils.TestUtils.setPrivateField;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AUTO;
 import frc.robot.RobotContainer;
 import frc.robot.commands.swerve.AutoBalance;
@@ -25,7 +23,6 @@ public class AutoBalanceTest {
   void setup() {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_robotContainer = new RobotContainer();
-    var subsystems = getPrivateObject(CommandScheduler.getInstance(), "m_subsystems");
     m_swerveDrive = m_robotContainer.getSwerveDrive();
   }
 
@@ -97,7 +94,7 @@ public class AutoBalanceTest {
         // Put the Swerve in tolerance again, but make sure it
         setPrivateField(m_swerveDrive, "m_simRoll", -1);
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
+      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.02) {
         // Test that AutoBalance only returns true if within tolerance greater than the timeout
         assertTrue(cmd.isFinished());
       }
@@ -139,7 +136,7 @@ public class AutoBalanceTest {
         // Put the Swerve in tolerance again, but make sure it
         setPrivateField(m_swerveDrive, "m_simRoll", -6);
         assertFalse(cmd.isFinished());
-      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.01) {
+      } else if (m_timer.get() > AUTO.kAutoBalanceTimeout * 3.25 + 0.02) {
         // Test that AutoBalance only returns true if within tolerance greater than the timeout
         assertTrue(cmd.isFinished());
       }

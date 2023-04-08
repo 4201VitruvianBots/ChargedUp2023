@@ -29,17 +29,17 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.CAN;
 import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.*;
-import frc.robot.Constants.STATEHANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 
 // creates LED subsystem
 public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
-  private final CANdle m_candle = new CANdle(Constants.CAN.CANdle); // LED In constants)
-  int red = 0;
-  int green = 0; // setting all LED colors to none: there is no color when robot activates
-  int blue = 0;
+  private final CANdle m_candle = new CANdle(CAN.CANdle); // LED In constants)
+  private int red = 0;
+  private int green = 0; // setting all LED colors to none: there is no color when robot activates
+  private int blue = 0;
   private SUPERSTRUCTURE_STATE currentRobotState = SUPERSTRUCTURE_STATE.STOWED;
   private boolean setSolid;
   private Animation m_toAnimate = null;
@@ -47,9 +47,10 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private final StringPublisher ledStatePub;
 
   // Mechanism2d visualization setup
-  public Mechanism2d m_mech2d = new Mechanism2d(1, 1);
-  public MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
-  public MechanismLigament2d m_ligament2d = m_root2d.append(new MechanismLigament2d("LED", 2, 90));
+  public final Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+  public final MechanismRoot2d m_root2d = m_mech2d.getRoot("LED", 0.5, 0);
+  public final MechanismLigament2d m_ligament2d =
+      m_root2d.append(new MechanismLigament2d("LED", 2, 90));
 
   // Create LED strip
   public LEDSubsystem(Controls controls) {
@@ -82,12 +83,12 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   }
 
   /**
-   * //will set LED color and animation type
+   * Will set LED color and animation type
    *
-   * @param Color8Bit the color channel
-   * @param white
-   * @param speed
-   * @param toChange
+   * @param color the color channel
+   * @param white LED intensity
+   * @param speed Animation Speed
+   * @param toChange AnimationType to use
    */
 
   // will create LED patterns
@@ -96,11 +97,11 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     int green = color.green;
     int blue = color.blue;
     switch (toChange) {
-      case ColorFlow: // stripe of color flowing through the led strip
+      case ColorFlow: // stripe of color flowing through the LED strip
         m_toAnimate =
             new ColorFlowAnimation(red, green, blue, white, speed, LED.LEDcount, Direction.Forward);
         break;
-      case Fire: // red and orange leds flaming up and down the led strip
+      case Fire: // red and orange LEDs flaming up and down the LED strip
         m_toAnimate = new FireAnimation(0.5, 0.7, LED.LEDcount, 0.7, 0.5);
         break;
       case Larson: // a line bouncing back and forth with its width determined by size
@@ -113,13 +114,13 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       case RgbFade: // cycling between red, greed, and blue
         m_toAnimate = new RgbFadeAnimation(1, speed, LED.LEDcount);
         break;
-      case SingleFade: // slowly turn all leds from solid color to off
+      case SingleFade: // slowly turn all LEDs from solid color to off
         m_toAnimate = new SingleFadeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
       case Strobe: // switching between solid color and full off at high speed
         m_toAnimate = new StrobeAnimation(red, green, blue, white, speed, LED.LEDcount);
         break;
-      case Twinkle: // random leds turning on and off with certain color
+      case Twinkle: // random LEDs turning on and off with certain color
         m_toAnimate =
             new TwinkleAnimation(
                 red, green, blue, white, speed, LED.LEDcount, TwinklePercent.Percent6);
@@ -215,6 +216,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putString("LED Mode", currentRobotState.toString());
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {}
 }

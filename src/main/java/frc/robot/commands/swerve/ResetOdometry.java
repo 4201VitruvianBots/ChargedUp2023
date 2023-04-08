@@ -12,8 +12,8 @@ public class ResetOdometry extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   public ResetOdometry(SwerveDrive swerveDrive) {
-    // Use addRequirements() here to declare subsystem dependencies.
     m_swerveDrive = swerveDrive;
+
     addRequirements(m_swerveDrive);
   }
 

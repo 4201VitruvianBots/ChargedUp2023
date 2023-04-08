@@ -91,7 +91,7 @@ public class DistanceSensor implements AutoCloseable {
         socket.setReceiveBufferSize(512);
         socket.setSoTimeout(10);
       } catch (SocketException | UnknownHostException socketFail) {
-        socketFail.printStackTrace();
+        //        socketFail.printStackTrace();
       }
     // }
     initSmartDashboard();
@@ -120,7 +120,7 @@ public class DistanceSensor implements AutoCloseable {
       return sensorValue;
     } catch (Exception e) {
       System.out.println("Boo hoo I can't read the file :_(");
-      e.printStackTrace();
+      //      e.printStackTrace();
       return -1;
     }
   }
@@ -318,16 +318,18 @@ public class DistanceSensor implements AutoCloseable {
         receivedData = new String(packet.getData(), 0, packet.getLength());
       }
     } catch (SocketTimeoutException ex) {
-      System.out.println("error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-SocketTimeoutError");
+      //      ex.printStackTrace();
     } catch (IOException ex) {
-      System.out.println("Client error: " + ex.getMessage());
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-IOError");
+      //      ex.printStackTrace();
     } catch (Exception ex) {
-      ex.printStackTrace();
+      System.out.println("DistanceSensor-UnknownError");
+      //      ex.printStackTrace();
     }
   }
 
+  @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
     if (socket != null) socket.close();

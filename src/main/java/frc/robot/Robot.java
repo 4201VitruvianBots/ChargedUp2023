@@ -5,11 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.utils.ChargedUpNodeMask;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -35,14 +35,9 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     SmartDashboard.putData(CommandScheduler.getInstance());
     DataLogManager.start();
-    //    addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
-    addPeriodic(
-        () ->
-            ChargedUpNodeMask.updateNodeMask(
-                m_robotContainer.getSwerveDrive().getPoseMeters(),
-                m_robotContainer.getStateHandler().getCurrentScoringState()),
-        0.04,
-        0.01);
+    if (RobotBase.isSimulation())
+      addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
+    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
     // Same as color sensors in RapidReact2022
     //    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.02, 0.01);
   }
@@ -62,7 +57,6 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     m_robotContainer.periodic();
-    //    m_robotContainer.getDistanceSensor().pollDistanceSensors();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

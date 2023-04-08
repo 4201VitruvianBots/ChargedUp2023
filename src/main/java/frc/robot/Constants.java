@@ -19,6 +19,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
@@ -34,8 +36,9 @@ import java.util.Map;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
+public final class Constants implements AutoCloseable {
   public static String robotName = "";
+
   // Add any constants that do not change between robots here, as well as all
   // enums
 
@@ -72,7 +75,6 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerLimitSwitch = 9;
-    public static final int wristLowerSwitch = 0;
   }
 
   public static final class CONSTANTS {
@@ -89,11 +91,12 @@ public final class Constants {
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
     public static final double carriageDistance = Units.inchesToMeters(6.5);
-    public static final int angleDegrees = 35;
+    public static final double carriageOffset = Units.inchesToMeters(11);
+    public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static double kMaxVel = Units.inchesToMeters(30);
-    public static double kMaxAccel = Units.inchesToMeters(15);
+    public static final double kMaxVel = Units.inchesToMeters(30);
+    public static final double kMaxAccel = Units.inchesToMeters(15);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -111,7 +114,9 @@ public final class Constants {
 
     public static final double kMaxForwardOutput = 0.6;
     public static final double kMaxReverseOutput = -0.45;
+
     public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
@@ -125,6 +130,12 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints m_fastConstraints =
         new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
+    public enum SPEED {
+      HALT,
+      SLOW,
+      FAST
+    }
+
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
@@ -135,7 +146,7 @@ public final class Constants {
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
       SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(Units.inchesToMeters(19.13));
+      INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 
       private final double value;
 
@@ -157,17 +168,17 @@ public final class Constants {
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
-      // Alpha 0<x<4 inches
-      // Beta 3.5 - 28 inches
-      // Gamma 27.5 - 50 inches
+      // Alpha 0 < x < 3.5 inches
+      // Beta 3 < x < 28 inches
+      // Gamma 27.5 < x < 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.inchesToMeters(4)),
-      BETA_MIN(Units.inchesToMeters(3.5)),
+      ALPHA_MAX(Units.inchesToMeters(3.5)),
+      BETA_MIN(Units.inchesToMeters(3.0)),
       BETA_MAX(Units.inchesToMeters(29)),
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
 
-      private final double value;
+      private double value;
 
       THRESHOLD(final double value) {
         this.value = value;
@@ -184,13 +195,14 @@ public final class Constants {
     public static final int leftConeSensorId = 1;
     public static final int rightConeSensorId = 2;
     public static final int cubeSensorId = 3;
-    public static final double length = Units.inchesToMeters(12);
+    public static final double length = Units.inchesToMeters(9.5);
 
     public static double kF = 0;
     public static double kP = 0.2;
 
-    public enum HELD_GAMEPIECE {
+    public enum INTAKE_STATE {
       NONE,
+      INTAKING,
       CUBE,
       CONE
     }
@@ -252,7 +264,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.7715;
-    public static double frontRightCANCoderOffset = 203.8625;
+    public static double frontRightCANCoderOffset = 5.889;
     public static double backLeftCANCoderOffset = 190.591;
     public static double backRightCANCoderOffset = 32.915;
 
@@ -260,12 +272,16 @@ public final class Constants {
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
 
-    public static final double kP_Translation = 0.6;
-    public static final double kI_Translation = 0;
-    public static final double kD_Translation = 0;
-    public static final double kP_Rotation = 4;
-    public static final double kI_Rotation = 0;
-    public static final double kD_Rotation = 0.01;
+    public static final double kP_X = 0.6;
+    public static final double kI_X = 0;
+    public static final double kD_X = 0;
+    public static final double kP_Y = 0.6;
+    public static final double kI_Y = 0;
+    public static final double kD_Y = 0;
+
+    public static final double kP_Theta = 4.0;
+    public static final double kI_Theta = 0;
+    public static final double kD_Theta = 0.01;
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,
@@ -306,11 +322,10 @@ public final class Constants {
     }
 
     public enum CAMERA_SERVER {
-      INTAKE("10.42.1.10"),
-      OUTTAKE("10.42.1.10"),
-      LEFT_LOCALIZER("10.42.1.11"),
-      RIGHT_LOCALIZER("10.42.1.12"),
-      FUSED_LOCALIZER("10.42.1.11");
+      INTAKE("10.42.1.11"),
+      LEFT_LOCALIZER("10.42.1.12"),
+      RIGHT_LOCALIZER("10.42.1.13"),
+      FUSED_LOCALIZER("10.42.1.12");
 
       private final String ip;
 
@@ -324,7 +339,7 @@ public final class Constants {
       }
     }
 
-    public static Transform3d[] LOCALIZER_CAMERA_POSITION = {
+    public static final Transform3d[] LOCALIZER_CAMERA_POSITION = {
       // Robot Center to Left Camera
       new Transform3d(
           new Translation3d(
@@ -349,12 +364,17 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
-    public static final double fourbarLength = Units.inchesToMeters(15);
+    public static final double fourbarLength = Units.inchesToMeters(19);
+    public static final double fourbarAngleDegrees = 180;
     public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kLimitedPercentOutputMultiplier = 0.1;
+
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopIdx = 0;
 
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
@@ -369,9 +389,6 @@ public final class Constants {
     public static final double kP = 0.04;
     public static final double kI = 0.0;
     public static final double kD = 1.0;
-
-    public static final int simEncoderSign =
-        WRIST.motorInversionType == TalonFXInvertType.Clockwise ? -1 : 1;
 
     public static final TrapezoidProfile.Constraints slowConstraints =
         new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
@@ -447,78 +464,80 @@ public final class Constants {
     }
   }
 
-  public static class STATEHANDLER {
-
-    public enum INTAKING_STATES {
-      NONE,
-      INTAKING,
-      CONE,
-      CUBE
-    }
+  public static class STATE_HANDLER {
 
     public enum ZONE {
       UNDEFINED, // Danger
+      STATUS, // Danger
       ALPHA,
       BETA,
       GAMMA,
     }
 
-    public static final int undefinedOrdinal = ZONE.UNDEFINED.ordinal();
-    public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
-    public static final int betaOrdinal = ZONE.BETA.ordinal();
-    public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
-
-    public static final double elevatorSetpointTolerance = Units.inchesToMeters(1);
+    public static final double elevatorSetpointTolerance = Units.inchesToMeters(2);
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
-    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(115);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
     public static boolean limitCanUtilization = true;
 
+    public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
+
+    public static final Mechanism2d superStructureMech2d =
+        new Mechanism2d(mechanism2dOffset * 3, mechanism2dOffset * 3);
+    public static final MechanismRoot2d chassisRoot2d =
+        superStructureMech2d.getRoot("ChassisRoot", mechanism2dOffset, mechanism2dOffset);
+    public static final MechanismRoot2d elevatorRoot2d =
+        superStructureMech2d.getRoot(
+            "ElevatorRoot", mechanism2dOffset, mechanism2dOffset + Units.inchesToMeters(3));
+
     public enum SUPERSTRUCTURE_STATE {
-      DISABLED(0),
-      ENABLED(0),
-      LOW_BATTERY(0),
       // UNDEFINED
-      DANGER_ZONE(undefinedOrdinal),
+      DANGER_ZONE(ZONE.UNDEFINED),
+      // STATUS
+      DISABLED(ZONE.STATUS),
+      ENABLED(ZONE.STATUS),
+      LOW_BATTERY(ZONE.STATUS),
       // LOWs
-      STOWED(alphaOrdinal),
-      INTAKE_LOW_CONE(alphaOrdinal),
-      INTAKE_LOW_CUBE(alphaOrdinal),
-      SCORE_LOW_REVERSE(alphaOrdinal),
-      SCORE_LOW(alphaOrdinal),
-      SCORE_LOW_CONE(alphaOrdinal),
-      SCORE_LOW_CUBE(alphaOrdinal),
-      ALPHA_ZONE(alphaOrdinal),
+      STOWED(ZONE.ALPHA),
+      INTAKE_LOW_CONE(ZONE.ALPHA),
+      INTAKE_LOW_CUBE(ZONE.ALPHA),
+      SCORE_LOW_REVERSE(ZONE.ALPHA),
+      SCORE_LOW(ZONE.ALPHA),
+      SCORE_LOW_CONE(ZONE.ALPHA),
+      SCORE_LOW_CUBE(ZONE.ALPHA),
+      ALPHA_ZONE(ZONE.ALPHA),
       // MID
-      BETA_ZONE(betaOrdinal),
-      SCORE_MID(betaOrdinal),
-      SCORE_MID_CONE(betaOrdinal),
-      SCORE_MID_CUBE(betaOrdinal),
+      BETA_ZONE(ZONE.BETA),
+      SCORE_MID(ZONE.BETA),
+      SCORE_MID_CONE(ZONE.BETA),
+      SCORE_MID_CUBE(ZONE.BETA),
       // HIGH
-      GAMMA_ZONE(gammaOrdinal),
-      INTAKE_EXTENDED(gammaOrdinal),
-      SCORE_HIGH(gammaOrdinal),
-      SCORE_HIGH_CONE(gammaOrdinal),
-      SCORE_HIGH_CUBE(gammaOrdinal);
+      GAMMA_ZONE(ZONE.GAMMA),
+      INTAKE_EXTENDED(ZONE.GAMMA),
+      SCORE_HIGH(ZONE.GAMMA),
+      SCORE_HIGH_CONE(ZONE.GAMMA),
+      SCORE_HIGH_CUBE(ZONE.GAMMA);
 
       // State Zone is determined by elevator setpoints
-      private final int zone;
+      private final ZONE zone;
 
-      SUPERSTRUCTURE_STATE(final int zone) {
+      SUPERSTRUCTURE_STATE(final ZONE zone) {
         this.zone = zone;
       }
 
-      public int getZone() {
+      public ZONE getZone() {
         return zone;
       }
     }
 
     public enum SETPOINT {
-      // Units are in meters
+      // Units are in meters, radians
       STOWED(ELEVATOR.SETPOINT.STOWED.get(), WRIST.SETPOINT.STOWED.get()),
       SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
+      SCORE_LOW_REVERSE(
+          ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get(), WRIST.SETPOINT.SCORE_LOW_REVERSE.get()),
       SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
       SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(
@@ -570,8 +589,12 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
+    // SWERVE_DRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
+    // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
+    // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
+    // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 203.8625; // 41.748;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 186.855; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 32.915;
   }
@@ -590,6 +613,8 @@ public final class Constants {
 
   private static void initSim() {
     robotName = "Sim";
+
+    ELEVATOR.THRESHOLD.ABSOLUTE_MIN.value = 0;
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 0;
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;
@@ -625,7 +650,7 @@ public final class Constants {
     }
 
     if (!DriverStation.isFMSAttached()) {
-      STATEHANDLER.limitCanUtilization = false;
+      STATE_HANDLER.limitCanUtilization = false;
     }
 
     SmartDashboard.putString("Robot Name", robotName);
@@ -633,4 +658,11 @@ public final class Constants {
 
   public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
   public static final String betaRobotMAC = "00:80:2F:19:30:B7";
+
+  @Override
+  public void close() throws Exception {
+    STATE_HANDLER.superStructureMech2d.close();
+    STATE_HANDLER.elevatorRoot2d.close();
+    STATE_HANDLER.chassisRoot2d.close();
+  }
 }

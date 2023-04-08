@@ -55,7 +55,7 @@ public class MemoryLog {
     Runtime.getRuntime().gc();
   }
 
-  // Uses runtime functions to calcualate total, free, and used memory
+  // Uses runtime functions to calculate total, free, and used memory
   private void updateMemoryValues() {
     this.totalMemory = Runtime.getRuntime().totalMemory();
     this.freeMemory = Runtime.getRuntime().freeMemory();
@@ -68,7 +68,7 @@ public class MemoryLog {
       logFile.write(string);
       logFile.close();
     } catch (IOException writeFailed) {
-      writeFailed.printStackTrace();
+      //      writeFailed.printStackTrace();
     }
   }
 
