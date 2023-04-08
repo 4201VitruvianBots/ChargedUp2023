@@ -280,8 +280,10 @@ public final class Constants {
     public static double backRightCANCoderOffset = 0;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+    public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 4;
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
+    public static final double kLimitedRotationRadiansPerSecond = kMaxRotationRadiansPerSecond / 4;
 
     public static final double kP_X = 0.6;
     public static final double kI_X = 0;

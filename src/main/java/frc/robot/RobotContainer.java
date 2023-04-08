@@ -42,6 +42,7 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
+import frc.robot.commands.swerve.LimitSwerveJoystickInput;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -151,6 +152,8 @@ public class RobotContainer implements AutoCloseable {
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
 
+    rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
+    
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
 

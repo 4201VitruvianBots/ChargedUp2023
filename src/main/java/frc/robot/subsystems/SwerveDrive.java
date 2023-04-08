@@ -79,6 +79,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
+  private boolean m_limitJoystickInput = false;
+
   private final SwerveDrivePoseEstimator m_odometry;
 
   private MechanismLigament2d m_swerveChassis2d;
@@ -104,6 +106,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   ChassisSpeeds chassisSpeeds;
   private double m_maxVelocity = SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
+  private double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
@@ -140,15 +143,25 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       module.resetAngleToAbsolute();
   }
 
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
+  }
+
   public void drive(
       double throttle,
       double strafe,
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= m_maxVelocity;
-    strafe *= m_maxVelocity;
-    rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
+    if (m_limitJoystickInput) {
+      throttle *= m_limitedVelocity;
+      strafe *= m_limitedVelocity;
+      rotation *= SWERVE_DRIVE.kLimitedRotationRadiansPerSecond;
+    } else {
+      throttle *= m_maxVelocity;
+      strafe *= m_maxVelocity;
+      rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
+    }
 
     /** Setting field vs Robot Relative */
     if (useHeadingTarget) {
