@@ -68,6 +68,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // Create a new ArmFeedforward with gains kS, kG, kV, and kA
   private final ArmFeedforward m_feedForward =
       new ArmFeedforward(WRIST.FFkS, WRIST.kG, WRIST.FFkV, WRIST.kA);
+  private ArmFeedforward m_currentFeedForward = m_feedForward;
 
   // This timer is used in trapezoid profile to calculate the amount of time since the last periodic
   // run
@@ -182,7 +183,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_controlMode = mode;
   }
 
-  public CONTROL_MODE getClosedLoopControl() {
+  public CONTROL_MODE getClosedLoopControlMode() {
     return m_controlMode;
   }
 
@@ -229,7 +230,23 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
-    return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
+    return (m_currentFeedForward.calculate(state.position, state.velocity) / 12.0);
+  }
+
+  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+    wristMotor.config_kF(WRIST.kSlotIdx, f);
+    wristMotor.config_kP(WRIST.kSlotIdx, d);
+    wristMotor.config_kI(WRIST.kSlotIdx, p);
+    wristMotor.config_kD(WRIST.kSlotIdx, i);
+    wristMotor.config_IntegralZone(WRIST.kSlotIdx, izone);
+  }
+
+  public void setArmMotorFeedForward(double s, double g, double v, double a) {
+    m_currentFeedForward = new ArmFeedforward(s, g, v, a);
+  }
+
+  public void setTrapezoidalConstraints(double maxVel, double maxAccel) {
+    m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
   }
 
   // Sets the setpoint of the wrist to its current position to keep it in place
@@ -355,75 +372,15 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
-
-    // // Initialize Test Values
-    // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
-    // wristTab.getDoubleTopic("kMaxAccel").publish().set(Constants.WRIST.kMaxSlowAccel);
-    // wristTab.getDoubleTopic("kA").publish().set(Constants.WRIST.kA);
-    // wristTab.getDoubleTopic("kS").publish().set(Constants.WRIST.FFkS);
-    // wristTab.getDoubleTopic("kV").publish().set(Constants.WRIST.FFkV);
-    // wristTab.getDoubleTopic("kG").publish().set(Constants.WRIST.kG);
-    // wristTab.getDoubleTopic("kP").publish().set(Constants.WRIST.kP);
-    // wristTab.getDoubleTopic("kI").publish().set(Constants.WRIST.kI);
-    // wristTab.getDoubleTopic("kD").publish().set(Constants.WRIST.kD);
-    // wristTab.getDoubleTopic("Desired Angle Degrees").publish().set(0);
-
-    // kMaxVelSub = wristTab.getDoubleTopic("kMaxSlowVel").subscribe(Constants.WRIST.kMaxSlowVel);
-    // kMaxAccelSub =
-    //     wristTab.getDoubleTopic("kMaxSlowAccel").subscribe(Constants.WRIST.kMaxSlowAccel);
-    // kSSub = wristTab.getDoubleTopic("kS").subscribe(Constants.WRIST.FFkS);
-    // kGSub = wristTab.getDoubleTopic("kG").subscribe(Constants.WRIST.kG);
-    // kVSub = wristTab.getDoubleTopic("kV").subscribe(Constants.WRIST.FFkV);
-    // kASub = wristTab.getDoubleTopic("kA").subscribe(Constants.WRIST.kA);
-    // kPSub = wristTab.getDoubleTopic("kP").subscribe(Constants.WRIST.kP);
-    // kISub = wristTab.getDoubleTopic("kI").subscribe(Constants.WRIST.kI);
-    // kDSub = wristTab.getDoubleTopic("kD").subscribe(Constants.WRIST.kD);
-    // kSetpointSub = wristTab.getDoubleTopic("Desired Angle Degrees").subscribe(0);
   }
 
   public void updateSmartDashboard() {
-    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControl().name());
+    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControlMode().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
 
-    currentCommandStatePub.set(getClosedLoopControl().toString());
+    currentCommandStatePub.set(getClosedLoopControlMode().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
     kCurrentAngleDegreesPub.set(getPositionDegrees());
-
-    // currentTrapezoidAcceleration.set(m_currentTrapezoidalConstraints.maxAcceleration);
-    // currentTrapezoidVelocity.set(m_currentTrapezoidalConstraints.maxVelocity);
-
-    // Testing Code
-    // setControlState(STATE.TEST_SETPOINT);
-    // if (m_controlState != STATE.TEST_SETPOINT) {
-    //   return;
-    // }
-
-    // DriverStation.reportWarning("USING WRIST TEST MODE!", false);
-    // double maxVel = kMaxVelSub.get(0);
-    // double maxAccel = kMaxAccelSub.get(0);
-    // m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
-    // double kS = kSSub.get(Constants.WRIST.FFkS);
-    // double kG = kGSub.get(Constants.WRIST.kG);
-    // double kV = kVSub.get(Constants.WRIST.FFkV);
-    // double kA = kASub.get(Constants.WRIST.kA);
-
-    // m_feedforward = new ArmFeedforward(kS, kG, kV, kA);
-
-    // double newTestKP = kPSub.get(0);
-    // if (testKP != newTestKP) {
-    //   wristMotor.config_kP(0, newTestKP);
-    //   testKP = newTestKP;
-    // }
-    // double newTestKI = kISub.get(0);
-    // if (testKI != newTestKI) {
-    //   wristMotor.config_kI(0, newTestKI);
-    //   testKI = newTestKI;
-    // }
-    // double newTestKD = kDSub.get(0);
-    // if (testKD != newTestKD) {
-    //   wristMotor.config_kD(0, newTestKD);
-    //   testKD = newTestKD;
-    // }
   }
 
   public void updateLog() {

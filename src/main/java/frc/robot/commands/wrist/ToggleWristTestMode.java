@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.elevator;
+package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Wrist;
 
-public class ToggleElevatorTestMode extends CommandBase {
+public class ToggleWristTestMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
-  private final Elevator m_elevator;
+  private final Wrist m_wrist;
 
   private CONTROL_MODE m_lastcontrolmode;
   private Command m_defultCommand;
 
-  public ToggleElevatorTestMode(Elevator elevator) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    m_elevator = elevator;
+  public ToggleWristTestMode(Wrist wrist) {
+    m_wrist = wrist;
 
-    addRequirements(m_elevator);
+    addRequirements(m_wrist);
   }
 
   @Override
@@ -31,14 +30,14 @@ public class ToggleElevatorTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_elevator.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP_TEST) {
-      m_lastcontrolmode = m_elevator.getClosedLoopControlMode();
-      m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
-      m_defultCommand = m_elevator.getDefaultCommand();
-      m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator));
+    if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP_TEST) {
+      m_lastcontrolmode = m_wrist.getClosedLoopControlMode();
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
+      m_defultCommand = m_wrist.getDefaultCommand();
+      m_wrist.setDefaultCommand(new RunWristTestMode(m_wrist));
     } else {
-      m_elevator.setClosedLoopControlMode(m_lastcontrolmode);
-      m_elevator.setDefaultCommand(m_defultCommand);
+      m_wrist.setClosedLoopControlMode(m_lastcontrolmode);
+      m_wrist.setDefaultCommand(m_defultCommand);
     }
   }
 

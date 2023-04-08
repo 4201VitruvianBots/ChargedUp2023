@@ -27,9 +27,9 @@ public class ToggleWristControlMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_wrist.getClosedLoopControl() != CONTROL_MODE.OPEN_LOOP)
+    if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.OPEN_LOOP)
       m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
-    else if (m_wrist.getClosedLoopControl() != CONTROL_MODE.CLOSED_LOOP)
+    else if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP)
       m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
   }
 

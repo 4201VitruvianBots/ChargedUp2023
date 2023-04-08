@@ -41,11 +41,7 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
-import frc.robot.commands.wrist.LimitWristJoystickInput;
-import frc.robot.commands.wrist.ResetWristAngleDegrees;
-import frc.robot.commands.wrist.RunWristJoystick;
-import frc.robot.commands.wrist.SetWristSetpoint;
-import frc.robot.commands.wrist.ToggleWristControlMode;
+import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.simulation.SimConstants;
@@ -127,6 +123,7 @@ public class RobotContainer implements AutoCloseable {
 
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator));
+      SmartDashboard.putData(new ToggleWristTestMode(m_wrist));
     }
   }
 

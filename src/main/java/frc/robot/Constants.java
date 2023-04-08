@@ -361,6 +361,9 @@ public final class Constants {
     public static final double kPercentOutputMultiplier = 0.2;
     public static final double kLimitedPercentOutputMultiplier = 0.1;
 
+    public static final int kSlotIdx = 0;
+    public static final int kPIDLoopIdx = 0;
+
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);
     public static final double kMaxSlowAccel = Units.degreesToRadians(290);

@@ -4,7 +4,6 @@
 
 package frc.robot.commands.elevator;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -50,10 +49,8 @@ public class RunElevatorTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
-    new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
     NetworkTable elevatorNtTab =
-        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
 
     // initialize Test Values
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
@@ -64,7 +61,7 @@ public class RunElevatorTestMode extends CommandBase {
     kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(ELEVATOR.kD);
     kIZoneSub = elevatorNtTab.getDoubleTopic("kIZone").subscribe(0);
 
-    kGSub = elevatorNtTab.getDoubleTopic("kS").subscribe(ELEVATOR.kG);
+    kGSub = elevatorNtTab.getDoubleTopic("kG").subscribe(ELEVATOR.kG);
     kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(ELEVATOR.kV);
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(ELEVATOR.kA);
 
