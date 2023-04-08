@@ -6,61 +6,77 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
+
+/*scoring = flashing white, intakingCube = blue,
+intakingCone = orange, locked on = flashing green,
+enable = green, disabled = red,
+cubeButton = purple, coneButton = yellow */
 
 /** Sets the LED based on the subsystems' statuses */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final LED m_led;
+  private final LEDSubsystem m_led;
 
-  private final Wrist m_wrist;
-  private final Intake m_intake;
-  private boolean Cone;
-  private boolean Cube;
-  private boolean disabled;
-  private boolean enabled;
-  private boolean elavating;
-  private boolean intaking;
-  private boolean wrist;
+  private final StateHandler m_stateHandler;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LED led, Intake intake, Wrist wrist) {
+  public GetSubsystemStates(LEDSubsystem led, StateHandler stateHandler) {
     m_led = led;
-    m_intake = intake;
-    m_wrist = wrist;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(led);
+    m_stateHandler = stateHandler;
+
+    addRequirements(m_led);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_led.expressState(LED.robotState.ENABLED);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     // the prioritized state to be expressed to the LEDs
-    disabled = DriverStation.isDisabled();
-    enabled = !disabled;
-    intaking = m_intake.getIntakeState();
-    wrist = m_wrist.getWristState();
-
     // set in order of priority to be expressed from the least priority to the
     // highest priority
-    if (disabled) {
-      m_led.expressState(LED.robotState.DISABLED);
-    } else if (elavating) {
-      m_led.expressState(LED.robotState.ELEVATING);
-    } else if (Cone) {
-      m_led.expressState(LED.robotState.CONE);
-    } else if (Cube) {
-      m_led.expressState(LED.robotState.CUBE);
-    } else if (wrist) {
-      m_led.expressState(LED.robotState.WRIST);
-    } else if (enabled) {
-      m_led.expressState(LED.robotState.ENABLED);
+    if (DriverStation.isDisabled()) {
+      // TODO: Add an isReady state
+      m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
+    } else {
+      switch (m_stateHandler.getDesiredState()) {
+          // TODO: Add states for substation intaking
+        case INTAKE_LOW_CONE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+          break;
+        case INTAKE_LOW_CUBE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+          break;
+        case ALPHA_ZONE:
+        case SCORE_LOW_REVERSE:
+        case SCORE_LOW:
+        case SCORE_LOW_CONE:
+        case SCORE_LOW_CUBE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.ALPHA_ZONE); // Solid Orange
+          break;
+        case BETA_ZONE:
+        case SCORE_MID_CONE:
+        case SCORE_MID_CUBE:
+        case SCORE_MID:
+          m_led.expressState(SUPERSTRUCTURE_STATE.BETA_ZONE);
+          // Solid Blue
+          break;
+        case GAMMA_ZONE:
+        case INTAKE_EXTENDED:
+        case SCORE_HIGH:
+        case SCORE_HIGH_CONE:
+        case SCORE_HIGH_CUBE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.GAMMA_ZONE);
+          // Solid White
+          break;
+        default:
+          m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
+          break;
+      }
     }
   }
 

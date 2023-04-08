@@ -9,7 +9,6 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.SwerveDrive;
@@ -20,7 +19,8 @@ public class SetSwerveOdometry extends CommandBase {
   private final SwerveDrive m_swerveDrive;
 
   private final FieldSim m_fieldSim;
-  private Pose2d m_pose2d;
+
+  private final Pose2d m_pose2d;
 
   /**
    * Sets the robot's position
@@ -48,7 +48,7 @@ public class SetSwerveOdometry extends CommandBase {
     m_fieldSim = fieldSim;
     m_pose2d = pose2d;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive);
+    addRequirements(m_swerveDrive);
   }
 
   // Called when the command is initially scheduled.
@@ -56,9 +56,10 @@ public class SetSwerveOdometry extends CommandBase {
   public void initialize() {
     m_swerveDrive.setOdometry(m_pose2d);
     if (RobotBase.isSimulation()) m_fieldSim.resetRobotPose(m_pose2d);
-    SmartDashboard.putNumber("SwerveInitialPositionX", m_pose2d.getX());
-    SmartDashboard.putNumber("SwerveInitialPositionY", m_pose2d.getY());
-    SmartDashboard.putNumber("SwerveInitialPositionRotation", m_pose2d.getRotation().getDegrees());
+    //    SmartDashboard.putNumber("SwerveInitialPositionX", m_pose2d.getX());
+    //    SmartDashboard.putNumber("SwerveInitialPositionY", m_pose2d.getY());
+    //    SmartDashboard.putNumber("SwerveInitialPositionRotation",
+    // m_pose2d.getRotation().getDegrees());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -1,0 +1,20 @@
+name: Mark stale issues
+
+on:
+  workflow_dispatch
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at 00:00
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v4
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 8 # Number of days before an issue becomes stale
+          days-before-close: 20 # Number of days before a stale issue is closed
+          stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'
+          close-issue-message: 'This issue has been automatically closed because it has not had recent activity. If you believe this was done in error, please comment or reopen the issue. Thank you for your contributions.'
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'pinned, security, in progress, documentation' # Add labels that you want to exempt from being marked as stale

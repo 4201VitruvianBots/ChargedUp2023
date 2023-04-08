@@ -27,11 +27,19 @@ public class MemoryLog {
   private final long startTime = System.nanoTime();
 
   public MemoryLog() {
+    // Creates the file if it does not already exist
+    try {
+      File newFile = new File(logPath);
+      newFile.createNewFile();
+    } catch (IOException e) {
+      //      e.printStackTrace();
+    }
+
     try {
       final FileWriter clearFile = new FileWriter(logPath, false);
       clearFile.close();
     } catch (IOException clearFailed) {
-      clearFailed.printStackTrace();
+      //      clearFailed.printStackTrace();
     }
   }
 
@@ -47,7 +55,7 @@ public class MemoryLog {
     Runtime.getRuntime().gc();
   }
 
-  // Uses runtime functions to calcualate total, free, and used memory
+  // Uses runtime functions to calculate total, free, and used memory
   private void updateMemoryValues() {
     this.totalMemory = Runtime.getRuntime().totalMemory();
     this.freeMemory = Runtime.getRuntime().freeMemory();
@@ -60,7 +68,7 @@ public class MemoryLog {
       logFile.write(string);
       logFile.close();
     } catch (IOException writeFailed) {
-      writeFailed.printStackTrace();
+      //      writeFailed.printStackTrace();
     }
   }
 

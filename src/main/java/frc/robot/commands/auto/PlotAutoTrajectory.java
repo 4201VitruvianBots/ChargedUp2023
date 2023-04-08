@@ -4,25 +4,42 @@
 
 package frc.robot.commands.auto;
 
-import edu.wpi.first.math.trajectory.Trajectory;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
+import frc.robot.simulation.SimConstants;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlotAutoTrajectory extends CommandBase {
-  FieldSim m_fieldSim;
-  Trajectory m_trajectory;
-  /** Creates a new PlotAutoTrajectory. */
-  public PlotAutoTrajectory(FieldSim fieldSim, Trajectory trajectory) {
+  private final FieldSim m_fieldSim;
+  private final List<PathPlannerTrajectory> m_trajectories;
+  private final String m_pathName;
+
+  public PlotAutoTrajectory(
+      FieldSim fieldSim, String pathName, List<PathPlannerTrajectory> trajectories) {
     m_fieldSim = fieldSim;
-    m_trajectory = trajectory;
+    m_pathName = pathName;
+    m_trajectories = trajectories;
 
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_fieldSim);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_fieldSim.setTrajectory(m_trajectory);
+    List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
+    var isRedPath = m_pathName.startsWith("Red");
+    if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
+    else ppTrajectories.addAll(m_trajectories);
+
+    m_fieldSim.setTrajectory(ppTrajectories);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

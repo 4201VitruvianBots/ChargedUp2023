@@ -7,13 +7,21 @@
 
 package frc.robot.simulation;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.Controls;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Contains various field dimensions and useful reference points. Dimensions are in meters, and sets
@@ -24,16 +32,13 @@ import java.util.Map;
  * methods to flip these values based on the current alliance color.
  */
 public final class SimConstants {
-  // TODO: Check in with design & other directorates to update these values
-
-  public static final double robotWidthMeters = Units.inchesToMeters(24);
-  public static final double robotLengthMeters = Units.inchesToMeters(24);
-
   public static final double fieldLength = Units.inchesToMeters(651.25);
   public static final double fieldWidth = Units.inchesToMeters(315.5);
   public static final double tapeWidth = Units.inchesToMeters(2.0);
   public static final double aprilTagWidth = Units.inchesToMeters(6.0);
   public static final double fieldHeightMeters = Units.feetToMeters(27);
+
+  public static final double cubeWidth = Units.inchesToMeters(9.5);
 
   public static final Pose2d startPositionMeters = new Pose2d();
 
@@ -264,4 +269,90 @@ public final class SimConstants {
               Units.inchesToMeters(42.19),
               Units.inchesToMeters(18.22),
               new Rotation3d()));
+
+  /**
+   * Flips a translation to the correct side of the field based on the current alliance color. By
+   * default, all translations and poses in {@link SimConstants} are stored with the origin at the
+   * rightmost point on the BLUE ALLIANCE wall.
+   */
+  public static Translation2d allianceFlip(Translation2d translation) {
+    if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
+      return new Translation2d(fieldLength - translation.getX(), translation.getY());
+    } else {
+      return translation;
+    }
+  }
+
+  public static List<PathPlannerTrajectory> absoluteFlip(List<PathPlannerTrajectory> trajectories) {
+    List<PathPlannerTrajectory> flippedTrajectories = new ArrayList<>();
+    for (var trajectory : trajectories) {
+
+      List<Trajectory.State> trajectoryStates =
+          trajectory.getStates().stream()
+              .map(state -> absoluteFlip(state))
+              .collect(Collectors.toList());
+
+      var flippedTrajectory =
+          new PathPlannerTrajectory(
+              trajectoryStates,
+              trajectory.getMarkers(),
+              trajectory.getStartStopEvent(),
+              trajectory.getEndStopEvent(),
+              false);
+
+      flippedTrajectories.add(flippedTrajectory);
+    }
+    return flippedTrajectories;
+  }
+
+  public static PathPlannerTrajectory.Waypoint absoluteFlip(
+      PathPlannerTrajectory.Waypoint waypoint) {
+    var newAnchorPoint = absoluteFlip(waypoint.anchorPoint);
+    var newHolonomicRotation = waypoint.holonomicRotation.rotateBy(Rotation2d.fromDegrees(180));
+    return new PathPlannerTrajectory.Waypoint(
+        newAnchorPoint,
+        waypoint.prevControl,
+        waypoint.nextControl,
+        waypoint.velOverride,
+        newHolonomicRotation,
+        waypoint.isReversal,
+        waypoint.isStopPoint,
+        waypoint.stopEvent);
+  }
+
+  public static PathPlannerTrajectory.State absoluteFlip(Trajectory.State state) {
+    var newPose = absoluteFlip(state.poseMeters);
+    return new PathPlannerTrajectory.State(
+        state.timeSeconds,
+        state.velocityMetersPerSecond,
+        state.accelerationMetersPerSecondSq,
+        newPose,
+        -state.curvatureRadPerMeter);
+  }
+
+  public static Pose2d absoluteFlip(Pose2d pose) {
+    return new Pose2d(
+        absoluteFlip(pose.getTranslation()),
+        new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+  }
+
+  public static Translation2d absoluteFlip(Translation2d translation) {
+    return new Translation2d(fieldLength - translation.getX(), translation.getY());
+  }
+
+  /**
+   * Flips a pose to the correct side of the field based on the current alliance color. By default,
+   * all translations and poses in {@link SimConstants} are stored with the origin at the rightmost
+   * point on the BLUE ALLIANCE wall.
+   */
+  public static Pose2d allianceFlip(Pose2d pose) {
+    if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
+      return new Pose2d(
+          fieldLength - pose.getX(),
+          pose.getY(),
+          new Rotation2d(-pose.getRotation().getCos(), pose.getRotation().getSin()));
+    } else {
+      return pose;
+    }
+  }
 }

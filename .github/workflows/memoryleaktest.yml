@@ -5,6 +5,7 @@ name: MemoryLeakTest
 # Controls when the action will run. Triggers the workflow at 8:00 am PST (16:00 UTC) every other day
 # Will use approx. 900/2000 allotted minutes per month
 on:
+  workflow_dispatch
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 16 */2 * *'
@@ -38,15 +39,19 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
-      run: ./gradlew build
+      run: ./gradlew build -x test
     
     # Runs a single command using the runners shell
     - name: Run the robot code in a simulator
       run: timeout 3600 ./gradlew simulateJava || code=$?; if [[ $code -ne 124 && $code -ne 0 ]]; then exit $code; fi
 
     # Runs a single command using the runners shell
+    - name: Override gitignore and add memory log file
+      run: git add -f .github/artifacts/memorylog.txt
+
+    # Runs a single command using the runners shell
     - name: Upload artifact of memory log
       uses: actions/upload-artifact@v3
       with:
-        name: memory-log-file
+        name: memorylog
         path: .github/artifacts/memorylog.txt

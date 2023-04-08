@@ -14,14 +14,20 @@ public class SetSwerveNeutralMode extends CommandBase {
   /**
    * Sets the drivetrain neutral mode (coast/brake).
    *
-   * @param driveTrain The driveTrain used by this command.
-   * @param mode {@link DriveTrainNeutralMode.}: COAST, BRAKE, or HALF_BRAKE.
+   * @param swerveDrive The driveTrain used by this command.
+   * @param mode {@link NeutralMode}: COAST, BRAKE, or HALF_BRAKE.
    */
   public SetSwerveNeutralMode(SwerveDrive swerveDrive, NeutralMode mode) {
     m_swerveDrive = swerveDrive;
     m_mode = mode;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive);
+    addRequirements(m_swerveDrive);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called when the command is initially scheduled.

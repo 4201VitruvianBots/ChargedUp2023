@@ -172,3 +172,8 @@ simgui.json
 *.wpilog
 
 *.checksum
+
+# Github action artifacts
+.github/artifacts/memorylog.txt
+
+memorylog.txt

@@ -4,36 +4,87 @@
 
 package frc.robot.utils;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.simulation.SimConstants;
+import frc.robot.subsystems.SwerveDrive;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrajectoryUtils {
-  public static PathPlannerTrajectory readTrajectory(
-      String fileName, double MaxVelocity, double MaxAcceleration, boolean reverse) {
+  public static List<PathPlannerTrajectory> readTrajectory(
+      String fileName, PathConstraints segmentConstraints) {
+    return readTrajectory(fileName, segmentConstraints, segmentConstraints);
+  }
 
-    if (fileName.startsWith("Red")) {
-      try {
-        return PathPlanner.loadPath(fileName, MaxVelocity, MaxAcceleration, reverse);
-      } catch (Exception e) {
-        // TODO: handle exception
-        DriverStation.reportWarning("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-        fileName = fileName.replace("Red", "Blue");
-        PathPlannerTrajectory trajectory =
-            readTrajectory(fileName, MaxVelocity, MaxAcceleration, reverse);
-        trajectory =
-            PathPlannerTrajectory.transformTrajectoryForAlliance(
-                trajectory, DriverStation.Alliance.Red);
-        return trajectory;
-      }
-    } else {
-      try {
-        return PathPlanner.loadPath(fileName, MaxVelocity, MaxAcceleration, reverse);
-      } catch (Exception e) {
-        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
-        return new PathPlannerTrajectory();
-        // TODO: handle exception
+  public static List<PathPlannerTrajectory> readTrajectory(
+      String fileName, PathConstraints pathConstraint, PathConstraints... segmentConstraints) {
+
+    if (pathConstraint.maxVelocity == 0 || pathConstraint.maxAcceleration == 0) {
+      DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
+    }
+    for (var c : segmentConstraints) {
+      if (c.maxVelocity == 0 || c.maxAcceleration == 0) {
+        DriverStation.reportError(fileName + " has an invalid velocity/acceleration", true);
       }
     }
+
+    if (fileName.startsWith("Red")) {
+      var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+      if (!file.exists()) {
+        DriverStation.reportWarning(
+            "TrajectoryUtils::readTrajectory failed for " + fileName, false);
+        fileName = fileName.replace("Red", "Blue");
+
+        var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+
+        return SimConstants.absoluteFlip(pathGroup);
+      }
+      return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+    } else {
+      try {
+        var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+
+        return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
+      } catch (Exception e) {
+        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, false);
+        return new ArrayList<>();
+      }
+    }
+  }
+
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, String pathName, PathConstraints constraints) {
+    var trajectories = readTrajectory(pathName, constraints);
+
+    return generatePPSwerveControllerCommand(swerveDrive, trajectories);
+  }
+
+  public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
+      SwerveDrive swerveDrive, List<PathPlannerTrajectory> trajectories) {
+    List<PPSwerveControllerCommand> commands = new ArrayList<>();
+
+    for (var trajectory : trajectories) {
+      PPSwerveControllerCommand swerveCommand =
+          new PPSwerveControllerCommand(
+              trajectory,
+              swerveDrive::getPoseMeters,
+              SWERVE_DRIVE.kSwerveKinematics,
+              swerveDrive.getXPidController(),
+              swerveDrive.getYPidController(),
+              swerveDrive.getThetaPidController(),
+              swerveDrive::setSwerveModuleStatesAuto,
+              false,
+              swerveDrive);
+
+      commands.add(swerveCommand);
+    }
+    return commands;
   }
 }

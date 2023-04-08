@@ -11,12 +11,13 @@ import frc.robot.subsystems.Controls;
 /** An example command that uses an example subsystem. */
 public class OverrideAllianceColor extends CommandBase {
   private final Controls m_controls;
-  private DriverStation.Alliance m_color;
+
+  private final DriverStation.Alliance m_color;
 
   /**
    * Creates a new ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param controls The subsystem used by this command.
    */
   public OverrideAllianceColor(Controls controls, DriverStation.Alliance color) {
     m_controls = controls;
@@ -33,10 +34,7 @@ public class OverrideAllianceColor extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_controls.setOverrideFmsAlliance(true);
-    m_controls.setOverrideFmsAllianceColor(m_color);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -44,10 +42,7 @@ public class OverrideAllianceColor extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_controls.setOverrideFmsAlliance(false);
-    m_controls.setOverrideFmsAllianceColor(DriverStation.Alliance.Invalid);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

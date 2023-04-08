@@ -4,104 +4,124 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.ELEVATOR.centerOffset;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants.CAN;
+import frc.robot.Constants.CONTROL_MODE;
+import frc.robot.Constants.DIO;
+import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR.SETPOINT;
+import frc.robot.Constants.ELEVATOR.THRESHOLD;
+import frc.robot.Constants.STATE_HANDLER;
 
-public class Elevator extends SubsystemBase {
+public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Initializing both motors
-  public static final TalonFX[] elevatorMotors = {
-    new TalonFX(Constants.Elevator.elevatorMotorLeft),
-    new TalonFX(Constants.Elevator.elevatorMotorRight)
+  private final TalonFX[] elevatorMotors = {
+    new TalonFX(CAN.elevatorMotorLeft), new TalonFX(CAN.elevatorMotorRight)
   };
 
-  // Used by RobotContainer to specify which button has been pressed
-  public enum elevatorHeights {
-    LOW,
-    MID,
-    HIGH,
-    JOYSTICK,
-    NONE
-  }
+  // Initializing limit switch at bottom of elevator
+  private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
+  private boolean lowerLimitSwitchTriggered = false;
 
-  // Limit switch at bottom of elevator
-  private static DigitalInput elevatorLowerSwitch =
-      new DigitalInput(Constants.Elevator.elevatorLowerSwitch);
+  private final double maxHeightMeters = THRESHOLD.ABSOLUTE_MAX.get();
 
-  private static double
-      desiredHeightValue; // The height in encoder units our robot is trying to reach
-  private static elevatorHeights desiredHeightState =
-      elevatorHeights.NONE; // Think of this as our "next state" in our state machine.
+  private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
+  private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
+  private ELEVATOR.SETPOINT m_desiredHeightState = SETPOINT.STOWED;
 
-  private static double elevatorJoystickY;
+  private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
-  private final double kP = 0.55;
-  private final double kI = 0;
-  private final double kD = 0;
-  private final double kF = 0.01;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  private static double elevatorHeight =
-      0; // the amount of rotations the motor has gone up from the initial low position
+  // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
+  // This is used in limiting the elevator's speed once we reach the top of the elevator
+  private double currentForwardOutput = 0;
+  private double newForwardOutput = 0;
 
-  private static final double maxElevatorHeight = Constants.Elevator.elevatorMaxHeightMeters;
+  // Positional limits set by the state handler
+  private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
-  // By default this is set to true as we use motion magic to determine what speed we should be at to get to our setpoint.
-  // If the sensors are acting up, we set this value to false to directly control the percent output of the motors.
-  private boolean elevatorIsClosedLoop = true;
+  // Controlled by open loop
+  private double m_joystickInput;
+  private boolean m_limitJoystickInput;
+  private boolean m_userSetpoint;
+
+  // Trapezoid profile setup
+  private TrapezoidProfile m_currentProfile;
+  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+  private final SimpleMotorFeedforward m_feedForward =
+      new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
+  private SimpleMotorFeedforward m_currentFeedForward = m_feedForward;
+  // This timer is used to calculate the time since the previous periodic run to determine our new
+  // setpoint
+  private static int m_simEncoderSign = 1;
+  private final Timer m_timer = new Timer();
+  private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
+  private double m_lastTimestamp = 0;
+  private double m_currentTimestamp = 0;
 
   // Simulation setup
-
-  private static final ElevatorSim elevatorSim =
+  private final ElevatorSim elevatorSim =
       new ElevatorSim(
-          Constants.Elevator.elevatorGearbox,
-          Constants.Elevator.elevatorGearing,
-          Constants.Elevator.elevatorMassKg,
-          Constants.Elevator.elevatorDrumRadiusMeters,
-          Constants.Elevator.elevatorMinHeightMeters,
-          Constants.Elevator.elevatorMaxHeightMeters,
+          ELEVATOR.gearbox,
+          ELEVATOR.gearRatio,
+          ELEVATOR.massKg,
+          ELEVATOR.drumRadiusMeters,
+          ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+          ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get(),
           true);
 
   // Shuffleboard setup
-
-  public static ShuffleboardTab elevatorTab = Shuffleboard.getTab("Elevator");
-
-  public GenericEntry elevatorHeightTab = elevatorTab.add("Elevator Height", 0.0).getEntry();
-  public GenericEntry elevatorTargetHeightTab =
-      elevatorTab.add("Elevator Target Height", desiredHeightValue).getEntry();
-  public GenericEntry elevatorTargetPosTab =
-      elevatorTab.add("Elevator Target Position", desiredHeightState.name()).getEntry();
-  public GenericEntry elevatorRawPerOutTab =
-      elevatorTab.add("Elevator Raw Percent Output", 0.0).getEntry();
-  public GenericEntry elevatorPerOutTab =
-      elevatorTab.add("Elevator Percent Output", "0%").getEntry();
-  public GenericEntry elevatorControlLoopTab = 
-      elevatorTab.add("Elevator Control Loop", "Closed").getEntry();
+  private DoublePublisher kHeightPub,
+      kEncoderCountsPub,
+      kDesiredHeightPub,
+      kHeightInchesPub,
+      kPercentOutputPub;
+  private StringPublisher kDesiredStatePub, kClosedLoopModePub, currentCommandStatePub;
+  private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
+  private MechanismLigament2d m_elevatorLigament2d;
 
-  public Mechanism2d mech2d = new Mechanism2d(maxElevatorHeight * 50, maxElevatorHeight * 50);
-  public MechanismRoot2d root2d = mech2d.getRoot("Elevator", maxElevatorHeight * 25, 0);
-  public MechanismLigament2d elevatorLigament2d =
-      root2d.append(new MechanismLigament2d("Elevator", elevatorHeight, 90));
+  // Logging setup
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
+  private final DoubleLogEntry setpointMetersEntry = new DoubleLogEntry(log, "/elevator/setpoint");
+  private final DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
 
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
@@ -109,208 +129,406 @@ public class Elevator extends SubsystemBase {
       motor.configFactoryDefault();
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      motor.setSelectedSensorPosition(elevatorHeight);
+      motor.setSelectedSensorPosition(0.0);
 
       // Config PID
-      motor.selectProfileSlot(Constants.Elevator.kSlotIdx, Constants.Elevator.kPIDLoopIdx);
-      motor.config_kF(Constants.Elevator.kSlotIdx, kF, Constants.Elevator.kTimeoutMs);
-      motor.config_kP(Constants.Elevator.kSlotIdx, kP, Constants.Elevator.kTimeoutMs);
-      motor.config_kI(Constants.Elevator.kSlotIdx, kI, Constants.Elevator.kTimeoutMs);
-      motor.config_kD(Constants.Elevator.kSlotIdx, kD, Constants.Elevator.kTimeoutMs);
+      motor.selectProfileSlot(ELEVATOR.kSlotIdx, ELEVATOR.kPIDLoopIdx);
+      motor.config_kP(ELEVATOR.kSlotIdx, ELEVATOR.kP, ELEVATOR.kTimeoutMs);
+      motor.config_kI(ELEVATOR.kSlotIdx, ELEVATOR.kI, ELEVATOR.kTimeoutMs);
+      motor.config_kD(ELEVATOR.kSlotIdx, ELEVATOR.kD, ELEVATOR.kTimeoutMs);
 
-      motor.configPeakOutputForward(1, Constants.Elevator.kTimeoutMs);
-      motor.configPeakOutputReverse(-1, Constants.Elevator.kTimeoutMs);
-
-      motor.setSensorPhase(
-          true); // Forward direction = positive, forward velocity = positive, positive x positive =
-      // positive
-
-      motor.configMotionCruiseVelocity(15000, Constants.Elevator.kTimeoutMs);
-      motor.configMotionAcceleration(6000, Constants.Elevator.kTimeoutMs);
-
-      motor.setSelectedSensorPosition(0.0); // Zero both motors
+      // Setting hard limits as to how fast the elevator can move forward and backward
+      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
+      // TODO: Review after new elevator is integrated
+      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
 
+    // Setting the right motor to output the same as the left motor
     elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
 
-    SmartDashboard.putData(this);
-    SmartDashboard.putData("Elevator", mech2d);
+    elevatorMotors[0].setInverted(ELEVATOR.mainMotorInversionType);
+    elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+
+    initShuffleboard();
+    m_timer.reset();
+    m_timer.start();
+
+    m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
+
+    try {
+      m_elevatorLigament2d =
+          STATE_HANDLER.elevatorRoot2d.append(
+              new MechanismLigament2d(
+                  "Elevator",
+                  getHeightMeters() + ELEVATOR.carriageDistance,
+                  ELEVATOR.mech2dAngleDegrees));
+
+      // Change the color of the mech2d
+      m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
   }
-  /*
-   * Elevator's motor output as a percentage
-   */
-  public static double getElevatorPercentOutput() {
+
+  // Elevator's motor output as a percentage
+  public double getPercentOutput() {
     return elevatorMotors[0].getMotorOutputPercent();
   }
 
-  public static void setElevatorPercentOutput(double output) {
+  public void setPercentOutput(double output) {
+    setPercentOutput(output, false);
+  }
+
+  // Setting the raw output of the motors
+  public void setPercentOutput(double output, boolean enforceLimits) {
+    // If we have activated our limit switch, do not move the elevator backward
+    if (getLimitSwitch() && output < 0) output = Math.max(output, 0);
+
+    // Enforce limits if requested
+    if (enforceLimits) {
+      if (getHeightMeters() > (getUpperLimitMeters() - Units.inchesToMeters(1)))
+        output = Math.min(output, 0);
+      if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) output = Math.max(output, 0);
+    }
+
     elevatorMotors[0].set(ControlMode.PercentOutput, output);
   }
 
-  public static void setElevatorMotionMagicMeters(double setpoint) {
+  // Sets the calculated trapezoid state of the motors
+  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+    // TODO: Find out why feedforward is no longer needed?
     elevatorMotors[0].set(
-        TalonFXControlMode.MotionMagic, setpoint / Constants.Elevator.metersToEncoderCounts);
+        TalonFXControlMode.Position,
+        state.position / ELEVATOR.encoderCountsToMeters,
+        DemandType.ArbitraryFeedForward,
+        //        calculateFeedforward(state)
+        0);
   }
 
-  /*
-   * Elevator's height position
-   */
-  public static double getElevatorHeight() {
-    return elevatorMotors[0].getSelectedSensorPosition() * Constants.Elevator.metersToEncoderCounts;
+  private double calculateFeedforward(TrapezoidProfile.State state) {
+    return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  public double getElevatorMotorVoltage() {
-    return elevatorMotors[0].getMotorOutputVoltage();
+  // Sets the setpoint to our current height, effectively keeping the elevator in place.
+  public void resetTrapezoidState() {
+    m_setpoint = new TrapezoidProfile.State(getHeightMeters(), getVelocityMetersPerSecond());
   }
 
-  public static boolean getElevatorLowerSwitch() {
-    return !elevatorLowerSwitch.get();
+  // Elevator's height position
+  public double getHeightMeters() {
+    return getHeightEncoderCounts() * ELEVATOR.encoderCountsToMeters;
   }
 
-  public static void setElevatorSensorPosition(double position) {
-    elevatorMotors[0].setSelectedSensorPosition(position);
+  // Returns the elevator's velocity in meters per second.
+  public double getVelocityMetersPerSecond() {
+    return elevatorMotors[0].getSelectedSensorVelocity() * ELEVATOR.encoderCountsToMeters * 10;
   }
 
-  public static elevatorHeights getElevatorDesiredHeightState() {
-    return desiredHeightState;
+  // Returns the raw sensor position with no conversions
+  public double getHeightEncoderCounts() {
+    return elevatorMotors[0].getSelectedSensorPosition();
   }
 
-  public boolean getElevatingState() {
-    return !(Math.abs(getElevatorPercentOutput()) < 0.05);
+  // Returns true if elevator is within half of an inch of its set position
+  // This means that the elevator is only trying to hold its current setpoint, not move towards a
+  // new one
+  public boolean atSetpoint() {
+    return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
   }
 
-  public void setElevatorDesiredHeightState(elevatorHeights heightEnum) {
-    desiredHeightState = heightEnum;
+  // Returns true if limit switch is activated
+  public boolean getLimitSwitch() {
+    return !lowerLimitSwitch.get();
   }
 
-  public void setElevatorJoystickY(double m_joystickY) {
-    elevatorJoystickY = m_joystickY;
+  // Sets the perceived position of the motors
+  // Usually used to zero the motors if the robot is started in a non-stowed position
+  public void setSensorPosition(double meters) {
+    elevatorMotors[0].setSelectedSensorPosition(meters / ELEVATOR.encoderCountsToMeters);
   }
 
-  /*
-   * Coast: Motor moving without power
-   * Brake: Motor is kept in place
-   */
-  public void setElevatorNeutralMode(NeutralMode mode) {
-    elevatorMotors[0].setNeutralMode(mode);
-    elevatorMotors[1].setNeutralMode(mode);
+  public void setDesiredPositionMeters(double meters) {
+    m_desiredPositionMeters = meters;
   }
 
-  /*
-   * Closed loop (default): Uses motion magic and a set setpoint to determine motor output
-   * Open loop: Changes motor output directly
-   */
-  public void setElevatorControlLoop(boolean isClosedLoop) {
-    elevatorIsClosedLoop = isClosedLoop;
+  public double getDesiredPositionMeters() {
+    return m_desiredPositionMeters;
   }
 
-  public boolean getElevatorControlLoop() {
-    return elevatorIsClosedLoop;
+  public double getCommandedPositionMeters() {
+    return m_commandedPositionMeters;
   }
 
-  // Update elevator height using encoders and bottom limit switch
-  public static void updateElevatorHeight() {
-    /* Uses limit switch to act as a baseline
-     * to reset the sensor position and height to improve accuracy
-     */
-    if (getElevatorLowerSwitch()) {
-      setElevatorSensorPosition(0.0);
-    }
-    elevatorHeight = getElevatorHeight();
+  public void setLowerLimitMeters(double meters) {
+    m_lowerLimitMeters = meters;
+  }
+
+  public double getLowerLimitMeters() {
+    return m_lowerLimitMeters;
+  }
+
+  public void setUpperLimitMeters(double meters) {
+    m_upperLimitMeters = meters;
+  }
+
+  public double getUpperLimitMeters() {
+    return m_upperLimitMeters;
+  }
+
+  public void setJoystickY(double m_joystickY) {
+    m_joystickInput = m_joystickY;
+  }
+
+  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+    elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
+    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, d);
+    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, p);
+    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, i);
+    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
+  }
+
+  public void setSimpleMotorFeedForward(double g, double v, double a) {
+    m_currentFeedForward = new SimpleMotorFeedforward(g, v, a);
+  }
+
+  public void setTrapezoidalConstraints(double maxVel, double maxAccel) {
+    m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
+  }
+
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
+  }
+
+  // True when moving the joystick up and down to control the elevator instead of buttons, in either
+  // open or closed loop
+  public boolean isUserControlled() {
+    return m_joystickInput != 0 && !m_userSetpoint;
+  }
+
+  public void setUserSetpoint(boolean bool) {
+    m_userSetpoint = bool;
+  }
+
+  // Sets the control state of the elevator
+  public void setClosedLoopControlMode(CONTROL_MODE mode) {
+    m_controlMode = mode;
+  }
+
+  // Returns the current control state enum
+  public CONTROL_MODE getClosedLoopControlMode() {
+    return m_controlMode;
+  }
+
+  public boolean isClosedLoopControl() {
+    return getClosedLoopControlMode() == CONTROL_MODE.CLOSED_LOOP;
+  }
+
+  // Returns a translation of the elevator's position in relation to the robot's position.
+  public Translation2d getField2dTranslation() {
+    return new Translation2d(
+        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
+  }
+
+  // Returns the ligament of the elevator so it can be updated in the state handler
+  public MechanismLigament2d getLigament() {
+    return m_elevatorLigament2d;
+  }
+
+  // Initializes shuffleboard values. Does not update them
+  private void initShuffleboard() {
+    SmartDashboard.putData("Elevator Subsystem", this);
+
+    NetworkTable elevatorNtTab =
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
+
+    kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
+    kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
+    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height Inches").publish();
+    kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
+    kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
+    kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
+    kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
+    currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
+    lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
+
+    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
   }
 
   public void updateShuffleboard() {
-    // TODO: Add encoder counts per second or since last scheduler run
+    SmartDashboard.putBoolean("Elevator Closed Loop", isClosedLoopControl());
+    SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
 
-    elevatorHeightTab.setDouble(getElevatorHeight());
-    elevatorTargetHeightTab.setDouble(Elevator.desiredHeightValue);
-    elevatorTargetPosTab.setString(desiredHeightState.name());
+    kClosedLoopModePub.set(getClosedLoopControlMode().toString());
+    kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
+    kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
+    lowerLimitSwitchPub.set(getLimitSwitch());
 
-    elevatorRawPerOutTab.setDouble(getElevatorPercentOutput());
-
-    /* Converts the raw percent output to something more readable, by
-     *  rounding it to the nearest whole number and turning it into an actual percentage.
-     *  Example: -0.71247 -> -71%
-     */
-    elevatorPerOutTab.setString(String.valueOf(Math.round(getElevatorPercentOutput() * 100)) + "%");
-
-    if (elevatorIsClosedLoop) {
-      elevatorControlLoopTab.setString("Closed");
+    if (!m_limitCanUtil) {
+      // Put not required stuff here
+      kEncoderCountsPub.set(getHeightEncoderCounts());
+      kHeightPub.set(getHeightMeters());
+      kDesiredStatePub.set(m_desiredHeightState.name());
+      kPercentOutputPub.set(getPercentOutput());
+      currentCommandStatePub.set(getClosedLoopControlMode().toString());
     }
-    else {
-      elevatorControlLoopTab.setString("Open");
+  }
+
+  public void updateLog() {
+    outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
+    setpointMetersEntry.append(m_desiredPositionMeters);
+    positionMetersEntry.append(getHeightMeters());
+  }
+
+  // TODO: Review if needed for new elevator
+  // Will severely limit the forward output of the motors when the elevator is fully extended to
+  // prevent breakage
+  public void updateForwardOutput() {
+    if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
+    else newForwardOutput = ELEVATOR.kMaxForwardOutput;
+
+    if (currentForwardOutput != newForwardOutput) {
+      elevatorMotors[0].configPeakOutputForward(newForwardOutput);
+      currentForwardOutput = newForwardOutput;
+    }
+  }
+
+  // Update elevator height using encoders and bottom limit switch
+  public void updateHeightMeters() {
+    /* Uses limit switch to act as a baseline
+     * to reset the sensor position and height to improve accuracy
+     */
+    if (getLimitSwitch() && !lowerLimitSwitchTriggered) {
+      setSensorPosition(0.0);
+      lowerLimitSwitchTriggered = true;
+    } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
+      lowerLimitSwitchTriggered = false;
+    }
+  }
+
+  // Updates the constraints of the elevator
+  public void updateTrapezoidProfileConstraints(ELEVATOR.SPEED speed) {
+    switch (speed) {
+      case FAST:
+        m_currentConstraints = ELEVATOR.m_fastConstraints;
+        break;
+      case HALT:
+        m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
+        break;
+      default:
+      case SLOW:
+        m_currentConstraints = ELEVATOR.m_slowConstraints;
+        break;
+    }
+  }
+
+  public void teleopInit() {
+    setDesiredPositionMeters(getHeightMeters());
+    resetTrapezoidState();
+  }
+
+  // This method will be called once per scheduler run
+  @Override
+  public void periodic() {
+    updateLog();
+    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
+    // work without this
+    updateHeightMeters();
+    updateForwardOutput();
+
+    switch (m_controlMode) {
+        // Called when setting to open loop
+      case OPEN_LOOP:
+        double percentOutput = m_joystickInput * ELEVATOR.kPercentOutputMultiplier;
+
+        // Limit the percent output of the elevator joystick when the stick is pressed down to make
+        // small adjustments
+        if (m_limitJoystickInput)
+          percentOutput = m_joystickInput * ELEVATOR.kLimitedPercentOutputMultiplier;
+
+        // Sets final percent output
+        // True means it will enforce limits. In this way it is not truly open loop, but it'll
+        // prevent the robot from breaking
+        setPercentOutput(percentOutput, true);
+        break;
+      case CLOSED_LOOP_TEST:
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
+
+        setSetpointTrapezoidState(m_setpoint);
+        break;
+      default:
+      case CLOSED_LOOP:
+        // Updates the constraints of the elevator
+        if (m_desiredPositionMeters - getHeightMeters() > 0) {
+          m_currentConstraints = ELEVATOR.m_fastConstraints;
+        } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
+          m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
+        } else {
+          m_currentConstraints = ELEVATOR.m_slowConstraints;
+        }
+
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
+
+        setSetpointTrapezoidState(m_setpoint);
+        break;
     }
   }
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(getElevatorPercentOutput() * 12);
+    elevatorSim.setInput(
+        MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
 
-    // Next, we update it. The standard loop time is 20ms.
-    elevatorSim.update(0.020);
+    double dt = StateHandler.getSimDt();
+    elevatorSim.update(dt);
 
+    // Internally sets the position of the motors in encoder counts based on our current height in
+    // meters
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorRawPosition(
-            (int) (elevatorSim.getPositionMeters() / Constants.Elevator.metersToEncoderCounts));
+            (int)
+                (m_simEncoderSign
+                    * elevatorSim.getPositionMeters()
+                    / ELEVATOR.encoderCountsToMeters));
 
+    // Internally sets the velocity of the motors in encoder counts per 100 ms based on our velocity
+    // in meters per second (1000 ms)
     elevatorMotors[0]
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (elevatorSim.getVelocityMetersPerSecond()
-                    / Constants.Elevator.metersToEncoderCounts
+                (m_simEncoderSign
+                    * elevatorSim.getVelocityMetersPerSecond()
+                    / ELEVATOR.encoderCountsToMeters
                     * 10));
 
+    // Sets the simulated voltage of the roboRio based on our current draw from the elevator
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 
-    elevatorLigament2d.setLength(Units.metersToInches(elevatorSim.getPositionMeters()));
+    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
+    // directly setting the length to meters
+    m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
-    // work without this
-    updateElevatorHeight();
-    switch (desiredHeightState) {
-      case JOYSTICK:
-        if (elevatorIsClosedLoop) {
-          desiredHeightValue = elevatorHeight + (-elevatorJoystickY * maxElevatorHeight);
-          break;
-        }
-        else {
-          setElevatorPercentOutput(-elevatorJoystickY * 0.8);
-          return;
-        }
-      case LOW:
-        desiredHeightValue = 0.0; // Placeholder values
-        break;
-      case MID:
-        desiredHeightValue = maxElevatorHeight / 2; // Placeholder values
-        break;
-      case HIGH:
-        desiredHeightValue = maxElevatorHeight; // Placeholder values
-        break;
-      case NONE:
-        desiredHeightValue = elevatorHeight;
-        break;
-    }
-    if (elevatorIsClosedLoop) {
-      setElevatorMotionMagicMeters(desiredHeightValue);
-    }
-    else {
-      double distanceBetween = MathUtil.applyDeadband(desiredHeightValue - elevatorHeight, maxElevatorHeight/100);
-      if (distanceBetween == 0) {
-        setElevatorPercentOutput(0.0);
-      }
-      else if (distanceBetween > 0) {
-        setElevatorPercentOutput(0.8);
-      }
-      else if (distanceBetween < 0) {
-        setElevatorPercentOutput(-0.8);
-      }
-    }
+  // Safely closes the subsystem
+  public void close() throws Exception {
+    lowerLimitSwitch.close();
   }
 }

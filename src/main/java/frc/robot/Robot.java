@@ -4,8 +4,10 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.server.PathPlannerServer;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -28,8 +30,17 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    PathPlannerServer.startServer(5811);
+    //    PathPlannerServer.startServer(5811);
+    Constants.initConstants();
     m_robotContainer = new RobotContainer();
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    DataLogManager.start();
+    if (RobotBase.isSimulation()) {
+      addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
+    }
+    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
+    // Same as color sensors in RapidReact2022
+    //    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.02, 0.01);
   }
 
   /**
@@ -56,13 +67,15 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.disabledPeriodic();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    m_robotContainer.autonomousInit();
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -82,7 +95,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    m_robotContainer.teleopeInit();
+    m_robotContainer.teleopInit();
   }
 
   /** This function is called periodically during operator control. */
@@ -97,7 +110,9 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    m_robotContainer.testPeriodic();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
