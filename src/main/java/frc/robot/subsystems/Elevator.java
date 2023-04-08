@@ -46,10 +46,8 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
-import frc.robot.Constants.WRIST;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 

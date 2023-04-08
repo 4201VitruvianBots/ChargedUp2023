@@ -94,9 +94,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Mech2d setup
   public final MechanismLigament2d m_ligament2d =
-      new MechanismLigament2d(
-          "Fourbar", WRIST.fourbarLength, 180);
-  
+      new MechanismLigament2d("Fourbar", WRIST.fourbarLength, 180);
+
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
@@ -158,7 +157,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
   }
-  
+
   public MechanismLigament2d getLigament() {
     return m_ligament2d;
   }
@@ -349,7 +348,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
     m_ligament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-    
+
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
     kCurrentAngleDegreesPub = wristTab.getDoubleTopic("Current Angle Degrees").publish();

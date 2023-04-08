@@ -63,7 +63,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     initSmartDashboard();
   }
-  
+
   public MechanismLigament2d getLigament() {
     return m_ligament2d;
   }
