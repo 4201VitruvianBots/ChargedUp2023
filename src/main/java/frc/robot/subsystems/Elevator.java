@@ -22,17 +22,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -63,6 +58,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
+  private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
+  private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
@@ -83,16 +80,20 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   // Trapezoid profile setup
+  private TrapezoidProfile m_currentProfile;
   private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private final SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
+  private SimpleMotorFeedforward m_currentFeedForward = m_feedForward;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
   private static int m_simEncoderSign = 1;
   private final Timer m_timer = new Timer();
+  private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
+  private double m_currentTimestamp = 0;
   private double m_lastSimTimestamp = 0;
 
   // Simulation setup
@@ -107,7 +108,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           true);
 
   // Shuffleboard setup
-  private DoubleSubscriber kSetpointSub;
   private DoublePublisher kHeightPub,
       kEncoderCountsPub,
       kDesiredHeightPub,
@@ -197,14 +197,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-    // TODO: Investigate why this is no longer needed?
-    //    m_feedForwardResult = calculateFeedforward(state);
-    double m_m_feedForwardResult = 0;
+    // TODO: Find out why feedforward is no longer needed?
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-        m_m_feedForwardResult);
+        //        calculateFeedforward(state)
+        0);
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -231,6 +230,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return elevatorMotors[0].getSelectedSensorPosition();
   }
 
+  // Returns true if elevator is within half of an inch of its set position
+  // This means that the elevator is only trying to hold its current setpoint, not move towards a
+  // new one
+  public boolean atSetpoint() {
+    return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
+  }
+
   // Returns true if limit switch is activated
   public boolean getLimitSwitch() {
     return !lowerLimitSwitch.get();
@@ -248,6 +254,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public double getDesiredPositionMeters() {
     return m_desiredPositionMeters;
+  }
+
+  public double getCommandedPositionMeters() {
+    return m_commandedPositionMeters;
   }
 
   public void setLowerLimitMeters(double meters) {
@@ -268,6 +278,22 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public void setJoystickY(double m_joystickY) {
     m_joystickInput = m_joystickY;
+  }
+
+  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+    elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
+    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, d);
+    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, p);
+    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, i);
+    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
+  }
+
+  public void setSimpleMotorFeedForward(double g, double v, double a) {
+    m_currentFeedForward = new SimpleMotorFeedforward(g, v, a);
+  }
+
+  public void setTrapezoidalConstraints(double maxVel, double maxAccel) {
+    m_currentConstraints = new TrapezoidProfile.Constraints(maxVel, maxAccel);
   }
 
   public void setJoystickLimit(boolean limit) {
@@ -332,31 +358,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
 
-    // TODO: Rewrite test interface
-    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
-
-    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
-    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
-    elevatorNtTab.getDoubleTopic("kS").publish().set(ELEVATOR.kG);
-    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
-    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
-
     elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
-
-    // Initialize Test Values
-    // kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(kP);
-    // kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(kI);
-    // kDSub = elevatorNtTab.getDoubleTopic("kD").subscribe(kD);
-
-    // kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(maxVel);
-    // kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(maxAccel);
-    // kSSub = elevatorNtTab.getDoubleTopic("kS").subscribe(kG);
-    // kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(kV);
-    // kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(kA);
-
-    kSetpointSub = elevatorNtTab.getDoubleTopic("setpoint").subscribe(0);
   }
 
   public void updateShuffleboard() {
@@ -372,6 +374,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       // Put not required stuff here
       kEncoderCountsPub.set(getHeightEncoderCounts());
       kHeightPub.set(getHeightMeters());
+      kDesiredStatePub.set(m_desiredHeightState.name());
       kPercentOutputPub.set(getPercentOutput());
       currentCommandStatePub.set(getClosedLoopControlMode().toString());
     }
@@ -383,7 +386,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     positionMetersEntry.append(getHeightMeters());
   }
 
-  // TODO: Review if this is needed after new elevator
+  // TODO: Review if needed for new elevator
   // Will severely limit the forward output of the motors when the elevator is fully extended to
   // prevent breakage
   public void updateForwardOutput() {
@@ -454,15 +457,35 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
         break;
-      default:
-      case CLOSED_LOOP:
+      case CLOSED_LOOP_TEST:
         // Updates our trapezoid profile state based on the time since our last periodic and our
         // recorded change in height
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        double currentTime = m_timer.get();
-        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
-        m_lastTimestamp = currentTime;
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
+
+        setSetpointTrapezoidState(m_setpoint);
+        break;
+      default:
+      case CLOSED_LOOP:
+        // Updates the constraints of the elevator
+        if (m_desiredPositionMeters - getHeightMeters() > 0) {
+          m_currentConstraints = ELEVATOR.m_fastConstraints;
+        } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
+          m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
+        } else {
+          m_currentConstraints = ELEVATOR.m_slowConstraints;
+        }
+
+        // Updates our trapezoid profile state based on the time since our last periodic and our
+        // recorded change in height
+        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
+        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        m_currentTimestamp = m_timer.get();
+        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
+        m_lastTimestamp = m_currentTimestamp;
 
         setSetpointTrapezoidState(m_setpoint);
         break;
@@ -475,9 +498,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
 
     // Next, we update it. The standard loop time is 20ms.
-    double currentTime = m_timer.get();
-    elevatorSim.update(currentTime - m_lastSimTimestamp);
-    m_lastSimTimestamp = currentTime;
+    if (!m_unitTestBoolean) m_currentTimestamp = m_timer.get();
+    elevatorSim.update(m_currentTimestamp - m_lastSimTimestamp);
+    m_lastSimTimestamp = m_currentTimestamp;
 
     // Internally sets the position of the motors in encoder counts based on our current height in
     // meters
@@ -503,9 +526,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // Sets the simulated voltage of the roboRio based on our current draw from the elevator
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+
+    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
+    // directly setting the length to meters
+    m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
-  @SuppressWarnings("RedundantThrows")
   @Override
   // Safely closes the subsystem
   public void close() throws Exception {
