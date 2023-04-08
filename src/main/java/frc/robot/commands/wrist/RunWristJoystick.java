@@ -37,7 +37,7 @@ public class RunWristJoystick extends CommandBase {
 
     if (joystickYDeadbandOutput != 0.0) {
       m_wrist.setClosedLoopControlMode(CONTROL_MODE.OPEN_LOOP);
-      m_wrist.setUserInput(-joystickYDeadbandOutput);
+      m_wrist.setJoystickInput(-joystickYDeadbandOutput);
     }
     if (joystickYDeadbandOutput == 0 && m_wrist.getClosedLoopControl() == CONTROL_MODE.OPEN_LOOP) {
       m_wrist.setSetpointPositionRadians(m_wrist.getPositionRadians());

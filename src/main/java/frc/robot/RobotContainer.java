@@ -29,11 +29,11 @@ import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.PlaceOneBalance;
 import frc.robot.commands.auto.TwoPiece;
-import frc.robot.commands.elevator.IncrementElevatorHeight;
+import frc.robot.commands.elevator.LimitElevatorJoystickInput;
 import frc.robot.commands.elevator.ResetElevatorHeight;
+import frc.robot.commands.elevator.RunElevatorJoystick;
 import frc.robot.commands.elevator.SetElevatorSetpoint;
 import frc.robot.commands.elevator.ToggleElevatorControlMode;
-// import frc.robot.commands.auto.RedTopTwoBalance;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.RunIntakeCube;
@@ -45,6 +45,7 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.wrist.LimitWristJoystickInput;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 import frc.robot.commands.wrist.RunWristJoystick;
 import frc.robot.commands.wrist.SetWristSetpoint;
@@ -121,7 +122,7 @@ public class RobotContainer implements AutoCloseable {
             () -> rightJoystick.getRawAxis(0)));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(new IncrementElevatorHeight(m_elevator, xboxController::getLeftY));
+    m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_stateHandler));
 
@@ -205,6 +206,11 @@ public class RobotContainer implements AutoCloseable {
     xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
+    // Will limit the speed of our elevator or wrist when the corresponding joystick
+    // is being pressed down
+    xboxController.leftStick().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+    xboxController.rightStick().whileTrue(new LimitWristJoystickInput(m_wrist));
+
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
@@ -276,6 +282,11 @@ public class RobotContainer implements AutoCloseable {
           .povDown()
           .onTrue(new SetElevatorSetpoint(m_elevator, ELEVATOR.SETPOINT.STOWED.get()));
       testController.povDown().onTrue(new SetWristSetpoint(m_wrist, WRIST.SETPOINT.STOWED.get()));
+
+      // Will limit the speed of our elevator or wrist when the corresponding joystick is being
+      // pressed down
+      testController.L3().whileTrue(new LimitElevatorJoystickInput(m_elevator));
+      testController.R3().whileTrue(new LimitWristJoystickInput(m_wrist));
 
       // Will switch between closed and open loop on button press
       testController.share().onTrue(new ToggleElevatorControlMode(m_elevator));

@@ -110,7 +110,9 @@ public final class Constants {
 
     public static final double kMaxForwardOutput = 0.6;
     public static final double kMaxReverseOutput = -0.45;
+
     public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.CounterClockwise;
 
@@ -356,6 +358,7 @@ public final class Constants {
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
 
     public static final double kPercentOutputMultiplier = 0.2;
+    public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     // Values were experimentally determined
     public static final double kMaxSlowVel = Units.degreesToRadians(400);

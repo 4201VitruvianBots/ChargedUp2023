@@ -81,6 +81,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Controlled by open loop
   private double m_joystickInput;
+  private boolean m_limitJoystickInput;
   private boolean m_userSetpoint;
 
   // Trapezoid profile setup
@@ -269,6 +270,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_joystickInput = m_joystickY;
   }
 
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
+  }
+
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
@@ -438,6 +443,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // Called when setting to open loop
       case OPEN_LOOP:
         double percentOutput = m_joystickInput * ELEVATOR.kPercentOutputMultiplier;
+
+        // Limit the percent output of the elevator joystick when the stick is pressed down to make
+        // small adjustments
+        if (m_limitJoystickInput)
+          percentOutput = m_joystickInput * ELEVATOR.kLimitedPercentOutputMultiplier;
+
         // Sets final percent output
         // True means it will enforce limits. In this way it is not truly open loop, but it'll
         // prevent the robot from breaking

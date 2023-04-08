@@ -52,6 +52,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
   private double m_joystickInput;
+  private boolean m_limitJoystickInput;
   private boolean m_userSetpoint;
 
   private final Intake m_intake;
@@ -157,13 +158,17 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
   }
-
+  
   public MechanismLigament2d getLigament() {
     return m_ligament2d;
   }
 
   public void setUserInput(double input) {
     m_joystickInput = input;
+  }
+
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
   }
 
   public void setUserSetpoint(boolean bool) {
@@ -438,6 +443,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     switch (m_controlMode) {
       case OPEN_LOOP:
         double percentOutput = m_joystickInput * WRIST.kPercentOutputMultiplier;
+
+        // Limit the percent output of the wrist joystick when the stick is pressed down to make
+        // small adjustments
+        if (m_limitJoystickInput)
+          percentOutput = m_joystickInput * WRIST.kLimitedPercentOutputMultiplier;
+
         setPercentOutput(percentOutput, true);
         break;
       case CLOSED_LOOP:
