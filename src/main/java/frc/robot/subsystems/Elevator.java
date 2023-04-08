@@ -46,10 +46,8 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
-import frc.robot.Constants.WRIST;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -119,15 +117,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
-  public final Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
-  public final MechanismRoot2d root2d =
-      mech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
-  public final MechanismLigament2d m_ligament2d =
-      root2d.append(
+  private final Mechanism2d m_superStructureMech2d =
+      new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
+  private final MechanismRoot2d m_elevatorMechRoot2d =
+      m_superStructureMech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
+  private final MechanismLigament2d m_elevatorLigament2d =
+      m_elevatorMechRoot2d.append(
           new MechanismLigament2d(
               "Elevator", getHeightMeters() + ELEVATOR.carriageDistance, ELEVATOR.angleDegrees));
-  public final MechanismLigament2d robotBase2d =
-      root2d.append(new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
+  private final MechanismLigament2d m_robotBaseLigament2d =
+      m_elevatorMechRoot2d.append(
+          new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -306,13 +306,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Returns the ligament of the elevator so it can be updated in the state handler
   public MechanismLigament2d getLigament() {
-    return m_ligament2d;
+    return m_elevatorLigament2d;
   }
 
   // Initializes shuffleboard values. Does not update them
   private void initShuffleboard() {
     if (RobotBase.isSimulation()) {
-      SmartDashboard.putData("Elevator Sim", mech2d);
+      SmartDashboard.putData("SuperStructure Sim", m_superStructureMech2d);
     }
     SmartDashboard.putData("Elevator Subsystem", this);
 
@@ -320,7 +320,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
     // Change the color of the mech2d
-    robotBase2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
+    m_robotBaseLigament2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
