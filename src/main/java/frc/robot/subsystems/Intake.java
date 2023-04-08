@@ -15,7 +15,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
@@ -32,6 +34,10 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Log setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+
+  // Mech2d setup
+  public final MechanismLigament2d m_ligament2d =
+      new MechanismLigament2d("Intake", INTAKE.length, 0);
 
   public Intake() {
     // one or two motors
@@ -54,6 +60,12 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     intakeMotor.config_kF(0, INTAKE.kF);
     intakeMotor.config_kP(0, INTAKE.kP);
+
+    initSmartDashboard();
+  }
+  
+  public MechanismLigament2d getLigament() {
+    return m_ligament2d;
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and
@@ -101,7 +113,11 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
+
   // Shuffleboard or SmartDashboard function
+  public void initSmartDashboard() {
+    m_ligament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+  }
 
   public void updateSmartDashboard() {
     // TODO: Consolidate this using the INTAKE_STATE enum

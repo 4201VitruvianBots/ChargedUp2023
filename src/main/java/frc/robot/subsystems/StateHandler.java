@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -412,6 +413,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
     m_wristLowerLimitPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
     m_wristUpperLimitPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
+
+    // Attach the ligaments of the mech2d together
+    m_elevator.getLigament().append(m_wrist.getLigament());
+    m_wrist.getLigament().append(m_intake.getLigament());
   }
 
   private void updateSmartDashboard() {
@@ -543,6 +548,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void testPeriodic() {
     m_scoringState = m_scoringStateChooser.getSelected();
     m_currentState = m_mainStateChooser.getSelected();
+  }
+
+  public void simulationPeriodic() {
+    // Update the angle of the mech2d
+    m_elevator.getLigament().setLength(m_elevator.getHeightMeters());
+    m_wrist.getLigament().setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+    m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
   }
 
   @SuppressWarnings("RedundantThrows")

@@ -92,9 +92,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           );
   private static int m_simEncoderSign = 1;
 
-  private MechanismLigament2d fourbarLigament2d;
-  private MechanismLigament2d intakeLigament2d;
-
+  // Mech2d setup
+  public final MechanismLigament2d m_ligament2d =
+      new MechanismLigament2d(
+          "Fourbar", WRIST.fourbarLength, 180);
+  
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry voltageEntry = new DoubleLogEntry(log, "/wrist/voltage");
@@ -156,8 +158,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
   }
+  
+  public MechanismLigament2d getLigament() {
+    return m_ligament2d;
+  }
 
-  public void setJoystickInput(double input) {
+  public void setUserInput(double input) {
     m_joystickInput = input;
   }
 
@@ -342,27 +348,14 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
+    m_ligament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
     kCurrentAngleDegreesPub = wristTab.getDoubleTopic("Current Angle Degrees").publish();
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
-
-    fourbarLigament2d =
-        m_elevator
-            .getLigament2d()
-            .append(
-                new MechanismLigament2d(
-                    "Fourbar",
-                    WRIST.fourbarLength,
-                    180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees()));
-    fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-
-    intakeLigament2d =
-        fourbarLigament2d.append(
-            new MechanismLigament2d("Intake", INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
-    intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
 
     // // Initialize Test Values
     // wristTab.getDoubleTopic("kMaxVel").publish().set(Constants.WRIST.kMaxSlowVel);
@@ -499,10 +492,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / WRIST.encoderUnitsToDegrees
                     * 10.0));
-
-    // Update the angle of the mech2d
-    fourbarLigament2d.setAngle(180 - m_elevator.getLigament2d().getAngle() - getPositionDegrees());
-    intakeLigament2d.setAngle(fourbarLigament2d.getAngle() * -1.5);
   }
 
   @SuppressWarnings("RedundantThrows")
