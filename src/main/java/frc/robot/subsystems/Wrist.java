@@ -18,7 +18,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoublePublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -94,8 +93,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static int m_simEncoderSign = 1;
 
   // Mech2d setup
-  private final MechanismLigament2d m_wristLigament2d =
-      new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
+  private MechanismLigament2d m_wristLigament2d;
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -108,16 +106,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry positionDegreesEntry =
       new DoubleLogEntry(log, "/wrist/positionDegrees");
 
-  private DoubleSubscriber kPSub,
-      kISub,
-      kDSub,
-      kMaxVelSub,
-      kMaxAccelSub,
-      kSSub,
-      kGSub,
-      kVSub,
-      kASub,
-      kSetpointSub;
   private DoublePublisher kCommandedAngleDegreesPub;
   private DoublePublisher kDesiredAngleDegreesPub;
   private DoublePublisher kCurrentAngleDegreesPub;
@@ -157,6 +145,14 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_timer.start();
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
+
+    try {
+      m_wristLigament2d =
+          new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
+      m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
   }
 
   public MechanismLigament2d getLigament() {
@@ -364,8 +360,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-
     kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
     kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
     kCurrentAngleDegreesPub = wristTab.getDoubleTopic("Current Angle Degrees").publish();
@@ -452,5 +446,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    m_wristLigament2d.close();
+  }
 }

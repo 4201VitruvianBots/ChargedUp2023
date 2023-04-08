@@ -118,6 +118,17 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void init() {
     m_currentState =
         determineSuperStructureState(m_elevator.getHeightMeters(), m_wrist.getPositionRadians());
+
+    if (RobotBase.isSimulation()) {
+      // Attach the ligaments of the mech2d together
+      try {
+        m_elevator.getLigament().append(m_wrist.getLigament());
+        m_wrist.getLigament().append(m_intake.getLigament());
+      } catch (Exception e) {
+        //        System.out.println("Ignoring WPILib Error");
+      }
+      SmartDashboard.putData("SuperStructure Sim", STATE_HANDLER.superStructureMech2d);
+    }
   }
 
   public void initializeScoringChooser() {
@@ -410,10 +421,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
     m_wristLowerLimitPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
     m_wristUpperLimitPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
-
-    // Attach the ligaments of the mech2d together
-    m_elevator.getLigament().append(m_wrist.getLigament());
-    m_wrist.getLigament().append(m_intake.getLigament());
   }
 
   private void updateSmartDashboard() {
@@ -547,9 +554,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentState = m_mainStateChooser.getSelected();
   }
 
+  @Override
   public void simulationPeriodic() {
     // Update the angle of the mech2d
-    m_elevator.getLigament().setLength(m_elevator.getHeightMeters());
+    m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
     m_wrist
         .getLigament()
         .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());

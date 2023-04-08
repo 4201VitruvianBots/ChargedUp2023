@@ -19,6 +19,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
@@ -34,8 +36,9 @@ import java.util.Map;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
+public final class Constants implements AutoCloseable {
   public static String robotName = "";
+
   // Add any constants that do not change between robots here, as well as all
   // enums
 
@@ -88,7 +91,8 @@ public final class Constants {
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
     public static final double centerOffset = Units.inchesToMeters(10);
     public static final double carriageDistance = Units.inchesToMeters(6.5);
-    public static final int angleDegrees = 35;
+    public static final double carriageOffset = Units.inchesToMeters(11);
+    public static final int mech2dAngleDegrees = 35;
 
     // PID
     public static final double kMaxVel = Units.inchesToMeters(30);
@@ -174,7 +178,7 @@ public final class Constants {
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
 
-      private final double value;
+      private double value;
 
       THRESHOLD(final double value) {
         this.value = value;
@@ -188,7 +192,7 @@ public final class Constants {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
-    public static final double length = Units.inchesToMeters(12);
+    public static final double length = Units.inchesToMeters(9.5);
 
     public static final int leftConeSensorId = 0;
     public static final int rightConeSensorId = 1;
@@ -352,7 +356,7 @@ public final class Constants {
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
-    public static final double fourbarLength = Units.inchesToMeters(15);
+    public static final double fourbarLength = Units.inchesToMeters(19);
     public static final double fourbarAngleDegrees = 180;
     public static final int kTimeoutMs = 0;
 
@@ -469,6 +473,16 @@ public final class Constants {
     public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
     public static boolean limitCanUtilization = true;
+
+    public static final double mechanism2dXOffset = 0.5;
+
+    public static final Mechanism2d superStructureMech2d =
+        new Mechanism2d(
+            ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2, ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2);
+    public static final MechanismRoot2d chassisRoot2d =
+        superStructureMech2d.getRoot("ChassisRoot", mechanism2dXOffset, Units.inchesToMeters(1.5));
+    public static final MechanismRoot2d elevatorRoot2d =
+        superStructureMech2d.getRoot("ElevatorRoot", mechanism2dXOffset, Units.inchesToMeters(4.5));
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
@@ -592,6 +606,8 @@ public final class Constants {
   private static void initSim() {
     robotName = "Sim";
 
+    ELEVATOR.THRESHOLD.ABSOLUTE_MIN.value = 0;
+
     SWERVE_DRIVE.frontLeftCANCoderOffset = 0;
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;
     SWERVE_DRIVE.backLeftCANCoderOffset = 0;
@@ -634,4 +650,11 @@ public final class Constants {
 
   public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
   public static final String betaRobotMAC = "00:80:2F:19:30:B7";
+
+  @Override
+  public void close() throws Exception {
+    STATE_HANDLER.superStructureMech2d.close();
+    STATE_HANDLER.elevatorRoot2d.close();
+    STATE_HANDLER.chassisRoot2d.close();
+  }
 }

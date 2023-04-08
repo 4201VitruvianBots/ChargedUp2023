@@ -36,8 +36,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   // Mech2d setup
-  private final MechanismLigament2d m_intakeLigament2d =
-      new MechanismLigament2d("Intake", INTAKE.length, 0);
+  private MechanismLigament2d m_intakeLigament2d;
 
   public Intake() {
     // one or two motors
@@ -62,6 +61,12 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.config_kP(0, INTAKE.kP);
 
     initSmartDashboard();
+    try {
+      m_intakeLigament2d = new MechanismLigament2d("Intake", INTAKE.length, 0);
+      m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
   }
 
   public MechanismLigament2d getLigament() {
@@ -115,9 +120,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   // Shuffleboard or SmartDashboard function
-  public void initSmartDashboard() {
-    m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
-  }
+  public void initSmartDashboard() {}
 
   public void updateSmartDashboard() {
     // TODO: Consolidate this using the INTAKE_STATE enum
@@ -150,5 +153,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    m_intakeLigament2d.close();
+  }
 }

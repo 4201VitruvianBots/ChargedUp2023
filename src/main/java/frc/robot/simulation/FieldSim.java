@@ -233,8 +233,6 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateRobotPoses();
 
-    if (RobotBase.isSimulation()) simulationPeriodic();
-
     try {
       SmartDashboard.putData("Field2d", m_field2d);
     } catch (NullPointerException e) {
@@ -242,6 +240,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
     }
   }
 
+  @Override
   public void simulationPeriodic() {}
 
   @SuppressWarnings("RedundantThrows")

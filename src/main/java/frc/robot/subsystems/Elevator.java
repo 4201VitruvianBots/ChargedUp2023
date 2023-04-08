@@ -31,9 +31,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,8 +39,9 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR.SETPOINT;
+import frc.robot.Constants.ELEVATOR.THRESHOLD;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.SWERVE_DRIVE;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
 
@@ -55,11 +54,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
   private boolean lowerLimitSwitchTriggered = false;
 
-  private final double maxHeightMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
+  private final double maxHeightMeters = THRESHOLD.ABSOLUTE_MAX.get();
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
   private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
-  private ELEVATOR.SETPOINT m_desiredHeightState = ELEVATOR.SETPOINT.STOWED;
+  private ELEVATOR.SETPOINT m_desiredHeightState = SETPOINT.STOWED;
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
@@ -117,17 +116,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
-  private final Mechanism2d m_superStructureMech2d =
-      new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
-  private final MechanismRoot2d m_elevatorMechRoot2d =
-      m_superStructureMech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
-  private final MechanismLigament2d m_elevatorLigament2d =
-      m_elevatorMechRoot2d.append(
-          new MechanismLigament2d(
-              "Elevator", getHeightMeters() + ELEVATOR.carriageDistance, ELEVATOR.angleDegrees));
-  private final MechanismLigament2d m_robotBaseLigament2d =
-      m_elevatorMechRoot2d.append(
-          new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
+  private MechanismLigament2d m_elevatorLigament2d;
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -169,6 +158,20 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_timer.start();
 
     m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
+
+    try {
+      m_elevatorLigament2d =
+          STATE_HANDLER.elevatorRoot2d.append(
+              new MechanismLigament2d(
+                  "Elevator",
+                  getHeightMeters() + ELEVATOR.carriageDistance,
+                  ELEVATOR.mech2dAngleDegrees));
+
+      // Change the color of the mech2d
+      m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
+    } catch (Exception e) {
+      //      System.out.println("Dumb WPILib Exception");
+    }
   }
 
   // Elevator's motor output as a percentage
@@ -337,16 +340,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Initializes shuffleboard values. Does not update them
   private void initShuffleboard() {
-    if (RobotBase.isSimulation()) {
-      SmartDashboard.putData("SuperStructure Sim", m_superStructureMech2d);
-    }
     SmartDashboard.putData("Elevator Subsystem", this);
 
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-
-    // Change the color of the mech2d
-    m_robotBaseLigament2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
