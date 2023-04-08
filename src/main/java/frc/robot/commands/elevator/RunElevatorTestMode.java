@@ -69,6 +69,17 @@ public class RunElevatorTestMode extends CommandBase {
     // initialize Test Values
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
 
+    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
+    elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
+
+    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
+    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
+    elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
+    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
+    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
+
     kFSub = elevatorNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(ELEVATOR.kP);
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(ELEVATOR.kI);

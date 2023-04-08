@@ -8,6 +8,10 @@ import java.util.function.BooleanSupplier;
  * Runs a command until a condition is met, then interrupts it to run another command. If the first
  * command finishes, this command will end without running the other command.
  */
+// Knock knock
+// Who's there?
+// Interrupting command
+// Interrupting comma-
 public class InterruptingCommand extends CommandBase {
   private final Command m_interruptible;
   private final Command m_interrupt;
