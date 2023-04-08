@@ -16,7 +16,6 @@ import frc.robot.subsystems.*;
 import frc.robot.utils.TrajectoryUtils;
 import org.junit.jupiter.api.*;
 
-@Disabled
 public class AutoTest extends CommandTestBase {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
@@ -48,7 +47,7 @@ public class AutoTest extends CommandTestBase {
     m_robotContainer.close();
   }
 
-  @Test
+  @Disabled("To Fix")
   public void testAutoPathFlipping() {
     System.out.println("Starting Test...");
     double blueTrajectoryMinX = 0;
@@ -107,7 +106,7 @@ public class AutoTest extends CommandTestBase {
     }
   }
 
-  @Test
+  @Disabled("Doesn't work")
   public void testAutoPathFollowing() {
 
     var trajectories =

@@ -4,7 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.SetSwerveOdometry;
@@ -45,7 +45,7 @@ public class TestSimAuto extends SequentialCommandGroup {
         swerveCommands.get(0),
         swerveCommands.get(1),
         swerveCommands.get(2),
-        new SetSetpoint(stateHandler, elevator, wrist, Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)
+        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH)
             .withTimeout(3),
         swerveCommands.get(3),
         new RepeatCommand(

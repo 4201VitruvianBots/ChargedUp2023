@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
@@ -36,23 +34,15 @@ public class TwoPiece extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    //    m_trajectories =
-    //        TrajectoryUtils.readTrajectory(
-    //            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
     m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(4), Units.feetToMeters(4)));
+            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
+    //    m_trajectories =
+    //        TrajectoryUtils.readTrajectory(
+    //            pathName, new PathConstraints(Units.feetToMeters(4), Units.feetToMeters(4)));
 
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
-
-    var stop =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(0)),
-        };
 
     addCommands(
         /** Setting Up Auto Zeros robot to path flips path if necessary */
@@ -97,7 +87,7 @@ public class TwoPiece extends SequentialCommandGroup {
         new AutoSetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.STOWED)
             .withTimeout(3),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
-            .andThen(() -> swerveDrive.setSwerveModuleStatesAuto(stop)));
+            .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
 
   public List<PathPlannerTrajectory> getTrajectories() {

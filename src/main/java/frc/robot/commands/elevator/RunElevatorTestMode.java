@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 
@@ -66,8 +65,7 @@ public class RunElevatorTestMode extends CommandBase {
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(ELEVATOR.kA);
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(ELEVATOR.kMaxVel);
-    kMaxAccelSub =
-        elevatorNtTab.getDoubleTopic("Max Accel").subscribe(Constants.ELEVATOR.kMaxAccel);
+    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(ELEVATOR.kMaxAccel);
 
     m_elevator.setUserSetpoint(true);
   }
@@ -75,7 +73,7 @@ public class RunElevatorTestMode extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    DriverStation.reportWarning("USING WRIST TEST MODE!", false);
+    DriverStation.reportWarning("USING ELEVATOR TEST MODE!", false);
     double newSetpoint = Units.inchesToMeters(kSetpointSub.get(0));
 
     double newKF = kFSub.get(0);
@@ -84,9 +82,9 @@ public class RunElevatorTestMode extends CommandBase {
     double newKD = kDSub.get(ELEVATOR.kD);
     double newIZone = kIZoneSub.get(0);
 
-    double newKG = kGSub.get(Constants.ELEVATOR.kG);
-    double newKV = kVSub.get(Constants.ELEVATOR.kV);
-    double newKA = kASub.get(Constants.ELEVATOR.kA);
+    double newKG = kGSub.get(ELEVATOR.kG);
+    double newKV = kVSub.get(ELEVATOR.kV);
+    double newKA = kASub.get(ELEVATOR.kA);
 
     double newMaxVel = kMaxVelSub.get(ELEVATOR.kMaxVel);
     double newMaxAccel = kMaxAccelSub.get(ELEVATOR.kMaxAccel);
