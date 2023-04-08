@@ -279,9 +279,9 @@ public final class Constants implements AutoCloseable {
     public static final double kI_Y = 0;
     public static final double kD_Y = 0;
 
-    public static final double kP_Theta = 4.0;
-    public static final double kI_Theta = 0;
-    public static final double kD_Theta = 0.01;
+    public static double kP_Theta = 4.0;
+    public static double kI_Theta = 0;
+    public static double kD_Theta = 0.01;
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,
@@ -620,6 +620,10 @@ public final class Constants implements AutoCloseable {
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;
     SWERVE_DRIVE.backLeftCANCoderOffset = 0;
     SWERVE_DRIVE.backRightCANCoderOffset = 0;
+
+    SWERVE_DRIVE.kP_Theta = 0.1;
+    SWERVE_DRIVE.kI_Theta = 0;
+    SWERVE_DRIVE.kD_Theta = 0;
   }
 
   private static void initUnknown() {

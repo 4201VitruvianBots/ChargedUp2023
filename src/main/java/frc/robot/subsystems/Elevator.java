@@ -93,7 +93,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
   private double m_currentTimestamp = 0;
-  private double m_lastSimTimestamp = 0;
 
   // Simulation setup
   private final ElevatorSim elevatorSim =
@@ -491,13 +490,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(
-        MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
+    elevatorSim.setInput(MathUtil.clamp(elevatorMotors[0].getMotorOutputVoltage(), -12, 12));
 
-    // Next, we update it. The standard loop time is 20ms.
-    if (!m_unitTestBoolean) m_currentTimestamp = m_timer.get();
-    elevatorSim.update(m_currentTimestamp - m_lastSimTimestamp);
-    m_lastSimTimestamp = m_currentTimestamp;
+    double dt = StateHandler.getSimDt();
+    elevatorSim.update(dt);
 
     // Internally sets the position of the motors in encoder counts based on our current height in
     // meters
@@ -523,6 +519,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // Sets the simulated voltage of the roboRio based on our current draw from the elevator
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+
+    elevatorMotors[0].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
+    elevatorMotors[1].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
 
     // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
     // directly setting the length to meters
