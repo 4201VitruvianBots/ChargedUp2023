@@ -85,7 +85,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
-      private SimpleMotorFeedforward m_currentFeedforward = m_feedForward;
+  private SimpleMotorFeedforward m_currentFeedforward = m_feedForward;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
   private static int simEncoderSign = 1;
