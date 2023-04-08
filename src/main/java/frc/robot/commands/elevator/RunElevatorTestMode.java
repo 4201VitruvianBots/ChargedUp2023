@@ -64,8 +64,8 @@ public class RunElevatorTestMode extends CommandBase {
     m_stateHandler.disable();
 
     NetworkTable elevatorNtTab =
-        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
-        
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
+
     // initialize Test Values
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
 

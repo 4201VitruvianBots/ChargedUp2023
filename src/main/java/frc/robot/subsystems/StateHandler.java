@@ -78,7 +78,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private boolean m_isStatehandlerEnabled; 
+  private boolean m_isStatehandlerEnabled = true; 
 
   private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
   private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();

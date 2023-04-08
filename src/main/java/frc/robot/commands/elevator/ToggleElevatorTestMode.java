@@ -16,7 +16,7 @@ public class ToggleElevatorTestMode extends CommandBase {
   private final StateHandler m_StateHandler; 
 
   private CONTROL_MODE m_lastcontrolmode;
-  private Command m_defultCommand;
+  private Command m_defaultCommand;
 
   public ToggleElevatorTestMode(Elevator elevator, StateHandler stateHandler) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -36,11 +36,11 @@ public class ToggleElevatorTestMode extends CommandBase {
     if (m_elevator.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP_TEST) {
       m_lastcontrolmode = m_elevator.getClosedLoopControlMode();
       m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
-      m_defultCommand = m_elevator.getDefaultCommand();
+      m_defaultCommand = m_elevator.getDefaultCommand();
       m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator, m_StateHandler));
     } else {
       m_elevator.setClosedLoopControlMode(m_lastcontrolmode);
-      m_elevator.setDefaultCommand(m_defultCommand);
+      m_elevator.setDefaultCommand(m_defaultCommand);
     }
   }
 
