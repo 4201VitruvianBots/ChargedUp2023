@@ -36,12 +36,12 @@ public class TwoPiece extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-//    m_trajectories =
-//        TrajectoryUtils.readTrajectory(
-//            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
+    //    m_trajectories =
+    //        TrajectoryUtils.readTrajectory(
+    //            pathName, new PathConstraints(Units.feetToMeters(15), Units.feetToMeters(13)));
     m_trajectories =
-            TrajectoryUtils.readTrajectory(
-                    pathName, new PathConstraints(Units.feetToMeters(4), Units.feetToMeters(4)));
+        TrajectoryUtils.readTrajectory(
+            pathName, new PathConstraints(Units.feetToMeters(4), Units.feetToMeters(4)));
 
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);

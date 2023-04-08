@@ -415,9 +415,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInputVoltage(
-        MathUtil.clamp(
-            wristMotor.getMotorOutputVoltage(), -12, 12));
+    m_armSim.setInputVoltage(MathUtil.clamp(wristMotor.getMotorOutputVoltage(), -12, 12));
 
     double dt = StateHandler.getSimDt();
     m_armSim.update(dt);

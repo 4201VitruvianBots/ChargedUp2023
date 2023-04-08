@@ -260,10 +260,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    m_turnMotorSim.setInputVoltage(
-        MathUtil.clamp(m_turnMotor.getMotorOutputVoltage(), -12, 12));
-    m_driveMotorSim.setInputVoltage(
-        MathUtil.clamp(m_driveMotor.getMotorOutputVoltage(), -12, 12));
+    m_turnMotorSim.setInputVoltage(MathUtil.clamp(m_turnMotor.getMotorOutputVoltage(), -12, 12));
+    m_driveMotorSim.setInputVoltage(MathUtil.clamp(m_driveMotor.getMotorOutputVoltage(), -12, 12));
 
     double dt = StateHandler.getSimDt();
     m_turnMotorSim.update(dt);

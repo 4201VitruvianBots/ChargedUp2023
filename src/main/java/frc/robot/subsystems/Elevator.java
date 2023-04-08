@@ -490,8 +490,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(
-        MathUtil.clamp(elevatorMotors[0].getMotorOutputVoltage(), -12, 12));
+    elevatorSim.setInput(MathUtil.clamp(elevatorMotors[0].getMotorOutputVoltage(), -12, 12));
 
     double dt = StateHandler.getSimDt();
     elevatorSim.update(dt);
