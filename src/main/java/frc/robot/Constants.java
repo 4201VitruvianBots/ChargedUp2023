@@ -474,15 +474,15 @@ public final class Constants implements AutoCloseable {
 
     public static boolean limitCanUtilization = true;
 
-    public static final double mechanism2dXOffset = 0.5;
+    public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 
     public static final Mechanism2d superStructureMech2d =
         new Mechanism2d(
-            ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2, ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2);
+            mechanism2dOffset * 3, mechanism2dOffset * 3);
     public static final MechanismRoot2d chassisRoot2d =
-        superStructureMech2d.getRoot("ChassisRoot", mechanism2dXOffset, Units.inchesToMeters(1.5));
+        superStructureMech2d.getRoot("ChassisRoot", mechanism2dOffset, mechanism2dOffset);
     public static final MechanismRoot2d elevatorRoot2d =
-        superStructureMech2d.getRoot("ElevatorRoot", mechanism2dXOffset, Units.inchesToMeters(4.5));
+        superStructureMech2d.getRoot("ElevatorRoot", mechanism2dOffset, mechanism2dOffset + Units.inchesToMeters(3));
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
