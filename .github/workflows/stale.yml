@@ -1,7 +1,7 @@
 name: Mark stale issues
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *' # Runs daily at 00:00
 
