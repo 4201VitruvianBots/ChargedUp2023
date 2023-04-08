@@ -122,7 +122,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
 
     if (RobotBase.isSimulation()) {
-      SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator));
+      SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
       SmartDashboard.putData(new ToggleWristTestMode(m_wrist));
     }
   }
@@ -211,7 +211,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
-
+    SmartDashboard.putData(new ToggleElevatorControlMode(m_elevator));
     initTestController();
   }
 
