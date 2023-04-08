@@ -32,6 +32,8 @@ public class RunElevatorTestMode extends CommandBase {
   private DoubleSubscriber kMaxAccelSub;
   private DoubleSubscriber kVSub;
   private DoubleSubscriber kASub;
+  private double testKA;
+  private double testKS;
   private double testKP;
   private double testKI;
   private double testKF;
@@ -50,6 +52,8 @@ public class RunElevatorTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
+    new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
@@ -82,6 +86,9 @@ public class RunElevatorTestMode extends CommandBase {
     double newTestKF = kFSub.get(0);
     double newTestKP = kPSub.get(0);
     double newTestizone = KizoneSub.get(0);
+    double newTestKS = kSSub.get(0);
+    double newTestKV = kVSub.get(0);
+    double newTestKA = kASub.get(0);
 
     if (testKF != newTestKF
         || (testKP != newTestKP
@@ -94,8 +101,15 @@ public class RunElevatorTestMode extends CommandBase {
       testKI = newTestKI;
       testizone = newTestizone;
     }
+    if (testKA != newTestKA || testKV != newTestKV || testKS != newTestKS)
+      ;
+    {
+      m_elevator.SimpleMotorFeedforward(newTestKA, newTestKV, newTestKS);
+      testKA = newTestKA;
+      testKS = newTestKS;
+      testKV = newTestKV;
+    }
   }
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}

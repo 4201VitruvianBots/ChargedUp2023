@@ -276,6 +276,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, i);
     elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
   }
+
+  public void SimpleMotorFeedforward(double s, double v, double a) {
+    elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, s);
+    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, v);
+    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, a);
+  }
+
   // True when moving the joystick up and down to control the elevator instead of buttons, in either
   // open or closed loop
   public boolean isUserControlled() {
