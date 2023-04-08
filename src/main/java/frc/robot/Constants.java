@@ -353,6 +353,7 @@ public final class Constants {
     public static final double mass = Units.lbsToKilograms(20);
     public static final double length = Units.inchesToMeters(22);
     public static final double fourbarLength = Units.inchesToMeters(15);
+    public static final double fourbarAngleDegrees = 180;
     public static final int kTimeoutMs = 0;
 
     public static TalonFXInvertType motorInversionType = TalonFXInvertType.Clockwise;
@@ -458,12 +459,6 @@ public final class Constants {
       GAMMA,
     }
 
-    public static final int undefinedOrdinal = ZONE.UNDEFINED.ordinal();
-    public static final int statusOrdinal = ZONE.STATUS.ordinal();
-    public static final int alphaOrdinal = ZONE.ALPHA.ordinal();
-    public static final int betaOrdinal = ZONE.BETA.ordinal();
-    public static final int gammaOrdinal = ZONE.GAMMA.ordinal();
-
     public static final double elevatorSetpointTolerance = Units.inchesToMeters(2);
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
@@ -474,40 +469,40 @@ public final class Constants {
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
-      DANGER_ZONE(undefinedOrdinal),
+      DANGER_ZONE(ZONE.UNDEFINED),
       // STATUS
-      DISABLED(statusOrdinal),
-      ENABLED(statusOrdinal),
-      LOW_BATTERY(statusOrdinal),
+      DISABLED(ZONE.STATUS),
+      ENABLED(ZONE.STATUS),
+      LOW_BATTERY(ZONE.STATUS),
       // LOWs
-      STOWED(alphaOrdinal),
-      INTAKE_LOW_CONE(alphaOrdinal),
-      INTAKE_LOW_CUBE(alphaOrdinal),
-      SCORE_LOW_REVERSE(alphaOrdinal),
-      SCORE_LOW(alphaOrdinal),
-      SCORE_LOW_CONE(alphaOrdinal),
-      SCORE_LOW_CUBE(alphaOrdinal),
-      ALPHA_ZONE(alphaOrdinal),
+      STOWED(ZONE.ALPHA),
+      INTAKE_LOW_CONE(ZONE.ALPHA),
+      INTAKE_LOW_CUBE(ZONE.ALPHA),
+      SCORE_LOW_REVERSE(ZONE.ALPHA),
+      SCORE_LOW(ZONE.ALPHA),
+      SCORE_LOW_CONE(ZONE.ALPHA),
+      SCORE_LOW_CUBE(ZONE.ALPHA),
+      ALPHA_ZONE(ZONE.ALPHA),
       // MID
-      BETA_ZONE(betaOrdinal),
-      SCORE_MID(betaOrdinal),
-      SCORE_MID_CONE(betaOrdinal),
-      SCORE_MID_CUBE(betaOrdinal),
+      BETA_ZONE(ZONE.BETA),
+      SCORE_MID(ZONE.BETA),
+      SCORE_MID_CONE(ZONE.BETA),
+      SCORE_MID_CUBE(ZONE.BETA),
       // HIGH
-      GAMMA_ZONE(gammaOrdinal),
-      INTAKE_EXTENDED(gammaOrdinal),
-      SCORE_HIGH(gammaOrdinal),
-      SCORE_HIGH_CONE(gammaOrdinal),
-      SCORE_HIGH_CUBE(gammaOrdinal);
+      GAMMA_ZONE(ZONE.GAMMA),
+      INTAKE_EXTENDED(ZONE.GAMMA),
+      SCORE_HIGH(ZONE.GAMMA),
+      SCORE_HIGH_CONE(ZONE.GAMMA),
+      SCORE_HIGH_CUBE(ZONE.GAMMA);
 
       // State Zone is determined by elevator setpoints
-      private final int zone;
+      private final ZONE zone;
 
-      SUPERSTRUCTURE_STATE(final int zone) {
+      SUPERSTRUCTURE_STATE(final ZONE zone) {
         this.zone = zone;
       }
 
-      public int getZone() {
+      public ZONE getZone() {
         return zone;
       }
     }

@@ -264,7 +264,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void zoneAdvancement() {
     // Check current mechanism positions before advancing zones
     switch (m_currentState.getZone()) {
-      case 1: // ALPHA
+      case ALPHA:
         // ALPHA -> BETA
         if (ELEVATOR.THRESHOLD.BETA_MIN.get() < m_elevator.getHeightMeters()) {
           if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
@@ -276,7 +276,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         }
         break;
 
-      case 2: // BETA
+      case BETA:
         // BETA -> ALPHA
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.ALPHA_MAX.get()) {
           if (WRIST.THRESHOLD.ALPHA_MIN.get() < m_wrist.getPositionRadians()
@@ -295,7 +295,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           }
         }
         break;
-      case 3: // GAMMA
+      case GAMMA:
         // GAMMA -> BETA
         if (m_elevator.getHeightMeters() < ELEVATOR.THRESHOLD.BETA_MAX.get()) {
           if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
@@ -306,7 +306,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           }
         }
         break;
-      case 0: // UNDEFINED
       default:
         // Undefined behavior, put a breakpoint here when debugging to check logic
         System.out.println("This should never be reached");
@@ -354,25 +353,24 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void updateZoneLimits() {
     switch (m_currentState.getZone()) {
-      case 1: // ALPHA
+      case ALPHA:
         setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.ALPHA_MIN.get());
         setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.ALPHA_MAX.get());
         setWristLowerLimitRadians(WRIST.THRESHOLD.ALPHA_MIN.get());
         setWristUpperLimitRadians(WRIST.THRESHOLD.ALPHA_MAX.get());
         break;
-      case 2: // BETA
+      case BETA:
         setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.BETA_MIN.get());
         setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.BETA_MAX.get());
         setWristLowerLimitRadians(WRIST.THRESHOLD.BETA_MIN.get());
         setWristUpperLimitRadians(WRIST.THRESHOLD.BETA_MAX.get());
         break;
-      case 3: // GAMMA
+      case GAMMA:
         setElevatorLowerLimitMeters(ELEVATOR.THRESHOLD.GAMMA_MIN.get());
         setElevatorUpperLimitMeters(ELEVATOR.THRESHOLD.GAMMA_MAX.get());
         setWristLowerLimitRadians(WRIST.THRESHOLD.GAMMA_MIN.get());
         setWristUpperLimitRadians(WRIST.THRESHOLD.GAMMA_MAX.get());
         break;
-      case 0:
       default:
         // Undefined state, put a breakpoint here when debugging to check logic
         System.out.println("This should never be reached");

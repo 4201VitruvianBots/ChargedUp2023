@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   // Mech2d setup
-  public final MechanismLigament2d m_ligament2d =
+  private final MechanismLigament2d m_intakeLigament2d =
       new MechanismLigament2d("Intake", INTAKE.length, 0);
 
   public Intake() {
@@ -65,7 +65,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   public MechanismLigament2d getLigament() {
-    return m_ligament2d;
+    return m_intakeLigament2d;
   }
 
   // TODO: Need two measurement values: One that averages the two used to measure the cone and
@@ -116,7 +116,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   // Shuffleboard or SmartDashboard function
   public void initSmartDashboard() {
-    m_ligament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+    m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
   }
 
   public void updateSmartDashboard() {
