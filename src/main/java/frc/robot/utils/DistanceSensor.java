@@ -10,15 +10,15 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.INTAKE.SENSOR_STATUS;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants;
+import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.SENSOR_STATUS;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.simulation.SimConstants;
 import java.io.IOException;
 import java.io.StringReader;
@@ -54,30 +54,54 @@ public class DistanceSensor implements AutoCloseable {
       sensor3MMPub,
       coneInchesPub,
       cubeInchesPub;
-  
+
   // Mechanism2d visualization setup
-  public Mechanism2d mech2d = new Mechanism2d(Constants.INTAKE.innerIntakeWidth * 1.5, Constants.INTAKE.innerIntakeWidth);
-  public MechanismRoot2d leftBottomRoot = mech2d.getRoot("Intake Bottom Left", Constants.INTAKE.innerIntakeWidth * 0.25, Constants.INTAKE.innerIntakeWidth * 0.1);
-  public MechanismRoot2d leftTopRoot = mech2d.getRoot("Intake Top Left", Constants.INTAKE.innerIntakeWidth * 0.25, Constants.INTAKE.innerIntakeWidth * 0.9);
-  public MechanismRoot2d rightBottomRoot = mech2d.getRoot("Intake Bottom Right", Constants.INTAKE.innerIntakeWidth * 1.25, Constants.INTAKE.innerIntakeWidth * 0.1);
-  public MechanismRoot2d coneRoot = mech2d.getRoot("Cone",
-    Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
-    Constants.INTAKE.innerIntakeWidth * 0.1);
-  public MechanismRoot2d cubeRoot = mech2d.getRoot("Cube",
-    Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
-    Constants.INTAKE.innerIntakeWidth * 0.9
-  );
+  public Mechanism2d mech2d =
+      new Mechanism2d(Constants.INTAKE.innerIntakeWidth * 1.5, Constants.INTAKE.innerIntakeWidth);
+  public MechanismRoot2d leftBottomRoot =
+      mech2d.getRoot(
+          "Intake Bottom Left",
+          Constants.INTAKE.innerIntakeWidth * 0.25,
+          Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d leftTopRoot =
+      mech2d.getRoot(
+          "Intake Top Left",
+          Constants.INTAKE.innerIntakeWidth * 0.25,
+          Constants.INTAKE.innerIntakeWidth * 0.9);
+  public MechanismRoot2d rightBottomRoot =
+      mech2d.getRoot(
+          "Intake Bottom Right",
+          Constants.INTAKE.innerIntakeWidth * 1.25,
+          Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d coneRoot =
+      mech2d.getRoot(
+          "Cone",
+          Constants.INTAKE.innerIntakeWidth * 0.25
+              + Units.inchesToMeters(getConeDistanceInches())
+              - getConeWidthMeters() / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.1);
+  public MechanismRoot2d cubeRoot =
+      mech2d.getRoot(
+          "Cube",
+          Constants.INTAKE.innerIntakeWidth * 0.25
+              + Units.inchesToMeters(getCubeDistanceInches())
+              - SimConstants.cubeWidth / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.9);
   public MechanismLigament2d leftIntakeLig =
-      leftBottomRoot.append(new MechanismLigament2d("Intake Left", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
+      leftBottomRoot.append(
+          new MechanismLigament2d("Intake Left", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
   public MechanismLigament2d rightIntakeLig =
-      rightBottomRoot.append(new MechanismLigament2d("Intake Right", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
+      rightBottomRoot.append(
+          new MechanismLigament2d("Intake Right", Constants.INTAKE.innerIntakeWidth * 0.8, 90));
   public MechanismLigament2d coneIntakeLig =
-      leftBottomRoot.append(new MechanismLigament2d("Cone Intake", Constants.INTAKE.innerIntakeWidth, 0));
+      leftBottomRoot.append(
+          new MechanismLigament2d("Cone Intake", Constants.INTAKE.innerIntakeWidth, 0));
   public MechanismLigament2d cubeIntakeLig =
-      leftTopRoot.append(new MechanismLigament2d("Cube Intake", Constants.INTAKE.innerIntakeWidth, 0));
-  public MechanismLigament2d coneLig = 
+      leftTopRoot.append(
+          new MechanismLigament2d("Cube Intake", Constants.INTAKE.innerIntakeWidth, 0));
+  public MechanismLigament2d coneLig =
       coneRoot.append(new MechanismLigament2d("Cone", getConeWidthMeters(), 0));
-  public MechanismLigament2d cubeLig = 
+  public MechanismLigament2d cubeLig =
       cubeRoot.append(new MechanismLigament2d("Cone", SimConstants.cubeWidth, 0));
 
   /** Creates a new DistanceSensor. */
@@ -115,7 +139,7 @@ public class DistanceSensor implements AutoCloseable {
 
       return sensorValue;
     } catch (Exception e) {
-      System.out.println("Failed to get sensor "+Integer.toString(sensor)+" value");
+      System.out.println("Failed to get sensor " + Integer.toString(sensor) + " value");
       //      e.printStackTrace();
       return -1;
     }
@@ -149,22 +173,27 @@ public class DistanceSensor implements AutoCloseable {
   public double getGamepieceDistanceInches(Constants.INTAKE.INTAKE_STATE gamePiece) {
     double distanceMeters;
 
-    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
-    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
+    double leftConeSensorValue =
+        getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue =
+        getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
     double cubeSensorValue = getSensorValueMillimeters(Constants.INTAKE.cubeSensorId) / 1000.0;
-    
-    switch(gamePiece) {
+
+    switch (gamePiece) {
       case CONE:
         // Reading cone sensors if cone in intake detected
         distanceMeters =
-          leftConeSensorValue
-            + ((Constants.INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2)
-            - (Constants.INTAKE.innerIntakeWidth / 2);
+            leftConeSensorValue
+                + ((Constants.INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue)
+                    / 2)
+                - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       case CUBE:
         // Reading cube sensors if cube in intake detected
         distanceMeters =
-            cubeSensorValue + (SimConstants.cubeWidth / 2) - (Constants.INTAKE.innerIntakeWidth / 2);
+            cubeSensorValue
+                + (SimConstants.cubeWidth / 2)
+                - (Constants.INTAKE.innerIntakeWidth / 2);
         break;
       default:
       case NONE:
@@ -178,8 +207,10 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getConeWidthMeters() {
-    double leftConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
-    double rightConeSensorValue = getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
+    double leftConeSensorValue =
+        getSensorValueMillimeters(Constants.INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue =
+        getSensorValueMillimeters(Constants.INTAKE.rightConeSensorId) / 1000.0;
     return (Constants.INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2;
   }
 
@@ -258,10 +289,16 @@ public class DistanceSensor implements AutoCloseable {
       rawStringPub.set(receivedData);
 
       // Mech2d updates
-      coneRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getConeDistanceInches()) - getConeWidthMeters() / 2,
-        Constants.INTAKE.innerIntakeWidth * 0.1);
-      cubeRoot.setPosition(Constants.INTAKE.innerIntakeWidth * 0.25 + Units.inchesToMeters(getCubeDistanceInches()) - SimConstants.cubeWidth / 2,
-        Constants.INTAKE.innerIntakeWidth * 0.9);
+      coneRoot.setPosition(
+          Constants.INTAKE.innerIntakeWidth * 0.25
+              + Units.inchesToMeters(getConeDistanceInches())
+              - getConeWidthMeters() / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.1);
+      cubeRoot.setPosition(
+          Constants.INTAKE.innerIntakeWidth * 0.25
+              + Units.inchesToMeters(getCubeDistanceInches())
+              - SimConstants.cubeWidth / 2,
+          Constants.INTAKE.innerIntakeWidth * 0.9);
       coneLig.setLength(getConeWidthMeters());
       coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
       cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
