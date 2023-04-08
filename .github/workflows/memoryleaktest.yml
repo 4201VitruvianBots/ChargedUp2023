@@ -5,6 +5,7 @@ name: MemoryLeakTest
 # Controls when the action will run. Triggers the workflow at 8:00 am PST (16:00 UTC) every other day
 # Will use approx. 900/2000 allotted minutes per month
 on:
+  workflow_dispatch
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '0 16 */2 * *'
