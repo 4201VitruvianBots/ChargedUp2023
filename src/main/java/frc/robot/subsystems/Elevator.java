@@ -63,7 +63,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
-  private boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
+  private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
   // This is used in limiting the elevator's speed once we reach the top of the elevator
@@ -84,12 +84,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-  private SimpleMotorFeedforward m_feedForward =
+  private final SimpleMotorFeedforward m_feedForward =
       new SimpleMotorFeedforward(ELEVATOR.kG, ELEVATOR.kV, ELEVATOR.kA);
   private SimpleMotorFeedforward m_currentFeedForward = m_feedForward;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
-  private static int simEncoderSign = 1;
+  private static int m_simEncoderSign = 1;
   private final Timer m_timer = new Timer();
   private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
@@ -130,10 +130,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
 
   // Logging setup
-  public DataLog log = DataLogManager.getLog();
-  public DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
-  public DoubleLogEntry setpointMetersEntry = new DoubleLogEntry(log, "/elevator/setpoint");
-  public DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
+  private final DataLog log = DataLogManager.getLog();
+  private final DoubleLogEntry outputCurrentEntry = new DoubleLogEntry(log, "/elevator/current");
+  private final DoubleLogEntry setpointMetersEntry = new DoubleLogEntry(log, "/elevator/setpoint");
+  private final DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
 
   /* Constructs a new Elevator. Mostly motor setup */
   public Elevator() {
@@ -168,7 +168,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_timer.reset();
     m_timer.start();
 
-    simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
+    m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
   }
 
   // Elevator's motor output as a percentage
@@ -197,11 +197,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Sets the calculated trapezoid state of the motors
   public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+    // TODO: Find out why feedforward is no longer needed?
     elevatorMotors[0].set(
         TalonFXControlMode.Position,
         state.position / ELEVATOR.encoderCountsToMeters,
         DemandType.ArbitraryFeedForward,
-        (m_currentFeedForward.calculate(state.velocity) / 12.0));
+//        calculateFeedforward(state)
+        0);
+  }
+
+  private double calculateFeedforward(TrapezoidProfile.State state) {
+    return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
   // Sets the setpoint to our current height, effectively keeping the elevator in place.
@@ -321,7 +327,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns a translation of the elevator's position in relation to the robot's position.
   public Translation2d getField2dTranslation() {
     return new Translation2d(
-        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) + centerOffset, 0);
+        -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
   // Returns the ligament of the elevator so it can be updated in the state handler
@@ -344,7 +350,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
-    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height").publish();
+    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height Inches").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
     kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
     kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
@@ -361,7 +367,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     kClosedLoopModePub.set(getClosedLoopControlMode().toString());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
-    kDesiredHeightPub.set(getDesiredPositionMeters());
+    kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
     lowerLimitSwitchPub.set(getLimitSwitch());
 
     if (!m_limitCanUtil) {
@@ -380,6 +386,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     positionMetersEntry.append(getHeightMeters());
   }
 
+  // TODO: Review if needed for new elevator
   // Will severely limit the forward output of the motors when the elevator is fully extended to
   // prevent breakage
   public void updateForwardOutput() {
@@ -501,7 +508,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorRawPosition(
             (int)
-                (simEncoderSign
+                (m_simEncoderSign
                     * elevatorSim.getPositionMeters()
                     / ELEVATOR.encoderCountsToMeters));
 
@@ -511,7 +518,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         .getSimCollection()
         .setIntegratedSensorVelocity(
             (int)
-                (simEncoderSign
+                (m_simEncoderSign
                     * elevatorSim.getVelocityMetersPerSecond()
                     / ELEVATOR.encoderCountsToMeters
                     * 10));
