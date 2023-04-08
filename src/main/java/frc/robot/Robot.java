@@ -38,8 +38,7 @@ public class Robot extends TimedRobot {
     if (RobotBase.isSimulation())
       addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
     addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
-    // Same as color sensors in RapidReact2022
-    //    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.02, 0.01);
+    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.1, 0.05);
   }
 
   /**
