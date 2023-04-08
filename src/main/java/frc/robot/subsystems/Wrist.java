@@ -417,7 +417,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void simulationPeriodic() {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
-            wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
+            wristMotor.getMotorOutputVoltage(), -12, 12));
 
     double dt = StateHandler.getSimDt();
     m_armSim.update(dt);
@@ -441,6 +441,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / WRIST.encoderUnitsToDegrees
                     * 10.0));
+
+    wristMotor.getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
   }
 
   @SuppressWarnings("RedundantThrows")

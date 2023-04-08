@@ -613,7 +613,7 @@ public final class Constants implements AutoCloseable {
     SWERVE_DRIVE.backLeftCANCoderOffset = 0;
     SWERVE_DRIVE.backRightCANCoderOffset = 0;
 
-    SWERVE_DRIVE.kP_Theta = 1;
+    SWERVE_DRIVE.kP_Theta = 0.1;
     SWERVE_DRIVE.kI_Theta = 0;
     SWERVE_DRIVE.kD_Theta = 0;
   }
