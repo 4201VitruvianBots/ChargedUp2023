@@ -73,7 +73,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // run
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
-  private double m_lastSimTimestamp = 0;
 
   private double m_currentKI = 0;
   private double m_newKI = 0;
@@ -419,9 +418,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_armSim.setInputVoltage(
         MathUtil.clamp(
             wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
-    double currentTime = m_timer.get();
-    m_armSim.update(currentTime - m_lastSimTimestamp);
-    m_lastSimTimestamp = currentTime;
+
+    double dt = StateHandler.getSimDt();
+    m_armSim.update(dt);
 
     Unmanaged.feedEnable(20);
 

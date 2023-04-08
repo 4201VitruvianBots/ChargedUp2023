@@ -58,7 +58,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private final FlywheelSim m_turnMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(0.1, 0.0001),
+          LinearSystemId.identifyVelocitySystem(0.25, 0.000001),
           SWERVE_MODULE.kTurnGearbox,
           SWERVE_MODULE.kTurningMotorGearRatio,
           VecBuilder.fill(0));
@@ -66,7 +66,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private final FlywheelSim m_driveMotorSim =
       new FlywheelSim(
           // Sim Values
-          LinearSystemId.identifyVelocitySystem(1.5, 0.6),
+          LinearSystemId.identifyVelocitySystem(0.8, 0.6),
           SWERVE_MODULE.kDriveGearbox,
           SWERVE_MODULE.kDriveMotorGearRatio);
 
@@ -74,8 +74,7 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private double m_turnPercentOutput;
   private double m_driveMotorSimDistance;
   private double m_turnMotorSimDistance;
-  private final Timer m_simTimer = new Timer();
-  private double m_lastSimTime = 0;
+
   private final int m_driveEncoderSimSign;
   private final int m_turnEncoderSimSign;
 
@@ -122,11 +121,6 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
         new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/turnCurrent");
     moduleDriveCurrentEntry =
         new DoubleLogEntry(m_log, "/swerve/" + m_modulePosition.name() + "/driveCurrent");
-
-    if (RobotBase.isSimulation()) {
-      m_simTimer.reset();
-      m_simTimer.start();
-    }
 
     // To distinguish modules in CommandScheduler
     setName("SwerveModule_" + m_modulePosition.ordinal());
@@ -276,15 +270,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_driveMotorSim.setInputVoltage(
         MathUtil.clamp(m_drivePercentOutput * RobotController.getBatteryVoltage(), -12, 12));
 
-    var currentTime = m_simTimer.get();
-    double dt = currentTime - m_lastSimTime;
+    double dt = StateHandler.getSimDt();
     m_turnMotorSim.update(dt);
     m_driveMotorSim.update(dt);
 
     m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * dt;
     m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * dt;
-
-    m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
 

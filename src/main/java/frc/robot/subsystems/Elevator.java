@@ -93,7 +93,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
   private double m_currentTimestamp = 0;
-  private double m_lastSimTimestamp = 0;
 
   // Simulation setup
   private final ElevatorSim elevatorSim =
@@ -494,10 +493,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorSim.setInput(
         MathUtil.clamp(getPercentOutput() * RobotController.getBatteryVoltage(), -12, 12));
 
-    // Next, we update it. The standard loop time is 20ms.
-    if (!m_unitTestBoolean) m_currentTimestamp = m_timer.get();
-    elevatorSim.update(m_currentTimestamp - m_lastSimTimestamp);
-    m_lastSimTimestamp = m_currentTimestamp;
+    double dt = StateHandler.getSimDt();
+    elevatorSim.update(dt);
 
     // Internally sets the position of the motors in encoder counts based on our current height in
     // meters

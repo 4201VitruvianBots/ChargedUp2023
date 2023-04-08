@@ -24,11 +24,7 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BottomDriveForward;
-import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.PlaceOneBalance;
-import frc.robot.commands.auto.TwoPiece;
+import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
@@ -363,6 +359,14 @@ public class RobotContainer implements AutoCloseable {
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
+
+    if (RobotBase.isSimulation()) {
+      m_autoChooser.setDefaultOption(
+          "TestSimAuto",
+          new TestSimAuto(
+              "TestSimAuto Copy", m_swerveDrive, m_elevator, m_wrist, m_stateHandler, m_fieldSim));
+    }
+
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     // Auto trajectory visualizer for testing/debugging
@@ -460,7 +464,7 @@ public class RobotContainer implements AutoCloseable {
     m_memorylog.simulationPeriodic();
 
     // TODO: Fix overwrite of currently running auto?
-    m_fieldSim.setTrajectory(autoPlotter.getSelected());
+    if (DriverStation.isDisabled()) m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   @Override

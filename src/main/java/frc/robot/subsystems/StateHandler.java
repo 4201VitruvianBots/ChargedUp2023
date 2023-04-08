@@ -78,6 +78,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
 
+  private static final Timer m_simTimer = new Timer();
+  private static double m_lastSimTime;
+  private static double m_currentSimTime;
+
   private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
   private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
 
@@ -128,6 +132,8 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         //        System.out.println("Ignoring WPILib Error");
       }
       SmartDashboard.putData("SuperStructure Sim", STATE_HANDLER.superStructureMech2d);
+      m_simTimer.reset();
+      m_simTimer.start();
     }
   }
 
@@ -190,6 +196,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public boolean isOnTarget() {
     return m_isOnTarget;
+  }
+
+  public static double getCurrentSimTime() {
+    return m_currentSimTime;
+  }
+
+  public static double getLastSimTime() {
+    return m_lastSimTime;
+  }
+
+  public static double getSimDt() {
+    return getCurrentSimTime() - getLastSimTime();
   }
 
   // Determines the current state based off current wrist/elevator positions.
@@ -556,6 +574,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
+    m_lastSimTime = m_currentSimTime;
+    m_currentSimTime = m_simTimer.get();
+
     // Update the angle of the mech2d
     m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
     m_wrist
