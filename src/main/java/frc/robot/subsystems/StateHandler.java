@@ -413,6 +413,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
     m_wristLowerLimitPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
     m_wristUpperLimitPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
+
+    // Attach the ligaments of the mech2d together
+    m_elevator.getLigament().append(m_wrist.getLigament());
+    m_wrist.getLigament().append(m_intake.getLigament());
   }
 
   private void updateSmartDashboard() {
@@ -548,10 +552,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void simulationPeriodic() {
     // Update the angle of the mech2d
-    MechanismLigament2d[] ligaments = m_elevator.getLigaments();
-    ligaments[0].setLength(m_elevator.getHeightMeters());
-    ligaments[1].setAngle(180 - ligaments[0].getAngle() - m_wrist.getPositionDegrees());
-    ligaments[2].setAngle(ligaments[1].getAngle() * -1.5);
+    m_elevator.getLigament().setLength(m_elevator.getHeightMeters());
+    m_wrist.getLigament().setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+    m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
   }
 
   @SuppressWarnings("RedundantThrows")

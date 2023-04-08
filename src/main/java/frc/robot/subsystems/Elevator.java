@@ -121,19 +121,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public final Mechanism2d mech2d = new Mechanism2d(maxHeightMeters * 1.5, maxHeightMeters * 1.5);
   public final MechanismRoot2d root2d =
       mech2d.getRoot("Elevator", maxHeightMeters * 0.5, maxHeightMeters * 0.5);
-  public final MechanismLigament2d elevatorLigament2d =
+  public final MechanismLigament2d m_ligament2d =
       root2d.append(
           new MechanismLigament2d(
               "Elevator", getHeightMeters() + ELEVATOR.carriageDistance, ELEVATOR.angleDegrees));
   public final MechanismLigament2d robotBase2d =
       root2d.append(new MechanismLigament2d("Robot Base", SWERVE_DRIVE.kTrackWidth, 0));
-  public final MechanismLigament2d fourbarLigament2d =
-      elevatorLigament2d.append(
-          new MechanismLigament2d(
-              "Fourbar", WRIST.fourbarLength, 180 - elevatorLigament2d.getAngle()));
-  public final MechanismLigament2d intakeLigament2d =
-      fourbarLigament2d.append(
-          new MechanismLigament2d("Intake", INTAKE.length, fourbarLigament2d.getAngle() * 1.5));
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -306,10 +299,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
-  // Returns the ligaments of the elevator so they can be updated in the state handler
-  public MechanismLigament2d[] getLigaments() {
-    MechanismLigament2d[] ligaments = {elevatorLigament2d, fourbarLigament2d, intakeLigament2d};
-    return ligaments;
+  // Returns the ligament of the elevator so it can be updated in the state handler
+  public MechanismLigament2d getLigament() {
+    return m_ligament2d;
   }
 
   // Initializes shuffleboard values. Does not update them
@@ -324,8 +316,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     // Change the color of the mech2d
     robotBase2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    fourbarLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-    intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
 
     kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
