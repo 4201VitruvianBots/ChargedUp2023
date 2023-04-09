@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.sim.fieldsim;
+package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.StateHandler;
 
 public class ToggleTestIntakeState extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
-  private final FieldSim m_fieldSim;
+  private final StateHandler m_stateHanlder;
 
-  public ToggleTestIntakeState(FieldSim fieldSim) {
-    m_fieldSim = fieldSim;
+  public ToggleTestIntakeState(StateHandler stateHandler) {
+    m_stateHanlder = stateHandler;
 
-    addRequirements(m_fieldSim);
+    addRequirements(m_stateHanlder);
   }
 
   @Override
@@ -25,7 +25,7 @@ public class ToggleTestIntakeState extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_fieldSim.setTestScoringState(!m_fieldSim.getTestScoringState());
+    m_stateHanlder.setTestScoringState(!m_stateHanlder.getTestScoringState());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

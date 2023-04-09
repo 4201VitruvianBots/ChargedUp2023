@@ -261,19 +261,19 @@ public class DistanceSensor implements AutoCloseable {
       rawStringPub.set(receivedData);
 
       // Mech2d updates
-//      coneRoot.setPosition(
-//          INTAKE.innerIntakeWidth * 0.25
-//              + Units.inchesToMeters(getConeDistanceInches())
-//              - getConeWidthMeters() / 2,
-//          INTAKE.innerIntakeWidth * 0.1);
-//      cubeRoot.setPosition(
-//          INTAKE.innerIntakeWidth * 0.25
-//              + Units.inchesToMeters(getCubeDistanceInches())
-//              - SimConstants.cubeWidth / 2,
-//          INTAKE.innerIntakeWidth * 0.9);
-//      coneLig.setLength(getConeWidthMeters());
-//      coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
-//      cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
+      //      coneRoot.setPosition(
+      //          INTAKE.innerIntakeWidth * 0.25
+      //              + Units.inchesToMeters(getConeDistanceInches())
+      //              - getConeWidthMeters() / 2,
+      //          INTAKE.innerIntakeWidth * 0.1);
+      //      cubeRoot.setPosition(
+      //          INTAKE.innerIntakeWidth * 0.25
+      //              + Units.inchesToMeters(getCubeDistanceInches())
+      //              - SimConstants.cubeWidth / 2,
+      //          INTAKE.innerIntakeWidth * 0.9);
+      //      coneLig.setLength(getConeWidthMeters());
+      //      coneIntakeLig.setLength(Units.inchesToMeters(getConeDistanceInches()));
+      //      cubeIntakeLig.setLength(Units.inchesToMeters(getCubeDistanceInches()));
     }
   }
 
