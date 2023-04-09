@@ -13,7 +13,8 @@ import frc.robot.subsystems.StateHandler;
 public class ToggleElevatorTestMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
   private final Elevator m_elevator;
-  private final StateHandler m_StateHandler; 
+
+  private final StateHandler m_StateHandler;
 
   private CONTROL_MODE m_lastcontrolmode;
   private Command m_defaultCommand;
@@ -21,7 +22,7 @@ public class ToggleElevatorTestMode extends CommandBase {
   public ToggleElevatorTestMode(Elevator elevator, StateHandler stateHandler) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    m_StateHandler = stateHandler; 
+    m_StateHandler = stateHandler;
     addRequirements(m_elevator);
   }
 
