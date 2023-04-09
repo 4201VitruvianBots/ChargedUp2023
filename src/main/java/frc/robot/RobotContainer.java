@@ -82,6 +82,7 @@ public class RobotContainer implements AutoCloseable {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
+
   private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
   private final CommandXboxController xboxController =
       new CommandXboxController(USB.xBoxController);

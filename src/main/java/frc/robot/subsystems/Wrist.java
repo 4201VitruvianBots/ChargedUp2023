@@ -382,7 +382,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateIValue();
     updateSmartDashboard();
-//    updateLog();
+    //    updateLog();
 
     TrapezoidProfile profile;
     double currentTime = m_timer.get();
