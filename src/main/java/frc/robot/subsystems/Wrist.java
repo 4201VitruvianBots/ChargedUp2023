@@ -92,7 +92,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static int m_simEncoderSign = 1;
 
   // Mech2d setup
-  private MechanismLigament2d m_wristLigament2d;
+  private MechanismLigament2d m_wristLigament2d =
+      new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -145,13 +146,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
 
-    try {
-      m_wristLigament2d =
-          new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
-      m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
+    m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
   }
 
   public MechanismLigament2d getLigament() {
@@ -446,6 +441,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    m_wristLigament2d.close();
+    if (m_wristLigament2d != null) m_wristLigament2d.close();
   }
 }

@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -17,10 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
@@ -107,19 +104,14 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     resetSearch();
     resetPipelineSearch();
     initSmartDashboard();
-
-    try {
-      m_limelightLigament2d =
-          STATE_HANDLER.chassisRoot2d.append(
-              new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
-      m_limelightLigament2d.setColor(new Color8Bit(0, 180, 40)); // Green
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
   }
 
   public MechanismLigament2d getLimelightLigament() {
     return m_limelightLigament2d;
+  }
+
+  public void setLimelightLigament(MechanismLigament2d ligament) {
+    m_limelightLigament2d = ligament;
   }
 
   /**
@@ -553,5 +545,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    if (m_limelightLigament2d != null) m_limelightLigament2d.close();
+  }
 }

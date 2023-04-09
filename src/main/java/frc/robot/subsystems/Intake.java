@@ -39,7 +39,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   // Mech2d setup
-  private MechanismLigament2d m_intakeLigament2d;
+  private MechanismLigament2d m_intakeLigament2d =
+      new MechanismLigament2d("Intake", INTAKE.length, 0);
 
   public Intake(DistanceSensor distanceSensor) {
     m_distanceSensor = distanceSensor;
@@ -65,12 +66,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.config_kP(0, INTAKE.kP);
 
     initSmartDashboard();
-    try {
-      m_intakeLigament2d = new MechanismLigament2d("Intake", INTAKE.length, 0);
-      m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
+
+    m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
   }
 
   public INTAKE.INTAKE_STATE getHeldGamepiece() {
@@ -172,6 +169,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    m_intakeLigament2d.close();
+    if (m_intakeLigament2d != null) m_intakeLigament2d.close();
   }
 }

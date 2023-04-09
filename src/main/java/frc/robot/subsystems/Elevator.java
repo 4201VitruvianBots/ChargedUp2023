@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
@@ -157,20 +156,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_timer.start();
 
     m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
-
-    try {
-      m_elevatorLigament2d =
-          STATE_HANDLER.elevatorRoot2d.append(
-              new MechanismLigament2d(
-                  "Elevator",
-                  getHeightMeters() + ELEVATOR.carriageDistance,
-                  ELEVATOR.mech2dAngleDegrees));
-
-      // Change the color of the mech2d
-      m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
   }
 
   // Elevator's motor output as a percentage
@@ -335,6 +320,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns the ligament of the elevator so it can be updated in the state handler
   public MechanismLigament2d getLigament() {
     return m_elevatorLigament2d;
+  }
+
+  public void setLigament(MechanismLigament2d ligament) {
+    m_elevatorLigament2d = ligament;
   }
 
   // Initializes shuffleboard values. Does not update them
@@ -532,5 +521,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Safely closes the subsystem
   public void close() throws Exception {
     lowerLimitSwitch.close();
+    if (m_elevatorLigament2d != null) m_elevatorLigament2d.close();
   }
 }

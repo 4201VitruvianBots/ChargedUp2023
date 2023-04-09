@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.STATE_HANDLER.chassisRoot2d;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -29,7 +27,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
@@ -122,16 +119,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     }
 
     initSmartDashboard();
-
-    try {
-      m_swerveChassis2d =
-          chassisRoot2d.append(
-              new MechanismLigament2d("SwerveChassis", SWERVE_DRIVE.kTrackWidth, 0));
-      // Change the color of the mech2d
-      m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    } catch (Exception e) {
-
-    }
   }
 
   private void resetModulesToAbsolute() {
@@ -283,6 +270,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     return true;
   }
 
+  public MechanismLigament2d getLigament() {
+    return m_swerveChassis2d;
+  }
+
+  public void setLigament(MechanismLigament2d ligament) {
+    m_swerveChassis2d = ligament;
+  }
+
   public PIDController getXPidController() {
     return m_xController;
   }
@@ -382,6 +377,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
+    if (m_swerveChassis2d != null) m_swerveChassis2d.close();
     for (var module : ModuleMap.orderedValuesList(m_swerveModules)) module.close();
   }
 }

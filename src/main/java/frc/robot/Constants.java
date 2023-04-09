@@ -19,8 +19,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
@@ -36,7 +34,7 @@ import java.util.Map;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants implements AutoCloseable {
+public final class Constants {
   public static String robotName = "";
 
   // Add any constants that do not change between robots here, as well as all
@@ -484,14 +482,6 @@ public final class Constants implements AutoCloseable {
 
     public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 
-    public static final Mechanism2d superStructureMech2d =
-        new Mechanism2d(mechanism2dOffset * 3, mechanism2dOffset * 3);
-    public static final MechanismRoot2d chassisRoot2d =
-        superStructureMech2d.getRoot("ChassisRoot", mechanism2dOffset, mechanism2dOffset);
-    public static final MechanismRoot2d elevatorRoot2d =
-        superStructureMech2d.getRoot(
-            "ElevatorRoot", mechanism2dOffset, mechanism2dOffset + Units.inchesToMeters(3));
-
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
       DANGER_ZONE(ZONE.UNDEFINED),
@@ -662,11 +652,4 @@ public final class Constants implements AutoCloseable {
 
   public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
   public static final String betaRobotMAC = "00:80:2F:19:30:B7";
-
-  @Override
-  public void close() throws Exception {
-    STATE_HANDLER.superStructureMech2d.close();
-    STATE_HANDLER.elevatorRoot2d.close();
-    STATE_HANDLER.chassisRoot2d.close();
-  }
 }
