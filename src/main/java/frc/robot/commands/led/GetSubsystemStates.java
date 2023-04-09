@@ -54,24 +54,26 @@ public class GetSubsystemStates extends CommandBase {
         case ALPHA_ZONE:
         case SCORE_LOW_REVERSE:
         case SCORE_LOW:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
+          break;
         case SCORE_LOW_CONE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
+          break;
         case SCORE_LOW_CUBE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.ALPHA_ZONE); // Solid Orange
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
           break;
         case BETA_ZONE:
         case SCORE_MID_CONE:
         case SCORE_MID_CUBE:
         case SCORE_MID:
-          m_led.expressState(SUPERSTRUCTURE_STATE.BETA_ZONE);
-          // Solid Blue
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.GAMMA_ZONE);
-          // Solid White
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
           break;
         default:
           m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
