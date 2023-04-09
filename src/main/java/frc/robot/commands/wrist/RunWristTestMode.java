@@ -45,13 +45,9 @@ public class RunWristTestMode extends CommandBase {
     m_wrist = wrist;
 
     addRequirements(m_wrist);
-  }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
     NetworkTable wristNtTab =
-        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("WristControl");
+            NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("WristControl");
 
     // initialize Test Values
     kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(0);
@@ -69,7 +65,11 @@ public class RunWristTestMode extends CommandBase {
 
     kMaxVelSub = wristNtTab.getDoubleTopic("Max Vel").subscribe(WRIST.kMaxSlowVel);
     kMaxAccelSub = wristNtTab.getDoubleTopic("Max Accel").subscribe(WRIST.kMaxSlowAccel);
+  }
 
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
     m_wrist.setUserSetpoint(true);
   }
 

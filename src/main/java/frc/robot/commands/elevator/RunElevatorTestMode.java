@@ -48,35 +48,27 @@ public class RunElevatorTestMode extends CommandBase {
     m_stateHandler = stateHandler;
 
     addRequirements(m_elevator);
-  }
-
-  @Override
-  public boolean runsWhenDisabled() {
-    return true;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    // Disable the state handler
-    m_stateHandler.disable();
 
     NetworkTable elevatorNtTab =
-        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
+            NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
 
     // initialize Test Values
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
 
-    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
-    elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
+    try {
+      elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
+      elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
+      elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
+      elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
 
-    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
-    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
-    elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
-    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
-    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
+      elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
+      elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
+      elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
+      elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
+      elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
+    } catch (Exception e) {
+
+    }
 
     kFSub = elevatorNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(ELEVATOR.kP);
@@ -90,6 +82,18 @@ public class RunElevatorTestMode extends CommandBase {
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(ELEVATOR.kMaxVel);
     kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(ELEVATOR.kMaxAccel);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    // Disable the state handler
+    m_stateHandler.disable();
 
     m_elevator.setUserSetpoint(true);
   }

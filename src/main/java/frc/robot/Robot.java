@@ -39,7 +39,8 @@ public class Robot extends TimedRobot {
       addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
     }
     addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
-    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.1, 0.05);
+    // TODO: Fix this causing code delays
+    //    addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.1, 0.05);
   }
 
   /**
@@ -115,9 +116,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {
-    addPeriodic(() -> m_robotContainer.getDistanceSensor().simulationPeriodic(), 1.0);
-  }
+  public void simulationInit() {}
 
   /** This function is called periodically whilst in simulation. */
   @Override
