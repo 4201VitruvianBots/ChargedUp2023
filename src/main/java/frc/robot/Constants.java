@@ -19,8 +19,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
@@ -36,7 +34,7 @@ import java.util.Map;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants implements AutoCloseable {
+public final class Constants {
   public static String robotName = "";
 
   // Add any constants that do not change between robots here, as well as all
@@ -192,19 +190,27 @@ public final class Constants implements AutoCloseable {
 
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
+    public static final int leftConeSensorId = 1;
+    public static final int rightConeSensorId = 2;
+    public static final int cubeSensorId = 3;
     public static final double length = Units.inchesToMeters(9.5);
 
-    public static final int leftConeSensorId = 0;
-    public static final int rightConeSensorId = 1;
-    public static final int cubeSensorId = 2;
-    public static final double kF = 0;
-    public static final double kP = 0.2;
+    public static double kF = 0;
+    public static double kP = 0.2;
 
     public enum INTAKE_STATE {
       NONE,
       INTAKING,
       CUBE,
       CONE
+    }
+
+    public enum SENSOR_STATUS {
+      UNREPORTED, // No status from the teensy is being reported
+      DISCONNECTED, // The teensy failed to initalize the sensor
+      TIMEOUT, // The sensor is connected, but failed to report a value in time
+      FAILED, // The sensor reading is an obviously incorrect value (not between 0-8192)
+      CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
     }
   }
 
@@ -271,9 +277,9 @@ public final class Constants implements AutoCloseable {
     public static final double kI_Y = 0;
     public static final double kD_Y = 0;
 
-    public static final double kP_Theta = 4.0;
-    public static final double kI_Theta = 0;
-    public static final double kD_Theta = 0.01;
+    public static double kP_Theta = 4.0;
+    public static double kI_Theta = 0;
+    public static double kD_Theta = 0.01;
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,
@@ -476,14 +482,6 @@ public final class Constants implements AutoCloseable {
 
     public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 
-    public static final Mechanism2d superStructureMech2d =
-        new Mechanism2d(mechanism2dOffset * 3, mechanism2dOffset * 3);
-    public static final MechanismRoot2d chassisRoot2d =
-        superStructureMech2d.getRoot("ChassisRoot", mechanism2dOffset, mechanism2dOffset);
-    public static final MechanismRoot2d elevatorRoot2d =
-        superStructureMech2d.getRoot(
-            "ElevatorRoot", mechanism2dOffset, mechanism2dOffset + Units.inchesToMeters(3));
-
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
       DANGER_ZONE(ZONE.UNDEFINED),
@@ -612,6 +610,10 @@ public final class Constants implements AutoCloseable {
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;
     SWERVE_DRIVE.backLeftCANCoderOffset = 0;
     SWERVE_DRIVE.backRightCANCoderOffset = 0;
+
+    SWERVE_DRIVE.kP_Theta = 0.1;
+    SWERVE_DRIVE.kI_Theta = 0;
+    SWERVE_DRIVE.kD_Theta = 0;
   }
 
   private static void initUnknown() {
@@ -650,11 +652,4 @@ public final class Constants implements AutoCloseable {
 
   public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
   public static final String betaRobotMAC = "00:80:2F:19:30:B7";
-
-  @Override
-  public void close() throws Exception {
-    STATE_HANDLER.superStructureMech2d.close();
-    STATE_HANDLER.elevatorRoot2d.close();
-    STATE_HANDLER.chassisRoot2d.close();
-  }
 }

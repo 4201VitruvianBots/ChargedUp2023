@@ -73,7 +73,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // run
   private final Timer m_timer = new Timer();
   private double m_lastTimestamp = 0;
-  private double m_lastSimTimestamp = 0;
 
   private double m_currentKI = 0;
   private double m_newKI = 0;
@@ -93,7 +92,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static int m_simEncoderSign = 1;
 
   // Mech2d setup
-  private MechanismLigament2d m_wristLigament2d;
+  private MechanismLigament2d m_wristLigament2d =
+      new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -146,13 +146,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
 
-    try {
-      m_wristLigament2d =
-          new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
-      m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
+    m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
   }
 
   public MechanismLigament2d getLigament() {
@@ -416,12 +410,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
-    m_armSim.setInputVoltage(
-        MathUtil.clamp(
-            wristMotor.getMotorOutputPercent() * RobotController.getBatteryVoltage(), -12, 12));
-    double currentTime = m_timer.get();
-    m_armSim.update(currentTime - m_lastSimTimestamp);
-    m_lastSimTimestamp = currentTime;
+    m_armSim.setInputVoltage(MathUtil.clamp(wristMotor.getMotorOutputVoltage(), -12, 12));
+
+    double dt = StateHandler.getSimDt();
+    m_armSim.update(dt);
 
     Unmanaged.feedEnable(20);
 
@@ -442,11 +434,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
                     * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
                     / WRIST.encoderUnitsToDegrees
                     * 10.0));
+
+    wristMotor.getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
   }
 
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    m_wristLigament2d.close();
+    if (m_wristLigament2d != null) m_wristLigament2d.close();
   }
 }

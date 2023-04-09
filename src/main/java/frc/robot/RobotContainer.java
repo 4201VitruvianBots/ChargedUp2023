@@ -24,11 +24,7 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BottomDriveForward;
-import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.PlaceOneBalance;
-import frc.robot.commands.auto.TwoPiece;
+import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
@@ -61,10 +57,15 @@ import java.util.List;
 public class RobotContainer implements AutoCloseable {
   private final DataLog m_logger = DataLogManager.getLog();
 
+  // Initialize used utils
+  private final MemoryLog m_memorylog = new MemoryLog();
+  private final LogManager m_logManager = new LogManager();
+  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+
   // The robot's subsystems and commands are defined here...
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator();
-  private final Intake m_intake = new Intake();
+  private final Intake m_intake = new Intake(m_distanceSensor);
   private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
@@ -81,11 +82,6 @@ public class RobotContainer implements AutoCloseable {
   // private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-
-  // Initialize used utils
-  private final MemoryLog m_memorylog = new MemoryLog();
-  private final LogManager m_logManager = new LogManager();
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
@@ -363,6 +359,14 @@ public class RobotContainer implements AutoCloseable {
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
+
+    if (RobotBase.isSimulation()) {
+      m_autoChooser.setDefaultOption(
+          "TestSimAuto",
+          new TestSimAuto(
+              "TestSimAuto Copy", m_swerveDrive, m_elevator, m_wrist, m_stateHandler, m_fieldSim));
+    }
+
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
     // Auto trajectory visualizer for testing/debugging
@@ -460,7 +464,7 @@ public class RobotContainer implements AutoCloseable {
     m_memorylog.simulationPeriodic();
 
     // TODO: Fix overwrite of currently running auto?
-    m_fieldSim.setTrajectory(autoPlotter.getSelected());
+    if (DriverStation.isDisabled()) m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
   @Override

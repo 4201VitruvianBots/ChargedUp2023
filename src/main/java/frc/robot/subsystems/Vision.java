@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -17,15 +16,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase implements AutoCloseable {
-
   private final SwerveDrive m_swerveDrive;
   private final Controls m_controls;
   private final Intake m_intakeSub;
@@ -53,14 +50,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private double startTime, timestamp;
   private boolean timerStart;
 
-  private enum targetType {
-    INTAKING,
-    CONE,
-    CUBE,
-    NONE
-  }
-
-  private targetType targetFound = targetType.NONE;
+  private INTAKE_STATE targetFound = INTAKE_STATE.NONE;
 
   private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -114,19 +104,14 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     resetSearch();
     resetPipelineSearch();
     initSmartDashboard();
-
-    try {
-      m_limelightLigament2d =
-          STATE_HANDLER.chassisRoot2d.append(
-              new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
-      m_limelightLigament2d.setColor(new Color8Bit(0, 180, 40)); // Green
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
-    }
   }
 
   public MechanismLigament2d getLimelightLigament() {
     return m_limelightLigament2d;
+  }
+
+  public void setLimelightLigament(MechanismLigament2d ligament) {
+    m_limelightLigament2d = ligament;
   }
 
   /**
@@ -276,7 +261,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * resets timer for pipeline finder
    */
   public void resetPipelineSearch() {
-    targetFound = targetType.NONE;
+    targetFound = INTAKE_STATE.NONE;
     searchPipelineTimer.reset();
     searchPipelineTimer.start();
   }
@@ -314,7 +299,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
     if (timestamp != 0 || searchTimer.get() - startTime > 3) {
       if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
-        targetFound = targetType.NONE;
+        targetFound = INTAKE_STATE.NONE;
         searchLimelightPipeline(location);
       }
     }
@@ -328,26 +313,26 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
-      if (targetFound == targetType.NONE || targetFound == targetType.INTAKING) {
+      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
         setPipeline(location, pipeline);
         if (getTargetArea(location) > 3.0 && pipeline == 1) {
-          targetFound = targetType.CUBE;
+          targetFound = INTAKE_STATE.CUBE;
         } else if (getTargetArea(location) > 3.0 && pipeline == 2) {
-          targetFound = targetType.CONE;
+          targetFound = INTAKE_STATE.CONE;
         }
       }
 
       // threshold to lose game object once it's found
-      if (targetFound == targetType.CUBE) {
+      if (targetFound == INTAKE_STATE.CUBE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          targetFound = targetType.NONE;
+          targetFound = INTAKE_STATE.NONE;
         }
       }
-      if (targetFound == targetType.CONE) {
+      if (targetFound == INTAKE_STATE.CONE) {
         if (getTargetArea(location) < 2.0) {
           reconnectLimelightPipeline(location);
-          targetFound = targetType.NONE;
+          targetFound = INTAKE_STATE.NONE;
         }
       }
     }
@@ -560,5 +545,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    if (m_limelightLigament2d != null) m_limelightLigament2d.close();
+  }
 }

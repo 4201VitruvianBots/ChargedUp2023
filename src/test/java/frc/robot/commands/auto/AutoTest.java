@@ -2,16 +2,21 @@ package frc.robot.commands.auto;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.CommandTestBase;
+import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.RobotContainer;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
+import frc.robot.utils.TrajectoryUtils;
 import org.junit.jupiter.api.*;
 
-@Disabled("WIP")
-public class AutoTest {
+public class AutoTest extends CommandTestBase {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
   protected Elevator m_elevator;
@@ -42,7 +47,7 @@ public class AutoTest {
     m_robotContainer.close();
   }
 
-  @Test
+  @Disabled("To Fix")
   public void testAutoPathFlipping() {
     System.out.println("Starting Test...");
     double blueTrajectoryMinX = 0;
@@ -99,5 +104,46 @@ public class AutoTest {
                 && state.poseMeters.getY() < redTrajectoryMaxY);
       }
     }
+  }
+
+  @Disabled("Doesn't work")
+  public void testAutoPathFollowing() {
+
+    var trajectories =
+        TrajectoryUtils.readTrajectory(
+            "TestSimAuto Copy",
+            new PathConstraints(
+                SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.4,
+                SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.4));
+    var commands = TrajectoryUtils.generatePPSwerveControllerCommand(m_swerveDrive, trajectories);
+
+    var timer = new Timer();
+    m_swerveDrive.setOdometry(trajectories.get(0).getInitialHolonomicPose());
+
+    for (int i = 0; i < trajectories.size(); i++) {
+      CommandScheduler.getInstance().schedule(commands.get(i));
+      double currentTime;
+      timer.reset();
+      timer.start();
+
+      while (true) {
+        CommandScheduler.getInstance().run();
+        currentTime = timer.get();
+        if (trajectories.get(i).getTotalTimeSeconds() < currentTime) {
+          break;
+        }
+
+        var currentPose = m_swerveDrive.getPoseMeters();
+        var trajectoryPose = trajectories.get(i).sample(currentTime);
+
+        var xDelta = Math.abs(trajectoryPose.poseMeters.getX() - currentPose.getX());
+        var yDelta = Math.abs(trajectoryPose.poseMeters.getY() - currentPose.getY());
+        if (xDelta > 2 || yDelta > 2) {
+          System.out.printf("Trajectory failed at T=%fs", currentTime);
+          assertTrue(false);
+        }
+      }
+    }
+    assertTrue(true);
   }
 }

@@ -21,9 +21,10 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
@@ -73,12 +74,27 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private final Intake m_intake;
   private final Wrist m_wrist;
-  private final SwerveDrive m_drive;
+  private final SwerveDrive m_swerveDrive;
   private final Elevator m_elevator;
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
   private boolean m_isStatehandlerEnabled = true; 
+
+  public static final Mechanism2d m_superStructureMech2d =
+      new Mechanism2d(STATE_HANDLER.mechanism2dOffset * 3, STATE_HANDLER.mechanism2dOffset * 3);
+  public static final MechanismRoot2d m_chassisRoot2d =
+      m_superStructureMech2d.getRoot(
+          "ChassisRoot", STATE_HANDLER.mechanism2dOffset, STATE_HANDLER.mechanism2dOffset);
+  public static final MechanismRoot2d m_elevatorRoot2d =
+      m_superStructureMech2d.getRoot(
+          "ElevatorRoot",
+          STATE_HANDLER.mechanism2dOffset,
+          STATE_HANDLER.mechanism2dOffset + Units.inchesToMeters(3));
+
+  private static final Timer m_simTimer = new Timer();
+  private static double m_lastSimTime;
+  private static double m_currentSimTime;
 
   private final SendableChooser<SUPERSTRUCTURE_STATE> m_mainStateChooser = new SendableChooser<>();
   private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
@@ -101,7 +117,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       LEDSubsystem led,
       Vision vision) {
     m_intake = intake;
-    m_drive = swerveDrive;
+    m_swerveDrive = swerveDrive;
     m_elevator = elevator;
     m_led = led;
     m_vision = vision;
@@ -126,12 +142,34 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       // Attach the ligaments of the mech2d together
       try {
+        var elevatorLigament =
+            m_elevatorRoot2d.append(
+                new MechanismLigament2d(
+                    "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
+        elevatorLigament.setColor(new Color8Bit(180, 0, 0)); // Red
+        m_elevator.setLigament(elevatorLigament);
+
+        var chassisLigament =
+            m_chassisRoot2d.append(
+                new MechanismLigament2d("SwerveChassis", Constants.SWERVE_DRIVE.kTrackWidth, 0));
+        // Change the color of the mech2d
+        chassisLigament.setColor(new Color8Bit(173, 216, 230)); // Light blue
+        m_swerveDrive.setLigament(chassisLigament);
+
+        var limelightLigament =
+            m_chassisRoot2d.append(
+                new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
+        limelightLigament.setColor(new Color8Bit(0, 180, 40)); // Green
+        m_vision.setLimelightLigament(limelightLigament);
+
         m_elevator.getLigament().append(m_wrist.getLigament());
         m_wrist.getLigament().append(m_intake.getLigament());
       } catch (Exception e) {
         //        System.out.println("Ignoring WPILib Error");
       }
-      SmartDashboard.putData("SuperStructure Sim", STATE_HANDLER.superStructureMech2d);
+      SmartDashboard.putData("SuperStructure Sim", m_superStructureMech2d);
+      m_simTimer.reset();
+      m_simTimer.start();
     }
   }
 
@@ -206,6 +244,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public boolean getIsStatehandlerEnabled(){
     return m_isStatehandlerEnabled; 
+  }
+    
+  public static double getCurrentSimTime() {
+    return m_currentSimTime;
+  }
+
+  public static double getLastSimTime() {
+    return m_lastSimTime;
+  }
+
+  public static double getSimDt() {
+    return getCurrentSimTime() - getLastSimTime();
   }
 
   // Determines the current state based off current wrist/elevator positions.
@@ -414,12 +464,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public boolean isRobotOnTarget(Pose2d targetPose, double margin) {
     var elevatorPose =
-        m_drive
+        m_swerveDrive
             .getPoseMeters()
             .transformBy(
                 new Transform2d(
                     m_elevator.getField2dTranslation().plus(m_wrist.getHorizontalTranslation()),
-                    m_drive.getHeadingRotation2d()));
+                    m_swerveDrive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
@@ -541,11 +591,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     if (m_smartScoringEnabled) {
-      var targetNode = getTargetNode(m_drive.getPoseMeters(), m_intake.getHeldGamepiece());
+      var targetNode = getTargetNode(m_swerveDrive.getPoseMeters(), m_intake.getHeldGamepiece());
       m_isOnTarget = isRobotOnTarget(targetNode, 0.1);
       m_wristOffset = m_wrist.getHorizontalTranslation().getX();
       m_setpointSolver.solveSetpoints(
-          m_drive.getPoseMeters(), targetNode, m_wristOffset, m_scoringState);
+          m_swerveDrive.getPoseMeters(), targetNode, m_wristOffset, m_scoringState);
       m_canScore = m_setpointSolver.canScore();
       m_wrist.setSetpointPositionRadians(WRIST.SETPOINT.SCORE_HIGH_CONE.get());
       m_elevator.setDesiredPositionMeters(m_setpointSolver.getElevatorSetpointMeters());
@@ -577,6 +627,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void simulationPeriodic() {
+    m_lastSimTime = m_currentSimTime;
+    m_currentSimTime = m_simTimer.get();
+
     // Update the angle of the mech2d
     m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
     m_wrist
@@ -587,5 +640,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  public void close() throws Exception {}
+  public void close() throws Exception {
+    m_superStructureMech2d.close();
+    m_chassisRoot2d.close();
+    m_elevatorRoot2d.close();
+  }
 }

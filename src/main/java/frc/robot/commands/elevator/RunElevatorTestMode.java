@@ -11,7 +11,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
@@ -91,8 +90,7 @@ public class RunElevatorTestMode extends CommandBase {
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(ELEVATOR.kA);
 
     kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(ELEVATOR.kMaxVel);
-    kMaxAccelSub =
-        elevatorNtTab.getDoubleTopic("Max Accel").subscribe(Constants.ELEVATOR.kMaxAccel);
+    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(ELEVATOR.kMaxAccel);
 
     m_elevator.setUserSetpoint(true);
   }
@@ -109,9 +107,9 @@ public class RunElevatorTestMode extends CommandBase {
     double newKD = kDSub.get(ELEVATOR.kD);
     double newIZone = kIZoneSub.get(0);
 
-    double newKG = kGSub.get(Constants.ELEVATOR.kG);
-    double newKV = kVSub.get(Constants.ELEVATOR.kV);
-    double newKA = kASub.get(Constants.ELEVATOR.kA);
+    double newKG = kGSub.get(ELEVATOR.kG);
+    double newKV = kVSub.get(ELEVATOR.kV);
+    double newKA = kASub.get(ELEVATOR.kA);
 
     double newMaxVel = kMaxVelSub.get(ELEVATOR.kMaxVel);
     double newMaxAccel = kMaxAccelSub.get(ELEVATOR.kMaxAccel);

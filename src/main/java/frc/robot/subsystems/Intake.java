@@ -11,7 +11,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
+import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -31,14 +32,18 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
 
+  private final DistanceSensor m_distanceSensor;
+
   // Log setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   // Mech2d setup
-  private MechanismLigament2d m_intakeLigament2d;
+  private MechanismLigament2d m_intakeLigament2d =
+      new MechanismLigament2d("Intake", INTAKE.length, 0);
 
-  public Intake() {
+  public Intake(DistanceSensor distanceSensor) {
+    m_distanceSensor = distanceSensor;
     // one or two motors
 
     // factory default configs
@@ -61,27 +66,46 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.config_kP(0, INTAKE.kP);
 
     initSmartDashboard();
-    try {
-      m_intakeLigament2d = new MechanismLigament2d("Intake", INTAKE.length, 0);
-      m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
-    } catch (Exception e) {
-      //      System.out.println("Dumb WPILib Exception");
+
+    m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
+  }
+
+  public INTAKE.INTAKE_STATE getHeldGamepiece() {
+    double leftConeSensorValue =
+        m_distanceSensor.getSensorValueMillimeters(INTAKE.leftConeSensorId) / 1000.0;
+    double rightConeSensorValue =
+        m_distanceSensor.getSensorValueMillimeters(INTAKE.rightConeSensorId) / 1000.0;
+    double cubeSensorValue =
+        m_distanceSensor.getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
+
+    if (leftConeSensorValue + rightConeSensorValue <= INTAKE.innerIntakeWidth) {
+      return INTAKE.INTAKE_STATE.CONE;
+    } else if (cubeSensorValue <= INTAKE.innerIntakeWidth - 1) {
+      return INTAKE.INTAKE_STATE.CUBE;
+    } else {
+      return INTAKE.INTAKE_STATE.NONE;
     }
+  }
+
+  // Returns a pose where the center of the gamepiece should be
+  public Pose2d getGamepiecePose(Pose2d intakePose) {
+    return new Pose2d(
+        intakePose.getX(),
+        intakePose.getY() + getGamepieceDistanceInches(),
+        intakePose.getRotation());
   }
 
   public MechanismLigament2d getLigament() {
     return m_intakeLigament2d;
   }
 
-  // TODO: Need two measurement values: One that averages the two used to measure the cone and
-  // another to measure the
-  //  distance to the cube
-  public double getConeDistance() {
-    return 0;
+  public double getGamepieceDistanceInches() {
+    return m_distanceSensor.getGamepieceDistanceInches(getHeldGamepiece());
   }
 
-  public double getCubeDistance() {
-    return 0;
+  // control mode function
+  public boolean getIntakeState() {
+    return isIntakingCone || isIntakingCube;
   }
 
   public boolean getIntakeConeState() {
@@ -98,16 +122,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public void setIntakeStateCube(boolean state) {
     isIntakingCube = state;
-  }
-
-  // True if Cube is detected, otherwise assume Cone
-  public INTAKE.INTAKE_STATE getHeldGamepiece() {
-    if (getConeDistance() > Units.inchesToMeters(15)
-        && getCubeDistance() > Units.inchesToMeters(15)) return INTAKE.INTAKE_STATE.NONE;
-    else if (getConeDistance() < Units.inchesToMeters(13)) return INTAKE.INTAKE_STATE.CONE;
-    else if (getCubeDistance() < Units.inchesToMeters(14)) return INTAKE.INTAKE_STATE.CUBE;
-
-    return INTAKE.INTAKE_STATE.NONE;
   }
 
   public double getMotorOutputCurrent() {
@@ -138,11 +152,12 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateLog();
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
-    // hold the game piece in.
-    if (!isIntakingCone && !isIntakingCube) {
-      if (getConeDistance() > 0) {
+    // hold
+    // the game piece in.
+    if (!getIntakeState()) {
+      if (m_distanceSensor.getConeDistanceInches() > 0) {
         m_percentOutput = 0;
-      } else if (getCubeDistance() > 0) {
+      } else if (m_distanceSensor.getCubeDistanceInches() > 0) {
         m_percentOutput = 0;
       } else {
         m_percentOutput = 0;
@@ -154,6 +169,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    m_intakeLigament2d.close();
+    if (m_intakeLigament2d != null) m_intakeLigament2d.close();
   }
 }

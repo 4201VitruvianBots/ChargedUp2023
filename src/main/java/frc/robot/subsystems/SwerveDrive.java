@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.STATE_HANDLER.chassisRoot2d;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -29,7 +27,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
@@ -85,8 +82,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("CanBeFinal")
   private boolean m_simOverride = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
 
-  private final Timer m_simTimer = new Timer();
-  private double m_lastSimTime = 0;
   private double m_simYaw;
   private double m_simRoll;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
@@ -116,24 +111,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
             getSwerveDriveModulePositionsArray(),
             new Pose2d());
 
+    m_turnController.enableContinuousInput(-Math.PI, Math.PI);
+
     if (RobotBase.isReal()) {
       Timer.delay(1);
       resetModulesToAbsolute();
-    } else {
-      m_simTimer.reset();
-      m_simTimer.start();
     }
+
     initSmartDashboard();
-
-    try {
-      m_swerveChassis2d =
-          chassisRoot2d.append(
-              new MechanismLigament2d("SwerveChassis", SWERVE_DRIVE.kTrackWidth, 0));
-      // Change the color of the mech2d
-      m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    } catch (Exception e) {
-
-    }
   }
 
   private void resetModulesToAbsolute() {
@@ -285,6 +270,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     return true;
   }
 
+  public MechanismLigament2d getLigament() {
+    return m_swerveChassis2d;
+  }
+
+  public void setLigament(MechanismLigament2d ligament) {
+    m_swerveChassis2d = ligament;
+  }
+
   public PIDController getXPidController() {
     return m_xController;
   }
@@ -375,12 +368,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
         SWERVE_DRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
-    var currentTime = m_simTimer.get();
-    double dt = currentTime - m_lastSimTime;
-
+    double dt = StateHandler.getSimDt();
     m_simYaw += chassisSpeed.omegaRadiansPerSecond * dt;
-
-    m_lastSimTime = currentTime;
 
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));
@@ -388,6 +377,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void close() throws Exception {
+    if (m_swerveChassis2d != null) m_swerveChassis2d.close();
     for (var module : ModuleMap.orderedValuesList(m_swerveModules)) module.close();
   }
 }

@@ -42,6 +42,10 @@ public class TrajectoryUtils {
             "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
 
+        file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+        if (!file.exists()) {
+          fileName = fileName.replace("Blue", "");
+        }
         var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
 
         return SimConstants.absoluteFlip(pathGroup);
@@ -50,6 +54,9 @@ public class TrajectoryUtils {
     } else {
       try {
         var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+        if (!file.exists()) {
+          fileName = fileName.replace("Blue", "");
+        }
 
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
