@@ -22,9 +22,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.*;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
@@ -142,26 +140,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       // Attach the ligaments of the mech2d together
       try {
-        var elevatorLigament =
-            m_elevatorRoot2d.append(
-                new MechanismLigament2d(
-                    "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
-        elevatorLigament.setColor(new Color8Bit(180, 0, 0)); // Red
-        m_elevator.setLigament(elevatorLigament);
-
-        var chassisLigament =
-            m_chassisRoot2d.append(
-                new MechanismLigament2d("SwerveChassis", Constants.SWERVE_DRIVE.kTrackWidth, 0));
-        // Change the color of the mech2d
-        chassisLigament.setColor(new Color8Bit(173, 216, 230)); // Light blue
-        m_swerveDrive.setLigament(chassisLigament);
-
-        var limelightLigament =
-            m_chassisRoot2d.append(
-                new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
-        limelightLigament.setColor(new Color8Bit(0, 180, 40)); // Green
-        m_vision.setLimelightLigament(limelightLigament);
-
         m_elevator.getLigament().append(m_wrist.getLigament());
         m_wrist.getLigament().append(m_intake.getLigament());
       } catch (Exception e) {
@@ -631,15 +609,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentSimTime = m_simTimer.get();
 
     // Update the angle of the mech2d
-    try {
-      m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
-      m_wrist
-          .getLigament()
-          .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
-      m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
-    } catch (Exception e) {
-
-    }
+    m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
+    m_wrist
+        .getLigament()
+        .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+    m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
   }
 
   @SuppressWarnings("RedundantThrows")

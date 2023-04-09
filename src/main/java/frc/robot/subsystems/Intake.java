@@ -39,7 +39,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   // Mech2d setup
-  private MechanismLigament2d m_intakeLigament2d =
+  private final MechanismLigament2d m_intakeLigament2d =
       new MechanismLigament2d("Intake", INTAKE.length, 0);
 
   public Intake(DistanceSensor distanceSensor) {

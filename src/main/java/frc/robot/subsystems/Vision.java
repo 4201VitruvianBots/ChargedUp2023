@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -16,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION;
@@ -104,14 +108,18 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     resetSearch();
     resetPipelineSearch();
     initSmartDashboard();
+
+    try {
+      m_limelightLigament2d =
+          m_chassisRoot2d.append(new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
+      m_limelightLigament2d.setColor(new Color8Bit(0, 180, 40)); // Green
+    } catch (Exception e) {
+
+    }
   }
 
   public MechanismLigament2d getLimelightLigament() {
     return m_limelightLigament2d;
-  }
-
-  public void setLimelightLigament(MechanismLigament2d ligament) {
-    m_limelightLigament2d = ligament;
   }
 
   /**

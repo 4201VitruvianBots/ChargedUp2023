@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.ELEVATOR.centerOffset;
+import static frc.robot.subsystems.StateHandler.m_elevatorRoot2d;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
@@ -156,6 +158,16 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_timer.start();
 
     m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
+
+    try {
+      m_elevatorLigament2d =
+          m_elevatorRoot2d.append(
+              new MechanismLigament2d(
+                  "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
+      m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
+    } catch (Exception e) {
+
+    }
   }
 
   // Elevator's motor output as a percentage

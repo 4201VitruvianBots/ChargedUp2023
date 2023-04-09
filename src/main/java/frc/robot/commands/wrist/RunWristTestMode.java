@@ -47,7 +47,7 @@ public class RunWristTestMode extends CommandBase {
     addRequirements(m_wrist);
 
     NetworkTable wristNtTab =
-            NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("WristControl");
+        NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("WristControl");
 
     // initialize Test Values
     kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(0);

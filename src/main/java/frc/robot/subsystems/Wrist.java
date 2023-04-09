@@ -92,7 +92,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static int m_simEncoderSign = 1;
 
   // Mech2d setup
-  private MechanismLigament2d m_wristLigament2d =
+  private final MechanismLigament2d m_wristLigament2d =
       new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
 
   // Logging setup
@@ -382,8 +382,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     updateIValue();
     updateSmartDashboard();
-    updateLog();
+//    updateLog();
 
+    TrapezoidProfile profile;
+    double currentTime = m_timer.get();
     switch (m_controlMode) {
       case OPEN_LOOP:
         double percentOutput = m_joystickInput * WRIST.kPercentOutputMultiplier;
@@ -395,11 +397,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
         setPercentOutput(percentOutput, true);
         break;
+      case CLOSED_LOOP_TEST:
+        //        m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
+        //        profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
+        //        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
+        //        m_lastTimestamp = currentTime;
+        //
+        //        setSetpointTrapezoidState(m_setpoint);
+        break;
       case CLOSED_LOOP:
       default:
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        TrapezoidProfile profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        double currentTime = m_timer.get();
+        profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
         m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
         m_lastTimestamp = currentTime;
 

@@ -78,14 +78,10 @@ public class RobotContainer implements AutoCloseable {
 
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
-  // private final DistanceSensor m_distanceSensor = new DistanceSensor();
-  // private final DistanceSensor m_distanceSensor = new DistanceSensor();
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   private final Joystick leftJoystick = new Joystick(USB.leftJoystick);
-
   private final Joystick rightJoystick = new Joystick(USB.rightJoystick);
   private final CommandXboxController xboxController =
       new CommandXboxController(USB.xBoxController);
@@ -451,6 +447,7 @@ public class RobotContainer implements AutoCloseable {
     // m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
+    //    m_distanceSensor.periodic();
     // m_logManager.periodic();
   }
 
