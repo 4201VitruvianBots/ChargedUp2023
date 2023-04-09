@@ -514,7 +514,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
     // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
     // directly setting the length to meters
-    m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
+    if (m_elevatorLigament2d != null)
+      m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
 
   @Override

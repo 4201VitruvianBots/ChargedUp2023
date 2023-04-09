@@ -79,7 +79,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private boolean m_isStatehandlerEnabled = true; 
+  private boolean m_isStatehandlerEnabled = true;
 
   public static final Mechanism2d m_superStructureMech2d =
       new Mechanism2d(STATE_HANDLER.mechanism2dOffset * 3, STATE_HANDLER.mechanism2dOffset * 3);
@@ -237,15 +237,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void enable() {
     m_isStatehandlerEnabled = true;
   }
-  
+
   public void disable() {
     m_isStatehandlerEnabled = false;
   }
 
-  public boolean getIsStatehandlerEnabled(){
-    return m_isStatehandlerEnabled; 
+  public boolean getIsStatehandlerEnabled() {
+    return m_isStatehandlerEnabled;
   }
-    
+
   public static double getCurrentSimTime() {
     return m_currentSimTime;
   }
@@ -482,7 +482,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
 
-    m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish(); 
+    m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish();
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
     m_desiredStatePub = stateHandlerTab.getStringTopic("desiredState").publish();
     m_currentZonePub = stateHandlerTab.getStringTopic("currentZone").publish();
@@ -496,7 +496,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentState().toString());
-    m_isEnabledPub.set(getIsStatehandlerEnabled()); 
+    m_isEnabledPub.set(getIsStatehandlerEnabled());
     m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());
@@ -631,11 +631,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_currentSimTime = m_simTimer.get();
 
     // Update the angle of the mech2d
-    m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
-    m_wrist
-        .getLigament()
-        .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
-    m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
+    try {
+      m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
+      m_wrist
+          .getLigament()
+          .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+      m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
+    } catch (Exception e) {
+
+    }
   }
 
   @SuppressWarnings("RedundantThrows")

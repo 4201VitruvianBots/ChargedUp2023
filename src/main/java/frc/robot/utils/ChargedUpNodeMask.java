@@ -105,13 +105,17 @@ public class ChargedUpNodeMask {
 
     if (scoringState == SCORING_STATE.LOW || scoringState == SCORING_STATE.LOW_REVERSE) {
       validNodeMask = validNodeMask & hybridNodes;
-    } else if (scoringState == SCORING_STATE.MID_CONE) {
+    }
+    if (scoringState == SCORING_STATE.MID_CONE) {
       validNodeMask = validNodeMask & midConeNodes;
-    } else if (scoringState == SCORING_STATE.MID_CUBE) {
+    }
+    if (scoringState == SCORING_STATE.MID_CUBE) {
       validNodeMask = validNodeMask & midCubeNodes;
-    } else if (scoringState == SCORING_STATE.HIGH_CONE) {
+    }
+    if (scoringState == SCORING_STATE.HIGH_CONE) {
       validNodeMask = validNodeMask & highConeNodes;
-    } else if (scoringState == SCORING_STATE.HIGH_CUBE) {
+    }
+    if (scoringState == SCORING_STATE.HIGH_CUBE) {
       validNodeMask = validNodeMask & highCubeNodes;
     }
   }
