@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -78,6 +79,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
+  private boolean m_isStatehandlerEnabled = true; 
 
   public static final Mechanism2d m_superStructureMech2d =
       new Mechanism2d(STATE_HANDLER.mechanism2dOffset * 3, STATE_HANDLER.mechanism2dOffset * 3);
@@ -98,6 +100,8 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
 
   private StringPublisher m_currentStatePub, m_desiredStatePub, m_currentZonePub;
+
+  private BooleanPublisher m_isEnabledPub;
   private DoublePublisher m_elevatorHeightMetersPub,
       m_elevatorLowerLimitPub,
       m_elevatorUpperLimitPub,
@@ -230,6 +234,18 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_isOnTarget;
   }
 
+  public void enable() {
+    m_isStatehandlerEnabled = true;
+  }
+  
+  public void disable() {
+    m_isStatehandlerEnabled = false;
+  }
+
+  public boolean getIsStatehandlerEnabled(){
+    return m_isStatehandlerEnabled; 
+  }
+    
   public static double getCurrentSimTime() {
     return m_currentSimTime;
   }
@@ -390,8 +406,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateCommandedSetpoints() {
-    setElevatorCommandedSetpoint();
-    setWristCommandedSetpoint();
+    if (m_isStatehandlerEnabled) {
+      setElevatorCommandedSetpoint();
+      setWristCommandedSetpoint();
+    }
   }
 
   private void setElevatorCommandedSetpoint() {
@@ -456,12 +474,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
+  public void disableStateHandler() {}
+
   private void initSmartDashboard() {
     var stateHandlerTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
 
     stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
 
+    m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish(); 
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
     m_desiredStatePub = stateHandlerTab.getStringTopic("desiredState").publish();
     m_currentZonePub = stateHandlerTab.getStringTopic("currentZone").publish();
@@ -475,7 +496,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentState().toString());
-
+    m_isEnabledPub.set(getIsStatehandlerEnabled()); 
     m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());

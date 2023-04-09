@@ -9,12 +9,17 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.StateHandler;
 
 public class RunElevatorTestMode extends CommandBase {
   private final Elevator m_elevator;
+
+  // Add a reference to the state handler
+  private final StateHandler m_stateHandler;
 
   private DoubleSubscriber kSetpointSub,
       kFSub,
@@ -39,20 +44,40 @@ public class RunElevatorTestMode extends CommandBase {
       testMaxAccel;
 
   /** Creates a new RunElevatorTestMode. */
-  public RunElevatorTestMode(Elevator elevator) {
+  public RunElevatorTestMode(Elevator elevator, StateHandler stateHandler) {
     m_elevator = elevator;
+    m_stateHandler = stateHandler;
 
     addRequirements(m_elevator);
+  }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // Disable the state handler
+    m_stateHandler.disable();
+
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
 
     // initialize Test Values
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
+
+    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
+    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
+    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
+    elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
+
+    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
+    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
+    elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
+    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
+    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
 
     kFSub = elevatorNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(ELEVATOR.kP);
@@ -88,7 +113,6 @@ public class RunElevatorTestMode extends CommandBase {
 
     double newMaxVel = kMaxVelSub.get(ELEVATOR.kMaxVel);
     double newMaxAccel = kMaxAccelSub.get(ELEVATOR.kMaxAccel);
-
     if (testKF != newKF
         || (testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone)) {
       m_elevator.setTalonPIDvalues(newKF, newKP, newKI, newKD, newIZone);
@@ -113,10 +137,13 @@ public class RunElevatorTestMode extends CommandBase {
 
     m_elevator.setDesiredPositionMeters(newSetpoint);
   }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_elevator.setUserSetpoint(false);
+    // Re-enable the state handler
+    m_stateHandler.enable();
   }
 
   // Returns true when the command should end.
