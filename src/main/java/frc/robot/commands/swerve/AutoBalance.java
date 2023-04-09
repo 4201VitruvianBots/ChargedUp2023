@@ -20,7 +20,7 @@ public class AutoBalance extends CommandBase {
 
   SwerveModuleState[] states;
 
-  private final PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private final PIDController outputCalculator = new PIDController(0.017, 0, 0);
   private double m_output = 0;
 
   /**

@@ -25,6 +25,7 @@ import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.PlaceOneBalance;
@@ -339,6 +340,19 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_vision,
             m_stateHandler));
+            
+
+            m_autoChooser.addOption(
+              "CenterOneBalanceCross",
+              new CenterOneBalanceCross(
+                  "CenterOneBalanceCross",
+                  m_swerveDrive,
+                  m_fieldSim,
+                  m_wrist,
+                  m_intake,
+                  m_elevator,
+                  m_vision,
+                  m_stateHandler));
 
     m_autoChooser.addOption(
         "JustBalance",
@@ -346,7 +360,7 @@ public class RobotContainer implements AutoCloseable {
             "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     m_autoChooser.addOption(
-        "BlueBottomDriveForward",
+        "BottomDriveForward",
         new BottomDriveForward(
             "BottomDriveForward",
             m_swerveDrive,

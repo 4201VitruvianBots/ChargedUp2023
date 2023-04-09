@@ -255,10 +255,10 @@ public final class Constants implements AutoCloseable {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 125.7715;
-    public static double frontRightCANCoderOffset = 5.889;
-    public static double backLeftCANCoderOffset = 190.591;
-    public static double backRightCANCoderOffset = 32.915;
+    public static double frontLeftCANCoderOffset = 0;
+    public static double frontRightCANCoderOffset = 0;
+    public static double backLeftCANCoderOffset = 0;
+    public static double backRightCANCoderOffset = 0;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
@@ -397,7 +397,7 @@ public final class Constants implements AutoCloseable {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(104.0)),
+      STOWED(Units.degreesToRadians(108.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-14.5)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
@@ -585,10 +585,10 @@ public final class Constants implements AutoCloseable {
     // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.7715; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 186.855; // 41.748;
-    SWERVE_DRIVE.backLeftCANCoderOffset = 190.591; // 261.475;
-    SWERVE_DRIVE.backRightCANCoderOffset = 32.915;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 124.980; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 167.432; // 41.748;
+    SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
+    SWERVE_DRIVE.backRightCANCoderOffset = 31.816;
   }
 
   private static void initAlpha() {
