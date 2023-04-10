@@ -327,17 +327,17 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-            m_autoChooser.addOption(
-              "SubstationTwoPickUp",
-              new SubstationTwoPickUp(
-                  "SubstationTwoPickUp",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_vision,
-                  m_elevator,
-                  m_stateHandler));
+    m_autoChooser.addOption(
+        "SubstationTwoPickUp",
+        new SubstationTwoPickUp(
+            "SubstationTwoPickUp",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "CenterOneBalance",
