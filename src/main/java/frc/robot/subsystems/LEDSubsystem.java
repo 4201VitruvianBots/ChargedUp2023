@@ -174,7 +174,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
-          setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Solid Pink
+          setPattern(LED.orange, 0, 0, ANIMATION_TYPE.Solid); // Solid Orange
           break;
         case DISABLED:
           setPattern(LED.red, 0, 0, ANIMATION_TYPE.Solid); // Solid Red
