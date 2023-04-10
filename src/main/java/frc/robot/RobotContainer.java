@@ -30,6 +30,7 @@ import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.SubstationTwoPickUp;
+import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
