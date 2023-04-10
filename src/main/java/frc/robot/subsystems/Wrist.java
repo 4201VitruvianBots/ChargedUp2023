@@ -136,7 +136,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
     // Give some time for the CANCoder to recognize the wrist before resetting the angle
-    if (RobotBase.isReal()) Timer.delay(2);
+    if (RobotBase.isReal()) Timer.delay(3);
 
     resetAngleDegrees(-15.0);
 

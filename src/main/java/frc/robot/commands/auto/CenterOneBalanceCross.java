@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.AutoRunIntakeCone;
-import frc.robot.commands.intake.AutoRunIntakeCube;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
@@ -23,16 +23,15 @@ import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
 // TODO: Rewrite without AutoBuilder
-public class BottomDriveForward extends SequentialCommandGroup {
-
-  public BottomDriveForward(
+public class CenterOneBalanceCross extends SequentialCommandGroup {
+  public CenterOneBalanceCross(
       String pathName,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,
       Intake intake,
-      Vision vision,
       Elevator elevator,
+      Vision vision,
       StateHandler stateHandler) {
 
     var m_trajectories =
@@ -42,7 +41,6 @@ public class BottomDriveForward extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
-        /** Setting Up Auto Zeros robot to path flips path if nessesary */
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
@@ -56,7 +54,7 @@ public class BottomDriveForward extends SequentialCommandGroup {
                     frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)
                 .withTimeout(2),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2)),
-        new WaitCommand(1.1),
+        new WaitCommand(0.6),
         /** Outakes cone */
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         /** Stows Wrist, Elevator, and Stops intake */
@@ -68,33 +66,31 @@ public class BottomDriveForward extends SequentialCommandGroup {
                     frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
                 .withTimeout(1.8),
             new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1.8)),
-        new WaitCommand(0.48),
-
+        // new WaitCommand(0.25),
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
             new SequentialCommandGroup(
-                new WaitCommand(5),
+                new WaitCommand(0.75),
                 new ParallelCommandGroup(
-                    new SetSetpoint(
+                    new AutoSetSetpoint(
                             stateHandler,
                             elevator,
                             wrist,
                             frc.robot.Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE)
-                        .withTimeout(2),
-                    new AutoRunIntakeCube(intake, 0.5, vision, swerveDrive).withTimeout(2)))),
-
-        /** Stows and Stops Intake */
+                        .withTimeout(0.5),
+                    new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(0.5)))),
         new ParallelCommandGroup(
-            new SetSetpoint(
-                    stateHandler,
-                    elevator,
-                    wrist,
-                    frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
-                .withTimeout(0.5),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(0.5)),
+            swerveCommands.get(1),
+            new SequentialCommandGroup(
+                new SetSetpoint(
+                        stateHandler,
+                        elevator,
+                        wrist,
+                        frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
+                    .withTimeout(0.5))),
+        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
 }
-//
