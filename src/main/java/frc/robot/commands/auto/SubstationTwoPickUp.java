@@ -11,6 +11,7 @@ import frc.robot.commands.intake.AutoRunIntakeCone;
 import frc.robot.commands.intake.AutoRunIntakeCube;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
@@ -22,10 +23,9 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
-// TODO: Rewrite without AutoBuilder
-public class BottomDriveForward extends SequentialCommandGroup {
+public class SubstationTwoPickUp extends SequentialCommandGroup {
 
-  public BottomDriveForward(
+  public SubstationTwoPickUp(
       String pathName,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
@@ -37,12 +37,11 @@ public class BottomDriveForward extends SequentialCommandGroup {
 
     var m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+            pathName, new PathConstraints(Units.feetToMeters(16), Units.feetToMeters(13)));
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
-        /** Setting Up Auto Zeros robot to path flips path if nessesary */
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
@@ -56,7 +55,7 @@ public class BottomDriveForward extends SequentialCommandGroup {
                     frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)
                 .withTimeout(2),
             new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2)),
-        new WaitCommand(1.1),
+        new WaitCommand(0.6),
         /** Outakes cone */
         new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
         /** Stows Wrist, Elevator, and Stops intake */
@@ -66,35 +65,55 @@ public class BottomDriveForward extends SequentialCommandGroup {
                     elevator,
                     wrist,
                     frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
-                .withTimeout(1.8),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1.8)),
-        new WaitCommand(0.48),
-
+                .withTimeout(1.4),
+            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1.65)),
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
             new SequentialCommandGroup(
-                new WaitCommand(5),
+                new WaitCommand(0.75),
                 new ParallelCommandGroup(
-                    new SetSetpoint(
+                    new AutoSetSetpoint(
                             stateHandler,
                             elevator,
                             wrist,
                             frc.robot.Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE)
-                        .withTimeout(2),
-                    new AutoRunIntakeCube(intake, 0.5, vision, swerveDrive).withTimeout(2)))),
-
-        /** Stows and Stops Intake */
+                        .withTimeout(0.5),
+                    new AutoRunIntakeCube(intake, 0.5, vision, swerveDrive).withTimeout(0.5)))),
         new ParallelCommandGroup(
-            new SetSetpoint(
+            swerveCommands.get(1),
+            new SequentialCommandGroup(
+                new SetSetpoint(
+                        stateHandler,
+                        elevator,
+                        wrist,
+                        frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
+                    .withTimeout(0.5),
+                new WaitCommand(0.5),
+                new SetSetpoint(
+                        stateHandler,
+                        elevator,
+                        wrist,
+                        frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)
+                    .withTimeout(2),
+                new AutoRunIntakeCube(intake, 0.2, vision, swerveDrive).withTimeout(2))),
+
+        /** Brings elevator & wrist to High Pulls up cone */
+        new WaitCommand(0.8),
+        /** Outakes cone */
+        new AutoRunIntakeCube(intake, -0.8, vision, swerveDrive).withTimeout(0.3),
+        /** Stows Wrist, Elevator, and Stops intake */
+        new ParallelCommandGroup(
+            new AutoSetSetpoint(
                     stateHandler,
                     elevator,
                     wrist,
                     frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
-                .withTimeout(0.5),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(0.5)),
+                .withTimeout(1.4),
+            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1.75)),
+        swerveCommands.get(2),
+        new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
 }
-//

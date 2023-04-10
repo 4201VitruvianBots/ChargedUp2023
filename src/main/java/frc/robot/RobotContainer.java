@@ -25,10 +25,11 @@ import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.PlaceOneBalance;
+import frc.robot.commands.auto.SubstationTwoPickUp;
 import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
@@ -318,7 +319,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
     m_autoChooser.addOption(
-        "TwoPiece",
+        "SubstationTwo",
         new TwoPiece(
             "TwoPiece",
             m_swerveDrive,
@@ -329,10 +330,22 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
+            m_autoChooser.addOption(
+              "SubstationTwoPickUp",
+              new SubstationTwoPickUp(
+                  "SubstationTwoPickUp",
+                  m_swerveDrive,
+                  m_fieldSim,
+                  m_wrist,
+                  m_intake,
+                  m_vision,
+                  m_elevator,
+                  m_stateHandler));
+
     m_autoChooser.addOption(
-        "PlaceOneBalance",
-        new PlaceOneBalance(
-            "PlaceOneBalance",
+        "CenterOneBalance",
+        new CenterOneBalance(
+            "CenterOneBalance",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -340,19 +353,18 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_vision,
             m_stateHandler));
-            
 
-            m_autoChooser.addOption(
-              "CenterOneBalanceCross",
-              new CenterOneBalanceCross(
-                  "CenterOneBalanceCross",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_elevator,
-                  m_vision,
-                  m_stateHandler));
+    m_autoChooser.addOption(
+        "CenterOneBalanceCross",
+        new CenterOneBalanceCross(
+            "CenterOneBalanceCross",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "JustBalance",
