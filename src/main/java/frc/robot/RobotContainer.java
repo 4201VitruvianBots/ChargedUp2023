@@ -24,14 +24,14 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BottomDriveForward;
+import frc.robot.commands.auto.BumpOnePickUp;
 import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.SubstationTwoPickUp;
+import frc.robot.commands.auto.SubstationTwo;
+import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
-import frc.robot.commands.auto.TwoPiece;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
@@ -318,8 +318,8 @@ public class RobotContainer implements AutoCloseable {
 
     m_autoChooser.addOption(
         "SubstationTwo",
-        new TwoPiece(
-            "TwoPiece",
+        new SubstationTwo(
+            "SubstationTwo",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -329,9 +329,9 @@ public class RobotContainer implements AutoCloseable {
             m_stateHandler));
 
     m_autoChooser.addOption(
-        "SubstationTwoPickUp",
-        new SubstationTwoPickUp(
-            "SubstationTwoPickUp",
+        "SubstationTwoBalance",
+        new SubstationTwoBalance(
+            "SubstationTwoBalance",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -370,9 +370,9 @@ public class RobotContainer implements AutoCloseable {
             "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
     m_autoChooser.addOption(
-        "BottomDriveForward",
-        new BottomDriveForward(
-            "BottomDriveForward",
+        "BumpOnePickUp",
+        new BumpOnePickUp(
+            "BumpOnePickUp",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -404,14 +404,13 @@ public class RobotContainer implements AutoCloseable {
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
       String[] autos = {
-        "BlueOnePiece",
-        "BlueTwoPiece",
-        "RedOnePiece",
-        "RedTwoPiece",
-        "BlueDriveForward",
-        "BlueBottomDriveForward",
-        "RedDriveForward",
-        "RedBottomDriveForward"
+        "SubstationTwo",
+        "SubstationTwoBalance",
+        "CenterOneBalance",
+        "CenterOneBalanceCross",
+        "BumpOnePickUp",
+        "DriveForward",
+        "TestSimAuto"
       };
       for (var auto : autos) {
         var isRedPath = auto.startsWith("Red");
