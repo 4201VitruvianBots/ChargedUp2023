@@ -11,12 +11,16 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.WRIST;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class RunWristTestMode extends CommandBase {
   private final Wrist m_wrist;
 
-  private DoubleSubscriber kSetpointSub,
+  // Add a reference to the state handler
+  private final StateHandler m_stateHandler;
+
+  private final DoubleSubscriber kSetpointSub,
       kFSub,
       kPSub,
       kISub,
@@ -41,8 +45,9 @@ public class RunWristTestMode extends CommandBase {
       testMaxAccel;
 
   /** Creates a new RunWristTestMode. */
-  public RunWristTestMode(Wrist wrist) {
+  public RunWristTestMode(Wrist wrist, StateHandler stateHandler) {
     m_wrist = wrist;
+    m_stateHandler = stateHandler;
 
     addRequirements(m_wrist);
 
@@ -50,6 +55,31 @@ public class RunWristTestMode extends CommandBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("WristControl");
 
     // initialize Test Values
+    try {
+      wristNtTab.getDoubleTopic("kSetpointDegrees").publish().set(0);
+
+      wristNtTab.getDoubleTopic("kP").publish().set(WRIST.kP);
+      wristNtTab.getDoubleTopic("kI").publish().set(WRIST.kI);
+      wristNtTab.getDoubleTopic("kD").publish().set(WRIST.kD);
+      wristNtTab.getDoubleTopic("kIZone").publish().set(0);
+
+      wristNtTab
+          .getDoubleTopic("Max Vel deg/s")
+          .publish()
+          .set(Units.radiansToDegrees(WRIST.kMaxSlowVel));
+      wristNtTab
+          .getDoubleTopic("Max Accel deg/s^2")
+          .publish()
+          .set(Units.radiansToDegrees(WRIST.kMaxSlowAccel));
+      wristNtTab.getDoubleTopic("kS").publish().set(WRIST.FFkS);
+      wristNtTab.getDoubleTopic("kG").publish().set(WRIST.kG);
+      wristNtTab.getDoubleTopic("kV").publish().set(WRIST.FFkV);
+      wristNtTab.getDoubleTopic("kA").publish().set(WRIST.kA);
+
+    } catch (Exception ignored) {
+
+    }
+
     kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(0);
 
     kFSub = wristNtTab.getDoubleTopic("kF").subscribe(0);
@@ -63,13 +93,16 @@ public class RunWristTestMode extends CommandBase {
     kVSub = wristNtTab.getDoubleTopic("kV").subscribe(WRIST.FFkV);
     kASub = wristNtTab.getDoubleTopic("kA").subscribe(WRIST.kA);
 
-    kMaxVelSub = wristNtTab.getDoubleTopic("Max Vel").subscribe(WRIST.kMaxSlowVel);
-    kMaxAccelSub = wristNtTab.getDoubleTopic("Max Accel").subscribe(WRIST.kMaxSlowAccel);
+    kMaxVelSub = wristNtTab.getDoubleTopic("Max Vel deg/s").subscribe(WRIST.kMaxSlowVel);
+    kMaxAccelSub = wristNtTab.getDoubleTopic("Max Accel deg/s^2").subscribe(WRIST.kMaxSlowAccel);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // Disable the state handler
+    m_stateHandler.disable();
+
     m_wrist.setUserSetpoint(true);
   }
 
@@ -90,12 +123,12 @@ public class RunWristTestMode extends CommandBase {
     double newKV = kVSub.get(WRIST.FFkV);
     double newKA = kASub.get(WRIST.kA);
 
-    double newMaxVel = kMaxVelSub.get(WRIST.kMaxSlowVel);
-    double newMaxAccel = kMaxAccelSub.get(WRIST.kMaxSlowAccel);
+    double newMaxVel = Units.degreesToRadians(kMaxVelSub.get(WRIST.kMaxSlowVel));
+    double newMaxAccel = Units.degreesToRadians(kMaxAccelSub.get(WRIST.kMaxSlowAccel));
 
     if (testKF != newKF
         || (testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone)) {
-      m_wrist.setTalonPIDvalues(newKF, newKP, newKI, newKD, newIZone);
+      m_wrist.setPIDvalues(newKF, newKP, newKI, newKD, newIZone);
       testKF = newKF;
       testKP = newKP;
       testKI = newKI;
@@ -122,6 +155,9 @@ public class RunWristTestMode extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_wrist.setUserSetpoint(false);
+
+    // Re-enable the state handler
+    m_stateHandler.enable();
   }
 
   // Returns true when the command should end.

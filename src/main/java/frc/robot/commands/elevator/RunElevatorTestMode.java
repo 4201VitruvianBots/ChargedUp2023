@@ -20,7 +20,7 @@ public class RunElevatorTestMode extends CommandBase {
   // Add a reference to the state handler
   private final StateHandler m_stateHandler;
 
-  private DoubleSubscriber kSetpointSub,
+  private final DoubleSubscriber kSetpointSub,
       kFSub,
       kPSub,
       kISub,
@@ -53,20 +53,30 @@ public class RunElevatorTestMode extends CommandBase {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("ElevatorControls");
 
     // initialize Test Values
-    elevatorNtTab.getDoubleTopic("kSetpointInches").publish().set(0);
+    try {
+      elevatorNtTab.getDoubleTopic("kSetpointInches").publish().set(0);
+
+      elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
+      elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
+      elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
+      elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
+
+      elevatorNtTab
+          .getDoubleTopic("Max Vel in/s")
+          .publish()
+          .set(Units.metersToInches(ELEVATOR.kMaxVel));
+      elevatorNtTab
+          .getDoubleTopic("Max Accel in/s^2")
+          .publish()
+          .set(Units.metersToInches(ELEVATOR.kMaxAccel));
+      elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
+      elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
+      elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
+    } catch (Exception ignored) {
+
+    }
 
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
-
-    elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
-    elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
-    elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
-    elevatorNtTab.getDoubleTopic("kIZone").publish().set(0);
-
-    elevatorNtTab.getDoubleTopic("Max Vel").publish().set(ELEVATOR.kMaxVel);
-    elevatorNtTab.getDoubleTopic("Max Accel").publish().set(ELEVATOR.kMaxAccel);
-    elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
-    elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
-    elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
 
     kFSub = elevatorNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(ELEVATOR.kP);
@@ -78,8 +88,8 @@ public class RunElevatorTestMode extends CommandBase {
     kVSub = elevatorNtTab.getDoubleTopic("kV").subscribe(ELEVATOR.kV);
     kASub = elevatorNtTab.getDoubleTopic("kA").subscribe(ELEVATOR.kA);
 
-    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel").subscribe(ELEVATOR.kMaxVel);
-    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel").subscribe(ELEVATOR.kMaxAccel);
+    kMaxVelSub = elevatorNtTab.getDoubleTopic("Max Vel in/s").subscribe(ELEVATOR.kMaxVel);
+    kMaxAccelSub = elevatorNtTab.getDoubleTopic("Max Accel in/s^2").subscribe(ELEVATOR.kMaxAccel);
   }
 
   @Override
@@ -112,8 +122,8 @@ public class RunElevatorTestMode extends CommandBase {
     double newKV = kVSub.get(ELEVATOR.kV);
     double newKA = kASub.get(ELEVATOR.kA);
 
-    double newMaxVel = kMaxVelSub.get(ELEVATOR.kMaxVel);
-    double newMaxAccel = kMaxAccelSub.get(ELEVATOR.kMaxAccel);
+    double newMaxVel = Units.inchesToMeters(kMaxVelSub.get(ELEVATOR.kMaxVel));
+    double newMaxAccel = Units.inchesToMeters(kMaxAccelSub.get(ELEVATOR.kMaxAccel));
 
     // THIS PIECE OF CODE RIGHT HERE IS WHAT IS CAUSING ALL OF THE ERRORS PLEASE FIX IT NOW
     if (testKF != newKF
@@ -149,6 +159,7 @@ public class RunElevatorTestMode extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_elevator.setUserSetpoint(false);
+
     // Re-enable the state handler
     m_stateHandler.enable();
   }

@@ -6,18 +6,24 @@ package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.CONTROL_MODE;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class ToggleWristTestMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
   private final Wrist m_wrist;
 
-  private CONTROL_MODE m_lastcontrolmode;
-  private Command m_defultCommand;
+  private final StateHandler m_stateHandler;
 
-  public ToggleWristTestMode(Wrist wrist) {
+  private final Command m_defaultCommand;
+
+  private boolean m_testMode = false;
+
+  public ToggleWristTestMode(Wrist wrist, StateHandler stateHandler) {
     m_wrist = wrist;
+    m_stateHandler = stateHandler;
+
+    m_defaultCommand = m_wrist.getDefaultCommand();
 
     addRequirements(m_wrist);
   }
@@ -30,14 +36,14 @@ public class ToggleWristTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP) {
-      m_lastcontrolmode = m_wrist.getClosedLoopControlMode();
-      m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
-      m_defultCommand = m_wrist.getDefaultCommand();
-      m_wrist.setDefaultCommand(new RunWristTestMode(m_wrist));
+    m_testMode = !m_testMode;
+
+    m_wrist.setTestMode(m_testMode);
+
+    if (m_testMode) {
+      m_wrist.setDefaultCommand(new RunWristTestMode(m_wrist, m_stateHandler));
     } else {
-      m_wrist.setClosedLoopControlMode(m_lastcontrolmode);
-      m_wrist.setDefaultCommand(m_defultCommand);
+      m_wrist.setDefaultCommand(m_defaultCommand);
     }
   }
 

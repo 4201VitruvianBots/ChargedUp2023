@@ -49,6 +49,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
+  private boolean m_testMode = false;
 
   private double m_joystickInput;
   private boolean m_limitJoystickInput;
@@ -58,6 +59,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Elevator m_elevator;
 
   private TrapezoidProfile.Constraints m_currentConstraints = WRIST.slowConstraints;
+  private SPEED m_speed = SPEED.SLOW;
 
   private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
@@ -223,7 +225,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (m_currentFeedForward.calculate(state.position, state.velocity) / 12.0);
   }
 
-  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+  public void setTestMode(boolean mode) {
+    m_testMode = mode;
+  }
+
+  public void setPIDvalues(double f, double p, double i, double d, double izone) {
     wristMotor.config_kF(WRIST.kSlotIdx, f);
     wristMotor.config_kP(WRIST.kSlotIdx, d);
     wristMotor.config_kI(WRIST.kSlotIdx, p);
@@ -335,8 +341,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  public void updateTrapezoidProfileConstraints(SPEED speed) {
-    switch (speed) {
+  public void setTrapezoidalProfileSpeed(SPEED speed) {
+    m_speed = speed;
+  }
+
+  private void updateTrapezoidProfileConstraints() {
+    switch (m_speed) {
       case FAST:
         m_currentConstraints = WRIST.fastConstraints;
         break;
@@ -380,7 +390,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-    updateIValue();
+    if (!m_testMode) {
+      updateIValue();
+      updateTrapezoidProfileConstraints();
+    }
+
     updateSmartDashboard();
     //    updateLog();
 
