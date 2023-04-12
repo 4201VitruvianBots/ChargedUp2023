@@ -107,7 +107,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kHeightInchesPub,
       kPercentOutputPub,
       kCurrentAccelPub,
-      kCurrentVelPub; 
+      kCurrentVelPub;
   private StringPublisher kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
 
