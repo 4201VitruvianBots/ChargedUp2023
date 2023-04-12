@@ -205,6 +205,27 @@ public final class Constants {
       CONE
     }
 
+    public enum INTAKE_SPEEDS {
+      // Units are in Radians
+      INTAKING_CONE(0.6),
+      HOLDING_CONE(0.2),
+      SCORING_CONE(-0.8),
+      STOP(0),
+      INTAKING_CUBE(-0.5),
+      HOLDING_CUBE(-0.1),
+      SCORING_CUBE(0.1);
+
+      private final double value;
+
+      INTAKE_SPEEDS(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
     public enum SENSOR_STATUS {
       UNREPORTED, // No status from the teensy is being reported
       DISCONNECTED, // The teensy failed to initalize the sensor
@@ -240,6 +261,7 @@ public final class Constants {
     public static final Color8Bit orange = new Color8Bit(247, 116, 40);
     public static final Color8Bit pink = new Color8Bit(255, 117, 140);
     public static final Color8Bit white = new Color8Bit(125, 125, 125);
+    public static final Color8Bit turquoise = new Color8Bit(24, 94, 89);
   }
 
   public static final class SWERVE_DRIVE {

@@ -5,27 +5,20 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.INTAKE;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.SwerveDrive;
-import frc.robot.subsystems.Vision;
 
-public class AutoRunIntakeCone extends CommandBase {
+public class AutoSetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
-  private final Vision m_vision;
-  private final SwerveDrive m_swerve;
-
-  private final double m_PercentOutput;
+  private INTAKE.INTAKE_SPEEDS m_setpoint;
 
   // TODO: Consolidate AutoRunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
-  public AutoRunIntakeCone(Intake intake, double PercentOutput, Vision vision, SwerveDrive swerve) {
+  public AutoSetIntakeSetpoint(Intake intake, INTAKE.INTAKE_SPEEDS setpoint) {
     m_intake = intake;
-    m_vision = vision;
-    m_swerve = swerve;
-    m_PercentOutput = PercentOutput;
-
+    m_setpoint = setpoint;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intake);
   }
@@ -33,35 +26,36 @@ public class AutoRunIntakeCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setIntakeStateCone(true);
+    if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
+        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
+      m_intake.setIntakeStateCone(true);
+    } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE
+        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
+      m_intake.setIntakeStateCube(true);
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setPercentOutput(m_PercentOutput);
-    // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
-    //   m_swerve.enableHeadingTarget(true);
-    //   m_swerve.setRobotHeading(
-    //       m_swerve
-    //           .getHeadingRotation2d()
-    //           .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-    //           .getRadians());
-    // }
+    m_intake.setPercentOutput(m_setpoint.get());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakeStateCone(false);
-    // m_intake.setPercentOutput(0);
-    // m_intake.setBooleanState(false);
-    // m_swerve.enableHeadingTarget(false);
+    if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
+        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
+      m_intake.setIntakeStateCone(false);
+    } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE
+        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
+      m_intake.setIntakeStateCube(false);
+    }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

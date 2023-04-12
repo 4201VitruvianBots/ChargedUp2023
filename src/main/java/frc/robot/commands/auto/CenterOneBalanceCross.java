@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.intake.AutoRunIntakeCone;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
+import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.commands.intake.AutoSetIntakeSetpoint;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
@@ -47,48 +49,30 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(
-                    stateHandler,
-                    elevator,
-                    wrist,
-                    frc.robot.Constants.STATE_HANDLER.SETPOINT.SCORE_HIGH)
-                .withTimeout(2),
-            new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(2)),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(2),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(2)),
         new WaitCommand(0.6),
         /** Outakes cone */
-        new AutoRunIntakeCone(intake, -0.8, vision, swerveDrive).withTimeout(1),
+        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE).withTimeout(1),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(
-                    stateHandler,
-                    elevator,
-                    wrist,
-                    frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
-                .withTimeout(1.8),
-            new AutoRunIntakeCone(intake, 0, vision, swerveDrive).withTimeout(1.8)),
-        // new WaitCommand(0.25),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.8),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP).withTimeout(1.8)),
+        new WaitCommand(0.75),
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
             new SequentialCommandGroup(
-                new WaitCommand(0.75),
+                new WaitCommand(2),
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(
-                            stateHandler,
-                            elevator,
-                            wrist,
-                            frc.robot.Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE)
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
                         .withTimeout(0.5),
-                    new AutoRunIntakeCone(intake, 0.5, vision, swerveDrive).withTimeout(0.5)))),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CUBE)
+                        .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
             new SequentialCommandGroup(
-                new SetSetpoint(
-                        stateHandler,
-                        elevator,
-                        wrist,
-                        frc.robot.Constants.STATE_HANDLER.SETPOINT.STOWED)
-                    .withTimeout(0.5))),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5))),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
