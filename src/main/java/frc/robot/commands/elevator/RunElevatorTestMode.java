@@ -56,7 +56,7 @@ public class RunElevatorTestMode extends CommandBase {
     elevatorNtTab.getDoubleTopic("kSetpointInches").publish().set(0);
 
     kSetpointSub = elevatorNtTab.getDoubleTopic("kSetpointInches").subscribe(0);
-    
+
     elevatorNtTab.getDoubleTopic("kP").publish().set(ELEVATOR.kP);
     elevatorNtTab.getDoubleTopic("kI").publish().set(ELEVATOR.kI);
     elevatorNtTab.getDoubleTopic("kD").publish().set(ELEVATOR.kD);
@@ -67,7 +67,7 @@ public class RunElevatorTestMode extends CommandBase {
     elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
     elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
     elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
-    
+
     kFSub = elevatorNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = elevatorNtTab.getDoubleTopic("kP").subscribe(ELEVATOR.kP);
     kISub = elevatorNtTab.getDoubleTopic("kI").subscribe(ELEVATOR.kI);
@@ -117,7 +117,10 @@ public class RunElevatorTestMode extends CommandBase {
 
     // THIS PIECE OF CODE RIGHT HERE IS WHAT IS CAUSING ALL OF THE ERRORS PLEASE FIX IT NOW
     if (testKF != newKF
-        || testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone) {
+        || testKP != newKP
+        || testKI != newKI
+        || testKD != newKD
+        || newIZone != newIZone) {
       m_elevator.setPIDvalues(newKF, newKP, newKI, newKD, newIZone);
       testKF = newKF;
       testKP = newKP;

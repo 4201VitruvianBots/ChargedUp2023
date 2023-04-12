@@ -21,7 +21,6 @@ public class ToggleElevatorTestMode extends CommandBase {
 
   private boolean m_testMode = false;
 
-
   public ToggleElevatorTestMode(Elevator elevator, StateHandler stateHandler) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
@@ -44,8 +43,7 @@ public class ToggleElevatorTestMode extends CommandBase {
 
     if (m_testMode) {
       m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator, m_StateHandler));
-    }
-    else {
+    } else {
       m_elevator.setDefaultCommand(m_defaultCommand);
     }
   }
