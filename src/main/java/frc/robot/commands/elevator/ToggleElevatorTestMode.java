@@ -6,7 +6,6 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 
@@ -14,15 +13,19 @@ public class ToggleElevatorTestMode extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
   private final Elevator m_elevator;
 
-  private final StateHandler m_StateHandler;
+  private final StateHandler m_stateHandler;
 
-  private CONTROL_MODE m_lastcontrolmode;
-  private Command m_defaultCommand;
+  private final Command m_defaultCommand;
+
+  private boolean m_testMode = false;
 
   public ToggleElevatorTestMode(Elevator elevator, StateHandler stateHandler) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
-    m_StateHandler = stateHandler;
+    m_stateHandler = stateHandler;
+
+    m_defaultCommand = m_elevator.getDefaultCommand();
+
     addRequirements(m_elevator);
   }
 
@@ -34,13 +37,13 @@ public class ToggleElevatorTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_elevator.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP_TEST) {
-      m_lastcontrolmode = m_elevator.getClosedLoopControlMode();
-      m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
-      m_defaultCommand = m_elevator.getDefaultCommand();
-      m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator, m_StateHandler));
+    m_testMode = !m_testMode;
+
+    m_elevator.setTestMode(m_testMode);
+
+    if (m_testMode) {
+      m_elevator.setDefaultCommand(new RunElevatorTestMode(m_elevator, m_stateHandler));
     } else {
-      m_elevator.setClosedLoopControlMode(m_lastcontrolmode);
       m_elevator.setDefaultCommand(m_defaultCommand);
     }
   }

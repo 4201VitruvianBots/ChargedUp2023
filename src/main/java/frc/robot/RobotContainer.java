@@ -123,7 +123,7 @@ public class RobotContainer implements AutoCloseable {
 
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
-      SmartDashboard.putData(new ToggleWristTestMode(m_wrist));
+      SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
     }
   }
 
