@@ -94,7 +94,7 @@ public final class Constants {
 
     // PID
     public static final double kMaxVel = Units.inchesToMeters(80);
-    public static final double kMaxAccel = Units.inchesToMeters(100); 
+    public static final double kMaxAccel = Units.inchesToMeters(90); 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -132,7 +132,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(24.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(43.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(42.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 

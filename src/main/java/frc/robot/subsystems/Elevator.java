@@ -361,8 +361,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
     lowerLimitSwitchPub.set(getLimitSwitch());
-    kCurrentAccelPub.set(m_currentConstraints.maxAcceleration);
-    kCurrentVelPub.set(m_currentConstraints.maxVelocity);
+    kCurrentAccelPub.set(Units.metersToInches(m_currentConstraints.maxAcceleration));
+    kCurrentVelPub.set(Units.metersToInches(m_currentConstraints.maxVelocity));
 
     if (!m_limitCanUtil) {
       // Put not required stuff here
