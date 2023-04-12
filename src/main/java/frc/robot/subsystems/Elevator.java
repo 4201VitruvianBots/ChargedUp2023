@@ -134,8 +134,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       // motor.config_IntegralZone(ELEVATOR.kSlotIdx, 0);
 
       // Setting hard limits as to how fast the elevator can move forward and backward
-      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputForward(1, ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-1, ELEVATOR.kTimeoutMs);
       // TODO: Review after new elevator is integrated
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
@@ -376,13 +376,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Will severely limit the forward output of the motors when the elevator is fully extended to
   // prevent breakage
   public void updateForwardOutput() {
-    if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
-    else newForwardOutput = ELEVATOR.kMaxForwardOutput;
+    // if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
+    // else newForwardOutput = ELEVATOR.kMaxForwardOutput;
 
-    if (currentForwardOutput != newForwardOutput) {
-      elevatorMotors[0].configPeakOutputForward(newForwardOutput);
-      currentForwardOutput = newForwardOutput;
-    }
+    // if (currentForwardOutput != newForwardOutput) {
+    //   elevatorMotors[0].configPeakOutputForward(newForwardOutput);
+    //   currentForwardOutput = newForwardOutput;
+    // }
   }
 
   // Update elevator height using encoders and bottom limit switch
@@ -445,15 +445,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         break;
       default:
       case CLOSED_LOOP:
-        // Updates the constraints of the elevator
-        if (m_desiredPositionMeters - getHeightMeters() > 0) {
-          m_currentConstraints = ELEVATOR.m_fastConstraints;
-        } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
-          m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
-        } else {
-          m_currentConstraints = ELEVATOR.m_slowConstraints;
-        }
-
         // Updates our trapezoid profile state based on the time since our last periodic and our
         // recorded change in height
         m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);

@@ -570,13 +570,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
 
     // Updates the trapezoidal constraints of the elevator
-    if (m_elevatorDesiredSetpointMeters - m_elevator.getHeightMeters() > 0) {
-      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.FAST);
-    } else if (m_elevator.getHeightMeters() < Units.inchesToMeters(3.0)) {
-      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.HALT);
-    } else {
-      m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.SLOW);
-    }
+    // if (m_elevatorDesiredSetpointMeters - m_elevator.getHeightMeters() > 0) {
+    //   m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.FAST);
+    // } else if (m_elevator.getHeightMeters() < Units.inchesToMeters(3.0)) {
+    //   m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.HALT);
+    // } else {
+    //   m_elevator.updateTrapezoidProfileConstraints(ELEVATOR.SPEED.SLOW);
+    // }
 
     // If the elevator is low, use the fast Wrist Trapezoid profile for faster intake deploy
     if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
