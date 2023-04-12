@@ -114,8 +114,10 @@ public class RunElevatorTestMode extends CommandBase {
 
     double newMaxVel = kMaxVelSub.get(ELEVATOR.kMaxVel);
     double newMaxAccel = kMaxAccelSub.get(ELEVATOR.kMaxAccel);
+
+    // THIS PIECE OF CODE RIGHT HERE IS WHAT IS CAUSING ALL OF THE ERRORS PLEASE FIX IT NOW
     if (testKF != newKF
-        || (testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone)) {
+        || testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone) {
       m_elevator.setPIDvalues(newKF, newKP, newKI, newKD, newIZone);
       testKF = newKF;
       testKP = newKP;
@@ -123,6 +125,7 @@ public class RunElevatorTestMode extends CommandBase {
       testKD = newKD;
       testKIZone = newIZone;
     }
+
     if (testKG != newKG || testKV != newKV || testKA != newKA) {
       m_elevator.setSimpleMotorFeedForward(newKG, newKV, newKA);
       testKG = newKG;

@@ -562,8 +562,7 @@ public final class Constants {
 
   public enum CONTROL_MODE {
     OPEN_LOOP,
-    CLOSED_LOOP,
-    CLOSED_LOOP_TEST
+    CLOSED_LOOP
   }
 
   public enum SCORING_STATE {

@@ -397,14 +397,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
         setPercentOutput(percentOutput, true);
         break;
-      case CLOSED_LOOP_TEST:
-        //        m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);
-        //        profile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        //        m_setpoint = profile.calculate(currentTime - m_lastTimestamp);
-        //        m_lastTimestamp = currentTime;
-        //
-        //        setSetpointTrapezoidState(m_setpoint);
-        break;
       case CLOSED_LOOP:
       default:
         m_goal = new TrapezoidProfile.State(m_desiredSetpointRadians, 0);

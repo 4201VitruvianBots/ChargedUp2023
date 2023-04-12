@@ -30,9 +30,9 @@ public class ToggleWristTestMode extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP_TEST) {
+    if (m_wrist.getClosedLoopControlMode() != CONTROL_MODE.CLOSED_LOOP) {
       m_lastcontrolmode = m_wrist.getClosedLoopControlMode();
-      m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP_TEST);
+      m_wrist.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
       m_defultCommand = m_wrist.getDefaultCommand();
       m_wrist.setDefaultCommand(new RunWristTestMode(m_wrist));
     } else {

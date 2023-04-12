@@ -135,6 +135,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       motor.config_kP(ELEVATOR.kSlotIdx, ELEVATOR.kP, ELEVATOR.kTimeoutMs);
       motor.config_kI(ELEVATOR.kSlotIdx, ELEVATOR.kI, ELEVATOR.kTimeoutMs);
       motor.config_kD(ELEVATOR.kSlotIdx, ELEVATOR.kD, ELEVATOR.kTimeoutMs);
+      //motor.config_IntegralZone(ELEVATOR.kSlotIdx, 0);
 
       // Setting hard limits as to how fast the elevator can move forward and backward
       motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
@@ -451,17 +452,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         // True means it will enforce limits. In this way it is not truly open loop, but it'll
         // prevent the robot from breaking
         setPercentOutput(percentOutput, true);
-        break;
-      case CLOSED_LOOP_TEST:
-        // Updates our trapezoid profile state based on the time since our last periodic and our
-        // recorded change in height
-        m_goal = new TrapezoidProfile.State(m_desiredPositionMeters, 0);
-        m_currentProfile = new TrapezoidProfile(m_currentConstraints, m_goal, m_setpoint);
-        m_currentTimestamp = m_timer.get();
-        m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
-        m_lastTimestamp = m_currentTimestamp;
-
-        setSetpointTrapezoidState(m_setpoint);
         break;
       default:
       case CLOSED_LOOP:
