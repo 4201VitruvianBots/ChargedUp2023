@@ -65,9 +65,9 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new WaitCommand(2),
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CONE)
                         .withTimeout(0.5),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CUBE)
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CONE)
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),

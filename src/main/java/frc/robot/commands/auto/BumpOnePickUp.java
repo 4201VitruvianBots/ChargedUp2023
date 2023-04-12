@@ -67,7 +67,7 @@ public class BumpOnePickUp extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new WaitCommand(3),
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CONE)
                         .withTimeout(2),
                     new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CONE)
                         .withTimeout(2)))),
@@ -75,7 +75,7 @@ public class BumpOnePickUp extends SequentialCommandGroup {
         /** Stows and Stops Intake */
         new ParallelCommandGroup(
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE).withTimeout(0.5)),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(0.5)),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

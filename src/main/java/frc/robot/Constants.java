@@ -133,6 +133,8 @@ public final class Constants {
       SLOW,
       FAST
     }
+    
+
 
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
@@ -156,6 +158,7 @@ public final class Constants {
         return value;
       }
     }
+
 
     public enum THRESHOLD {
       // Units are in meters
@@ -187,7 +190,44 @@ public final class Constants {
       }
     }
   }
+  public static class AUTOTIMES {
+   
+    public enum WAIT {
+     
+      STOWHIGH(1.65),
+      STOWHIGHFAST(0.5),
 
+      STOWMID(1.4),
+      STOWMIDFAST(0.7),
+
+      STOWLOW(1.4),
+
+      SCOREHIGH(0.7),
+      SCOREMID(0.7),
+      SCORELOW(0.7),
+
+      STOWTOINTAKE(0.5),
+
+      SCORECONE(0.5),
+      SCORECUBE(0.5);
+      
+
+
+
+      public double value;
+
+       WAIT(double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+
+    }
+    
+
+  }
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
     public static final int leftConeSensorId = 1;
@@ -483,6 +523,8 @@ public final class Constants {
       }
     }
   }
+
+
 
   public static class STATE_HANDLER {
 
