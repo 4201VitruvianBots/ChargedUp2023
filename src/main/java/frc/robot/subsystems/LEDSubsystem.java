@@ -168,7 +168,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
-        setPattern(LED.white, 15, 0, ANIMATION_TYPE.Solid); // Solid White
+          setPattern(LED.white, 15, 0, ANIMATION_TYPE.Solid); // Solid White
           break;
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:

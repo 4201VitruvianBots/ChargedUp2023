@@ -18,11 +18,11 @@ cubeButton = purple, coneButton = yellow */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LEDSubsystem m_led;
+
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
   private boolean isIntakingCone;
   private boolean isIntakingCube;
-
 
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(LEDSubsystem led, Intake intake, StateHandler stateHandler) {
