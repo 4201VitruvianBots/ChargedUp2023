@@ -242,6 +242,7 @@ public final class Constants implements AutoCloseable {
     public static final Color8Bit orange = new Color8Bit(247, 116, 40);
     public static final Color8Bit pink = new Color8Bit(255, 117, 140);
     public static final Color8Bit white = new Color8Bit(125, 125, 125);
+    public static final Color8Bit turquoise = new Color8Bit(24, 94, 89);
   }
 
   public static final class SWERVE_DRIVE {

@@ -18,14 +18,17 @@ cubeButton = purple, coneButton = yellow */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LEDSubsystem m_led;
-
+  private final Intake m_intake;
   private final StateHandler m_stateHandler;
+  private boolean isIntakingCone;
+  private boolean isIntakingCube;
+
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LEDSubsystem led, StateHandler stateHandler) {
+  public GetSubsystemStates(LEDSubsystem led, Intake intake, StateHandler stateHandler) {
     m_led = led;
     m_stateHandler = stateHandler;
-
+    m_intake = intake;
     addRequirements(m_led);
   }
 
@@ -36,6 +39,8 @@ public class GetSubsystemStates extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    isIntakingCone = m_intake.getIntakeConeState();
+    isIntakingCube = m_intake.getIntakeCubeState();
     // the prioritized state to be expressed to the LEDs
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -46,10 +51,18 @@ public class GetSubsystemStates extends CommandBase {
       switch (m_stateHandler.getDesiredState()) {
           // TODO: Add states for substation intaking
         case INTAKE_LOW_CONE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+          if (isIntakingCone) {
+            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+          } else {
+            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
+          }
           break;
         case INTAKE_LOW_CUBE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+          if (isIntakingCube) {
+            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+          } else {
+            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
+          }
           break;
         case ALPHA_ZONE:
         case SCORE_LOW_REVERSE:
@@ -70,6 +83,8 @@ public class GetSubsystemStates extends CommandBase {
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
+          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_EXTENDED);
+          break;
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
