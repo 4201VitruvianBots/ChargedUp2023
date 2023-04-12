@@ -61,8 +61,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
   // This is used in limiting the elevator's speed once we reach the top of the elevator
-  private double currentForwardOutput = 0;
-  private double newForwardOutput = 0;
+  // private double currentForwardOutput = 0;
+  // private double newForwardOutput = 0;
 
   // Positional limits set by the state handler
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
@@ -105,7 +105,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kEncoderCountsPub,
       kDesiredHeightPub,
       kHeightInchesPub,
-      kPercentOutputPub;
+      kPercentOutputPub,
+      kCurrentAccelPub,
+      kCurrentVelPub; 
   private StringPublisher kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
 
@@ -344,6 +346,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
     lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
+    kCurrentAccelPub = elevatorNtTab.getDoubleTopic("Current Acceleration").publish();
+    kCurrentVelPub = elevatorNtTab.getDoubleTopic("Current Velocity").publish();
 
     elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
   }
@@ -356,6 +360,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
     lowerLimitSwitchPub.set(getLimitSwitch());
+    kCurrentAccelPub.set(m_currentConstraints.maxAcceleration);
+    kCurrentVelPub.set(m_currentConstraints.maxVelocity);
 
     if (!m_limitCanUtil) {
       // Put not required stuff here
