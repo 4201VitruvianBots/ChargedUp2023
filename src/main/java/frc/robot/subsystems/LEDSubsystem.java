@@ -149,26 +149,27 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     if (state != currentRobotState) {
       switch (state) {
         case INTAKE_LOW_CONE:
-          setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Solid);
+          setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Strobe); // Flashing Yellow
           break;
         case INTAKE_LOW_CUBE:
-          setPattern(LED.purple, 0, 0, ANIMATION_TYPE.Solid);
+          setPattern(LED.purple, 0, 0, ANIMATION_TYPE.Strobe); // Flashing Purple
           break;
         case ALPHA_ZONE:
         case SCORE_LOW_REVERSE:
         case SCORE_LOW:
         case SCORE_LOW_CONE:
-        case SCORE_LOW_CUBE:
-          setPattern(LED.white, 0, 0, ANIMATION_TYPE.Solid); // Solid White
+          setPattern(LED.turquoise, 0, 0, ANIMATION_TYPE.Solid); // Solid Turquoise
           break;
         case BETA_ZONE:
         case SCORE_MID:
         case SCORE_MID_CONE:
         case SCORE_MID_CUBE:
-          setPattern(LED.blue, 15, 0, ANIMATION_TYPE.Solid); // Solid Blue
+          setPattern(LED.blue, 0, 0, ANIMATION_TYPE.Solid); // Solid Blue
           break;
         case GAMMA_ZONE:
         case INTAKE_EXTENDED:
+          setPattern(LED.white, 15, 0, ANIMATION_TYPE.Solid); // Solid White
+          break;
         case SCORE_HIGH:
         case SCORE_HIGH_CONE:
         case SCORE_HIGH_CUBE:
