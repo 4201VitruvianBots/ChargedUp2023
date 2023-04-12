@@ -275,15 +275,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void setPIDvalues(double f, double p, double i, double d, double izone) {
-    // System.out.println("F: "+Double.toString(f));
-    // System.out.println("D: "+Double.toString(d));
-    // System.out.println("P: "+Double.toString(p));
-    // System.out.println("I: "+Double.toString(i));
-    // System.out.println("Izone: "+Double.toString(izone));
     elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
-    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, d);
-    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, p);
-    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, i);
+    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, p);
+    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, i);
+    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, d);
     elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
   }
 
