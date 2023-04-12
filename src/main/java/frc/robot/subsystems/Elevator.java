@@ -16,6 +16,8 @@ import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.TalonFXPIDSetConfiguration;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -55,11 +57,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
   private boolean lowerLimitSwitchTriggered = false;
 
-  private final double maxHeightMeters = THRESHOLD.ABSOLUTE_MAX.get();
-
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
-  private double m_commandedPositionMeters; // The height in meters our robot is trying to reach
-  private ELEVATOR.SETPOINT m_desiredHeightState = SETPOINT.STOWED;
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
 
@@ -112,7 +110,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kDesiredHeightPub,
       kHeightInchesPub,
       kPercentOutputPub;
-  private StringPublisher kDesiredStatePub, kClosedLoopModePub, currentCommandStatePub;
+  private StringPublisher kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
 
   // Mechanism2d visualization setup
@@ -233,7 +231,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // This means that the elevator is only trying to hold its current setpoint, not move towards a
   // new one
   public boolean atSetpoint() {
-    return Math.abs(getHeightMeters() - getCommandedPositionMeters()) < Units.metersToInches(0.5);
+    return Math.abs(getHeightMeters() - getDesiredPositionMeters()) < Units.metersToInches(0.5);
   }
 
   // Returns true if limit switch is activated
@@ -253,10 +251,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public double getDesiredPositionMeters() {
     return m_desiredPositionMeters;
-  }
-
-  public double getCommandedPositionMeters() {
-    return m_commandedPositionMeters;
   }
 
   public void setLowerLimitMeters(double meters) {
@@ -279,7 +273,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_joystickInput = m_joystickY;
   }
 
-  public void setTalonPIDvalues(double f, double p, double i, double d, double izone) {
+  public void setPIDvalues(double f, double p, double i, double d, double izone) {
+    // System.out.println("F: "+Double.toString(f));
+    // System.out.println("D: "+Double.toString(d));
+    // System.out.println("P: "+Double.toString(p));
+    // System.out.println("I: "+Double.toString(i));
+    // System.out.println("Izone: "+Double.toString(izone));
     elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
     elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, d);
     elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, p);
@@ -349,7 +348,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
     kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height Inches").publish();
     kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
-    kDesiredStatePub = elevatorNtTab.getStringTopic("Desired State").publish();
     kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
     kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
     currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
@@ -371,7 +369,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       // Put not required stuff here
       kEncoderCountsPub.set(getHeightEncoderCounts());
       kHeightPub.set(getHeightMeters());
-      kDesiredStatePub.set(m_desiredHeightState.name());
       kPercentOutputPub.set(getPercentOutput());
       currentCommandStatePub.set(getClosedLoopControlMode().toString());
     }
@@ -439,6 +436,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     updateHeightMeters();
     updateForwardOutput();
 
+    
     switch (m_controlMode) {
         // Called when setting to open loop
       case OPEN_LOOP:
@@ -524,8 +522,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     elevatorMotors[0].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
     elevatorMotors[1].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
 
-    // This is why the mech2d is not proportional. We're using Units.metersToInches instead of
-    // directly setting the length to meters
     if (m_elevatorLigament2d != null)
       m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
   }
