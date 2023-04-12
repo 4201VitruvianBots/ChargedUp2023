@@ -83,7 +83,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 10.18; // Real value 15.7?
+    public static final double gearRatio = 13.06; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(30);
-    public static final double kMaxAccel = Units.inchesToMeters(15);
+    public static final double kMaxVel = Units.inchesToMeters(75);
+    public static final double kMaxAccel = Units.inchesToMeters(150); 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -106,7 +106,7 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.04;
+    public static final double kP = 0.11;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
@@ -142,9 +142,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(26.5)),
+      SCORE_MID_CONE(Units.inchesToMeters(24.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 
@@ -173,8 +173,8 @@ public final class Constants {
       // Beta 3 < x < 28 inches
       // Gamma 27.5 < x < 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.inchesToMeters(3.5)),
-      BETA_MIN(Units.inchesToMeters(3.0)),
+      ALPHA_MAX(Units.inchesToMeters(15.5)),
+      BETA_MIN(Units.inchesToMeters(15.0)),
       BETA_MAX(Units.inchesToMeters(29)),
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
@@ -471,9 +471,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(140.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
