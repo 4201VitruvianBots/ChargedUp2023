@@ -83,7 +83,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 13.06; // Real value 15.7?
+    public static final double gearRatio = 10.18; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(75);
-    public static final double kMaxAccel = Units.inchesToMeters(150); 
+    public static final double kMaxVel = Units.inchesToMeters(80);
+    public static final double kMaxAccel = Units.inchesToMeters(100); 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -110,23 +110,13 @@ public final class Constants {
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
-    public static final double kMaxForwardOutput = 0.6;
-    public static final double kMaxReverseOutput = -0.45;
-
     public static final double kPercentOutputMultiplier = 0.2;
     public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
 
-    // Trapezoid profile stuff
-    public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * .5, kMaxAccel);
-    // Used when elevator is moving downward
-    public static final TrapezoidProfile.Constraints m_slowConstraints =
+    public static final TrapezoidProfile.Constraints m_Constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
-    // Used when elevator is moving upward
-    public static final TrapezoidProfile.Constraints m_fastConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
     public enum SPEED {
       HALT,
@@ -142,7 +132,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(24.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(43.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 

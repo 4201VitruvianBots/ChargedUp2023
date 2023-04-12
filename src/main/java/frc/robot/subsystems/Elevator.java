@@ -61,11 +61,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
-  // This is used in limiting the elevator's speed once we reach the top of the elevator
-  private double currentForwardOutput = 0;
-  private double newForwardOutput = 0;
-
   // Positional limits set by the state handler
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
@@ -77,7 +72,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Trapezoid profile setup
   private TrapezoidProfile m_currentProfile;
-  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_Constraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private final SimpleMotorFeedforward m_feedForward =
@@ -384,21 +379,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     positionMetersEntry.append(getHeightMeters());
   }
 
-  // TODO: Review if needed for new elevator
-  // Will severely limit the forward output of the motors when the elevator is fully extended to
-  // prevent breakage
-  private void updateForwardOutput() {
-    if (!m_testMode) {
-      if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
-      else newForwardOutput = ELEVATOR.kMaxForwardOutput;
-
-      if (currentForwardOutput != newForwardOutput) {
-        elevatorMotors[0].configPeakOutputForward(newForwardOutput);
-        currentForwardOutput = newForwardOutput;
-      }
-    }
-  }
-
   // Update elevator height using encoders and bottom limit switch
   private void updateHeightMeters() {
     /* Uses limit switch to act as a baseline
@@ -409,32 +389,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       lowerLimitSwitchTriggered = true;
     } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
       lowerLimitSwitchTriggered = false;
-    }
-  }
-
-  // Updates the constraints of the elevator
-  private void updateTrapezoidProfileConstraints() {
-    SPEED speed;
-    // Updates the trapezoidal constraints of the elevator
-    if (m_desiredPositionMeters - getHeightMeters() > 0) {
-      speed = SPEED.FAST;
-    } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
-      speed = SPEED.HALT;
-    } else {
-      speed = SPEED.SLOW;
-    }
-
-    switch (speed) {
-      case FAST:
-        m_currentConstraints = ELEVATOR.m_fastConstraints;
-        break;
-      case HALT:
-        m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
-        break;
-      default:
-      case SLOW:
-        m_currentConstraints = ELEVATOR.m_slowConstraints;
-        break;
     }
   }
 
@@ -451,8 +405,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // work without this
     if (!m_testMode) {
       updateHeightMeters();
-      //      updateForwardOutput();
-      updateTrapezoidProfileConstraints();
     }
 
     switch (m_controlMode) {
