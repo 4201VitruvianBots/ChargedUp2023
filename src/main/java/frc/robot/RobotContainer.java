@@ -20,11 +20,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.commands.auto.BumpOnePickUp;
 import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
@@ -162,44 +162,48 @@ public class RobotContainer implements AutoCloseable {
         .whileTrue(
             new ConditionalCommand(
                 new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CUBE),
+                    m_stateHandler,
+                    m_elevator,
+                    m_wrist,
+                    STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CUBE),
                 new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CONE
-                ),
-                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE)); 
+                    m_stateHandler,
+                    m_elevator,
+                    m_wrist,
+                    STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CONE),
+                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));
 
     // Score MID Setpoints
     xboxController
         .b()
         .whileTrue(
-          new ConditionalCommand(
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CUBE),
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CONE
-              ),
-              () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE)); 
+            new ConditionalCommand(
+                new SetSetpoint(
+                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CUBE),
+                new SetSetpoint(
+                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CONE),
+                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));
     // Stowed
     xboxController
         .x()
         .whileTrue(
-          new ConditionalCommand(
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED),
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED
-              ),
-              () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));     // High
+            new ConditionalCommand(
+                new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED),
+                new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED),
+                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE)); // High
     xboxController
         .y()
         .whileTrue(
-          new ConditionalCommand(
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CUBE),
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CONE
-              ),
-              () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));     // Toggle elevator, wrist control state
+            new ConditionalCommand(
+                new SetSetpoint(
+                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CUBE),
+                new SetSetpoint(
+                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CONE),
+                () ->
+                    m_intake.getIntakeMode()
+                        == Constants.INTAKE
+                            .INTAKE_STATE
+                            .CUBE)); // Toggle elevator, wrist control state
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));

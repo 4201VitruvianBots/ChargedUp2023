@@ -10,18 +10,19 @@ import frc.robot.subsystems.Intake;
 
 public class SetIntakeMode extends CommandBase {
   /** Creates a new SetCubeMode. */
-  private final Intake m_intake; 
+  private final Intake m_intake;
+
   private final INTAKE_STATE m_mode;
+
   public SetIntakeMode(Intake intake, INTAKE_STATE mode) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_intake = intake;
-    m_mode = mode; 
+    m_mode = mode;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

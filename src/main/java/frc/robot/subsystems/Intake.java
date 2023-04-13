@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private boolean isIntakingCone = false;
 
-  private INTAKE_STATE m_intakeMode= INTAKE_STATE.CONE; 
+  private INTAKE_STATE m_intakeMode = INTAKE_STATE.CONE;
 
   private boolean isIntakingCube = false;
 
@@ -141,7 +141,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   public INTAKE_STATE getIntakeMode() {
-    return m_intakeMode; 
+    return m_intakeMode;
   }
 
   // Shuffleboard or SmartDashboard function
