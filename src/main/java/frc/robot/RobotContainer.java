@@ -158,7 +158,7 @@ public class RobotContainer implements AutoCloseable {
 
     // Extended
     xboxController
-        .povDown()
+        .a()
         .whileTrue(
             new ConditionalCommand(
                 new SetSetpoint(
@@ -187,10 +187,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-            new ConditionalCommand(
-                new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED),
-                new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED),
-                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE)); // High
+              new SetSetpoint(
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));     // High
     xboxController
         .y()
         .whileTrue(
@@ -221,7 +219,7 @@ public class RobotContainer implements AutoCloseable {
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
-    xboxController.a().whileTrue(new SetIntakeMode(m_intake, INTAKE_STATE.CUBE));
+    xboxController.povLeft().whileTrue(new SetIntakeMode(m_intake, INTAKE_STATE.CUBE));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     // Will limit the speed of our elevator or wrist when the corresponding joystick
