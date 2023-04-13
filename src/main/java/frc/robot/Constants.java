@@ -605,10 +605,13 @@ public final class Constants {
     AUTO_BALANCE,
     LOW_REVERSE,
     LOW,
+    MID,
     MID_CONE,
     MID_CUBE,
+    HIGH,
     HIGH_CONE,
     HIGH_CUBE,
+    EXTENDED
   }
 
   private static void initBeta() {

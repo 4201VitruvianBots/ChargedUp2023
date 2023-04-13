@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
@@ -40,6 +41,7 @@ import frc.robot.commands.intake.RunIntakeCube;
 import frc.robot.commands.intake.SetIntakeMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
+import frc.robot.commands.statehandler.SetConditionalSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
@@ -163,29 +165,15 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .a()
         .whileTrue(
-            new ConditionalCommand(
-                new SetSetpoint(
-                    m_stateHandler,
-                    m_elevator,
-                    m_wrist,
-                    STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CUBE),
-                new SetSetpoint(
-                    m_stateHandler,
-                    m_elevator,
-                    m_wrist,
-                    STATE_HANDLER.SETPOINT.INTAKING_EXTENDED_CONE),
-                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.EXTENDED));
 
     // Score MID Setpoints
     xboxController
         .b()
         .whileTrue(
-            new ConditionalCommand(
-                new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CUBE),
-                new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CONE),
-                () -> m_intake.getIntakeMode() == Constants.INTAKE.INTAKE_STATE.CUBE));
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.MID));
     // Stowed
     xboxController
         .x()
@@ -195,16 +183,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .y()
         .whileTrue(
-            new ConditionalCommand(
-                new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CUBE),
-                new SetSetpoint(
-                    m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CONE),
-                () ->
-                    m_intake.getIntakeMode()
-                        == Constants.INTAKE
-                            .INTAKE_STATE
-                            .CUBE)); // Toggle elevator, wrist control state
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.HIGH));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));

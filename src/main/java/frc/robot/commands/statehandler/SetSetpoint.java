@@ -16,7 +16,7 @@ public class SetSetpoint extends CommandBase {
   private final Elevator m_elevator;
 
   private final Wrist m_wrist;
-  private final StateHandler m_StateHandler;
+  private final StateHandler m_stateHandler;
 
   private final STATE_HANDLER.SETPOINT m_desiredState;
 
@@ -27,7 +27,7 @@ public class SetSetpoint extends CommandBase {
       STATE_HANDLER.SETPOINT desiredState) {
     m_elevator = elevator;
     m_wrist = Wrist;
-    m_StateHandler = stateHandler;
+    m_stateHandler = stateHandler;
     m_desiredState = desiredState;
 
     addRequirements(m_elevator, m_wrist);
@@ -45,7 +45,7 @@ public class SetSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_StateHandler.setDesiredSetpoint(m_desiredState);
+    m_stateHandler.setDesiredSetpoint(m_desiredState);
   }
 
   // Called once the command ends or is interrupted.
