@@ -497,7 +497,7 @@ public final class Constants {
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
     public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
-    public static boolean limitCanUtilization = false; 
+    public static boolean limitCanUtilization = false;
 
     public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 
