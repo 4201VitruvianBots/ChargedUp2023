@@ -154,11 +154,12 @@ public class RobotContainer implements AutoCloseable {
 
     // Score button Bindings
 
-    // Score LOW Setpoints
+    // Extended
     xboxController
         .a()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_LOW));
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED));
 
     // Score MID Setpoints
     xboxController
@@ -178,11 +179,6 @@ public class RobotContainer implements AutoCloseable {
             new SetSetpoint(
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
     // Toggle elevator, wrist control state
-    xboxController
-        .povUp()
-        .whileTrue(
-            new SetSetpoint(
-                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
