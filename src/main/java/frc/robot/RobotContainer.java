@@ -153,7 +153,7 @@ public class RobotContainer implements AutoCloseable {
             () -> rightJoystick.getRawAxis(0)));
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
-    
+
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
 
