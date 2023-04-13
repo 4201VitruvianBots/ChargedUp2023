@@ -39,7 +39,7 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
 
     var m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(16), Units.feetToMeters(13))); 
+            pathName, new PathConstraints(Units.feetToMeters(16), Units.feetToMeters(13)));
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
@@ -50,10 +50,13 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(WAIT.SCOREHIGH.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(WAIT.SCOREHIGH.get())),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)
+                .withTimeout(WAIT.SCOREHIGH.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE)
+                .withTimeout(WAIT.SCOREHIGH.get())),
         /** Outakes cone */
-        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE).withTimeout(WAIT.SCORECONE.get()),
+        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE)
+            .withTimeout(WAIT.SCORECONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.3),
@@ -73,7 +76,8 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
                 new WaitCommand(0.5),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(1.4),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)
+                    .withTimeout(1.4),
                 new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE).withTimeout(1.4))),
 
         /** Brings elevator & wrist to High Pulls up cone */

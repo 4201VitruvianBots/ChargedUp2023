@@ -28,6 +28,7 @@ import frc.robot.commands.auto.BumpOnePickUp;
 import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.ElevatorTimerTest;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.SubstationTwo;
 import frc.robot.commands.auto.SubstationTwoBalance;
@@ -315,6 +316,11 @@ public class RobotContainer implements AutoCloseable {
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
+
+    m_autoChooser.addOption(
+        "ElevatorTimerTest",
+        new ElevatorTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
         "SubstationTwo",

@@ -94,7 +94,7 @@ public final class Constants {
 
     // PID
     public static final double kMaxVel = Units.inchesToMeters(75);
-    public static final double kMaxAccel = Units.inchesToMeters(150); 
+    public static final double kMaxAccel = Units.inchesToMeters(150);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -133,8 +133,6 @@ public final class Constants {
       SLOW,
       FAST
     }
-    
-
 
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
@@ -158,7 +156,6 @@ public final class Constants {
         return value;
       }
     }
-
 
     public enum THRESHOLD {
       // Units are in meters
@@ -190,44 +187,40 @@ public final class Constants {
       }
     }
   }
+
   public static class AUTOTIMES {
-   
+
     public enum WAIT {
-     
-      STOWHIGH(1.65),
-      STOWHIGHFAST(0.5),
+      STOWHIGH(0.5), // Good
+      STOWHIGHFAST(0.25),
 
-      STOWMID(1.4),
-      STOWMIDFAST(0.7),
+      STOWMID(0.3),
+      STOWMIDFAST(0.15),
 
-      STOWLOW(1.4),
+      STOWLOW(0.1),
 
-      SCOREHIGH(0.7),
+      SCOREHIGH(0.6),
       SCOREMID(0.7),
-      SCORELOW(0.7),
+      SCORELOW(0.4),
 
-      STOWTOINTAKE(0.5),
+      SCORETIME(0.5),
+      STOWTOINTAKE(0.2), // good
 
-      SCORECONE(0.5),
-      SCORECUBE(0.5);
-      
-
-
+      SCORECONE(0.3), // good
+      SCORECUBE(0.565); // good
 
       public double value;
 
-       WAIT(double value) {
+      WAIT(double value) {
         this.value = value;
       }
 
       public double get() {
         return value;
       }
-
     }
-    
-
   }
+
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
     public static final int leftConeSensorId = 1;
@@ -523,8 +516,6 @@ public final class Constants {
       }
     }
   }
-
-
 
   public static class STATE_HANDLER {
 
