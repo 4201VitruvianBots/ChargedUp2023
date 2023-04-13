@@ -133,7 +133,7 @@ public class DistanceSensor implements AutoCloseable {
 
       return sensorValue;
     } catch (Exception e) {
-      //System.out.println("Failed to get sensor " + Integer.toString(sensor) + " value");
+      // System.out.println("Failed to get sensor " + Integer.toString(sensor) + " value");
       //      e.printStackTrace();
       return -1;
     }
@@ -261,7 +261,7 @@ public class DistanceSensor implements AutoCloseable {
       }
 
     } catch (Exception e) {
-      //System.out.println("Boo hoo I can't read the file :_(");
+      // System.out.println("Boo hoo I can't read the file :_(");
       e.printStackTrace();
       return SENSOR_STATUS.UNREPORTED;
     }
