@@ -21,11 +21,14 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private boolean isIntakingCone = false;
+
+  private INTAKE_STATE m_intakeMode= INTAKE_STATE.CONE; 
 
   private boolean isIntakingCube = false;
 
@@ -131,6 +134,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // set percent output function
   public void setPercentOutput(double value) {
     intakeMotor.set(ControlMode.PercentOutput, value);
+  }
+
+  public void setIntakeMode(INTAKE_STATE mode) {
+    m_intakeMode = mode;
+  }
+
+  public INTAKE_STATE getIntakeMode() {
+    return m_intakeMode; 
   }
 
   // Shuffleboard or SmartDashboard function

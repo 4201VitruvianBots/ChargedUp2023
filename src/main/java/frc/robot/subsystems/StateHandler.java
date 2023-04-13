@@ -289,9 +289,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
             < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED_CONE.get())
             < elevatorSetpointTolerance
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED_CONE.get())
             < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             < elevatorSetpointTolerance
