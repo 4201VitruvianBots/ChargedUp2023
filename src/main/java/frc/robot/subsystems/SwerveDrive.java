@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
@@ -79,6 +78,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
+  private boolean m_limitJoystickInput = false;
+
   private final SwerveDrivePoseEstimator m_odometry;
 
   private MechanismLigament2d m_swerveChassis2d;
@@ -104,6 +105,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   ChassisSpeeds chassisSpeeds;
   private double m_maxVelocity = SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
+  private double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
@@ -127,10 +129,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     try {
       m_swerveChassis2d =
           m_chassisRoot2d.append(
-              new MechanismLigament2d("SwerveChassis", Constants.SWERVE_DRIVE.kTrackWidth, 0));
+              new MechanismLigament2d("SwerveChassis", SWERVE_DRIVE.kTrackWidth, 0));
       // Change the color of the mech2d
       m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    } catch (Exception e) {
+    } catch (Exception m_ignored) {
 
     }
   }
@@ -140,15 +142,25 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       module.resetAngleToAbsolute();
   }
 
+  public void setJoystickLimit(boolean limit) {
+    m_limitJoystickInput = limit;
+  }
+
   public void drive(
       double throttle,
       double strafe,
       double rotation,
       boolean isFieldRelative,
       boolean isOpenLoop) {
-    throttle *= m_maxVelocity;
-    strafe *= m_maxVelocity;
-    rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
+    if (m_limitJoystickInput) {
+      throttle *= m_limitedVelocity;
+      strafe *= m_limitedVelocity;
+      rotation *= SWERVE_DRIVE.kLimitedRotationRadiansPerSecond;
+    } else {
+      throttle *= m_maxVelocity;
+      strafe *= m_maxVelocity;
+      rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
+    }
 
     /** Setting field vs Robot Relative */
     if (useHeadingTarget) {

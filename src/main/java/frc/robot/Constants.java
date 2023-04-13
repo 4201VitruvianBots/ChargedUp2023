@@ -83,7 +83,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 13.06; // Real value 15.7?
+    public static final double gearRatio = 10.18; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(75);
-    public static final double kMaxAccel = Units.inchesToMeters(150);
+    public static final double kMaxVel = Units.inchesToMeters(80);
+    public static final double kMaxAccel = Units.inchesToMeters(90);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -110,23 +110,13 @@ public final class Constants {
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
-    public static final double kMaxForwardOutput = 0.6;
-    public static final double kMaxReverseOutput = -0.45;
-
     public static final double kPercentOutputMultiplier = 0.2;
     public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
 
-    // Trapezoid profile stuff
-    public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * .5, kMaxAccel);
-    // Used when elevator is moving downward
-    public static final TrapezoidProfile.Constraints m_slowConstraints =
+    public static final TrapezoidProfile.Constraints m_Constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
-    // Used when elevator is moving upward
-    public static final TrapezoidProfile.Constraints m_fastConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
     public enum SPEED {
       HALT,
@@ -140,11 +130,12 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(24.5)),
-      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
-      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(Units.inchesToMeters(38.0));
+      SCORE_MID_CONE(Units.inchesToMeters(23.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(26.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(38.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(40.0)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
+      INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
       private final double value;
 
@@ -160,9 +151,7 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in meters
       // Used to tell current zone for transitions
-      ABSOLUTE_MIN(
-          Units.inchesToMeters(
-              -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
+      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
@@ -322,8 +311,10 @@ public final class Constants {
     public static double backRightCANCoderOffset = 0;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+    public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
+    public static final double kLimitedRotationRadiansPerSecond = kMaxRotationRadiansPerSecond / 5;
 
     public static final double kP_X = 0.6;
     public static final double kI_X = 0;
@@ -430,10 +421,17 @@ public final class Constants {
     public static final int kPIDLoopIdx = 0;
 
     // Values were experimentally determined
-    public static final double kMaxSlowVel = Units.degreesToRadians(400);
-    public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
-    public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
+    // public static final double kMaxSlowVel = Units.degreesToRadians(400);
+    // public static final double kMaxSlowAccel = Units.degreesToRadians(290);
+    // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
+    // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
+
+    public static final double kMaxVel = Units.degreesToRadians(400);
+    public static final double kMaxAccel = Units.degreesToRadians(250);
+
+    public static final TrapezoidProfile.Constraints m_constraints =
+        new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
+
     public static final double FFkS = 0.06;
     public static final double kG = 0.54;
     public static final double FFkV = 1.6;
@@ -443,10 +441,10 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
-    public static final TrapezoidProfile.Constraints slowConstraints =
-        new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
-    public static final TrapezoidProfile.Constraints fastConstraints =
-        new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
+    // public static final TrapezoidProfile.Constraints slowConstraints =
+    //     new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
+    // public static final TrapezoidProfile.Constraints fastConstraints =
+    //     new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
@@ -458,17 +456,18 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(108.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.5)),
+      STOWED(Units.degreesToRadians(90.0)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(140.0)),
-      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
+      SCORE_MID_CONE(Units.degreesToRadians(125.0)),
+      SCORE_MID_CUBE(Units.degreesToRadians(130.0)),
       SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
-      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
+      SCORE_HIGH_CUBE(Units.degreesToRadians(145.0)),
+      INTAKING_EXTENDED_CONE(SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
 
@@ -533,7 +532,7 @@ public final class Constants {
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
     public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
-    public static boolean limitCanUtilization = true;
+    public static boolean limitCanUtilization = false;
 
     public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 
@@ -583,10 +582,24 @@ public final class Constants {
       SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
       SCORE_LOW_REVERSE(
           ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get(), WRIST.SETPOINT.SCORE_LOW_REVERSE.get()),
-      SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
-      SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(
-          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
+      SCORE_MID_CONE(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
+
+      SCORE_MID_CUBE(ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), WRIST.SETPOINT.SCORE_MID_CUBE.get()),
+
+      SCORE_HIGH_CONE(
+          ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+
+      SCORE_HIGH_CUBE(
+          ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), WRIST.SETPOINT.SCORE_HIGH_CUBE.get()),
+
+      INTAKING_EXTENDED_CONE(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED_CONE.get(),
+          WRIST.SETPOINT.INTAKING_EXTENDED_CONE.get()),
+
+      INTAKING_EXTENDED_CUBE(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED_CUBE.get(),
+          WRIST.SETPOINT.INTAKING_EXTENDED_CUBE.get()),
+
       INTAKING_LOW_CONE(
           ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW_CONE.get()),
       INTAKING_LOW_CUBE(
@@ -625,10 +638,13 @@ public final class Constants {
     AUTO_BALANCE,
     LOW_REVERSE,
     LOW,
+    MID,
     MID_CONE,
     MID_CUBE,
+    HIGH,
     HIGH_CONE,
     HIGH_CUBE,
+    EXTENDED
   }
 
   private static void initBeta() {
@@ -657,8 +673,6 @@ public final class Constants {
 
   private static void initSim() {
     robotName = "Sim";
-
-    ELEVATOR.THRESHOLD.ABSOLUTE_MIN.value = 0;
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 0;
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;

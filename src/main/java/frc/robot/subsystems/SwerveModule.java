@@ -108,6 +108,9 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_driveMotor.configFactoryDefault();
     m_driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
     m_driveMotor.setInverted(false);
+    m_driveMotor.setNeutralMode(NeutralMode.Brake);
+    m_turnMotor.setNeutralMode(NeutralMode.Brake);
+
     m_driveEncoderSimSign = m_driveMotor.getInverted() ? -1 : 1;
 
     // m_angleEncoder.configMagnetOffset(m_angleOffset);

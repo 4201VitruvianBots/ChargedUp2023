@@ -43,14 +43,15 @@ public class BumpOnePickUp extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
-        /** Setting Up Auto Zeros robot to path flips path if nessesary */
+        /** Setting Up Auto Zeros robot to path flips path if necessary */
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(2),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
+                .withTimeout(2),
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(2)),
         new WaitCommand(1.1),
         /** Outakes cone */

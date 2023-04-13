@@ -48,7 +48,8 @@ public class SubstationTwo extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(2),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
+                .withTimeout(2),
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(2)),
         new WaitCommand(0.6),
         /** Outakes cone */
@@ -73,7 +74,8 @@ public class SubstationTwo extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
                 new WaitCommand(0.5),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH).withTimeout(2),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
+                    .withTimeout(2),
                 new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE).withTimeout(2))),
 
         /** Brings elevator & wrist to High Pulls up cone */

@@ -9,12 +9,12 @@ import frc.robot.subsystems.StateHandler;
 
 public class ToggleTestIntakeState extends CommandBase {
   /** Creates a new SetElevatorControlLoop. */
-  private final StateHandler m_stateHanlder;
+  private final StateHandler m_stateHandler;
 
   public ToggleTestIntakeState(StateHandler stateHandler) {
-    m_stateHanlder = stateHandler;
+    m_stateHandler = stateHandler;
 
-    addRequirements(m_stateHanlder);
+    addRequirements(m_stateHandler);
   }
 
   @Override
@@ -25,7 +25,7 @@ public class ToggleTestIntakeState extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_stateHanlder.setTestScoringState(!m_stateHanlder.getTestScoringState());
+    m_stateHandler.setTestScoringState(!m_stateHandler.getTestScoringState());
   }
 
   // Called every time the scheduler runs while the command is scheduled.

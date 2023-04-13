@@ -34,7 +34,7 @@ public class DistanceSensor implements AutoCloseable {
   private final int socketPort = 25000;
 
   private byte[] buffer = new byte[512];
-  private double[] sensorValuesMM = new double[] {0, 0, 0};
+  private final double[] sensorValuesMM = new double[] {0, 0, 0};
 
   private DatagramSocket socket;
   private String receivedData = "";
@@ -116,7 +116,27 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getSensorValueMillimeters(int sensor) {
-    return sensorValuesMM[sensor - 1];
+    try {
+      String sensorName = "sensor" + sensor + ".mm";
+
+      // parsing string from received data
+      obj = new JSONParser().parse(new StringReader(receivedData));
+
+      // typecasting obj to JSONObject
+      JSONObject jo = (JSONObject) obj;
+
+      // getting sensor value
+      long sensorValueLong = (long) jo.get(sensorName);
+
+      // auto-unboxing does not go from Long to int directly, so
+      double sensorValue = (double) sensorValueLong;
+
+      return sensorValue;
+    } catch (Exception e) {
+      // System.out.println("Failed to get sensor " + Integer.toString(sensor) + " value");
+      //      e.printStackTrace();
+      return -1;
+    }
   }
 
   public double getSensorValueInches(int sensor) {
@@ -241,7 +261,7 @@ public class DistanceSensor implements AutoCloseable {
       }
 
     } catch (Exception e) {
-      System.out.println("Boo hoo I can't read the file :_(");
+      // System.out.println("Boo hoo I can't read the file :_(");
       e.printStackTrace();
       return SENSOR_STATUS.UNREPORTED;
     }

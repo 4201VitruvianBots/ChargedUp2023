@@ -21,11 +21,14 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private boolean isIntakingCone = false;
+
+  private INTAKE_STATE m_intakeMode = INTAKE_STATE.CONE;
 
   private boolean isIntakingCube = false;
 
@@ -54,7 +57,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     // set current limit on TalonFX motors
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 30, 0.1));
-    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 30, 0.1));
+    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);
@@ -133,6 +136,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
 
+  public void setIntakeMode(INTAKE_STATE mode) {
+    m_intakeMode = mode;
+  }
+
+  public INTAKE_STATE getIntakeMode() {
+    return m_intakeMode;
+  }
+
   // Shuffleboard or SmartDashboard function
   public void initSmartDashboard() {}
 
@@ -169,6 +180,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    if (m_intakeLigament2d != null) m_intakeLigament2d.close();
+    m_intakeLigament2d.close();
   }
 }

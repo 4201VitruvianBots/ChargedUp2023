@@ -14,7 +14,6 @@ public class AutoSetIntakeSetpoint extends CommandBase {
 
   private INTAKE.INTAKE_SPEEDS m_setpoint;
 
-  // TODO: Consolidate AutoRunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
   public AutoSetIntakeSetpoint(Intake intake, INTAKE.INTAKE_SPEEDS setpoint) {
     m_intake = intake;

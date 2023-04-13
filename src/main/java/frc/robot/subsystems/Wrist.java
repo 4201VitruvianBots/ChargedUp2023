@@ -36,7 +36,6 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
-import frc.robot.Constants.WRIST.SPEED;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
@@ -58,8 +57,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final Intake m_intake;
   private final Elevator m_elevator;
 
-  private TrapezoidProfile.Constraints m_currentConstraints = WRIST.slowConstraints;
-  private SPEED m_speed = SPEED.SLOW;
+  private TrapezoidProfile.Constraints m_currentConstraints = WRIST.m_constraints;
 
   private Translation2d m_wristHorizontalTranslation = new Translation2d();
 
@@ -133,14 +131,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // TODO: Review limits, test to see what is appropriate or not
     wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
 
-    wristMotor.setInverted(WRIST.motorInversionType);
-
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
 
     // Give some time for the CANCoder to recognize the wrist before resetting the angle
     if (RobotBase.isReal()) Timer.delay(3);
 
     resetAngleDegrees(-15.0);
+    wristMotor.setInverted(WRIST.motorInversionType);
 
     initSmartDashboard();
     m_timer.reset();
@@ -308,6 +305,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (getPositionDegrees() > 170);
   }
 
+  // TODO: Recalculate values using new intake/elevator
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
@@ -338,22 +336,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     if (m_currentKI != m_newKI) {
       wristMotor.config_kI(0, m_newKI);
       m_currentKI = m_newKI;
-    }
-  }
-
-  public void setTrapezoidalProfileSpeed(SPEED speed) {
-    m_speed = speed;
-  }
-
-  private void updateTrapezoidProfileConstraints() {
-    switch (m_speed) {
-      case FAST:
-        m_currentConstraints = WRIST.fastConstraints;
-        break;
-      default:
-      case SLOW:
-        m_currentConstraints = WRIST.slowConstraints;
-        break;
     }
   }
 
@@ -392,7 +374,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void periodic() {
     if (!m_testMode) {
       updateIValue();
-      updateTrapezoidProfileConstraints();
     }
 
     updateSmartDashboard();
@@ -456,6 +437,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    if (m_wristLigament2d != null) m_wristLigament2d.close();
+    m_wristLigament2d.close();
   }
 }

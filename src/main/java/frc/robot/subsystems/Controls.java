@@ -57,7 +57,11 @@ public class Controls extends SubsystemBase implements AutoCloseable {
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
     allianceString = controlsTab.getStringTopic("alliance_string").publish();
     allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
-    controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
+    try {
+      controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
+    } catch (Exception m_ignored) {
+
+    }
   }
 
   /**

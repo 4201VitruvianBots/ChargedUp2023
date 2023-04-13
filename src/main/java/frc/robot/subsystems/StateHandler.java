@@ -78,7 +78,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private boolean m_isStatehandlerEnabled = true;
+  private boolean m_isStateHandlerEnabled = true;
 
   public static final Mechanism2d m_superStructureMech2d =
       new Mechanism2d(STATE_HANDLER.mechanism2dOffset * 3, STATE_HANDLER.mechanism2dOffset * 3);
@@ -244,15 +244,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void enable() {
-    m_isStatehandlerEnabled = true;
+    m_isStateHandlerEnabled = true;
   }
 
   public void disable() {
-    m_isStatehandlerEnabled = false;
+    m_isStateHandlerEnabled = false;
   }
 
-  public boolean getIsStatehandlerEnabled() {
-    return m_isStatehandlerEnabled;
+  public boolean getIsStateHandlerEnabled() {
+    return m_isStateHandlerEnabled;
   }
 
   public static double getCurrentSimTime() {
@@ -289,9 +289,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
             < elevatorSetpointTolerance
         && Math.abs(wristPositionRadians - WRIST.SETPOINT.SCORE_LOW_REVERSE.get())
             < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE;
-    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED.get())
+    if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.INTAKING_EXTENDED_CONE.get())
             < elevatorSetpointTolerance
-        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED.get())
+        && Math.abs(wristPositionRadians - WRIST.SETPOINT.INTAKING_EXTENDED_CONE.get())
             < wristSetpointTolerance) return SUPERSTRUCTURE_STATE.INTAKE_EXTENDED;
     if (Math.abs(elevatorPositionMeters - ELEVATOR.SETPOINT.SCORE_LOW_CONE.get())
             < elevatorSetpointTolerance
@@ -415,7 +415,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateCommandedSetpoints() {
-    if (m_isStatehandlerEnabled) {
+    if (m_isStateHandlerEnabled) {
       setElevatorCommandedSetpoint();
       setWristCommandedSetpoint();
     }
@@ -483,13 +483,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
-  public void disableStateHandler() {}
-
   private void initSmartDashboard() {
     var stateHandlerTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
 
-    stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
+    try {
+      stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
+    } catch (Exception m_ignored) {
+
+    }
 
     m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish();
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
@@ -505,7 +507,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentState().toString());
-    m_isEnabledPub.set(getIsStatehandlerEnabled());
+    m_isEnabledPub.set(getIsStateHandlerEnabled());
     m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());
@@ -567,13 +569,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
-    }
-
-    // If the elevator is low, use the fast Wrist Trapezoid profile for faster intake deploy
-    if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
-      m_wrist.setTrapezoidalProfileSpeed(WRIST.SPEED.FAST);
-    } else {
-      m_wrist.setTrapezoidalProfileSpeed(WRIST.SPEED.SLOW);
     }
 
     // TODO: Update this based on Intake sensors

@@ -40,7 +40,6 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.ELEVATOR.SPEED;
 import frc.robot.Constants.STATE_HANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
@@ -61,11 +60,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  // TODO: Review if this limit is necessary if we are already using trapezoidal profiles
-  // This is used in limiting the elevator's speed once we reach the top of the elevator
-  private double currentForwardOutput = 0;
-  private double newForwardOutput = 0;
-
   // Positional limits set by the state handler
   private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
   private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
@@ -77,7 +71,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Trapezoid profile setup
   private TrapezoidProfile m_currentProfile;
-  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_slowConstraints;
+  private TrapezoidProfile.Constraints m_currentConstraints = ELEVATOR.m_Constraints;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
   private final SimpleMotorFeedforward m_feedForward =
@@ -164,7 +158,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
               new MechanismLigament2d(
                   "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
       m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
-    } catch (Exception ignored) {
+    } catch (Exception m_ignored) {
 
     }
   }
@@ -278,12 +272,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_testMode = mode;
   }
 
-  public void setPIDvalues(double f, double p, double i, double d, double izone) {
+  public void setPIDvalues(double f, double p, double i, double d, double iZone) {
     elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
     elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, p);
     elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, i);
     elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, d);
-    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
+    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, iZone);
   }
 
   public void setSimpleMotorFeedForward(double g, double v, double a) {
@@ -328,7 +322,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
-  // Returns the ligament of the elevator so it can be updated in the state handler
+  // Returns the ligament of the elevator to update in StateHandler
   public MechanismLigament2d getLigament() {
     return m_elevatorLigament2d;
   }
@@ -355,7 +349,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kCurrentAccelPub = elevatorNtTab.getDoubleTopic("Current Acceleration").publish();
     kCurrentVelPub = elevatorNtTab.getDoubleTopic("Current Velocity").publish();
 
-    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    try {
+      elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    } catch (Exception m_ignored) {
+
+    }
   }
 
   public void updateShuffleboard() {
@@ -366,8 +364,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));
     kDesiredHeightPub.set(Units.metersToInches(getDesiredPositionMeters()));
     lowerLimitSwitchPub.set(getLimitSwitch());
-    kCurrentAccelPub.set(m_currentConstraints.maxAcceleration);
-    kCurrentVelPub.set(m_currentConstraints.maxVelocity);
+    kCurrentAccelPub.set(Units.metersToInches(m_currentConstraints.maxAcceleration));
+    kCurrentVelPub.set(Units.metersToInches(m_currentConstraints.maxVelocity));
 
     if (!m_limitCanUtil) {
       // Put not required stuff here
@@ -384,21 +382,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     positionMetersEntry.append(getHeightMeters());
   }
 
-  // TODO: Review if needed for new elevator
-  // Will severely limit the forward output of the motors when the elevator is fully extended to
-  // prevent breakage
-  private void updateForwardOutput() {
-    if (!m_testMode) {
-      if (Units.metersToInches(getHeightMeters()) > 40.0) newForwardOutput = 0.2;
-      else newForwardOutput = ELEVATOR.kMaxForwardOutput;
-
-      if (currentForwardOutput != newForwardOutput) {
-        elevatorMotors[0].configPeakOutputForward(newForwardOutput);
-        currentForwardOutput = newForwardOutput;
-      }
-    }
-  }
-
   // Update elevator height using encoders and bottom limit switch
   private void updateHeightMeters() {
     /* Uses limit switch to act as a baseline
@@ -409,32 +392,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       lowerLimitSwitchTriggered = true;
     } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
       lowerLimitSwitchTriggered = false;
-    }
-  }
-
-  // Updates the constraints of the elevator
-  private void updateTrapezoidProfileConstraints() {
-    SPEED speed;
-    // Updates the trapezoidal constraints of the elevator
-    if (m_desiredPositionMeters - getHeightMeters() > 0) {
-      speed = SPEED.FAST;
-    } else if (getHeightMeters() < Units.inchesToMeters(3.0)) {
-      speed = SPEED.HALT;
-    } else {
-      speed = SPEED.SLOW;
-    }
-
-    switch (speed) {
-      case FAST:
-        m_currentConstraints = ELEVATOR.m_fastConstraints;
-        break;
-      case HALT:
-        m_currentConstraints = ELEVATOR.m_stopSlippingConstraints;
-        break;
-      default:
-      case SLOW:
-        m_currentConstraints = ELEVATOR.m_slowConstraints;
-        break;
     }
   }
 
@@ -451,8 +408,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     // work without this
     if (!m_testMode) {
       updateHeightMeters();
-      //      updateForwardOutput();
-      updateTrapezoidProfileConstraints();
     }
 
     switch (m_controlMode) {

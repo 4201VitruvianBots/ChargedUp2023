@@ -2,38 +2,38 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.wrist;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.subsystems.Intake;
 
-// Limit the percent output of the wrist joystick when the stick is pressed down to make small
-// adjustments
-public class LimitWristJoystickInput extends CommandBase {
-  private final Wrist m_wrist;
+public class SetIntakeMode extends CommandBase {
+  /** Creates a new SetCubeMode. */
+  private final Intake m_intake;
 
-  /** Creates a new LimitWristJoystickInput. */
-  public LimitWristJoystickInput(Wrist wrist) {
-    m_wrist = wrist;
+  private final INTAKE_STATE m_mode;
 
+  public SetIntakeMode(Intake intake, INTAKE_STATE mode) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_wrist);
+    m_intake = intake;
+    m_mode = mode;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    m_wrist.setJoystickLimit(true);
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_intake.setIntakeMode(m_mode);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_wrist.setJoystickLimit(false);
+    m_intake.setIntakeMode(INTAKE_STATE.CONE);
   }
 
   // Returns true when the command should end.

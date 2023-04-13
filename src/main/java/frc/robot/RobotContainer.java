@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
@@ -37,10 +39,13 @@ import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.RunIntakeCube;
+import frc.robot.commands.intake.SetIntakeMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
+import frc.robot.commands.statehandler.SetConditionalSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.AutoBalance;
+import frc.robot.commands.swerve.LimitSwerveJoystickInput;
 import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -150,40 +155,37 @@ public class RobotContainer implements AutoCloseable {
             () -> leftJoystick.getRawAxis(0),
             () -> rightJoystick.getRawAxis(0)));
 
+    rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
+
     xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
     xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
 
     // Score button Bindings
 
-    // Score LOW Setpoints
+    // Extended
     xboxController
         .a()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_LOW));
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.EXTENDED));
 
     // Score MID Setpoints
     xboxController
         .b()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID));
-
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.MID));
     // Stowed
     xboxController
         .x()
         .whileTrue(
-            new SetSetpoint(m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));
-    // High
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED)); // High
     xboxController
         .y()
         .whileTrue(
-            new SetSetpoint(
-                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
-    // Toggle elevator, wrist control state
-    xboxController
-        .povUp()
-        .whileTrue(
-            new SetSetpoint(
-                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_EXTENDED));
+            new SetConditionalSetpoint(
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.HIGH));
 
     // Will switch between closed and open loop on button press
     xboxController.back().onTrue(new ToggleElevatorControlMode(m_elevator));
@@ -201,7 +203,7 @@ public class RobotContainer implements AutoCloseable {
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
-    xboxController.povLeft().onTrue(new SwitchTargetNode(m_stateHandler, true));
+    xboxController.povLeft().whileTrue(new SetIntakeMode(m_intake, INTAKE_STATE.CUBE));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     // Will limit the speed of our elevator or wrist when the corresponding joystick
@@ -213,6 +215,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
     SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
+    SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
     initTestController();
   }
 
@@ -260,7 +263,7 @@ public class RobotContainer implements AutoCloseable {
           .circle()
           .whileTrue(
               new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID));
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_MID_CONE));
 
       // Stowed
       testController
@@ -273,7 +276,7 @@ public class RobotContainer implements AutoCloseable {
           .triangle()
           .whileTrue(
               new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH));
+                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CONE));
 
       // Toggle elevator, wrist control state
       testController
