@@ -422,15 +422,15 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(135.0)),
+      STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(110.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(140.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(110.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -448,15 +448,15 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
-      ABSOLUTE_MAX(Units.degreesToRadians(150.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.degreesToRadians(144.0)),
+      ALPHA_MAX(Units.degreesToRadians(110.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
-      BETA_MAX(Units.degreesToRadians(125.0)),
+      BETA_MAX(Units.degreesToRadians(146.0)),
       GAMMA_MIN(
           Units.degreesToRadians(
               40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
-      GAMMA_MAX(125.0),
+      GAMMA_MAX(ABSOLUTE_MAX.get()),
 
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),

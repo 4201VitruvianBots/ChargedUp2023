@@ -119,7 +119,7 @@ public class RobotContainer implements AutoCloseable {
     m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_stateHandler));
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
-    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, 145.0));
+    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
 
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
