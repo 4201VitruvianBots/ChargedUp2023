@@ -130,11 +130,12 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(24.5)),
-      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(42.0)),
-      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(Units.inchesToMeters(38.0));
+      SCORE_MID_CONE(Units.inchesToMeters(23.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(26.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(38.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(40.0)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
+      INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0)); 
 
       private final double value;
 
@@ -422,17 +423,18 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(135.0)),
+      STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(110.0)),
-      SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(110.0)),
-      SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
+      SCORE_MID_CONE(Units.degreesToRadians(125.0)),
+      SCORE_MID_CUBE(Units.degreesToRadians(130.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
+      SCORE_HIGH_CUBE(Units.degreesToRadians(145.0)),
+      INTAKING_EXTENDED_CONE(SCORE_HIGH_CONE.get()),
+      INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get()); 
 
       private final double value;
 
@@ -448,15 +450,15 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
-      ABSOLUTE_MAX(Units.degreesToRadians(150.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.degreesToRadians(144.0)),
+      ALPHA_MAX(Units.degreesToRadians(110.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
-      BETA_MAX(Units.degreesToRadians(125.0)),
+      BETA_MAX(Units.degreesToRadians(146.0)),
       GAMMA_MIN(
           Units.degreesToRadians(
               40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
-      GAMMA_MAX(125.0),
+      GAMMA_MAX(ABSOLUTE_MAX.get()),
 
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
@@ -547,10 +549,20 @@ public final class Constants {
       SCORE_LOW(ELEVATOR.SETPOINT.SCORE_LOW_CONE.get(), WRIST.SETPOINT.SCORE_LOW_CONE.get()),
       SCORE_LOW_REVERSE(
           ELEVATOR.SETPOINT.SCORE_LOW_REVERSE.get(), WRIST.SETPOINT.SCORE_LOW_REVERSE.get()),
-      SCORE_MID(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
-      SCORE_HIGH(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
-      INTAKING_EXTENDED(
-          ELEVATOR.SETPOINT.INTAKING_EXTENDED.get(), WRIST.SETPOINT.INTAKING_EXTENDED.get()),
+      SCORE_MID_CONE(ELEVATOR.SETPOINT.SCORE_MID_CONE.get(), WRIST.SETPOINT.SCORE_MID_CONE.get()),
+
+      SCORE_MID_CUBE(ELEVATOR.SETPOINT.SCORE_MID_CUBE.get(), WRIST.SETPOINT.SCORE_MID_CUBE.get()), 
+
+      SCORE_HIGH_CONE(ELEVATOR.SETPOINT.SCORE_HIGH_CONE.get(), WRIST.SETPOINT.SCORE_HIGH_CONE.get()),
+
+      SCORE_HIGH_CUBE(ELEVATOR.SETPOINT.SCORE_HIGH_CUBE.get(), WRIST.SETPOINT.SCORE_HIGH_CUBE.get()),
+
+      INTAKING_EXTENDED_CONE(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED_CONE.get(), WRIST.SETPOINT.INTAKING_EXTENDED_CONE.get()),
+      
+      INTAKING_EXTENDED_CUBE(
+          ELEVATOR.SETPOINT.INTAKING_EXTENDED_CUBE.get(), WRIST.SETPOINT.INTAKING_EXTENDED_CUBE.get()), 
+          
       INTAKING_LOW_CONE(
           ELEVATOR.SETPOINT.INTAKING_LOW.get(), WRIST.SETPOINT.INTAKING_LOW_CONE.get()),
       INTAKING_LOW_CUBE(

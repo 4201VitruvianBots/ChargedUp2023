@@ -45,7 +45,7 @@ public class TestSimAuto extends SequentialCommandGroup {
         swerveCommands.get(0),
         swerveCommands.get(1),
         swerveCommands.get(2),
-        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH)
+        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.SCORE_HIGH_CONE)
             .withTimeout(3),
         swerveCommands.get(3),
         new RepeatCommand(

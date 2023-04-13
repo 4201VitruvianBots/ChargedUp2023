@@ -136,7 +136,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // Give some time for the CANCoder to recognize the wrist before resetting the angle
     if (RobotBase.isReal()) Timer.delay(3);
 
-    resetAngleDegrees(145.0);
+    resetAngleDegrees(-15.0);
     wristMotor.setInverted(WRIST.motorInversionType);
 
     initSmartDashboard();
