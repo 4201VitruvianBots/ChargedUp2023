@@ -59,7 +59,7 @@ public class FieldSimTest {
   }
 
   @Test
-  public void testRedAllianceBlueCooperatitionNodes() {
+  public void testRedAllianceBlueCoopertitionNodes() {
     TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);
     TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
     m_swerveDrive.setOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));

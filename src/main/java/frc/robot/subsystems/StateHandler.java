@@ -78,7 +78,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
-  private boolean m_isStatehandlerEnabled = true;
+  private boolean m_isStateHandlerEnabled = true;
 
   public static final Mechanism2d m_superStructureMech2d =
       new Mechanism2d(STATE_HANDLER.mechanism2dOffset * 3, STATE_HANDLER.mechanism2dOffset * 3);
@@ -244,15 +244,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public void enable() {
-    m_isStatehandlerEnabled = true;
+    m_isStateHandlerEnabled = true;
   }
 
   public void disable() {
-    m_isStatehandlerEnabled = false;
+    m_isStateHandlerEnabled = false;
   }
 
-  public boolean getIsStatehandlerEnabled() {
-    return m_isStatehandlerEnabled;
+  public boolean getIsStateHandlerEnabled() {
+    return m_isStateHandlerEnabled;
   }
 
   public static double getCurrentSimTime() {
@@ -414,7 +414,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateCommandedSetpoints() {
-    if (m_isStatehandlerEnabled) {
+    if (m_isStateHandlerEnabled) {
       setElevatorCommandedSetpoint();
       setWristCommandedSetpoint();
     }
@@ -482,13 +482,15 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
-  public void disableStateHandler() {}
-
   private void initSmartDashboard() {
     var stateHandlerTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
 
-    stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
+    try {
+      stateHandlerTab.getBooleanTopic("limitCANUtilization").publish().set(m_limitCanUtil);
+    } catch (Exception m_ignored) {
+
+    }
 
     m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish();
     m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
@@ -504,7 +506,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private void updateSmartDashboard() {
     SmartDashboard.putString("Superstructure State", getCurrentState().toString());
-    m_isEnabledPub.set(getIsStatehandlerEnabled());
+    m_isEnabledPub.set(getIsStateHandlerEnabled());
     m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());
     m_currentZonePub.set(getCurrentZone().toString());

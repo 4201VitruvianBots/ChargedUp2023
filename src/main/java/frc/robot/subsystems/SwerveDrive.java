@@ -130,7 +130,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
               new MechanismLigament2d("SwerveChassis", Constants.SWERVE_DRIVE.kTrackWidth, 0));
       // Change the color of the mech2d
       m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    } catch (Exception e) {
+    } catch (Exception m_ignored) {
 
     }
   }

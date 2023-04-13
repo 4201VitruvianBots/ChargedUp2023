@@ -305,6 +305,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return (getPositionDegrees() > 170);
   }
 
+  // TODO: Recalculate values using new intake/elevator
   public void updateHorizontalTranslation() {
     // Cube: f(x)=0.00000874723*t^3-0.00218403*t^2-0.101395*t+16;
     // Cone: f(x)=0.000860801*t^2-0.406027*t+16.3458;
@@ -436,6 +437,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    if (m_wristLigament2d != null) m_wristLigament2d.close();
+    m_wristLigament2d.close();
   }
 }

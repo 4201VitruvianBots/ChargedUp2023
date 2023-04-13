@@ -12,7 +12,7 @@ import frc.robot.subsystems.Wrist;
 public class LimitWristJoystickInput extends CommandBase {
   private final Wrist m_wrist;
 
-  /** Creates a new LimitwristJoystickInput. */
+  /** Creates a new LimitWristJoystickInput. */
   public LimitWristJoystickInput(Wrist wrist) {
     m_wrist = wrist;
 

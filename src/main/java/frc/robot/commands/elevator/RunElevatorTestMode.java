@@ -72,7 +72,7 @@ public class RunElevatorTestMode extends CommandBase {
       elevatorNtTab.getDoubleTopic("kG").publish().set(ELEVATOR.kG);
       elevatorNtTab.getDoubleTopic("kV").publish().set(ELEVATOR.kV);
       elevatorNtTab.getDoubleTopic("kA").publish().set(ELEVATOR.kA);
-    } catch (Exception ignored) {
+    } catch (Exception m_ignored) {
 
     }
 
@@ -125,7 +125,6 @@ public class RunElevatorTestMode extends CommandBase {
     double newMaxVel = Units.inchesToMeters(kMaxVelSub.get(ELEVATOR.kMaxVel));
     double newMaxAccel = Units.inchesToMeters(kMaxAccelSub.get(ELEVATOR.kMaxAccel));
 
-    // THIS PIECE OF CODE RIGHT HERE IS WHAT IS CAUSING ALL OF THE ERRORS PLEASE FIX IT NOW
     if (testKF != newKF
         || testKP != newKP
         || testKI != newKI

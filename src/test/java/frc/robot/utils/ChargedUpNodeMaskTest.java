@@ -85,7 +85,7 @@ public class ChargedUpNodeMaskTest {
     redNodes.addAll(redHighConeNodes);
     redNodes.addAll(redHighCubeNodes);
 
-    // Mark Cooperatition Nodes separately
+    // Mark Coopertition Nodes separately
     for (int i = 0; i < 3; i++) {
       Translation2d[] gridRow = new Translation2d[3];
       switch (i) {

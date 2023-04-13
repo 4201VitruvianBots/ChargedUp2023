@@ -110,7 +110,7 @@ public class VitruvianTrajectory extends PathPlannerTrajectory {
         // This is probably bad
         stateCurveRadius = (double) FieldUtils.readField(state, "curveRadius", true);
         stateDeltaPos = (double) FieldUtils.readField(state, "deltaPos", true);
-      } catch (Exception e) {
+      } catch (Exception m_ignored) {
 
       }
 

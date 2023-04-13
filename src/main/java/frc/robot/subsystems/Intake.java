@@ -169,6 +169,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   @SuppressWarnings("RedundantThrows")
   @Override
   public void close() throws Exception {
-    if (m_intakeLigament2d != null) m_intakeLigament2d.close();
+    m_intakeLigament2d.close();
   }
 }

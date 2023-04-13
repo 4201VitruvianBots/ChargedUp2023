@@ -17,7 +17,7 @@ import frc.robot.utils.TrajectoryUtils;
 import java.util.List;
 
 public class TestSimAuto extends SequentialCommandGroup {
-  List<PathPlannerTrajectory> m_trajectories;
+  private final List<PathPlannerTrajectory> m_trajectories;
 
   public TestSimAuto(
       String pathName,

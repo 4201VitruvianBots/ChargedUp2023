@@ -34,7 +34,7 @@ public class DistanceSensor implements AutoCloseable {
   private final int socketPort = 25000;
 
   private byte[] buffer = new byte[512];
-  private double[] sensorValuesMM = new double[] {0, 0, 0};
+  private final double[] sensorValuesMM = new double[] {0, 0, 0};
 
   private DatagramSocket socket;
   private String receivedData = "";

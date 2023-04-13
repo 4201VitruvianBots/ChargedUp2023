@@ -41,7 +41,7 @@ public class CenterOneBalance extends SequentialCommandGroup {
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
     addCommands(
-        /** Setting Up Auto Zeros robot to path flips path if nessesary */
+        /** Setting Up Auto Zeros robot to path flips path if necessary */
         new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
 

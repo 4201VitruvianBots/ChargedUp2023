@@ -76,7 +76,7 @@ public class RunWristTestMode extends CommandBase {
       wristNtTab.getDoubleTopic("kV").publish().set(WRIST.FFkV);
       wristNtTab.getDoubleTopic("kA").publish().set(WRIST.kA);
 
-    } catch (Exception ignored) {
+    } catch (Exception m_ignored) {
 
     }
 

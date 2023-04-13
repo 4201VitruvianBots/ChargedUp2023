@@ -158,7 +158,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
               new MechanismLigament2d(
                   "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
       m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
-    } catch (Exception ignored) {
+    } catch (Exception m_ignored) {
 
     }
   }
@@ -272,12 +272,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     m_testMode = mode;
   }
 
-  public void setPIDvalues(double f, double p, double i, double d, double izone) {
+  public void setPIDvalues(double f, double p, double i, double d, double iZone) {
     elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
     elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, p);
     elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, i);
     elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, d);
-    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, izone);
+    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, iZone);
   }
 
   public void setSimpleMotorFeedForward(double g, double v, double a) {
@@ -322,7 +322,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         -getHeightMeters() * Math.cos(ELEVATOR.mountAngleRadians.getRadians()) - centerOffset, 0);
   }
 
-  // Returns the ligament of the elevator so it can be updated in the state handler
+  // Returns the ligament of the elevator to update in StateHandler
   public MechanismLigament2d getLigament() {
     return m_elevatorLigament2d;
   }
@@ -349,7 +349,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     kCurrentAccelPub = elevatorNtTab.getDoubleTopic("Current Acceleration").publish();
     kCurrentVelPub = elevatorNtTab.getDoubleTopic("Current Velocity").publish();
 
-    elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    try {
+      elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
+    } catch (Exception m_ignored) {
+
+    }
   }
 
   public void updateShuffleboard() {

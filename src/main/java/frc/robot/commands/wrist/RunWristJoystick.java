@@ -32,7 +32,7 @@ public class RunWristJoystick extends CommandBase {
   // commands to move wrist (Move using joystick values, go to a setpoint)
   @Override
   public void execute() {
-    // Deadbands joystick X so joystick Xs below 0.05 won't be registered
+    // Adds a Deadband so joystick Xs below 0.05 won't be registered
     double joystickYDeadbandOutput = MathUtil.applyDeadband(m_joystickY.getAsDouble(), 0.1);
 
     if (joystickYDeadbandOutput != 0.0) {

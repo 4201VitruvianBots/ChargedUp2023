@@ -11,7 +11,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 
-public class AutoRunIntakeVisionCone extends CommandBase {
+public class AutoRunIntakeVision extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final SwerveDrive m_swerve;
 
@@ -21,7 +21,7 @@ public class AutoRunIntakeVisionCone extends CommandBase {
   private final double m_PercentOutput;
 
   /** Creates a new RunIntake. */
-  public AutoRunIntakeVisionCone(
+  public AutoRunIntakeVision(
       SwerveDrive swerve, Vision vision, Intake intake, double PercentOutput) {
     m_swerve = swerve;
     m_vision = vision;
