@@ -54,7 +54,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     // set current limit on TalonFX motors
     intakeMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 30, 0.1));
-    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 30, 0.1));
+    intakeMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.1));
     intakeMotor.setStatusFramePeriod(1, 255);
     intakeMotor.setStatusFramePeriod(2, 255);
     intakeMotor.setNeutralMode(NeutralMode.Brake);

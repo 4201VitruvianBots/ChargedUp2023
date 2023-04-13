@@ -387,10 +387,17 @@ public final class Constants {
     public static final int kPIDLoopIdx = 0;
 
     // Values were experimentally determined
-    public static final double kMaxSlowVel = Units.degreesToRadians(400);
-    public static final double kMaxSlowAccel = Units.degreesToRadians(290);
-    public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
-    public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
+    // public static final double kMaxSlowVel = Units.degreesToRadians(400);
+    // public static final double kMaxSlowAccel = Units.degreesToRadians(290);
+    // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
+    // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
+
+    public static final double kMaxVel = Units.degreesToRadians(400);
+    public static final double kMaxAccel = Units.degreesToRadians(250);
+
+    public static final TrapezoidProfile.Constraints m_constraints =
+        new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
+
     public static final double FFkS = 0.06;
     public static final double kG = 0.54;
     public static final double FFkV = 1.6;
@@ -400,10 +407,10 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
-    public static final TrapezoidProfile.Constraints slowConstraints =
-        new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
-    public static final TrapezoidProfile.Constraints fastConstraints =
-        new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
+    // public static final TrapezoidProfile.Constraints slowConstraints =
+    //     new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
+    // public static final TrapezoidProfile.Constraints fastConstraints =
+    //     new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
@@ -415,15 +422,15 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(108.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.5)),
+      STOWED(Units.degreesToRadians(135.0)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(140.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(110.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(110.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 
@@ -441,15 +448,15 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in radians
       ABSOLUTE_MIN(Units.degreesToRadians(-20.0)),
-      ABSOLUTE_MAX(Units.degreesToRadians(180.0)),
+      ABSOLUTE_MAX(Units.degreesToRadians(150.0)),
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.degreesToRadians(110.0)),
+      ALPHA_MAX(Units.degreesToRadians(144.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
-      BETA_MAX(Units.degreesToRadians(146.0)),
+      BETA_MAX(Units.degreesToRadians(125.0)),
       GAMMA_MIN(
           Units.degreesToRadians(
               40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
-      GAMMA_MAX(ABSOLUTE_MAX.get()),
+      GAMMA_MAX(125.0),
 
       HORIZONTAL_LENGTH_MINUS15_CUBE(Units.inchesToMeters(17.0)),
       HORIZONTAL_LENGTH_MINUS15_CONE(Units.inchesToMeters(20.0)),
@@ -490,7 +497,7 @@ public final class Constants {
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
     public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
 
-    public static boolean limitCanUtilization = true;
+    public static boolean limitCanUtilization = false; 
 
     public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
 

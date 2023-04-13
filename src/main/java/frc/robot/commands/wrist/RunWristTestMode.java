@@ -66,11 +66,11 @@ public class RunWristTestMode extends CommandBase {
       wristNtTab
           .getDoubleTopic("Max Vel deg/s")
           .publish()
-          .set(Units.radiansToDegrees(WRIST.kMaxSlowVel));
+          .set(Units.radiansToDegrees(WRIST.kMaxVel));
       wristNtTab
           .getDoubleTopic("Max Accel deg/s^2")
           .publish()
-          .set(Units.radiansToDegrees(WRIST.kMaxSlowAccel));
+          .set(Units.radiansToDegrees(WRIST.kMaxAccel));
       wristNtTab.getDoubleTopic("kS").publish().set(WRIST.FFkS);
       wristNtTab.getDoubleTopic("kG").publish().set(WRIST.kG);
       wristNtTab.getDoubleTopic("kV").publish().set(WRIST.FFkV);
@@ -93,8 +93,8 @@ public class RunWristTestMode extends CommandBase {
     kVSub = wristNtTab.getDoubleTopic("kV").subscribe(WRIST.FFkV);
     kASub = wristNtTab.getDoubleTopic("kA").subscribe(WRIST.kA);
 
-    kMaxVelSub = wristNtTab.getDoubleTopic("Max Vel deg/s").subscribe(WRIST.kMaxSlowVel);
-    kMaxAccelSub = wristNtTab.getDoubleTopic("Max Accel deg/s^2").subscribe(WRIST.kMaxSlowAccel);
+    kMaxVelSub = wristNtTab.getDoubleTopic("Max Vel deg/s").subscribe(WRIST.kMaxVel);
+    kMaxAccelSub = wristNtTab.getDoubleTopic("Max Accel deg/s^2").subscribe(WRIST.kMaxAccel);
   }
 
   // Called when the command is initially scheduled.
@@ -123,8 +123,8 @@ public class RunWristTestMode extends CommandBase {
     double newKV = kVSub.get(WRIST.FFkV);
     double newKA = kASub.get(WRIST.kA);
 
-    double newMaxVel = Units.degreesToRadians(kMaxVelSub.get(WRIST.kMaxSlowVel));
-    double newMaxAccel = Units.degreesToRadians(kMaxAccelSub.get(WRIST.kMaxSlowAccel));
+    double newMaxVel = Units.degreesToRadians(kMaxVelSub.get(WRIST.kMaxVel));
+    double newMaxAccel = Units.degreesToRadians(kMaxAccelSub.get(WRIST.kMaxAccel));
 
     if (testKF != newKF
         || (testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone)) {

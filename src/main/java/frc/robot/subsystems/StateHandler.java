@@ -353,8 +353,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       case ALPHA:
         // ALPHA -> BETA
         if (ELEVATOR.THRESHOLD.BETA_MIN.get() < m_elevator.getHeightMeters()) {
-          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()
-              && m_wrist.getPositionRadians() < WRIST.THRESHOLD.BETA_MAX.get()) {
+          if (WRIST.THRESHOLD.BETA_MIN.get() < m_wrist.getPositionRadians()) {
             m_currentState = SUPERSTRUCTURE_STATE.BETA_ZONE;
             m_currentZone = ZONE.BETA;
             return;
@@ -567,13 +566,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
-    }
-
-    // If the elevator is low, use the fast Wrist Trapezoid profile for faster intake deploy
-    if (m_elevator.getHeightMeters() < Units.inchesToMeters(4.0)) {
-      m_wrist.setTrapezoidalProfileSpeed(WRIST.SPEED.FAST);
-    } else {
-      m_wrist.setTrapezoidalProfileSpeed(WRIST.SPEED.SLOW);
     }
 
     // TODO: Update this based on Intake sensors
