@@ -94,7 +94,7 @@ public final class Constants {
 
     // PID
     public static final double kMaxVel = Units.inchesToMeters(80);
-    public static final double kMaxAccel = Units.inchesToMeters(90); 
+    public static final double kMaxAccel = Units.inchesToMeters(90);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
