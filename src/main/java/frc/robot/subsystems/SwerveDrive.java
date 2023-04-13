@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
@@ -130,7 +129,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     try {
       m_swerveChassis2d =
           m_chassisRoot2d.append(
-              new MechanismLigament2d("SwerveChassis", Constants.SWERVE_DRIVE.kTrackWidth, 0));
+              new MechanismLigament2d("SwerveChassis", SWERVE_DRIVE.kTrackWidth, 0));
       // Change the color of the mech2d
       m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
     } catch (Exception m_ignored) {

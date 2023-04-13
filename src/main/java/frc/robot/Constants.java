@@ -151,9 +151,7 @@ public final class Constants {
     public enum THRESHOLD {
       // Units are in meters
       // Used to tell current zone for transitions
-      ABSOLUTE_MIN(
-          Units.inchesToMeters(
-              -10.0)), // In case the elevator belt slips, we want to be able to hit the limit
+      ABSOLUTE_MIN(Units.inchesToMeters(0.0)),
       // switch to reset it
       ABSOLUTE_MAX(Units.inchesToMeters(50.0)),
       // NOTE: Zone limits should overlap to allow for transitions
@@ -639,8 +637,6 @@ public final class Constants {
 
   private static void initSim() {
     robotName = "Sim";
-
-    ELEVATOR.THRESHOLD.ABSOLUTE_MIN.value = 0;
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 0;
     SWERVE_DRIVE.frontRightCANCoderOffset = 0;
