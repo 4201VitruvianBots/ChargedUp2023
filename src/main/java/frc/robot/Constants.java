@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(30);
-    public static final double kMaxAccel = Units.inchesToMeters(15);
+    public static final double kMaxVel = Units.inchesToMeters(80);
+    public static final double kMaxAccel = Units.inchesToMeters(90); 
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -106,27 +106,17 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.04;
+    public static final double kP = 0.11;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
-
-    public static final double kMaxForwardOutput = 0.6;
-    public static final double kMaxReverseOutput = -0.45;
 
     public static final double kPercentOutputMultiplier = 0.2;
     public static final double kLimitedPercentOutputMultiplier = 0.1;
 
     public static TalonFXInvertType mainMotorInversionType = TalonFXInvertType.Clockwise;
 
-    // Trapezoid profile stuff
-    public static final TrapezoidProfile.Constraints m_stopSlippingConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * .5, kMaxAccel);
-    // Used when elevator is moving downward
-    public static final TrapezoidProfile.Constraints m_slowConstraints =
+    public static final TrapezoidProfile.Constraints m_Constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
-    // Used when elevator is moving upward
-    public static final TrapezoidProfile.Constraints m_fastConstraints =
-        new TrapezoidProfile.Constraints(kMaxVel * 1.3, kMaxAccel * 1.3);
 
     public enum SPEED {
       HALT,
@@ -140,9 +130,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(26.5)),
+      SCORE_MID_CONE(Units.inchesToMeters(24.5)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.inchesToMeters(46.5)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(42.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(Units.inchesToMeters(38.0));
 
@@ -170,8 +160,8 @@ public final class Constants {
       // Beta 3 < x < 28 inches
       // Gamma 27.5 < x < 50 inches
       ALPHA_MIN(ABSOLUTE_MIN.get()),
-      ALPHA_MAX(Units.inchesToMeters(3.5)),
-      BETA_MIN(Units.inchesToMeters(3.0)),
+      ALPHA_MAX(Units.inchesToMeters(15.5)),
+      BETA_MIN(Units.inchesToMeters(15.0)),
       BETA_MAX(Units.inchesToMeters(29)),
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
@@ -431,9 +421,9 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(145.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(140.0)),
       SCORE_MID_CUBE(SCORE_MID_CONE.get()),
-      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
       SCORE_HIGH_CUBE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED(SCORE_HIGH_CONE.get());
 

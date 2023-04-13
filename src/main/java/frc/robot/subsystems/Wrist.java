@@ -231,9 +231,9 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public void setPIDvalues(double f, double p, double i, double d, double izone) {
     wristMotor.config_kF(WRIST.kSlotIdx, f);
-    wristMotor.config_kP(WRIST.kSlotIdx, d);
-    wristMotor.config_kI(WRIST.kSlotIdx, p);
-    wristMotor.config_kD(WRIST.kSlotIdx, i);
+    wristMotor.config_kP(WRIST.kSlotIdx, p);
+    wristMotor.config_kI(WRIST.kSlotIdx, i);
+    wristMotor.config_kD(WRIST.kSlotIdx, d);
     wristMotor.config_IntegralZone(WRIST.kSlotIdx, izone);
   }
 
