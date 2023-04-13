@@ -187,8 +187,8 @@ public class RobotContainer implements AutoCloseable {
     xboxController
         .x()
         .whileTrue(
-              new SetSetpoint(
-                  m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED));     // High
+            new SetSetpoint(
+                m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.STOWED)); // High
     xboxController
         .y()
         .whileTrue(
