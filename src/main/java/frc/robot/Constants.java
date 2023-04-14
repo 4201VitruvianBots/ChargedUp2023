@@ -181,14 +181,14 @@ public final class Constants {
     public enum WAIT {
 
       SCORE_HIGH_CONE(0.65), //good
-      SCORE_HIGH_CUBE(0.6), //good
+      SCORE_HIGH_CUBE(0.65), //good
       SCORE_MID_CONE(0.7),
       SCORE_MID_CUBE(0.7),
 
       WAIT_TO_PLACE_CONE(1.5), //good
-      WAIT_TO_PLACE_CUBE(1), //good
+      WAIT_TO_PLACE_CUBE(1.5), //good
 
-      SCORING_CONE(0.5), // good
+      SCORING_CONE(0.7), // good
       SCORING_CUBE(0.5), //good
 
 

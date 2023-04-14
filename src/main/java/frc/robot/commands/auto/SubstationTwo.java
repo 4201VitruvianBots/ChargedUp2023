@@ -38,7 +38,7 @@ public class SubstationTwo extends SequentialCommandGroup {
 
     var m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(16), Units.feetToMeters(13)));
+            pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
@@ -79,9 +79,8 @@ public class SubstationTwo extends SequentialCommandGroup {
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
-            new SequentialCommandGroup(
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-                new WaitCommand(0.5),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5)
+            ),
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
                         .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
@@ -98,7 +97,7 @@ public class SubstationTwo extends SequentialCommandGroup {
                         .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
                     new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP)
                         .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
-                        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()))),
+                        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
 
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
