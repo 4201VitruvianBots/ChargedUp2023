@@ -26,19 +26,15 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BumpOnePickUp;
 import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.SubstationTwo;
-import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.RunIntakeCube;
-import frc.robot.commands.intake.SetIntakeMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetConditionalSetpoint;
@@ -106,6 +102,7 @@ public class RobotContainer implements AutoCloseable {
     initializeSubsystems();
     m_logger.pause();
     configureBindings();
+    resetSubsystemPositions();
 
     initializeAutoChooser();
   }
@@ -129,6 +126,16 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
       SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
+    }
+  }
+
+  private void resetSubsystemPositions() {
+    if (!m_logManager.initTempExists()) {
+      ResetElevatorHeight resetElevator = new ResetElevatorHeight(m_elevator, 0);
+      ResetWristAngleDegrees resetWrist = new ResetWristAngleDegrees(m_wrist, -15.0);
+      resetElevator.execute();
+      resetWrist.execute();
+      m_logManager.createInitTempFile();
     }
   }
 

@@ -600,6 +600,10 @@ public final class Constants {
     CLOSED_LOOP
   }
 
+  public static class UTIL {
+    public static final String tempFileName = "initialize";
+  }
+  
   public enum SCORING_STATE {
     STOWED,
     AUTO_BALANCE,

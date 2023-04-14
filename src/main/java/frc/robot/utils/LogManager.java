@@ -4,11 +4,14 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.util.DeleteAllLogs;
+import frc.robot.Constants.UTIL;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -16,6 +19,8 @@ import java.util.ArrayList;
 /** Add your docs here. */
 public class LogManager {
   private final String mainPath = new File("").getAbsolutePath();
+
+  private final String tempPath = mainPath + "/tmp";
 
   private ArrayList<String> logFilePaths = new ArrayList<>();
 
@@ -67,6 +72,24 @@ public class LogManager {
       } else {
         System.out.println("Failed to delete log file " + fileObj.getName());
       }
+    }
+  }
+
+  // Checks if the initialize file exists under the temporary folder.
+  public boolean initTempExists() {
+    try {
+      return Files.isDirectory(Paths.get(tempPath)) && Files.isRegularFile(Paths.get(tempPath+UTIL.tempFileName));
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public void createInitTempFile() {
+    try {
+      File fileObj = new File(tempPath+UTIL.tempFileName);
+      fileObj.createNewFile();
+    } catch (IOException e) {
+      DriverStation.reportWarning("Failed to create init file", e.getStackTrace());
     }
   }
 
