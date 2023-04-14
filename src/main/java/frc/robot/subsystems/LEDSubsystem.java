@@ -149,7 +149,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     if (state != currentRobotState) {
       switch (state) {
         case WRIST_IS_RESET: 
-          setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Strobe); // Flashing Pink
+          setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Flashing Pink
           break;
         case INTAKE_LOW_CONE:
           setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Strobe); // Flashing Yellow
