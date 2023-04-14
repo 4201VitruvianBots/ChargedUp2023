@@ -53,7 +53,7 @@ public class SetConditionalSetpoint extends CommandBase {
   @Override
   public void execute() {
     switch (m_desiredState) {
-      case EXTENDED:
+      case INTAKE_EXTENDED:
         if (m_intake.getIntakeMode() == INTAKE_STATE.CUBE)
           m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CONE);

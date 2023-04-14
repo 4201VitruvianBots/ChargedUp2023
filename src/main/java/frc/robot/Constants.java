@@ -611,7 +611,8 @@ public final class Constants {
     HIGH,
     HIGH_CONE,
     HIGH_CUBE,
-    EXTENDED
+    INTAKE,
+    INTAKE_EXTENDED
   }
 
   private static void initBeta() {

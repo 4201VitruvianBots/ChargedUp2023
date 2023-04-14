@@ -166,7 +166,7 @@ public class RobotContainer implements AutoCloseable {
         .a()
         .whileTrue(
             new SetConditionalSetpoint(
-                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.EXTENDED));
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.INTAKE_EXTENDED));
 
     // Score MID Setpoints
     xboxController
