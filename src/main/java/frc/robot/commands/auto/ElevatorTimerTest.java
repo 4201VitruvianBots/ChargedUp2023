@@ -35,24 +35,24 @@ public class ElevatorTimerTest extends SequentialCommandGroup {
 
                 /** Brings elevator & wrist to High Pulls up cone */
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)
-                        .withTimeout(WAIT.SCOREHIGH.get()),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE)
-                        .withTimeout(WAIT.SCOREHIGH.get())),
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
+                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE)
+                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
                 /** Outakes cone */
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE)
-                    .withTimeout(WAIT.SCORECONE.get()),
-                new WaitCommand(WAIT.SCORETIME.get()),
+                new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
+                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CUBE)
+                    .withTimeout(WAIT.SCORING_CUBE.get()),
                 new PrintCommand("SCORE"),
-                new WaitCommand(WAIT.SCORECONE.get()),
+                new WaitCommand(WAIT.SCORING_CUBE.get()),
                 /** Stows Wrist, Elevator, and Stops intake */
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                        .withTimeout(WAIT.STOWHIGHFAST.get()),
+                        .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
                     new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP)
-                        .withTimeout(WAIT.STOWHIGHFAST.get())),
+                        .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
                 /** Runs Path with Intaking cube during */
-                new PrintCommand("Driving Driving Driving Driving Driving Driving Driving "),
+                new PrintCommand("DRIVING"),
                 new WaitCommand(1))));
   }
 }

@@ -50,13 +50,13 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)
-                .withTimeout(WAIT.SCOREHIGH.get()),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE)
-                .withTimeout(WAIT.SCOREHIGH.get())),
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
         /** Outakes cone */
         new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE)
-            .withTimeout(WAIT.SCORECONE.get()),
+            .withTimeout(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.3),
@@ -76,7 +76,7 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
             new SequentialCommandGroup(
                 new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
                 new WaitCommand(0.5),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH)
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
                     .withTimeout(1.4),
                 new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE).withTimeout(1.4))),
 

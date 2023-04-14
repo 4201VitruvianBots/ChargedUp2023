@@ -180,23 +180,27 @@ public final class Constants {
   public static class AUTOTIMES {
 
     public enum WAIT {
-      STOWHIGH(0.5), // Good
-      STOWHIGHFAST(0.25),
 
-      STOWMID(0.3),
-      STOWMIDFAST(0.15),
+      SCORE_HIGH_CONE(0.65), //good
+      SCORE_HIGH_CUBE(0.6), //good
+      SCORE_MID_CONE(0.7),
+      SCORE_MID_CUBE(0.7),
 
-      STOWLOW(0.1),
+      WAIT_TO_PLACE_CONE(0.66), //good
+      WAIT_TO_PLACE_CUBE(0.66), //good
 
-      SCOREHIGH(0.6),
-      SCOREMID(0.7),
-      SCORELOW(0.4),
+      SCORING_CONE(0.25), // good
+      SCORING_CUBE(0.05), //good
 
-      SCORETIME(0.5),
-      STOWTOINTAKE(0.2), // good
 
-      SCORECONE(0.3), // good
-      SCORECUBE(0.565); // good
+      STOW_HIGH_CONE(0.55), // good
+      STOW_HIGH_CUBE(0.55), //good
+
+      STOW_MID_CONE(0.3),
+      STOW_MID_CUBE(0.15),
+
+      STOW_TO_INTAKE(0.1); // good
+
 
       public double value;
 
