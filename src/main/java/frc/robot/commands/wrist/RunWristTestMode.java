@@ -110,7 +110,7 @@ public class RunWristTestMode extends CommandBase {
   @Override
   public void execute() {
     DriverStation.reportWarning("USING WRIST TEST MODE!", false);
-    double newSetpoint = Units.degreesToRadians(kSetpointSub.get(0));
+    double newSetpoint = Units.degreesToRadians(kSetpointSub.get(90));
 
     double newKF = kFSub.get(0);
     double newKP = kPSub.get(WRIST.kP);
