@@ -6,12 +6,11 @@ package frc.robot.utils;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.util.DeleteAllLogs;
 import frc.robot.Constants.UTIL;
+import frc.robot.commands.util.DeleteAllLogs;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -78,7 +77,8 @@ public class LogManager {
   // Checks if the initialize file exists under the temporary folder.
   public boolean initTempExists() {
     try {
-      return Files.isDirectory(Paths.get(tempPath)) && Files.isRegularFile(Paths.get(tempPath+UTIL.tempFileName));
+      return Files.isDirectory(Paths.get(tempPath))
+          && Files.isRegularFile(Paths.get(tempPath + UTIL.tempFileName));
     } catch (Exception e) {
       return false;
     }
@@ -86,7 +86,7 @@ public class LogManager {
 
   public void createInitTempFile() {
     try {
-      File fileObj = new File(tempPath+UTIL.tempFileName);
+      File fileObj = new File(tempPath + UTIL.tempFileName);
       fileObj.createNewFile();
     } catch (IOException e) {
       DriverStation.reportWarning("Failed to create init file", e.getStackTrace());
