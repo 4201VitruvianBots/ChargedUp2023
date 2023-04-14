@@ -198,7 +198,7 @@ public final class Constants {
       CONE_MIN(8000),
       CONE_MAX(10000),
       CUBE_MIN(-6000),
-      CUBE_MAX(-8000); 
+      CUBE_MAX(-8000);
 
       private final double value;
 
