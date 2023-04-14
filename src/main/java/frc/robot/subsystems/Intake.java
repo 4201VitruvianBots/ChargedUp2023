@@ -94,7 +94,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public Pose2d getGamepiecePose(Pose2d intakePose) {
     return new Pose2d(
         intakePose.getX(),
-        intakePose.getY() + getGamepieceDistanceInches(),
+        intakePose.getY() + getGamepieceDistanceInchesReturns0(),
         intakePose.getRotation());
   }
 
@@ -102,9 +102,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return m_intakeLigament2d;
   }
 
-  public double getGamepieceDistanceInches() {
-//    return m_distanceSensor.getGamepieceDistanceInches(getHeldGamepiece());
-    return 0
+  public double getGamepieceDistanceInchesReturns0() {
+    return 0; 
   }
 
   // control mode function
