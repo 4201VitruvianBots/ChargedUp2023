@@ -73,7 +73,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerLimitSwitch = 9;
-    public static final int resetWristSwitch = 8; //TODO: Update when switch is put on robot
+    public static final int resetWristSwitch = 8; // TODO: Update when switch is put on robot
   }
 
   public static final class CONSTANTS {
@@ -527,7 +527,7 @@ public final class Constants {
       SCORE_LOW_CONE(ZONE.ALPHA),
       SCORE_LOW_CUBE(ZONE.ALPHA),
       ALPHA_ZONE(ZONE.ALPHA),
-      WRIST_IS_RESET(ZONE.ALPHA), 
+      WRIST_IS_RESET(ZONE.ALPHA),
       // MID
       BETA_ZONE(ZONE.BETA),
       SCORE_MID(ZONE.BETA),

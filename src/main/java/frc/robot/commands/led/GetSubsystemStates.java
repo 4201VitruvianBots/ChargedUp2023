@@ -21,12 +21,13 @@ public class GetSubsystemStates extends CommandBase {
 
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
-  private final Wrist m_wrist; 
+  private final Wrist m_wrist;
   private boolean isIntakingCone;
   private boolean isIntakingCube;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist) {
+  public GetSubsystemStates(
+      LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist) {
     m_led = led;
     m_stateHandler = stateHandler;
     m_intake = intake;
