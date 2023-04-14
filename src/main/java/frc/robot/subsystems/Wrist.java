@@ -143,12 +143,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Workaround for wrist not setting angle properly/inversion race condition
   private void initializeWristAngle() {
-    if(DriverStation.isDisabled() && !m_wristInitialized) {
+    if (DriverStation.isDisabled() && !m_wristInitialized) {
       double wristResetAngleDegrees = -15.0;
       resetAngleDegrees(wristResetAngleDegrees);
 
-      if(getPositionDegrees() == wristResetAngleDegrees)
-        m_wristInitialized = true;
+      if (getPositionDegrees() == wristResetAngleDegrees) m_wristInitialized = true;
     }
   }
 
