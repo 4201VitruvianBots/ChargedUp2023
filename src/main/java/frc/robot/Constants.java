@@ -73,6 +73,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerLimitSwitch = 9;
+    public static final int resetWristSwitch = 8; //TODO: Update when switch is put on robot
   }
 
   public static final class CONSTANTS {
@@ -195,10 +196,10 @@ public final class Constants {
 
     public enum VELOCITYTHRESHOLDS {
       // Units are in raw motor velocity units
-      CONE_MIN(15000),
-      CONE_MAX(20000),
-      CUBE_MIN(8000),
-      CUBE_MAX(10000); 
+      CONE_MIN(8000),
+      CONE_MAX(10000),
+      CUBE_MIN(-6000),
+      CUBE_MAX(-8000);
 
       private final double value;
 
@@ -289,10 +290,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 0;
-    public static double frontRightCANCoderOffset = 0;
-    public static double backLeftCANCoderOffset = 0;
-    public static double backRightCANCoderOffset = 0;
+    public static double frontLeftCANCoderOffset = 125.068;
+    public static double frontRightCANCoderOffset = 153.721;
+    public static double backLeftCANCoderOffset = 190.635;
+    public static double backRightCANCoderOffset = 31.904;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
@@ -432,7 +433,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(15)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
@@ -526,6 +527,7 @@ public final class Constants {
       SCORE_LOW_CONE(ZONE.ALPHA),
       SCORE_LOW_CUBE(ZONE.ALPHA),
       ALPHA_ZONE(ZONE.ALPHA),
+      WRIST_IS_RESET(ZONE.ALPHA), 
       // MID
       BETA_ZONE(ZONE.BETA),
       SCORE_MID(ZONE.BETA),
