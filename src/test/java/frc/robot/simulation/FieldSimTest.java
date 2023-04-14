@@ -10,14 +10,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.RobotContainer;
+import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.SwerveDrive;
 import org.junit.jupiter.api.*;
 import utils.TestUtils;
 
-@Disabled
 public class FieldSimTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
+  protected Controls m_controls;
   protected FieldSim m_fieldSim;
 
   @BeforeEach
@@ -26,6 +27,7 @@ public class FieldSimTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     m_robotContainer = new RobotContainer();
     m_swerveDrive = m_robotContainer.getSwerveDrive();
+    m_controls = m_robotContainer.getControls();
     m_fieldSim = m_robotContainer.getFieldSim();
   }
 
@@ -38,9 +40,9 @@ public class FieldSimTest {
 
   @Test
   public void testRedAllianceRedNodes() {
-    TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);
-    TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
+    TestUtils.setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
     m_swerveDrive.setOdometry(new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(0)));
+
     updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
     assertEquals(m_fieldSim.getValidNodes().size(), 9);
     for (var node : m_fieldSim.getValidNodes()) {
@@ -60,8 +62,7 @@ public class FieldSimTest {
 
   @Test
   public void testRedAllianceBlueCoopertitionNodes() {
-    TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Red);
-    TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
+    TestUtils.setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
     m_swerveDrive.setOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
     updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
@@ -83,8 +84,7 @@ public class FieldSimTest {
 
   @Test
   public void testBlueAllianceBlueNodes() {
-    TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Blue);
-    TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
+    TestUtils.setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Blue);
     m_swerveDrive.setOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
 
     updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
@@ -108,8 +108,7 @@ public class FieldSimTest {
 
   @Test
   public void testBlueAllianceRedCoopertitionNodes() {
-    TestUtils.setPrivateField(m_fieldSim, "m_currentAlliance", DriverStation.Alliance.Blue);
-    TestUtils.setPrivateField(m_fieldSim, "testScoringState", false);
+    TestUtils.setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Blue);
     m_swerveDrive.setOdometry(new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(0)));
 
     updateNodeMask(m_swerveDrive.getPoseMeters(), SCORING_STATE.LOW);
