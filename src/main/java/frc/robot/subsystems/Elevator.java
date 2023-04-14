@@ -48,6 +48,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final TalonFX[] elevatorMotors = {
     new TalonFX(CAN.elevatorMotorLeft), new TalonFX(CAN.elevatorMotorRight)
   };
+  private boolean m_elevatorInitialized;
 
   // Initializing limit switch at bottom of elevator
   private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
@@ -139,9 +140,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
 
     // Setting the right motor to output the same as the left motor
-    elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
-
     elevatorMotors[0].setInverted(ELEVATOR.mainMotorInversionType);
+
+    elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
     elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
@@ -160,6 +161,16 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
     } catch (Exception m_ignored) {
 
+    }
+  }
+
+  private void initElevatorMotorFollower() {
+    if(DriverStation.isDisabled() && m_elevatorInitialized) {
+      elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
+      elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+
+      if (elevatorMotors[1].getControlMode() == ControlMode.Follower)
+        m_elevatorInitialized = true;
     }
   }
 
@@ -403,6 +414,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
+    initElevatorMotorFollower();
     updateLog();
     updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
     // work without this

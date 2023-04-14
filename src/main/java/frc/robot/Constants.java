@@ -414,7 +414,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(15)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
