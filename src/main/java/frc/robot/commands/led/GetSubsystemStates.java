@@ -21,14 +21,16 @@ public class GetSubsystemStates extends CommandBase {
 
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
+  private final Wrist m_wrist; 
   private boolean isIntakingCone;
   private boolean isIntakingCube;
 
   /** Sets the LED based on the subsystems' statuses */
-  public GetSubsystemStates(LEDSubsystem led, Intake intake, StateHandler stateHandler) {
+  public GetSubsystemStates(LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist) {
     m_led = led;
     m_stateHandler = stateHandler;
     m_intake = intake;
+    m_wrist = wrist;
     addRequirements(m_led);
   }
 
@@ -45,8 +47,11 @@ public class GetSubsystemStates extends CommandBase {
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (DriverStation.isDisabled()) {
-      // TODO: Add an isReady state
-      m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
+      if (Math.abs(m_wrist.getPositionDegrees() + 15.0) <= 0.5) {
+        m_led.expressState(SUPERSTRUCTURE_STATE.WRIST_IS_RESET);
+      } else {
+        m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
+      }
     } else {
       switch (m_stateHandler.getDesiredState()) {
           // TODO: Add states for substation intaking

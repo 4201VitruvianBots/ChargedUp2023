@@ -120,7 +120,7 @@ public class RobotContainer implements AutoCloseable {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_stateHandler));
+    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist));
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
