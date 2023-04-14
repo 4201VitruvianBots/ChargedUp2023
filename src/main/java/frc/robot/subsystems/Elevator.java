@@ -134,16 +134,15 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       // Setting hard limits as to how fast the elevator can move forward and backward
       //      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
-      //      motor.configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.45, ELEVATOR.kTimeoutMs);
       // TODO: Review after new elevator is integrated
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
 
     // Setting the right motor to output the same as the left motor
     elevatorMotors[0].setInverted(ELEVATOR.mainMotorInversionType);
-
-    elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
-    elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
+    // elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
+    // elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
     elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
 
@@ -206,6 +205,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         DemandType.ArbitraryFeedForward,
         //        calculateFeedforward(state)
         0);
+    elevatorMotors[1].set(ControlMode.PercentOutput, elevatorMotors[0].getMotorOutputPercent());
   }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
@@ -413,7 +413,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
-    initElevatorMotorFollower();
+    // initElevatorMotorFollower();
     updateLog();
     updateShuffleboard(); // Yes, this needs to be called in the periodic. The simulation does not
     // work without this
