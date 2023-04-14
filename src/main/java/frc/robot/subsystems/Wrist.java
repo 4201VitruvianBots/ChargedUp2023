@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
+import frc.robot.Constants.DIO;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
@@ -40,6 +41,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // Initialize single wrist motor
   private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
   private boolean m_wristInitialized = false;
+
+  // Timer for wrist reset (if button is up for 100ms, reset the wrist)
+  private DigitalInput resetSwitch = new DigitalInput(DIO.resetWristSwitch);
+  private Timer timer = new Timer();
 
   private double m_desiredSetpointRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
@@ -287,6 +292,18 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   // the ground.
   public void resetAngleDegrees(double angleDegrees) {
     wristMotor.setSelectedSensorPosition(angleDegrees / WRIST.encoderUnitsToDegrees);
+  }
+
+  public void handleButtonPress() {
+    if (resetSwitch.get()) {
+      timer.start(); // start the timer when the button is up
+    } else {
+      if (timer.hasElapsed(0.1)) { // check if the button has been up for 100ms
+        resetAngleDegrees(-15.0); // run the command to zero the wrist
+        timer.stop(); // stop the timer
+        timer.reset(); // reset the timer for the next button press
+      }
+    }
   }
 
   public void setLowerLimit(double radians) {
