@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class LogManager {
   private final String mainPath = new File("").getAbsolutePath();
 
-  private final String tempPath = mainPath + "/tmp";
+  private final String tempPath = "/tmp/";
 
   private ArrayList<String> logFilePaths = new ArrayList<>();
 
