@@ -80,7 +80,7 @@ public class RunWristTestMode extends CommandBase {
 
     }
 
-    kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(0);
+    kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(90);
 
     kFSub = wristNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = wristNtTab.getDoubleTopic("kP").subscribe(WRIST.kP);
@@ -110,7 +110,7 @@ public class RunWristTestMode extends CommandBase {
   @Override
   public void execute() {
     DriverStation.reportWarning("USING WRIST TEST MODE!", false);
-    double newSetpoint = Units.degreesToRadians(kSetpointSub.get(0));
+    double newSetpoint = Units.degreesToRadians(kSetpointSub.get(90));
 
     double newKF = kFSub.get(0);
     double newKP = kPSub.get(WRIST.kP);
@@ -145,8 +145,8 @@ public class RunWristTestMode extends CommandBase {
 
     if (testMaxVel != newMaxVel || testMaxAccel != newMaxAccel) {
       m_wrist.setTrapezoidalConstraints(newMaxVel, newMaxAccel);
-      testMaxVel = newKG;
-      testMaxAccel = newKV;
+      testMaxVel = newMaxVel;
+      testMaxAccel = newMaxAccel;
     }
 
     m_wrist.setSetpointPositionRadians(newSetpoint);
