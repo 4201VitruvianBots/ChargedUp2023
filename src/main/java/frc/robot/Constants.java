@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(140);
-    public static final double kMaxAccel = Units.inchesToMeters(300);
+    public static final double kMaxVel = Units.inchesToMeters(280);
+    public static final double kMaxAccel = Units.inchesToMeters(600);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -130,9 +130,9 @@ public final class Constants {
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.inchesToMeters(25.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(26.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(45.0)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(40.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(28.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(43.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(44.0)),
       INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
@@ -413,7 +413,7 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
       INTAKING_LOW_CONE(Units.degreesToRadians(15)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),

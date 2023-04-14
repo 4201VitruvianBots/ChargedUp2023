@@ -145,8 +145,8 @@ public class RunWristTestMode extends CommandBase {
 
     if (testMaxVel != newMaxVel || testMaxAccel != newMaxAccel) {
       m_wrist.setTrapezoidalConstraints(newMaxVel, newMaxAccel);
-      testMaxVel = newKG;
-      testMaxAccel = newKV;
+      testMaxVel = newMaxVel;
+      testMaxAccel = newMaxAccel;
     }
 
     m_wrist.setSetpointPositionRadians(newSetpoint);
