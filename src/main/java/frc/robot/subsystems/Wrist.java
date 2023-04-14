@@ -147,7 +147,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       double wristResetAngleDegrees = -15.0;
       resetAngleDegrees(wristResetAngleDegrees);
 
-      if (getPositionDegrees() == wristResetAngleDegrees) m_wristInitialized = true;
+      if (Math.abs(getPositionDegrees() - wristResetAngleDegrees) <= 0.01)
+        m_wristInitialized = true;
     }
   }
 
