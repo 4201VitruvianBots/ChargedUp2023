@@ -80,7 +80,7 @@ public class RunWristTestMode extends CommandBase {
 
     }
 
-    kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(0);
+    kSetpointSub = wristNtTab.getDoubleTopic("kSetpointDegrees").subscribe(90);
 
     kFSub = wristNtTab.getDoubleTopic("kF").subscribe(0);
     kPSub = wristNtTab.getDoubleTopic("kP").subscribe(WRIST.kP);
