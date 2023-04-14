@@ -87,7 +87,7 @@ public class TrajectoryUtils {
               swerveDrive.getYPidController(),
               swerveDrive.getThetaPidController(),
               swerveDrive::setSwerveModuleStatesAuto,
-              false,
+              true,
               swerveDrive);
 
       commands.add(swerveCommand);
