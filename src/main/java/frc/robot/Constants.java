@@ -610,10 +610,10 @@ public final class Constants {
     // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 124.980; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 167.432; // 41.748;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 153.721; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
-    SWERVE_DRIVE.backRightCANCoderOffset = 31.816;
+    SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
   }
 
   private static void initAlpha() {
