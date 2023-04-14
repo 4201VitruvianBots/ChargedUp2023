@@ -134,7 +134,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       // Setting hard limits as to how fast the elevator can move forward and backward
       //      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
-           motor.configPeakOutputReverse(-0.6, ELEVATOR.kTimeoutMs);
+      motor.configPeakOutputReverse(-0.6, ELEVATOR.kTimeoutMs);
       // TODO: Review after new elevator is integrated
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
