@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.utils.DistanceSensor;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -35,7 +34,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
 
-  private final DistanceSensor m_distanceSensor;
+  //  private final DistanceSensor m_distanceSensor;
 
   // Log setup
   private final DataLog log = DataLogManager.getLog();
@@ -45,8 +44,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final MechanismLigament2d m_intakeLigament2d =
       new MechanismLigament2d("Intake", INTAKE.length, 0);
 
-  public Intake(DistanceSensor distanceSensor) {
-    m_distanceSensor = distanceSensor;
+  public Intake() {
+    //    m_distanceSensor = distanceSensor;
     // one or two motors
 
     // factory default configs
@@ -74,20 +73,21 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   public INTAKE.INTAKE_STATE getHeldGamepiece() {
-    double leftConeSensorValue =
-        m_distanceSensor.getSensorValueMillimeters(INTAKE.leftConeSensorId) / 1000.0;
-    double rightConeSensorValue =
-        m_distanceSensor.getSensorValueMillimeters(INTAKE.rightConeSensorId) / 1000.0;
-    double cubeSensorValue =
-        m_distanceSensor.getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
+    //    double leftConeSensorValue =
+    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.leftConeSensorId) / 1000.0;
+    //    double rightConeSensorValue =
+    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.rightConeSensorId) / 1000.0;
+    //    double cubeSensorValue =
+    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
 
-    if (leftConeSensorValue + rightConeSensorValue <= INTAKE.innerIntakeWidth) {
-      return INTAKE.INTAKE_STATE.CONE;
-    } else if (cubeSensorValue <= INTAKE.innerIntakeWidth - 1) {
-      return INTAKE.INTAKE_STATE.CUBE;
-    } else {
-      return INTAKE.INTAKE_STATE.NONE;
-    }
+    //    if (leftConeSensorValue + rightConeSensorValue <= INTAKE.innerIntakeWidth) {
+    //      return INTAKE.INTAKE_STATE.CONE;
+    //    } else if (cubeSensorValue <= INTAKE.innerIntakeWidth - 1) {
+    //      return INTAKE_STATE.CUBE;
+    //    } else {
+    //      return INTAKE_STATE.NONE;
+    //    }
+    return INTAKE_STATE.NONE;
   }
 
   // Returns a pose where the center of the gamepiece should be
@@ -103,7 +103,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   public double getGamepieceDistanceInches() {
-    return m_distanceSensor.getGamepieceDistanceInches(getHeldGamepiece());
+    //    return m_distanceSensor.getGamepieceDistanceInches(getHeldGamepiece());
+    return 0;
   }
 
   // control mode function
@@ -165,16 +166,16 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
     // hold
     // the game piece in.
-    if (!getIntakeState()) {
-      if (m_distanceSensor.getConeDistanceInches() > 0) {
-        m_percentOutput = 0;
-      } else if (m_distanceSensor.getCubeDistanceInches() > 0) {
-        m_percentOutput = 0;
-      } else {
-        m_percentOutput = 0;
-      }
-      setPercentOutput(m_percentOutput);
-    }
+    //    if (!getIntakeState()) {
+    //      if (m_distanceSensor.getConeDistanceInches() > 0) {
+    //        m_percentOutput = 0;
+    //      } else if (m_distanceSensor.getCubeDistanceInches() > 0) {
+    //        m_percentOutput = 0;
+    //      } else {
+    //        m_percentOutput = 0;
+    //      }
+    //      setPercentOutput(m_percentOutput);
+    //    }
   }
 
   @SuppressWarnings("RedundantThrows")

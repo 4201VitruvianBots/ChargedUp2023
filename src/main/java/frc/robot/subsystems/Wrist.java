@@ -23,10 +23,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,6 +39,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Initialize single wrist motor
   private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
+  private boolean m_wristInitialized = false;
 
   private double m_desiredSetpointRadians;
   private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
@@ -127,17 +125,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.config_kD(0, WRIST.kD);
     wristMotor.configPeakOutputForward(WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
     wristMotor.configPeakOutputReverse(-WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
+    wristMotor.setInverted(WRIST.motorInversionType);
 
     // TODO: Review limits, test to see what is appropriate or not
     wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
 
     wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
-
-    // Give some time for the CANCoder to recognize the wrist before resetting the angle
-    if (RobotBase.isReal()) Timer.delay(3);
-
-    resetAngleDegrees(-15.0);
-    wristMotor.setInverted(WRIST.motorInversionType);
 
     initSmartDashboard();
     m_timer.reset();
@@ -146,6 +139,17 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
 
     m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+  }
+
+  // Workaround for wrist not setting angle properly/inversion race condition
+  private void initializeWristAngle() {
+    if (DriverStation.isDisabled() && !m_wristInitialized) {
+      double wristResetAngleDegrees = -15.0;
+      resetAngleDegrees(wristResetAngleDegrees);
+
+      if (Math.abs(getPositionDegrees() - wristResetAngleDegrees) <= 0.05)
+        m_wristInitialized = true;
+    }
   }
 
   public MechanismLigament2d getLigament() {
@@ -372,6 +376,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
+    initializeWristAngle();
+
     if (!m_testMode) {
       updateIValue();
     }

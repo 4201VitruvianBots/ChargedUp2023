@@ -55,7 +55,6 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
-import frc.robot.utils.DistanceSensor;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.util.ArrayList;
@@ -73,12 +72,12 @@ public class RobotContainer implements AutoCloseable {
   // Initialize used utils
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
-  private final DistanceSensor m_distanceSensor = new DistanceSensor();
+  //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // The robot's subsystems and commands are defined here...
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator();
-  private final Intake m_intake = new Intake(m_distanceSensor);
+  private final Intake m_intake = new Intake();
   private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
@@ -167,7 +166,7 @@ public class RobotContainer implements AutoCloseable {
         .a()
         .whileTrue(
             new SetConditionalSetpoint(
-                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.EXTENDED));
+                m_stateHandler, m_elevator, m_wrist, m_intake, SCORING_STATE.INTAKE_EXTENDED));
 
     // Score MID Setpoints
     xboxController
@@ -479,15 +478,15 @@ public class RobotContainer implements AutoCloseable {
     return m_fieldSim;
   }
 
-  public DistanceSensor getDistanceSensor() {
-    return m_distanceSensor;
-  }
+  //  public DistanceSensor getDistanceSensor() {
+  //    return m_distanceSensor;
+  //  }
 
   public void periodic() {
     // m_fieldSim.periodic();
     // Rumbles the controller if the robot is on target based off FieldSim
     xboxController.getHID().setRumble(RumbleType.kBothRumble, m_stateHandler.isOnTarget() ? 1 : 0);
-    m_distanceSensor.periodic();
+    //    m_distanceSensor.periodic();
     // m_logManager.periodic();
   }
 
@@ -516,7 +515,7 @@ public class RobotContainer implements AutoCloseable {
     m_intake.close();
     m_controls.close();
 
-    m_distanceSensor.close();
+    //    m_distanceSensor.close();
     m_logger.close();
   }
 }

@@ -83,7 +83,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 10.18; // Real value 15.7?
+    public static final double gearRatio = 8.82; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -93,8 +93,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(80);
-    public static final double kMaxAccel = Units.inchesToMeters(90);
+    public static final double kMaxVel = Units.inchesToMeters(280);
+    public static final double kMaxAccel = Units.inchesToMeters(600);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -119,7 +119,6 @@ public final class Constants {
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
 
     public enum SPEED {
-      HALT,
       SLOW,
       FAST
     }
@@ -130,10 +129,10 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(23.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(26.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(38.0)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(40.0)),
+      SCORE_MID_CONE(Units.inchesToMeters(25.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(28.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(43.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(44.0)),
       INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
@@ -165,7 +164,7 @@ public final class Constants {
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
 
-      private double value;
+      private final double value;
 
       THRESHOLD(final double value) {
         this.value = value;
@@ -231,8 +230,26 @@ public final class Constants {
       CONE
     }
 
+    public enum VELOCITYTHRESHOLDS {
+      // Units are in raw motor velocity units
+      CONE_MIN(8000),
+      CONE_MAX(10000),
+      CUBE_MIN(-6000),
+      CUBE_MAX(-8000);
+
+      private final double value;
+
+      VELOCITYTHRESHOLDS(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
     public enum INTAKE_SPEEDS {
-      // Units are in Radians
+      // Units are in Percent Output
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
@@ -254,7 +271,7 @@ public final class Constants {
 
     public enum SENSOR_STATUS {
       UNREPORTED, // No status from the teensy is being reported
-      DISCONNECTED, // The teensy failed to initalize the sensor
+      DISCONNECTED, // The teensy failed to initialize the sensor
       TIMEOUT, // The sensor is connected, but failed to report a value in time
       FAILED, // The sensor reading is an obviously incorrect value (not between 0-8192)
       CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
@@ -309,10 +326,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 0;
-    public static double frontRightCANCoderOffset = 0;
-    public static double backLeftCANCoderOffset = 0;
-    public static double backRightCANCoderOffset = 0;
+    public static double frontLeftCANCoderOffset = 125.068;
+    public static double frontRightCANCoderOffset = 153.721;
+    public static double backLeftCANCoderOffset = 190.635;
+    public static double backRightCANCoderOffset = 31.904;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
@@ -445,30 +462,20 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
-    // public static final TrapezoidProfile.Constraints slowConstraints =
-    //     new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
-    // public static final TrapezoidProfile.Constraints fastConstraints =
-    //     new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
-
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
-
-    public enum SPEED {
-      SLOW,
-      FAST
-    }
 
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(125.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(135.0)),
       SCORE_MID_CUBE(Units.degreesToRadians(130.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(135.0)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(145.0)),
       INTAKING_EXTENDED_CONE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
@@ -648,7 +655,8 @@ public final class Constants {
     HIGH,
     HIGH_CONE,
     HIGH_CUBE,
-    EXTENDED
+    INTAKE,
+    INTAKE_EXTENDED
   }
 
   private static void initBeta() {
@@ -657,10 +665,10 @@ public final class Constants {
     // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 124.980; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 167.432; // 41.748;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 153.721; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
-    SWERVE_DRIVE.backRightCANCoderOffset = 31.816;
+    SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
   }
 
   private static void initAlpha() {
