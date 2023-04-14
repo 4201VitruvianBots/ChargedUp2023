@@ -30,29 +30,28 @@ public class ElevatorTimerTest extends SequentialCommandGroup {
       StateHandler stateHandler) {
 
     addCommands(
-        new RepeatCommand(
             new SequentialCommandGroup(
 
                 /** Brings elevator & wrist to High Pulls up cone */
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
-                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE)
-                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
+                        .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE)
+                        .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
                 /** Outakes cone */
-                new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CUBE)
-                    .withTimeout(WAIT.SCORING_CUBE.get()),
+                new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
+                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE)
+                    .withTimeout(WAIT.SCORING_CONE.get()),
                 new PrintCommand("SCORE"),
-                new WaitCommand(WAIT.SCORING_CUBE.get()),
+                new WaitCommand(WAIT.SCORING_CONE.get()),
                 /** Stows Wrist, Elevator, and Stops intake */
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                        .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+                        .withTimeout(WAIT.STOW_HIGH_CONE.get()),
                     new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP)
-                        .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
+                        .withTimeout(WAIT.STOW_HIGH_CONE.get())),
                 /** Runs Path with Intaking cube during */
                 new PrintCommand("DRIVING"),
-                new WaitCommand(1))));
+                new WaitCommand(1)));
   }
 }
