@@ -5,19 +5,22 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
 
-public class RunIntakeCone extends CommandBase {
+public class SetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+  private final StateHandler m_StateHandler; 
 
-  private final double m_PercentOutput;
+  private final INTAKE_SPEEDS m_speed;
 
-  // TODO: Consolidate RunIntakeCone/Cube. Use an Enum to differentiate input/output values
   /** Creates a new RunIntake. */
-  public RunIntakeCone(Intake intake, double PercentOutput) {
+  public SetIntakeSetpoint(Intake intake, INTAKE_SPEEDS speed, StateHandler statehandler) {
     m_intake = intake;
-    m_PercentOutput = PercentOutput;
+    m_speed = speed;
+    m_StateHandler = statehandler;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intake);
@@ -26,31 +29,23 @@ public class RunIntakeCone extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setIntakeStateCone(true);
-    m_intake.setIntakeStateCone(true);
+    m_intake.setIntakeStateCube(true);
+    m_intake.setIntakeStateCube(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setPercentOutput(-m_PercentOutput);
-    // if (m_vision.searchLimelightTarget(CAMERA_SERVER.INTAKE)) {
-    //   m_swerve.enableHeadingTarget(true);
-    //   m_swerve.setRobotHeading(
-    //       m_swerve
-    //           .getHeadingRotation2d()
-    //           .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-    //           .getRadians());
-    // }
+    m_intake.setPercentOutput(m_speed.get());
+    m_StateHandler.StowWrist(m_speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_intake.setPercentOutput(0);
-    m_intake.setIntakeStateCone(false);
-    // m_swerve.enableHeadingTarget(false);
-    m_intake.setIntakeStateCone(false);
+    m_intake.setIntakeStateCube(false);
+    m_intake.setIntakeStateCube(false);
   }
 
   // Returns true when the command should end.

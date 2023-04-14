@@ -193,6 +193,24 @@ public final class Constants {
       CONE
     }
 
+    public enum VELOCITYTHRESHOLDS {
+      // Units are in raw motor velocity units
+      CONE_MIN(15000),
+      CONE_MAX(20000),
+      CUBE_MIN(8000),
+      CUBE_MAX(10000); 
+
+      private final double value;
+
+      VELOCITYTHRESHOLDS(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
     public enum INTAKE_SPEEDS {
       // Units are in Percent Output
       INTAKING_CONE(0.6),

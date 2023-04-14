@@ -9,6 +9,8 @@ import static frc.robot.Constants.STATE_HANDLER.wristSetpointTolerance;
 import static frc.robot.utils.ChargedUpNodeMask.getTargetNode;
 import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -21,18 +23,24 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.INTAKE.VELOCITYTHRESHOLDS;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.STATE_HANDLER.*;
+import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.commands.statehandler.ToggleTestIntakeState;
 import frc.robot.utils.SetpointSolver;
-import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase implements AutoCloseable {
   /**
@@ -59,6 +67,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
+  private double startTime; 
 
   private double m_elevatorDesiredSetpointMeters;
   private double m_wristDesiredSetpointRadians;
@@ -482,6 +491,28 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
+
+  public void StowWrist(INTAKE_SPEEDS speed) {
+  if (m_desiredState == SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE) {
+    if (speed == INTAKE_SPEEDS.INTAKING_CONE && 
+        m_intake.getVelocity() > VELOCITYTHRESHOLDS.CONE_MIN.get() && 
+        m_intake.getVelocity() < VELOCITYTHRESHOLDS.CONE_MAX.get() &&
+        Timer.getFPGATimestamp() - startTime >= 0.5) {
+      setDesiredSetpoint(SETPOINT.STOWED);
+    } else {
+      startTime = Timer.getFPGATimestamp();
+    }
+  } else if (m_desiredState == SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE) {
+    if (speed == INTAKE_SPEEDS.INTAKING_CUBE && 
+        m_intake.getVelocity() > VELOCITYTHRESHOLDS.CUBE_MIN.get() && 
+        m_intake.getVelocity() < VELOCITYTHRESHOLDS.CUBE_MAX.get() &&
+        Timer.getFPGATimestamp() - startTime >= 0.5) {
+      setDesiredSetpoint(SETPOINT.STOWED);
+    } else {
+      startTime = Timer.getFPGATimestamp();
+    }
+  }
+}
 
   private void initSmartDashboard() {
     var stateHandlerTab =

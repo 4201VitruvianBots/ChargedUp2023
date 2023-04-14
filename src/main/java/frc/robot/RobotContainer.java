@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
@@ -36,8 +37,7 @@ import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
-import frc.robot.commands.intake.RunIntakeCone;
-import frc.robot.commands.intake.RunIntakeCube;
+import frc.robot.commands.intake.SetIntakeSetpoint;
 import frc.robot.commands.intake.SetIntakeMode;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
@@ -156,8 +156,8 @@ public class RobotContainer implements AutoCloseable {
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
 
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
+    xboxController.leftTrigger(0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CUBE, m_stateHandler));
+    xboxController.rightTrigger(0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CONE, m_stateHandler));
 
     // Score button Bindings
 
@@ -222,7 +222,7 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
+      testController.axisGreaterThan(3, 0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CUBE, m_stateHandler));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -235,7 +235,7 @@ public class RobotContainer implements AutoCloseable {
                       m_stateHandler.getCurrentState().getZone()
                           == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
+      testController.axisGreaterThan(4, 0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CONE, m_stateHandler));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(

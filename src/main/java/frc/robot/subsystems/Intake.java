@@ -144,6 +144,10 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     return m_intakeMode;
   }
 
+  public double getVelocity(){
+    return intakeMotor.getSelectedSensorVelocity(); 
+  }
+
   // Shuffleboard or SmartDashboard function
   public void initSmartDashboard() {}
 
