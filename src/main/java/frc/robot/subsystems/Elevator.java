@@ -165,12 +165,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   private void initElevatorMotorFollower() {
-    if(DriverStation.isDisabled() && m_elevatorInitialized) {
+    if (DriverStation.isDisabled() && m_elevatorInitialized) {
       elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
       elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
-      if (elevatorMotors[1].getControlMode() == ControlMode.Follower)
-        m_elevatorInitialized = true;
+      if (elevatorMotors[1].getControlMode() == ControlMode.Follower) m_elevatorInitialized = true;
     }
   }
 

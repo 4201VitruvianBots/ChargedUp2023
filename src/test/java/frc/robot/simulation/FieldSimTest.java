@@ -15,7 +15,6 @@ import frc.robot.subsystems.SwerveDrive;
 import org.junit.jupiter.api.*;
 import utils.TestUtils;
 
-
 public class FieldSimTest {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
