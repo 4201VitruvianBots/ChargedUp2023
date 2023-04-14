@@ -328,13 +328,13 @@ public class DistanceSensor implements AutoCloseable {
 
       //      }
     } catch (SocketTimeoutException ex) {
-      System.out.println("DistanceSensor-SocketTimeoutError");
+      //      System.out.println("DistanceSensor-SocketTimeoutError");
       //      ex.printStackTrace();
     } catch (IOException ex) {
-      System.out.println("DistanceSensor-IOError");
+      //      System.out.println("DistanceSensor-IOError");
       //      ex.printStackTrace();
     } catch (Exception ex) {
-      System.out.println("DistanceSensor-UnknownError");
+      //      System.out.println("DistanceSensor-UnknownError");
       //      ex.printStackTrace();
     }
   }

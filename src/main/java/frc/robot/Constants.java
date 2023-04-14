@@ -119,7 +119,6 @@ public final class Constants {
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
 
     public enum SPEED {
-      HALT,
       SLOW,
       FAST
     }
@@ -165,7 +164,7 @@ public final class Constants {
       GAMMA_MIN(Units.inchesToMeters(28.5)),
       GAMMA_MAX(ABSOLUTE_MAX.get());
 
-      private double value;
+      private final double value;
 
       THRESHOLD(final double value) {
         this.value = value;
@@ -195,7 +194,7 @@ public final class Constants {
     }
 
     public enum INTAKE_SPEEDS {
-      // Units are in Radians
+      // Units are in Percent Output
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
@@ -217,7 +216,7 @@ public final class Constants {
 
     public enum SENSOR_STATUS {
       UNREPORTED, // No status from the teensy is being reported
-      DISCONNECTED, // The teensy failed to initalize the sensor
+      DISCONNECTED, // The teensy failed to initialize the sensor
       TIMEOUT, // The sensor is connected, but failed to report a value in time
       FAILED, // The sensor reading is an obviously incorrect value (not between 0-8192)
       CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
@@ -408,18 +407,8 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 1.0;
 
-    // public static final TrapezoidProfile.Constraints slowConstraints =
-    //     new TrapezoidProfile.Constraints(WRIST.kMaxSlowVel, WRIST.kMaxSlowAccel);
-    // public static final TrapezoidProfile.Constraints fastConstraints =
-    //     new TrapezoidProfile.Constraints(WRIST.kMaxFastVel, WRIST.kMaxFastAccel);
-
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
-
-    public enum SPEED {
-      SLOW,
-      FAST
-    }
 
     public enum SETPOINT {
       // Units are in Radians
