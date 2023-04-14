@@ -193,6 +193,24 @@ public final class Constants {
       CONE
     }
 
+    public enum VELOCITYTHRESHOLDS {
+      // Units are in raw motor velocity units
+      CONE_MIN(8000),
+      CONE_MAX(10000),
+      CUBE_MIN(-6000),
+      CUBE_MAX(-8000); 
+
+      private final double value;
+
+      VELOCITYTHRESHOLDS(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
     public enum INTAKE_SPEEDS {
       // Units are in Percent Output
       INTAKING_CONE(0.6),
@@ -271,10 +289,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 0;
-    public static double frontRightCANCoderOffset = 0;
-    public static double backLeftCANCoderOffset = 0;
-    public static double backRightCANCoderOffset = 0;
+    public static double frontLeftCANCoderOffset = 125.068;
+    public static double frontRightCANCoderOffset = 153.721;
+    public static double backLeftCANCoderOffset = 190.635;
+    public static double backRightCANCoderOffset = 31.904;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
@@ -414,7 +432,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(15)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
