@@ -4,20 +4,28 @@
 
 package frc.robot.commands.intake;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
 
 public class AutoSetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+  private final Vision m_vision;
+  private final SwerveDrive m_swerve;
 
   private INTAKE.INTAKE_SPEEDS m_setpoint;
 
   /** Creates a new RunIntake. */
-  public AutoSetIntakeSetpoint(Intake intake, INTAKE.INTAKE_SPEEDS setpoint) {
+  public AutoSetIntakeSetpoint(Intake intake, INTAKE.INTAKE_SPEEDS setpoint, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
     m_setpoint = setpoint;
+    m_vision = vision;
+    m_swerve = swerve;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intake);
   }
@@ -28,9 +36,21 @@ public class AutoSetIntakeSetpoint extends CommandBase {
     if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
         || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
       m_intake.setIntakeStateCone(true);
+      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 2.0);
+      m_swerve.enableHeadingTarget(true);
+      m_swerve.setRobotHeadingRadians(
+        m_swerve.getHeadingRotation2d()
+        .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+        .getRadians());
+
     } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE
         || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
       m_intake.setIntakeStateCube(true);
+      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 1.0);
+      m_swerve.setRobotHeadingRadians(
+        m_swerve.getHeadingRotation2d()
+        .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+        .getRadians());
     }
   }
 
@@ -38,6 +58,8 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   @Override
   public void execute() {
     m_intake.setPercentOutput(m_setpoint.get());
+
+
   }
 
   // Called once the command ends or is interrupted.
@@ -46,9 +68,13 @@ public class AutoSetIntakeSetpoint extends CommandBase {
     if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
         || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
       m_intake.setIntakeStateCone(false);
+      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 0);
+      m_swerve.enableHeadingTarget(false);
     } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE
         || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
       m_intake.setIntakeStateCube(false);
+      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 0);
+      m_swerve.enableHeadingTarget(false);
     }
   }
 

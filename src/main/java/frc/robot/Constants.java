@@ -199,7 +199,7 @@ public final class Constants {
       STOW_MID_CONE(0.3),
       STOW_MID_CUBE(0.3),
 
-      STOW_TO_INTAKE(0.1); // good
+      INTAKE_TO_STOW(0.5); // good
 
 
       public double value;

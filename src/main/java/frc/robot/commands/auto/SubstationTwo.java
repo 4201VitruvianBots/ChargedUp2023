@@ -79,7 +79,7 @@ public class SubstationTwo extends SequentialCommandGroup {
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5)
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(WAIT.INTAKE_TO_STOW.get())
             ),
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
