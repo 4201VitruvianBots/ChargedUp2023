@@ -291,7 +291,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 136.934; 
+    public static double frontRightCANCoderOffset = 136.934;
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
