@@ -324,12 +324,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       setPipeline(location, pipeline);
       // Try to find cube
       if (pipeline == 1) {
-        if (getTargetArea(location) > 3.0)
-          limelightINTAKINGState = INTAKE.INTAKE_STATE.INTAKING_CONE;
+        if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.CUBE;
       }
       if (pipeline == 2) {
-        if (getTargetArea(location) > 3.0)
-          limelightINTAKINGState = INTAKE.INTAKE_STATE.INTAKING_CUBE;
+        if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.CONE;
       }
     }
 

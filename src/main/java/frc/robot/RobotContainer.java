@@ -346,13 +346,36 @@ public class RobotContainer implements AutoCloseable {
 
     m_autoChooser.addOption(
         "ElevatorTimerTest",
-        new ElevatorTimerTest(
+        new HighConeTimerTest(
             m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
         "SubstationTwo",
         new SubstationTwo(
             "SubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+    m_autoChooser.addOption(
+        "SubstationThree",
+        new SubstationThree(
+            "SubstationThree",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
