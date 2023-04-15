@@ -34,6 +34,7 @@ import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetConditionalSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.statehandler.ZeroAllSensors;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -112,7 +113,8 @@ public class RobotContainer implements AutoCloseable {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist));
+    m_led.setDefaultCommand(
+        new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist, m_elevator));
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
@@ -233,6 +235,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
     SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
     SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
+    SmartDashboard.putData(new ZeroAllSensors(m_elevator, m_wrist, m_swerveDrive));
     initTestController();
   }
 
