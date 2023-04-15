@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.AUTOTIMES.WAIT;
+import frc.robot.Constants.AUTO.WAIT;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;

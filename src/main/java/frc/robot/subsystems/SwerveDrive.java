@@ -251,7 +251,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public Rotation2d getHeadingRotation2d() {
-    return Rotation2d.fromDegrees(getHeadingDegrees());
+    if (DriverStation.isFMSAttached() && Controls.getAllianceColor() == DriverStation.Alliance.Red)
+      return Rotation2d.fromDegrees(getHeadingDegrees()).plus(Rotation2d.fromDegrees(180));
+    else return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
   public Pose2d getPoseMeters() {

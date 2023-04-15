@@ -2,12 +2,13 @@ package frc.robot.commands.auto;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.AUTOTIMES.WAIT;
+import frc.robot.Constants.AUTO.WAIT;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
@@ -23,8 +24,10 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
+import java.util.List;
 
 public class SubstationTwo extends SequentialCommandGroup {
+  private final List<PathPlannerTrajectory> m_trajectories;
 
   public SubstationTwo(
       String pathName,
@@ -36,7 +39,7 @@ public class SubstationTwo extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    var m_trajectories =
+    m_trajectories =
         TrajectoryUtils.readTrajectory(
             pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
     var swerveCommands =
@@ -100,5 +103,9 @@ public class SubstationTwo extends SequentialCommandGroup {
         new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
+  }
+
+  public List<PathPlannerTrajectory> getTrajectories() {
+    return m_trajectories;
   }
 }
