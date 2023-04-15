@@ -34,8 +34,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   // Mech2d setup
   private MechanismLigament2d m_limelightLigament2d;
 
-  private final NetworkTable m_intakeNet;
-  private final NetworkTable outtake;
+  private final NetworkTable m_intakeNt;
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
   private final NetworkTable m_fLocalizer;
@@ -54,7 +53,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private double startTime, timestamp;
   private boolean timerStart;
 
-  private INTAKE_STATE targetFound = INTAKE_STATE.NONE;
+  private INTAKE_STATE limelightState = INTAKE_STATE.NONE;
 
   private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -73,8 +72,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     m_controls = controls;
     m_intakeSub = intake;
 
-    m_intakeNet = NetworkTableInstance.getDefault().getTable("limelight");
-    outtake = NetworkTableInstance.getDefault().getTable("limelight");
+    m_intakeNt = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
     m_fLocalizer = NetworkTableInstance.getDefault().getTable("fusedLocalizer");
@@ -137,7 +135,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getValidTargetType(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("tv").getDouble(0);
+        return m_intakeNt.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
@@ -166,7 +164,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetXAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return -m_intakeNet.getEntry("tx").getDouble(0);
+        return -m_intakeNt.getEntry("tx").getDouble(0);
       default:
         return 0;
     }
@@ -178,7 +176,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetYAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("ty").getDouble(0);
+        return m_intakeNt.getEntry("ty").getDouble(0);
       default:
         return 0;
     }
@@ -190,7 +188,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getCameraLatency(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("tl").getDouble(0);
+        return m_intakeNt.getEntry("tl").getDouble(0);
       default:
         return 0;
     }
@@ -202,7 +200,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetArea(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("ta").getDouble(0);
+        return m_intakeNt.getEntry("ta").getDouble(0);
       default:
         return 0;
     }
@@ -229,7 +227,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public void setPipeline(CAMERA_SERVER location, double pipeline) {
     switch (location) {
       case INTAKE:
-        m_intakeNet.getEntry("pipeline").setDouble(pipeline);
+        m_intakeNt.getEntry("pipeline").setDouble(pipeline);
         break;
     }
   }
@@ -237,7 +235,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getPipeline(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("pipeline").getDouble(0);
+        return m_intakeNt.getEntry("pipeline").getDouble(0);
       default:
         return 0.0;
     }
@@ -269,7 +267,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * resets timer for pipeline finder
    */
   public void resetPipelineSearch() {
-    targetFound = INTAKE_STATE.NONE;
+    limelightState = INTAKE_STATE.NONE;
     searchPipelineTimer.reset();
     searchPipelineTimer.start();
   }
@@ -307,7 +305,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
     if (timestamp != 0 || searchTimer.get() - startTime > 3) {
       if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
-        targetFound = INTAKE_STATE.NONE;
+        limelightState = INTAKE_STATE.NONE;
         searchLimelightPipeline(location);
       }
     }
@@ -317,31 +315,34 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
-    if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
+    // Search
+    if (limelightState == INTAKE_STATE.INTAKING) {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
-      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
-        setPipeline(location, pipeline);
-        if (getTargetArea(location) > 1.0 && pipeline == 1) {
-          targetFound = INTAKE_STATE.CUBE;
-        } else if (getTargetArea(location) > 1.0 && pipeline == 2) {
-          targetFound = INTAKE_STATE.CONE;
-        }
+      setPipeline(location, pipeline);
+      // Try to find cube
+      if (pipeline == 1) {
+        if (getTargetArea(location) > 3.0)
+          limelightState = INTAKE_STATE.CUBE;
       }
+      if (pipeline == 2) {
+        if (getTargetArea(location) > 3.0)
+          limelightState = INTAKE_STATE.CONE;
+      }
+    }
 
-      // threshold to lose game object once it's found
-      if (targetFound == INTAKE_STATE.CUBE) {
-        if (getTargetArea(location) < 1.0) {
-          // reconnectLimelightPipeline(location);
-          targetFound = INTAKE_STATE.NONE;
-        }
+    // threshold to lose game object once it's found
+    if (limelightState == INTAKE_STATE.CUBE) {
+      if (getTargetArea(location) < 2.0) {
+        reconnectLimelightPipeline(location);
+        limelightState = INTAKE_STATE.NONE;
       }
-      if (targetFound == INTAKE_STATE.CONE) {
-        if (getTargetArea(location) < 1.0) {
-          // reconnectLimelightPipeline(location);
-          targetFound = INTAKE_STATE.NONE;
-        }
+    }
+    if (limelightState == INTAKE_STATE.CONE) {
+      if (getTargetArea(location) < 2.0) {
+        reconnectLimelightPipeline(location);
+        limelightState = INTAKE_STATE.NONE;
       }
     }
   }
