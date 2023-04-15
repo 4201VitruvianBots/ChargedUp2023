@@ -35,7 +35,7 @@ public class AutoRunIntakeVision extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setIntakeStateCone(true);
+    m_intake.setIntakingState(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -55,7 +55,7 @@ public class AutoRunIntakeVision extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setIntakeStateCone(false);
+    m_intake.setIntakingState(false);
     m_swerve.enableHeadingTarget(false);
   }
 

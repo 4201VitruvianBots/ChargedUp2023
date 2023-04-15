@@ -31,14 +31,14 @@ public class SetIntakeSetpoint extends CommandBase {
   public void initialize() {
     double speedcheck = m_speed.get(); 
     if (speedcheck > 0.0) {
-        m_intake.setIntakeStateCone(true);
+        m_intake.setIntakingState(true);
         m_intake.setIntakeStateCube(false);
       }
       else if (speedcheck < 0.0) {
-        m_intake.setIntakeStateCone(false);
+        m_intake.setIntakingState(false);
         m_intake.setIntakeStateCube(true);
   } else {
-    m_intake.setIntakeStateCone(false);
+    m_intake.setIntakingState(false);
     m_intake.setIntakeStateCube(false);
   }
 }
@@ -55,7 +55,7 @@ public class SetIntakeSetpoint extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.setPercentOutput(0);
     m_intake.setIntakeStateCube(false);
-    m_intake.setIntakeStateCone(false);
+    m_intake.setIntakingState(false);
   }
 
   // Returns true when the command should end.

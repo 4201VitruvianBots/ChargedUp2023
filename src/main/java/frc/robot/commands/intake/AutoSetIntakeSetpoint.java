@@ -34,7 +34,7 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   @Override
   public void initialize() {
     if (m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
-      m_intake.setIntakeStateCone(true);
+      m_intake.setIntakingState(true);
     } else if ( m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
       m_intake.setIntakeStateCube(true);
     }
@@ -60,7 +60,7 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   public void end(boolean interrupted) {
     if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
         || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
-      m_intake.setIntakeStateCone(false);
+      m_intake.setIntakingState(false);
       m_vision.setPipeline(CAMERA_SERVER.INTAKE, 0);
       m_swerve.enableHeadingTarget(false);
     } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE

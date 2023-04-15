@@ -226,9 +226,12 @@ public final class Constants {
 
     public enum INTAKE_STATE {
       NONE,
-      INTAKING,
-      CUBE,
-      CONE
+      INTAKING_CONE,
+      INTAKING_CUBE,
+      HOLDING_CONE,
+      HOLDING_CUBE,
+      SCORING_CONE,
+      SCORING_CUBE
     }
 
     public enum VELOCITYTHRESHOLDS {

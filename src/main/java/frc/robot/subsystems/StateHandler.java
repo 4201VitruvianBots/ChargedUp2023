@@ -212,11 +212,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE) {
         if (intakeState == INTAKE_STATE.CONE) m_scoringState = SCORING_STATE.MID_CONE;
-        else if (intakeState == INTAKE_STATE.CUBE) m_scoringState = SCORING_STATE.MID_CUBE;
+        else if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.MID_CUBE;
       } else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
         if (intakeState == INTAKE_STATE.CONE) m_scoringState = SCORING_STATE.HIGH_CONE;
-        else if (intakeState == INTAKE_STATE.CUBE) m_scoringState = SCORING_STATE.HIGH_CUBE;
+        else if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.HIGH_CUBE;
       } else {
         m_scoringState = SCORING_STATE.STOWED;
       }
@@ -575,7 +575,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     switch (m_currentIntakeState) {
       case CONE:
         break;
-      case CUBE:
+      case HOLDING_CONE:
         break;
       case INTAKING:
         break;

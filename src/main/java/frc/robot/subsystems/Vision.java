@@ -324,7 +324,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       // Try to find cube
       if (pipeline == 1) {
         if (getTargetArea(location) > 3.0)
-          limelightState = INTAKE_STATE.CUBE;
+          limelightState = INTAKE_STATE.HOLDING_CONE;
       }
       if (pipeline == 2) {
         if (getTargetArea(location) > 3.0)
@@ -333,7 +333,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     }
 
     // threshold to lose game object once it's found
-    if (limelightState == INTAKE_STATE.CUBE) {
+    if (limelightState == INTAKE_STATE.HOLDING_CONE) {
       if (getTargetArea(location) < 2.0) {
         reconnectLimelightPipeline(location);
         limelightState = INTAKE_STATE.NONE;
@@ -346,19 +346,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       }
     }
   }
-
-  public void searchforCube(CAMERA_SERVER location, double pipelineNeed) {
-      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
-        double pipeline = pipelineNeed;
-        setPipeline(location, pipeline);
-        if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
-          targetFound = INTAKE_STATE.CUBE;
-      }
-        if (getTargetArea(location) < 1.0) {
-          targetFound = INTAKE_STATE.NONE;
-        }
-      }
-    }
 
   /*
    * Collects transformation/rotation data from limelight

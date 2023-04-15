@@ -179,7 +179,7 @@ public class DistanceSensor implements AutoCloseable {
                 + ((INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2)
                 - (INTAKE.innerIntakeWidth / 2);
         break;
-      case CUBE:
+      case HOLDING_CONE:
         // Reading cube sensors if cube in intake detected
         distanceMeters =
             cubeSensorValue + (SimConstants.cubeWidth / 2) - (INTAKE.innerIntakeWidth / 2);
@@ -206,7 +206,7 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.CUBE);
+    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.HOLDING_CONE);
   }
 
   private void initSmartDashboard() {
