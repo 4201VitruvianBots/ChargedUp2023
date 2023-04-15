@@ -73,6 +73,7 @@ public final class Constants {
 
   public static final class DIO {
     public static final int elevatorLowerLimitSwitch = 9;
+    public static final int resetWristSwitch = 8; // TODO: Update when switch is put on robot
   }
 
   public static final class CONSTANTS {
@@ -83,7 +84,7 @@ public final class Constants {
   public static final class ELEVATOR {
     // Elevator sim constants
     public static final DCMotor gearbox = DCMotor.getFalcon500(2);
-    public static final double gearRatio = 10.18; // Real value 15.7?
+    public static final double gearRatio = 8.82; // Real value 15.7?
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
@@ -93,8 +94,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(80);
-    public static final double kMaxAccel = Units.inchesToMeters(90);
+    public static final double kMaxVel = Units.inchesToMeters(238);
+    public static final double kMaxAccel = Units.inchesToMeters(520);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -129,10 +130,10 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(23.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(26.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(38.0)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(40.0)),
+      SCORE_MID_CONE(Units.inchesToMeters(25.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(29.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(45.5)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(44.0)),
       INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
@@ -193,6 +194,24 @@ public final class Constants {
       CONE
     }
 
+    public enum VELOCITYTHRESHOLDS {
+      // Units are in raw motor velocity units
+      CONE_MIN(8000),
+      CONE_MAX(10000),
+      CUBE_MIN(-6000),
+      CUBE_MAX(-8000);
+
+      private final double value;
+
+      VELOCITYTHRESHOLDS(final double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
+
     public enum INTAKE_SPEEDS {
       // Units are in Percent Output
       INTAKING_CONE(0.6),
@@ -247,7 +266,7 @@ public final class Constants {
     public static final Color8Bit yellow = new Color8Bit(150, 120, 0);
     public static final Color8Bit purple = new Color8Bit(128, 0, 128);
     public static final Color8Bit orange = new Color8Bit(247, 116, 40);
-    public static final Color8Bit pink = new Color8Bit(255, 117, 140);
+    public static final Color8Bit pink = new Color8Bit(170, 40, 55);
     public static final Color8Bit white = new Color8Bit(125, 125, 125);
     public static final Color8Bit turquoise = new Color8Bit(24, 94, 89);
   }
@@ -271,10 +290,10 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 0;
-    public static double frontRightCANCoderOffset = 0;
-    public static double backLeftCANCoderOffset = 0;
-    public static double backRightCANCoderOffset = 0;
+    public static double frontLeftCANCoderOffset = 125.068;
+    public static double frontRightCANCoderOffset = 136.934;
+    public static double backLeftCANCoderOffset = 190.635;
+    public static double backRightCANCoderOffset = 31.904;
 
     public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
@@ -413,14 +432,14 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(90.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-14.1)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(13.5)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(125.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(135.0)),
       SCORE_MID_CUBE(Units.degreesToRadians(130.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(140.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(128.0)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(145.0)),
       INTAKING_EXTENDED_CONE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
@@ -486,7 +505,7 @@ public final class Constants {
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
-    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(115.0);
 
     public static boolean limitCanUtilization = false;
 
@@ -508,6 +527,7 @@ public final class Constants {
       SCORE_LOW_CONE(ZONE.ALPHA),
       SCORE_LOW_CUBE(ZONE.ALPHA),
       ALPHA_ZONE(ZONE.ALPHA),
+      WRIST_IS_RESET(ZONE.ALPHA),
       // MID
       BETA_ZONE(ZONE.BETA),
       SCORE_MID(ZONE.BETA),
@@ -614,10 +634,10 @@ public final class Constants {
     // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 124.980; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 167.432; // 41.748;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 136.934; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
-    SWERVE_DRIVE.backRightCANCoderOffset = 31.816;
+    SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
   }
 
   private static void initAlpha() {

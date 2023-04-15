@@ -147,8 +147,8 @@ public class RunElevatorTestMode extends CommandBase {
 
     if (testMaxVel != newMaxVel || testMaxAccel != newMaxAccel) {
       m_elevator.setTrapezoidalConstraints(newMaxVel, newMaxAccel);
-      testMaxVel = newKG;
-      testMaxAccel = newKV;
+      testMaxVel = newMaxVel;
+      testMaxAccel = newMaxAccel;
     }
 
     m_elevator.setDesiredPositionMeters(newSetpoint);

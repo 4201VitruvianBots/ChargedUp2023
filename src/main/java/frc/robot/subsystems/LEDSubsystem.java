@@ -148,6 +148,9 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   public void expressState(SUPERSTRUCTURE_STATE state) {
     if (state != currentRobotState) {
       switch (state) {
+        case WRIST_IS_RESET:
+          setPattern(LED.pink, 0, 0, ANIMATION_TYPE.Solid); // Flashing Pink
+          break;
         case INTAKE_LOW_CONE:
           setPattern(LED.yellow, 0, 0, ANIMATION_TYPE.Strobe); // Flashing Yellow
           break;
@@ -157,6 +160,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case ALPHA_ZONE:
         case SCORE_LOW_REVERSE:
         case SCORE_LOW:
+        case SCORE_LOW_CUBE:
         case SCORE_LOW_CONE:
           setPattern(LED.turquoise, 0, 0, ANIMATION_TYPE.Solid); // Solid Turquoise
           break;
