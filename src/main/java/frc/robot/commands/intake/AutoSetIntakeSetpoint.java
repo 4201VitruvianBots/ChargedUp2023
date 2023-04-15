@@ -43,7 +43,6 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_vision.setPipeline(CAMERA_SERVER.INTAKE, 1.0);
     m_intake.setPercentOutput(m_setpoint.get());
       m_swerve.enableHeadingTarget(true);
       m_swerve.setRobotHeadingRadians(

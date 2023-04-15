@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.AUTOTIMES.WAIT;
 import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
@@ -50,25 +51,30 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
-                .withTimeout(2),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE, vision, swerveDrive).withTimeout(2)),
-        new WaitCommand(0.6),
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE, vision, swerveDrive)
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
         /** Outakes cone */
-        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE, vision, swerveDrive).withTimeout(1),
+        new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
+        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE, vision, swerveDrive)
+            .withTimeout(WAIT.SCORING_CONE.get()),
+        new WaitCommand(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.8),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive).withTimeout(1.8)),
-        new WaitCommand(0.75),
-        /** Runs Path with Intaking cube during */
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+                .withTimeout(WAIT.STOW_HIGH_CONE.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
+                .withTimeout(WAIT.STOW_HIGH_CONE.get())),
+                new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
+                
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
             new SequentialCommandGroup(
                 new WaitCommand(2),
                 new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CONE)
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
                         .withTimeout(0.5),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CONE, vision, swerveDrive)
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CUBE, vision, swerveDrive)
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),

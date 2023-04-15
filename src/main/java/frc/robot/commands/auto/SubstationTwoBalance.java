@@ -55,12 +55,19 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE, vision, swerveDrive)
                 .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
         /** Outakes cone */
+        new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
         new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE, vision, swerveDrive)
             .withTimeout(WAIT.SCORING_CONE.get()),
+        new WaitCommand(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.3),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive).withTimeout(0.3)),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+                .withTimeout(WAIT.STOW_HIGH_CONE.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
+                .withTimeout(WAIT.STOW_HIGH_CONE.get())),
+                new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
+
+
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
@@ -73,21 +80,26 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
-            new SequentialCommandGroup(
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-                new WaitCommand(0.5),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
-                    .withTimeout(1.4),
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE, vision, swerveDrive).withTimeout(1.4))),
-
-        /** Brings elevator & wrist to High Pulls up cone */
-        new WaitCommand(0.4),
-        /** Outakes cone */
-        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CUBE, vision, swerveDrive).withTimeout(0.3),
-        /** Stows Wrist, Elevator, and Stops intake */
-        new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive).withTimeout(0.5)),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(WAIT.INTAKE_TO_STOW.get())
+            ),
+                new ParallelCommandGroup(
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
+                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE, vision, swerveDrive)
+                        .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
+                /** Outakes cone */
+                new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
+                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CUBE, vision, swerveDrive)
+                    .withTimeout(WAIT.SCORING_CUBE.get()),
+                new WaitCommand(WAIT.SCORING_CUBE.get()),
+                /** Stows Wrist, Elevator, and Stops intake */
+                new ParallelCommandGroup(
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+                        .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
+                        .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
+                        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
+                        
         swerveCommands.get(2),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

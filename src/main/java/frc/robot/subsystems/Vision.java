@@ -348,16 +348,16 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   public void searchforCube(CAMERA_SERVER location, double pipelineNeed) {
-      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
-        double pipeline = pipelineNeed;
-        setPipeline(location, pipeline);
-        if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
-          targetFound = INTAKE_STATE.CUBE;
-      }
-        if (getTargetArea(location) < 1.0) {
-          targetFound = INTAKE_STATE.NONE;
-        }
-      }
+      // if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
+      //   double pipeline = pipelineNeed;
+      //   setPipeline(location, pipeline);
+      //   if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
+      //     targetFound = INTAKE_STATE.CUBE;
+      // }
+      //   if (getTargetArea(location) < 1.0) {
+      //     targetFound = INTAKE_STATE.NONE;
+      //   }
+      // }
     }
 
   /*

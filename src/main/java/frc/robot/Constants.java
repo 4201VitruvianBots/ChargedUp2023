@@ -186,10 +186,10 @@ public final class Constants {
       SCORE_MID_CONE(0.7),
       SCORE_MID_CUBE(0.7),
 
-      WAIT_TO_PLACE_CONE(2), //good
-      WAIT_TO_PLACE_CUBE(2), //good
+      WAIT_TO_PLACE_CONE(1.7), //good
+      WAIT_TO_PLACE_CUBE(1.7), //good
 
-      SCORING_CONE(0.9), // good
+      SCORING_CONE(0.85), // good
       SCORING_CUBE(0.5), //good
 
 
@@ -257,7 +257,7 @@ public final class Constants {
       STOP(0),
       INTAKING_CUBE(-0.5),
       HOLDING_CUBE(-0.1),
-      SCORING_CUBE(0.1);
+      SCORING_CUBE(0.5);
 
       private final double value;
 
