@@ -30,9 +30,10 @@ import frc.robot.Constants.WRIST;
 // import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.ElevatorTimerTest;
+import frc.robot.commands.auto.HighConeTimerTest;
 import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.LimeLightTest;
+import frc.robot.commands.auto.SubstationThree;
 import frc.robot.commands.auto.SubstationTwo;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
@@ -322,7 +323,7 @@ public class RobotContainer implements AutoCloseable {
 
     m_autoChooser.addOption(
         "ElevatorTimerTest",
-        new ElevatorTimerTest(
+        new HighConeTimerTest(
             m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
@@ -337,17 +338,29 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-            m_autoChooser.addOption(
-              "RedSubstationTwo",
-              new SubstationTwo(
-                  "RedSubstationTwo",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_vision,
-                  m_elevator,
-                  m_stateHandler));
+    m_autoChooser.addOption(
+        "SubstationThree",
+        new SubstationThree(
+            "SubstationThree",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "SubstationTwoBalance",
@@ -407,9 +420,10 @@ public class RobotContainer implements AutoCloseable {
         new DriveForward(
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
-            m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "Limelight Test",
-        new LimeLightTest(m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+        new LimeLightTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 

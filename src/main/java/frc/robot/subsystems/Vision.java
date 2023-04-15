@@ -323,12 +323,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       setPipeline(location, pipeline);
       // Try to find cube
       if (pipeline == 1) {
-        if (getTargetArea(location) > 3.0)
-          limelightState = INTAKE_STATE.CUBE;
+        if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.CUBE;
       }
       if (pipeline == 2) {
-        if (getTargetArea(location) > 3.0)
-          limelightState = INTAKE_STATE.CONE;
+        if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.CONE;
       }
     }
 
@@ -348,17 +346,17 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   public void searchforCube(CAMERA_SERVER location, double pipelineNeed) {
-      // if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
-      //   double pipeline = pipelineNeed;
-      //   setPipeline(location, pipeline);
-      //   if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
-      //     targetFound = INTAKE_STATE.CUBE;
-      // }
-      //   if (getTargetArea(location) < 1.0) {
-      //     targetFound = INTAKE_STATE.NONE;
-      //   }
-      // }
-    }
+    // if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
+    //   double pipeline = pipelineNeed;
+    //   setPipeline(location, pipeline);
+    //   if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
+    //     targetFound = INTAKE_STATE.CUBE;
+    // }
+    //   if (getTargetArea(location) < 1.0) {
+    //     targetFound = INTAKE_STATE.NONE;
+    //   }
+    // }
+  }
 
   /*
    * Collects transformation/rotation data from limelight

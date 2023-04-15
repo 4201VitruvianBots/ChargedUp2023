@@ -15,13 +15,15 @@ import frc.robot.subsystems.Vision;
 public class AutoSetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
+
   private final Vision m_vision;
   private final SwerveDrive m_swerve;
 
   private INTAKE.INTAKE_SPEEDS m_setpoint;
 
   /** Creates a new RunIntake. */
-  public AutoSetIntakeSetpoint(Intake intake, INTAKE.INTAKE_SPEEDS setpoint, Vision vision, SwerveDrive swerve) {
+  public AutoSetIntakeSetpoint(
+      Intake intake, INTAKE.INTAKE_SPEEDS setpoint, Vision vision, SwerveDrive swerve) {
     m_intake = intake;
     m_setpoint = setpoint;
     m_vision = vision;
@@ -35,7 +37,7 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   public void initialize() {
     if (m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
       m_intake.setIntakeStateCone(true);
-    } else if ( m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
+    } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
       m_intake.setIntakeStateCube(true);
     }
   }
@@ -44,14 +46,13 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   @Override
   public void execute() {
     m_intake.setPercentOutput(m_setpoint.get());
-      m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeadingRadians(
-          m_swerve
-              .getHeadingRotation2d()
-              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-              .getRadians());
-              System.out.println("We see cube");
-
+    m_swerve.enableHeadingTarget(true);
+    m_swerve.setRobotHeadingRadians(
+        m_swerve
+            .getHeadingRotation2d()
+            .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+            .getRadians());
+    System.out.println("We see cube");
   }
 
   // Called once the command ends or is interrupted.

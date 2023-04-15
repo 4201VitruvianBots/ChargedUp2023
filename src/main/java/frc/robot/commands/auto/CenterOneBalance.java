@@ -63,8 +63,7 @@ public class CenterOneBalance extends SequentialCommandGroup {
                 .withTimeout(WAIT.STOW_HIGH_CONE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
                 .withTimeout(WAIT.STOW_HIGH_CONE.get())),
-                new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
-                
+        new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
         swerveCommands.get(0),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

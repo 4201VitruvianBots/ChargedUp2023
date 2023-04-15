@@ -12,7 +12,8 @@ import frc.robot.subsystems.StateHandler;
 public class SetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
-  private final StateHandler m_StateHandler; 
+
+  private final StateHandler m_StateHandler;
 
   private final INTAKE_SPEEDS m_speed;
 
@@ -29,20 +30,18 @@ public class SetIntakeSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double speedcheck = m_speed.get(); 
+    double speedcheck = m_speed.get();
     if (speedcheck > 0.0) {
-        m_intake.setIntakeStateCone(true);
-        m_intake.setIntakeStateCube(false);
-      }
-      else if (speedcheck < 0.0) {
-        m_intake.setIntakeStateCone(false);
-        m_intake.setIntakeStateCube(true);
-  } else {
-    m_intake.setIntakeStateCone(false);
-    m_intake.setIntakeStateCube(false);
+      m_intake.setIntakeStateCone(true);
+      m_intake.setIntakeStateCube(false);
+    } else if (speedcheck < 0.0) {
+      m_intake.setIntakeStateCone(false);
+      m_intake.setIntakeStateCube(true);
+    } else {
+      m_intake.setIntakeStateCone(false);
+      m_intake.setIntakeStateCube(false);
+    }
   }
-}
-
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

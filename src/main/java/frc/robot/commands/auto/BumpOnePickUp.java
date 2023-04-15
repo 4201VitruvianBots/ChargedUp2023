@@ -66,8 +66,8 @@ public class BumpOnePickUp extends SequentialCommandGroup {
                 .withTimeout(WAIT.STOW_HIGH_CONE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
                 .withTimeout(WAIT.STOW_HIGH_CONE.get())),
-                new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
-                
+        new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
+
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
@@ -76,13 +76,15 @@ public class BumpOnePickUp extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
                         .withTimeout(2),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CUBE, vision, swerveDrive)
+                    new AutoSetIntakeSetpoint(
+                            intake, INTAKE_SPEEDS.INTAKING_CUBE, vision, swerveDrive)
                         .withTimeout(2)))),
 
         /** Stows and Stops Intake */
         new ParallelCommandGroup(
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE, vision, swerveDrive).withTimeout(0.5)),
+            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE, vision, swerveDrive)
+                .withTimeout(0.5)),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
