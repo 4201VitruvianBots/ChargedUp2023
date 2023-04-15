@@ -78,25 +78,23 @@ public class SwerveDriveTest extends CommandTestBase {
     joystick.setRawAxis(0, 0);
     joystick.setRawAxis(1, 1);
     joystick.notifyNewData();
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       CommandScheduler.getInstance().run();
       Timer.delay(0.02);
     }
 
-    assertTrue(
-            m_swerveDrive.getOdometry().getEstimatedPosition().getX() > 0);
+    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getX() > 0);
 
     joystick.setRawAxis(0, -1);
     joystick.setRawAxis(1, 0);
     joystick.notifyNewData();
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       CommandScheduler.getInstance().run();
       Timer.delay(0.02);
     }
 
     System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY());
-    assertTrue(
-            m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
+    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
   }
 
   @Test
@@ -109,7 +107,7 @@ public class SwerveDriveTest extends CommandTestBase {
     joystick.setRawAxis(0, 0);
     joystick.setRawAxis(1, 1);
     joystick.notifyNewData();
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       CommandScheduler.getInstance().run();
       Timer.delay(0.02);
     }
@@ -120,12 +118,11 @@ public class SwerveDriveTest extends CommandTestBase {
     joystick.setRawAxis(0, 1);
     joystick.setRawAxis(1, 0);
     joystick.notifyNewData();
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
       CommandScheduler.getInstance().run();
       Timer.delay(0.02);
     }
 
-    assertTrue(
-            m_swerveDrive.getOdometry().getEstimatedPosition().getY() > 0);
+    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() > 0);
   }
 }
