@@ -313,17 +313,12 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     }
   }
 
-
-  public void searchLimelightPipeline(CAMERA_SERVER location, INTAKE_STATE state) {
-    limelightState = state;
-    searchLimelightPipeline(CAMERA_SERVER location);
-  }
   /*
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     // Search
-    if (limelightState == INTAKE_STATE.NONE || limelightState == INTAKE_STATE.INTAKING) {
+    if (limelightState == INTAKE_STATE.INTAKING) {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
