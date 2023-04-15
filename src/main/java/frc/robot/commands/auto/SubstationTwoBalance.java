@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
+import frc.robot.Constants.AUTOTIMES.WAIT;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
@@ -50,15 +51,17 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
-                .withTimeout(2),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE).withTimeout(2)),
-        new WaitCommand(0.6),
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CONE, vision, swerveDrive)
+                .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
         /** Outakes cone */
-        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE).withTimeout(1),
+        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CONE, vision, swerveDrive)
+            .withTimeout(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.4),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP).withTimeout(1.65)),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.3),
+            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
+                .withTimeout(0.3)),
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
@@ -67,25 +70,29 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
                         .withTimeout(0.5),
-                    new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CUBE)
+                    new AutoSetIntakeSetpoint(
+                            intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)
                         .withTimeout(0.5)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
             new SequentialCommandGroup(
                 new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
                 new WaitCommand(0.5),
-                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
-                    .withTimeout(2),
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CUBE).withTimeout(2))),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
+                    .withTimeout(1.4),
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
+                    .withTimeout(1.4))),
 
         /** Brings elevator & wrist to High Pulls up cone */
-        new WaitCommand(0.8),
+        new WaitCommand(0.4),
         /** Outakes cone */
-        new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CUBE).withTimeout(0.3),
+        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
+            .withTimeout(0.3),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.75),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP).withTimeout(1.75)),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
+            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
+                .withTimeout(0.5)),
         swerveCommands.get(2),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

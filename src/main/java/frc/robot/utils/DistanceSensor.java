@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.INTAKE.SENSOR_STATUS;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.simulation.SimConstants;
@@ -172,14 +173,14 @@ public class DistanceSensor implements AutoCloseable {
     double cubeSensorValue = getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
 
     switch (gamePiece) {
-      case CONE:
+      case HOLDING_CONE:
         // Reading cone sensors if cone in intake detected
         distanceMeters =
             leftConeSensorValue
                 + ((INTAKE.innerIntakeWidth + leftConeSensorValue - rightConeSensorValue) / 2)
                 - (INTAKE.innerIntakeWidth / 2);
         break;
-      case CUBE:
+      case HOLDING_CUBE:
         // Reading cube sensors if cube in intake detected
         distanceMeters =
             cubeSensorValue + (SimConstants.cubeWidth / 2) - (INTAKE.innerIntakeWidth / 2);
@@ -202,11 +203,11 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.CONE);
+    return getGamepieceDistanceInches(INTAKE_STATE.INTAKING_CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.CUBE);
+    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.HOLDING_CONE);
   }
 
   private void initSmartDashboard() {

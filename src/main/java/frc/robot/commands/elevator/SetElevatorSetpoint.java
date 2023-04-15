@@ -35,6 +35,7 @@ public class SetElevatorSetpoint extends CommandBase {
   @Override
   public void initialize() {
     m_elevator.setClosedLoopControlMode(CONTROL_MODE.CLOSED_LOOP);
+    m_elevator.setUserSetpoint(true);
     m_elevator.setDesiredPositionMeters(m_setpoint);
   }
 
@@ -49,7 +50,9 @@ public class SetElevatorSetpoint extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_elevator.setUserSetpoint(false);
+  }
 
   // Returns true when the command should end.
   @Override

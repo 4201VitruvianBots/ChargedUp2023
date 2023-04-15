@@ -21,13 +21,18 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.STATE_HANDLER.*;
+import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.commands.statehandler.ToggleTestIntakeState;
@@ -42,12 +47,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
    */
   private SCORING_STATE m_scoringState = SCORING_STATE.STOWED;
 
-  private INTAKE_STATE m_currentIntakeState = INTAKE_STATE.NONE;
   private double m_wristOffset = 0;
   private SUPERSTRUCTURE_STATE m_currentState = SUPERSTRUCTURE_STATE.STOWED;
   private SUPERSTRUCTURE_STATE m_currentDisplayedState = m_currentState;
   private SUPERSTRUCTURE_STATE m_lastState = m_currentState;
   private SUPERSTRUCTURE_STATE m_desiredState = m_currentState;
+  private SETPOINT m_desiredSetpoint = SETPOINT.STOWED;
   private ZONE m_currentZone = ZONE.UNDEFINED;
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
@@ -59,6 +64,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
+  private double startTime = 0;
 
   private double m_elevatorDesiredSetpointMeters;
   private double m_wristDesiredSetpointRadians;
@@ -190,6 +196,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return m_currentZone;
   }
 
+  public boolean isScoring() {
+    return getDesiredSetpoint() != SETPOINT.SCORE_MID_CONE
+        || getDesiredSetpoint() != SETPOINT.SCORE_MID_CUBE
+        || getDesiredSetpoint() != SETPOINT.SCORE_HIGH_CONE
+        || getDesiredSetpoint() != SETPOINT.SCORE_HIGH_CUBE;
+  }
+
   public void setTestScoringState(boolean state) {
     m_testScoringState = state;
   }
@@ -202,7 +215,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (m_testScoringState) {
       m_scoringState = m_scoringStateChooser.getSelected();
     } else {
-      var intakeState = m_intake.getHeldGamepiece();
+      var intakeState = m_intake.getIntakeState();
 
       if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_LOW_REVERSE)
         m_scoringState = SCORING_STATE.LOW_REVERSE;
@@ -211,12 +224,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
         m_scoringState = SCORING_STATE.LOW;
       else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE) {
-        if (intakeState == INTAKE_STATE.CONE) m_scoringState = SCORING_STATE.MID_CONE;
-        else if (intakeState == INTAKE_STATE.CUBE) m_scoringState = SCORING_STATE.MID_CUBE;
+        if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.MID_CONE;
+        else if (intakeState == INTAKE_STATE.INTAKING_CUBE) m_scoringState = SCORING_STATE.MID_CUBE;
       } else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
-        if (intakeState == INTAKE_STATE.CONE) m_scoringState = SCORING_STATE.HIGH_CONE;
-        else if (intakeState == INTAKE_STATE.CUBE) m_scoringState = SCORING_STATE.HIGH_CUBE;
+        if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.HIGH_CONE;
+        else if (intakeState == INTAKE_STATE.INTAKING_CUBE)
+          m_scoringState = SCORING_STATE.HIGH_CUBE;
       } else {
         m_scoringState = SCORING_STATE.STOWED;
       }
@@ -265,6 +279,51 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public static double getSimDt() {
     return getCurrentSimTime() - getLastSimTime();
+  }
+
+  // Sets desired setpoint from setpoint enums created, clamps the setpoints before settings based
+  // on local limits which are based on the current zone
+  public void setDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
+    m_desiredSetpoint = desiredSetpoint;
+    SetElevatorDesiredSetpoint(desiredSetpoint);
+    SetWristDesiredSetpoint(desiredSetpoint);
+  }
+
+  public void SetWristDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
+    m_wristDesiredSetpointRadians = desiredSetpoint.getWristSetpointRadians();
+  }
+
+  public void SetElevatorDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
+    m_elevatorDesiredSetpointMeters = desiredSetpoint.getElevatorSetpointMeters();
+  }
+
+  public STATE_HANDLER.SETPOINT getDesiredSetpoint() {
+    return m_desiredSetpoint;
+  }
+
+  private void updateCommandedSetpoints() {
+    if (m_isStateHandlerEnabled) {
+      setElevatorCommandedSetpoint();
+      setWristCommandedSetpoint();
+    }
+  }
+
+  private void setElevatorCommandedSetpoint() {
+    if ((m_currentState.getZone() == m_desiredState.getZone())
+        || (m_wrist.getPositionRadians() >= universalWristLowerLimitRadians
+            && m_wrist.getPositionRadians() <= universalWristUpperLimitRadians)) {
+      m_elevator.setDesiredPositionMeters(
+          MathUtil.clamp(
+              m_elevatorDesiredSetpointMeters,
+              ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
+              ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()));
+    }
+  }
+
+  private void setWristCommandedSetpoint() {
+    m_wrist.setSetpointPositionRadians(
+        MathUtil.clamp(
+            m_wristDesiredSetpointRadians, wristLowerLimitRadians, wristUpperLimitRadians));
   }
 
   // Determines the current state based off current wrist/elevator positions.
@@ -399,46 +458,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  // Sets desired setpoint from setpoint enums created, clamps the setpoints before settings based
-  // on local limits which are based on the current zone
-  public void setDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
-    SetElevatorDesiredSetpoint(desiredSetpoint);
-    SetWristDesiredSetpoint(desiredSetpoint);
-  }
-
-  public void SetWristDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
-    m_wristDesiredSetpointRadians = desiredSetpoint.getWristSetpointRadians();
-  }
-
-  public void SetElevatorDesiredSetpoint(STATE_HANDLER.SETPOINT desiredSetpoint) {
-    m_elevatorDesiredSetpointMeters = desiredSetpoint.getElevatorSetpointMeters();
-  }
-
-  private void updateCommandedSetpoints() {
-    if (m_isStateHandlerEnabled) {
-      setElevatorCommandedSetpoint();
-      setWristCommandedSetpoint();
-    }
-  }
-
-  private void setElevatorCommandedSetpoint() {
-    if ((m_currentState.getZone() == m_desiredState.getZone())
-        || (m_wrist.getPositionRadians() >= universalWristLowerLimitRadians
-            && m_wrist.getPositionRadians() <= universalWristUpperLimitRadians)) {
-      m_elevator.setDesiredPositionMeters(
-          MathUtil.clamp(
-              m_elevatorDesiredSetpointMeters,
-              ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
-              ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get()));
-    }
-  }
-
-  private void setWristCommandedSetpoint() {
-    m_wrist.setSetpointPositionRadians(
-        MathUtil.clamp(
-            m_wristDesiredSetpointRadians, wristLowerLimitRadians, wristUpperLimitRadians));
-  }
-
   public void updateZoneLimits() {
     switch (m_currentState.getZone()) {
       case ALPHA:
@@ -481,6 +500,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
                     m_swerveDrive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
+  }
+
+  public void StowWrist() {
+    // Get an average of the intake velocity over the last 0.1 seconds
+    // If the average is within our range, we set to stowed
+    // if (m_intake.finishedIntaking(m_desiredState))
+    //   setDesiredSetpoint(SETPOINT.STOWED);
   }
 
   private void initSmartDashboard() {
@@ -569,19 +595,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
-    }
-
-    // TODO: Update this based on Intake sensors
-    switch (m_currentIntakeState) {
-      case CONE:
-        break;
-      case CUBE:
-        break;
-      case INTAKING:
-        break;
-      default:
-      case NONE:
-        break;
     }
 
     if (m_smartScoringEnabled) {

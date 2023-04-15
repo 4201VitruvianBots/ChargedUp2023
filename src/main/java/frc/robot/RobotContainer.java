@@ -29,9 +29,7 @@ import frc.robot.Constants.WRIST;
 import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
-import frc.robot.commands.intake.RunIntakeCone;
-import frc.robot.commands.intake.RunIntakeCube;
-import frc.robot.commands.intake.SetIntakeMode;
+import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetConditionalSetpoint;
@@ -159,8 +157,20 @@ public class RobotContainer implements AutoCloseable {
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
 
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
+    xboxController
+        .leftTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
+                () -> m_stateHandler.isScoring()));
+    xboxController
+        .rightTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
+                () -> m_stateHandler.isScoring()));
 
     // Score button Bindings
 
@@ -226,7 +236,9 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -239,7 +251,9 @@ public class RobotContainer implements AutoCloseable {
                       m_stateHandler.getCurrentState().getZone()
                           == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
@@ -324,6 +338,11 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
     m_autoChooser.addOption(
+        "ElevatorTimerTest",
+        new ElevatorTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
+    m_autoChooser.addOption(
         "SubstationTwo",
         new SubstationTwo(
             "SubstationTwo",
@@ -347,17 +366,17 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-    m_autoChooser.addOption(
-        "CenterOneBalance",
-        new CenterOneBalance(
-            "CenterOneBalance",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision,
-            m_stateHandler));
+    // m_autoChooser.addOption(
+    //     "CenterOneBalance",
+    //     new CenterOneBalance(
+    //         "CenterOneBalance",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_elevator,
+    //         m_vision,
+    //         m_stateHandler));
 
     m_autoChooser.addOption(
         "CenterOneBalanceCross",
@@ -376,10 +395,27 @@ public class RobotContainer implements AutoCloseable {
         new JustBalance(
             "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
+    // m_autoChooser.addOption(
+    //     "BumpOnePickUp",
+    //     new BumpOnePickUp(
+    //         "BumpOnePickUp",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator,
+    //         m_stateHandler));
+
     m_autoChooser.addOption(
-        "BumpOnePickUp",
-        new BumpOnePickUp(
-            "BumpOnePickUp",
+        "DriveForward",
+        new DriveForward(
+            "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
+
+    m_autoChooser.addOption(
+        "Limelight Test",
+        new LimeLightTest(
+            "DriveForward",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -387,11 +423,6 @@ public class RobotContainer implements AutoCloseable {
             m_vision,
             m_elevator,
             m_stateHandler));
-
-    m_autoChooser.addOption(
-        "DriveForward",
-        new DriveForward(
-            "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 

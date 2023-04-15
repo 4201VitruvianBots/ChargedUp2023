@@ -54,17 +54,17 @@ public class SetConditionalSetpoint extends CommandBase {
   public void execute() {
     switch (m_desiredState) {
       case INTAKE_EXTENDED:
-        if (m_intake.getIntakeMode() == INTAKE_STATE.CUBE)
+        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
           m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CONE);
         break;
       case HIGH:
-        if (m_intake.getIntakeMode() == INTAKE_STATE.CUBE)
+        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
           m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_HIGH_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_HIGH_CONE);
         break;
       case MID:
-        if (m_intake.getIntakeMode() == INTAKE_STATE.CUBE)
+        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
           m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_MID_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_MID_CONE);
         break;
