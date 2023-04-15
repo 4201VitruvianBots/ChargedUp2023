@@ -318,14 +318,15 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
-      int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
+      // int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
+      double pipeline = getPipeline(location);
 
       // threshold to find game object
       if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
         setPipeline(location, pipeline);
-        if (getTargetArea(location) > 3.0 && pipeline == 1) {
+        if (getTargetArea(location) > 3.0 && pipeline == 1.0) {
           targetFound = INTAKE_STATE.CUBE;
-        } else if (getTargetArea(location) > 3.0 && pipeline == 2) {
+        } else if (getTargetArea(location) > 3.0 && pipeline == 2.0) {
           targetFound = INTAKE_STATE.CONE;
         }
       }
@@ -333,13 +334,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       // threshold to lose game object once it's found
       if (targetFound == INTAKE_STATE.CUBE) {
         if (getTargetArea(location) < 2.0) {
-          reconnectLimelightPipeline(location);
+          // reconnectLimelightPipeline(location);
           targetFound = INTAKE_STATE.NONE;
         }
       }
       if (targetFound == INTAKE_STATE.CONE) {
         if (getTargetArea(location) < 2.0) {
-          reconnectLimelightPipeline(location);
+          // reconnectLimelightPipeline(location);
           targetFound = INTAKE_STATE.NONE;
         }
       }
