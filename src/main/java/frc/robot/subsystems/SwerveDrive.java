@@ -226,13 +226,14 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   public void setOdometry(Pose2d pose) {
     m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
-    if(RobotBase.isSimulation()) {
+    if (RobotBase.isSimulation()) {
       m_pigeon.getSimCollection().setRawHeading(pose.getRotation().getDegrees());
-    } else
-      m_pigeon.setYaw(pose.getRotation().getDegrees());
+    } else m_pigeon.setYaw(pose.getRotation().getDegrees());
 
-    for(var position:SWERVE_MODULE_POSITION.values()) {
-      var transform = new Transform2d(SWERVE_DRIVE.kModuleTranslations.get(position), Rotation2d.fromDegrees(0));
+    for (var position : SWERVE_MODULE_POSITION.values()) {
+      var transform =
+          new Transform2d(
+              SWERVE_DRIVE.kModuleTranslations.get(position), Rotation2d.fromDegrees(0));
       var modulePose = pose.plus(transform);
       getSwerveModule(position).resetAngle(pose.getRotation().getDegrees());
       getSwerveModule(position).setModulePose(modulePose);

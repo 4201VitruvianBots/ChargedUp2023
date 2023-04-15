@@ -94,8 +94,8 @@ public final class Constants {
     public static final int mech2dAngleDegrees = 35;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(280);
-    public static final double kMaxAccel = Units.inchesToMeters(600);
+    public static final double kMaxVel = Units.inchesToMeters(238);
+    public static final double kMaxAccel = Units.inchesToMeters(520);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -130,10 +130,10 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(25.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(28.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(43.0)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(44.0)),
+      SCORE_MID_CONE(Units.inchesToMeters(26.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(46.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
       INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
@@ -177,43 +177,6 @@ public final class Constants {
     }
   }
 
-  public static class AUTOTIMES {
-
-    public enum WAIT {
-
-      SCORE_HIGH_CONE(0.65), //good
-      SCORE_HIGH_CUBE(0.65), //good
-      SCORE_MID_CONE(0.7),
-      SCORE_MID_CUBE(0.7),
-
-      WAIT_TO_PLACE_CONE(1.7), //good
-      WAIT_TO_PLACE_CUBE(1.7), //good
-
-      SCORING_CONE(0.85), // good
-      SCORING_CUBE(0.5), //good
-
-
-      STOW_HIGH_CONE(0.55), // good
-      STOW_HIGH_CUBE(0.55), //good
-
-      STOW_MID_CONE(0.3),
-      STOW_MID_CUBE(0.3),
-
-      INTAKE_TO_STOW(0.5); // good
-
-
-      public double value;
-
-      WAIT(double value) {
-        this.value = value;
-      }
-
-      public double get() {
-        return value;
-      }
-    }
-  }
-
   public static final class INTAKE {
     public static final double innerIntakeWidth = Units.inchesToMeters(15.5);
     public static final int leftConeSensorId = 1;
@@ -224,15 +187,10 @@ public final class Constants {
     public static double kF = 0;
     public static double kP = 0.2;
 
-    public enum INTAKE_STATE {
-      NONE,
-      INTAKING,
-      CUBE,
-      CONE
-    }
-
-    public enum VELOCITYTHRESHOLDS {
+    public enum VELOCITY_THRESHOLDS {
       // Units are in raw motor velocity units
+      NONE_MIN(9000),
+      NONE_MAX(11000),
       CONE_MIN(8000),
       CONE_MAX(10000),
       CUBE_MIN(-6000),
@@ -240,7 +198,7 @@ public final class Constants {
 
       private final double value;
 
-      VELOCITYTHRESHOLDS(final double value) {
+      VELOCITY_THRESHOLDS(final double value) {
         this.value = value;
       }
 
@@ -249,19 +207,19 @@ public final class Constants {
       }
     }
 
-    public enum INTAKE_SPEEDS {
+    public enum INTAKE_STATE {
       // Units are in Percent Output
+      NONE(0),
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
-      STOP(0),
       INTAKING_CUBE(-0.5),
       HOLDING_CUBE(-0.1),
       SCORING_CUBE(0.5);
 
       private final double value;
 
-      INTAKE_SPEEDS(final double value) {
+      INTAKE_STATE(final double value) {
         this.value = value;
       }
 
@@ -303,7 +261,7 @@ public final class Constants {
     public static final Color8Bit yellow = new Color8Bit(150, 120, 0);
     public static final Color8Bit purple = new Color8Bit(128, 0, 128);
     public static final Color8Bit orange = new Color8Bit(247, 116, 40);
-    public static final Color8Bit pink = new Color8Bit(255, 117, 140);
+    public static final Color8Bit pink = new Color8Bit(190, 30, 35);
     public static final Color8Bit white = new Color8Bit(125, 125, 125);
     public static final Color8Bit turquoise = new Color8Bit(24, 94, 89);
   }
@@ -328,7 +286,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 153.721;
+    public static double frontRightCANCoderOffset = 114.961;
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
@@ -468,7 +426,7 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(90.0)),
+      STOWED(Units.degreesToRadians(95.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
@@ -476,7 +434,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.degreesToRadians(135.0)),
       SCORE_MID_CUBE(Units.degreesToRadians(130.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(135.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(128.0)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(145.0)),
       INTAKING_EXTENDED_CONE(SCORE_HIGH_CONE.get()),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
@@ -542,7 +500,7 @@ public final class Constants {
     public static final double wristSetpointTolerance = Units.degreesToRadians(4);
 
     public static final double universalWristLowerLimitRadians = Units.degreesToRadians(25.0);
-    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(125.0);
+    public static final double universalWristUpperLimitRadians = Units.degreesToRadians(115.0);
 
     public static boolean limitCanUtilization = false;
 
@@ -639,11 +597,46 @@ public final class Constants {
   public static class AUTO {
     public static double kAutoBalanceTimeout = 2.0;
     public static final double kAutoBalanceAngleThresholdDegrees = 1.5;
+
+    public enum WAIT {
+      SCORE_HIGH_CONE(0.65), // good
+      SCORE_HIGH_CUBE(0.65), // good
+      SCORE_MID_CONE(0.7),
+      SCORE_MID_CUBE(0.7),
+
+      WAIT_TO_PLACE_CONE(2), // good
+      WAIT_TO_PLACE_CUBE(2), // good
+
+      SCORING_CONE(0.9), // good
+      SCORING_CUBE(0.5), // good
+
+      STOW_HIGH_CONE(0.55), // good
+      STOW_HIGH_CUBE(0.55), // good
+
+      STOW_MID_CONE(0.3),
+      STOW_MID_CUBE(0.3),
+
+      INTAKE_TO_STOW(0.5); // good
+
+      public double value;
+
+      WAIT(double value) {
+        this.value = value;
+      }
+
+      public double get() {
+        return value;
+      }
+    }
   }
 
   public enum CONTROL_MODE {
     OPEN_LOOP,
     CLOSED_LOOP
+  }
+
+  public static class UTIL {
+    public static final String tempFileName = "initialize";
   }
 
   public enum SCORING_STATE {
@@ -668,15 +661,13 @@ public final class Constants {
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 153.721; // 41.748;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 114.961; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
-
   }
 
   private static void initAlpha() {
     robotName = "Alpha";
-
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;

@@ -160,6 +160,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         case ALPHA_ZONE:
         case SCORE_LOW_REVERSE:
         case SCORE_LOW:
+        case SCORE_LOW_CUBE:
         case SCORE_LOW_CONE:
           setPattern(LED.turquoise, 0, 0, ANIMATION_TYPE.Solid); // Solid Turquoise
           break;

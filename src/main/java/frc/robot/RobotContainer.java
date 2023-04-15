@@ -26,25 +26,15 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-// import frc.robot.commands.auto.BumpOnePickUp;
-// import frc.robot.commands.auto.CenterOneBalance;
-import frc.robot.commands.auto.CenterOneBalanceCross;
-import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.ElevatorTimerTest;
-import frc.robot.commands.auto.JustBalance;
-import frc.robot.commands.auto.LimeLightTest;
-import frc.robot.commands.auto.SubstationTwo;
-import frc.robot.commands.auto.SubstationTwoBalance;
-import frc.robot.commands.auto.TestSimAuto;
+import frc.robot.commands.auto.*;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
-import frc.robot.commands.intake.RunIntakeCone;
-import frc.robot.commands.intake.RunIntakeCube;
-import frc.robot.commands.intake.SetIntakeMode;
+import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetConditionalSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.statehandler.ZeroAllSensors;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -107,6 +97,7 @@ public class RobotContainer implements AutoCloseable {
     initializeSubsystems();
     m_logger.pause();
     configureBindings();
+    resetSubsystemPositions();
 
     initializeAutoChooser();
   }
@@ -122,7 +113,8 @@ public class RobotContainer implements AutoCloseable {
     // Control elevator height by moving the joystick up and down
     m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
-    m_led.setDefaultCommand(new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist));
+    m_led.setDefaultCommand(
+        new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist, m_elevator));
 
     SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
     SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
@@ -130,6 +122,16 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
       SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
+    }
+  }
+
+  private void resetSubsystemPositions() {
+    if (!m_logManager.initTempExists()) {
+      ResetElevatorHeight resetElevator = new ResetElevatorHeight(m_elevator, 0);
+      ResetWristAngleDegrees resetWrist = new ResetWristAngleDegrees(m_wrist, -15.0);
+      resetElevator.execute();
+      resetWrist.execute();
+      m_logManager.createInitTempFile();
     }
   }
 
@@ -157,8 +159,20 @@ public class RobotContainer implements AutoCloseable {
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
 
-    xboxController.leftTrigger(0.1).whileTrue(new RunIntakeCone(m_intake, 0.9));
-    xboxController.rightTrigger(0.1).whileTrue(new RunIntakeCube(m_intake, 0.74));
+    xboxController
+        .leftTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
+                () -> m_stateHandler.isScoring()));
+    xboxController
+        .rightTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
+                () -> m_stateHandler.isScoring()));
 
     // Score button Bindings
 
@@ -201,9 +215,14 @@ public class RobotContainer implements AutoCloseable {
             new SetSetpoint(
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
+    xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE));
+    // TODO: Review this change
+    xboxController
+        .povDown()
+        .onTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE).withTimeout(.25));
+
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
-    xboxController.povLeft().whileTrue(new SetIntakeMode(m_intake, INTAKE_STATE.CUBE));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     // Will limit the speed of our elevator or wrist when the corresponding joystick
@@ -216,6 +235,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
     SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
     SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
+    SmartDashboard.putData(new ZeroAllSensors(m_elevator, m_wrist, m_swerveDrive));
     initTestController();
   }
 
@@ -223,7 +243,9 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new RunIntakeCone(m_intake, 0.64));
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -236,7 +258,9 @@ public class RobotContainer implements AutoCloseable {
                       m_stateHandler.getCurrentState().getZone()
                           == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new RunIntakeCube(m_intake, 0.64));
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
@@ -337,17 +361,17 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-            m_autoChooser.addOption(
-              "RedSubstationTwo",
-              new SubstationTwo(
-                  "RedSubstationTwo",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_vision,
-                  m_elevator,
-                  m_stateHandler));
+    m_autoChooser.addOption(
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "SubstationTwoBalance",
@@ -407,9 +431,17 @@ public class RobotContainer implements AutoCloseable {
         new DriveForward(
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
-            m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "Limelight Test",
-        new LimeLightTest(m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+        new LimeLightTest(
+            "DriveForward",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 
@@ -493,6 +525,10 @@ public class RobotContainer implements AutoCloseable {
 
   public FieldSim getFieldSim() {
     return m_fieldSim;
+  }
+
+  public Joystick getLeftJoystick() {
+    return leftJoystick;
   }
 
   //  public DistanceSensor getDistanceSensor() {

@@ -4,41 +4,45 @@
 
 package frc.robot.commands.intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.subsystems.Intake;
 
-public class SetIntakeMode extends CommandBase {
-  /** Creates a new SetCubeMode. */
+public class SetIntakeState extends CommandBase {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Intake m_intake;
 
-  private final INTAKE_STATE m_mode;
+  private final INTAKE_STATE m_speed;
 
-  public SetIntakeMode(Intake intake, INTAKE_STATE mode) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  private final Timer m_timer = new Timer();
+
+  /** Creates a new RunIntake. */
+  public SetIntakeState(Intake intake, INTAKE_STATE speed) {
     m_intake = intake;
-    m_mode = mode;
+    m_speed = speed;
+
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_intake.setIntakingState(m_speed);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_intake.setIntakeMode(m_mode);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_intake.setIntakeMode(INTAKE_STATE.CONE);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

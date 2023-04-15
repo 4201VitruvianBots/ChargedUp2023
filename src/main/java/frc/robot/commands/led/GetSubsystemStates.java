@@ -4,8 +4,10 @@
 
 package frc.robot.commands.led;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -19,6 +21,7 @@ public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LEDSubsystem m_led;
 
+  private final Elevator m_elevator;
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
   private final Wrist m_wrist;
@@ -27,11 +30,12 @@ public class GetSubsystemStates extends CommandBase {
 
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(
-      LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist) {
+      LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist, Elevator elevator) {
     m_led = led;
     m_stateHandler = stateHandler;
     m_intake = intake;
     m_wrist = wrist;
+    m_elevator = elevator;
     addRequirements(m_led);
   }
 
@@ -42,13 +46,14 @@ public class GetSubsystemStates extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isIntakingCone = m_intake.getIntakeConeState();
-    isIntakingCube = m_intake.getIntakeCubeState();
+    isIntakingCone = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
+    isIntakingCube = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
     // the prioritized state to be expressed to the LEDs
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (DriverStation.isDisabled()) {
-      if (Math.abs(m_wrist.getPositionDegrees() + 15.0) <= 0.5) {
+      if (Math.abs(m_wrist.getPositionDegrees() + 15.0) <= 0.5
+          && Units.metersToInches(m_elevator.getHeightMeters()) <= 0.5) {
         m_led.expressState(SUPERSTRUCTURE_STATE.WRIST_IS_RESET);
       } else {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
