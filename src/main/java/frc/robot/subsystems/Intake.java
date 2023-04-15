@@ -120,6 +120,10 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
 
+  public TalonFX getIntakeMotor() {
+    return intakeMotor;
+  }
+
   private void updateIntakeState() {
     if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
       if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CONE_MIN.get())
