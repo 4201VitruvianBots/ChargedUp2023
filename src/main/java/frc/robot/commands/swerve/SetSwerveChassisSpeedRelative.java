@@ -2,7 +2,7 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.subsystems.SwerveDrive;
 import java.util.function.DoubleSupplier;
 
@@ -37,7 +37,7 @@ public class SetSwerveChassisSpeedRelative extends CommandBase {
             m_throttleInput.getAsDouble(),
             m_strafeInput.getAsDouble(),
             m_rotationInput.getAsDouble());
-    var states = Constants.SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
 
     m_swerveDrive.setSwerveModuleStates(states, false);
   }

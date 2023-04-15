@@ -3,7 +3,8 @@ package frc.robot.commands.swerve;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import java.util.function.DoubleSupplier;
@@ -15,8 +16,7 @@ public class DriveForwardWithVisionInput extends CommandBase {
   private final DoubleSupplier m_throttleInput;
 
   private final PIDController strafePIDController =
-      new PIDController(
-          Constants.SWERVE_DRIVE.kP_Y, Constants.SWERVE_DRIVE.kI_Y, Constants.SWERVE_DRIVE.kD_Y);
+      new PIDController(SWERVE_DRIVE.kP_Y, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
 
   public DriveForwardWithVisionInput(
       SwerveDrive swerveDrive, Vision vision, DoubleSupplier throttleInput) {
@@ -36,13 +36,11 @@ public class DriveForwardWithVisionInput extends CommandBase {
   @Override
   public void execute() {
     double strafeOutput = 0;
-    if (m_vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE))
-      strafeOutput =
-          strafePIDController.calculate(
-              m_vision.getTargetXAngle(Constants.VISION.CAMERA_SERVER.INTAKE));
+    if (m_vision.getValidTarget(CAMERA_SERVER.INTAKE))
+      strafeOutput = strafePIDController.calculate(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE));
 
     var chassisSpeeds = new ChassisSpeeds(m_throttleInput.getAsDouble(), strafeOutput, 0);
-    var states = Constants.SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    var states = SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
 
     m_swerveDrive.setSwerveModuleStates(states, false);
   }

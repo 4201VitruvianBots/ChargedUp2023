@@ -5,7 +5,9 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.commands.InterruptingCommand;
 import frc.robot.commands.swerve.DriveForwardWithVisionInput;
 import frc.robot.commands.swerve.SetSwerveOdometry;
@@ -36,8 +38,8 @@ public class LimeLightTest extends SequentialCommandGroup {
         TrajectoryUtils.readTrajectory(
             pathName,
             new PathConstraints(
-                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5,
-                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5));
+                SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5,
+                SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5));
 
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
@@ -47,12 +49,12 @@ public class LimeLightTest extends SequentialCommandGroup {
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
-        new InstantCommand(() -> vision.setPipeline(Constants.VISION.CAMERA_SERVER.INTAKE, 2)),
+        new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, 2)),
         new InterruptingCommand(
             swerveCommands.get(0),
             new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.2)
-                .until(() -> intake.getIntakeState() == Constants.INTAKE.INTAKE_STATE.HOLDING_CONE),
-            () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)));
+                .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE),
+            () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)));
   }
 
   public List<PathPlannerTrajectory> getTrajectories() {
