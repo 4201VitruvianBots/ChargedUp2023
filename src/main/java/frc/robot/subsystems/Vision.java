@@ -34,8 +34,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   // Mech2d setup
   private MechanismLigament2d m_limelightLigament2d;
 
-  private final NetworkTable m_intakeNet;
-  private final NetworkTable outtake;
+  private final NetworkTable m_intakeNt;
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
   private final NetworkTable m_fLocalizer;
@@ -73,8 +72,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     m_controls = controls;
     m_intakeSub = intake;
 
-    m_intakeNet = NetworkTableInstance.getDefault().getTable("limelight");
-    outtake = NetworkTableInstance.getDefault().getTable("limelight");
+    m_intakeNt = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
     m_fLocalizer = NetworkTableInstance.getDefault().getTable("fusedLocalizer");
@@ -137,7 +135,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getValidTargetType(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("tv").getDouble(0);
+        return m_intakeNt.getEntry("tv").getDouble(0);
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("tv").getDouble(0);
       case RIGHT_LOCALIZER:
@@ -166,7 +164,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetXAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return -m_intakeNet.getEntry("tx").getDouble(0);
+        return -m_intakeNt.getEntry("tx").getDouble(0);
       default:
         return 0;
     }
@@ -178,7 +176,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetYAngle(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("ty").getDouble(0);
+        return m_intakeNt.getEntry("ty").getDouble(0);
       default:
         return 0;
     }
@@ -190,7 +188,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getCameraLatency(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("tl").getDouble(0);
+        return m_intakeNt.getEntry("tl").getDouble(0);
       default:
         return 0;
     }
@@ -202,7 +200,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getTargetArea(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("ta").getDouble(0);
+        return m_intakeNt.getEntry("ta").getDouble(0);
       default:
         return 0;
     }
@@ -229,7 +227,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public void setPipeline(CAMERA_SERVER location, double pipeline) {
     switch (location) {
       case INTAKE:
-        m_intakeNet.getEntry("pipeline").setDouble(pipeline);
+        m_intakeNt.getEntry("pipeline").setDouble(pipeline);
         break;
     }
   }
@@ -237,7 +235,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public double getPipeline(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
-        return m_intakeNet.getEntry("pipeline").getDouble(0);
+        return m_intakeNt.getEntry("pipeline").getDouble(0);
       default:
         return 0.0;
     }
