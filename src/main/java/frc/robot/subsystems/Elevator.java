@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.Constants.DIO;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.STATE_HANDLER;
 
@@ -51,8 +50,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_elevatorInitialized;
 
   // Initializing limit switch at bottom of elevator
-  private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
-  private boolean lowerLimitSwitchTriggered = false;
+  //  private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
+  //  private boolean lowerLimitSwitchTriggered = false;
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
 
@@ -241,7 +240,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Returns true if limit switch is activated
   public boolean getLimitSwitch() {
-    return !lowerLimitSwitch.get();
+    //    return !lowerLimitSwitch.get();
+    return false;
   }
 
   // Sets the perceived position of the motors
@@ -397,12 +397,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     /* Uses limit switch to act as a baseline
      * to reset the sensor position and height to improve accuracy
      */
-    if (getLimitSwitch() && !lowerLimitSwitchTriggered) {
-      setSensorPosition(0.0);
-      lowerLimitSwitchTriggered = true;
-    } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
-      lowerLimitSwitchTriggered = false;
-    }
+    //    if (getLimitSwitch() && !lowerLimitSwitchTriggered) {
+    //      setSensorPosition(0.0);
+    //      lowerLimitSwitchTriggered = true;
+    //    } else if (!getLimitSwitch() && lowerLimitSwitchTriggered) {
+    //      lowerLimitSwitchTriggered = false;
+    //    }
   }
 
   public void teleopInit() {
@@ -493,7 +493,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   @Override
   // Safely closes the subsystem
   public void close() throws Exception {
-    lowerLimitSwitch.close();
+    //    lowerLimitSwitch.close();
     if (m_elevatorLigament2d != null) m_elevatorLigament2d.close();
   }
 }

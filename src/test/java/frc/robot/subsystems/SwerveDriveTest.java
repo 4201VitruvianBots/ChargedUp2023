@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static utils.TestUtils.setPrivateField;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -72,45 +70,12 @@ public class SwerveDriveTest extends CommandTestBase {
   }
 
   @Test
-  public void TestAllianceFlipTeleopBlue() {
+  public void TestAllianceFlipTeleop() {
     DriverStationSim.setFmsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
     m_controls.periodic();
     m_swerveDrive.setOdometry(new Pose2d());
-
-    var joystick = new JoystickSim(m_leftJoystick);
-    joystick.setRawAxis(0, 0);
-    joystick.setRawAxis(1, 1);
-    joystick.notifyNewData();
-
-    for(int i = 0; i < 10; i++) {
-      CommandScheduler.getInstance().run();
-      Timer.delay(0.02);
-    }
-
-//    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getX() + " > " + 0);
-    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getX() > 0);
-
-    joystick.setRawAxis(0, -1);
-    joystick.setRawAxis(1, 0);
-    joystick.notifyNewData();
-
-    for(int i = 0; i < 10; i++) {
-      CommandScheduler.getInstance().run();
-      Timer.delay(0.02);
-    }
-
-//    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY() + " < " + 0);
-    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
-  }
-
-  @Test
-  public void TestAllianceFlipTeleopRed() {
-    DriverStationSim.setFmsAttached(true);
-    DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
-    m_controls.periodic();
-    m_swerveDrive.setOdometry(
-        new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(-180)));
 
     var joystick = new JoystickSim(m_leftJoystick);
     joystick.setRawAxis(0, 0);
@@ -122,7 +87,39 @@ public class SwerveDriveTest extends CommandTestBase {
       Timer.delay(0.02);
     }
 
-//    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getX() + " < " + SimConstants.fieldLength);
+    //    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getX() + " > " + 0);
+    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getX() > 0);
+
+    joystick.setRawAxis(0, -1);
+    joystick.setRawAxis(1, 0);
+    joystick.notifyNewData();
+
+    for (int i = 0; i < 10; i++) {
+      CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
+    }
+
+    //    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY() + " < " + 0);
+    assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
+
+    DriverStationSim.setFmsAttached(true);
+    DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
+    DriverStationSim.notifyNewData();
+    m_controls.periodic();
+    m_swerveDrive.setOdometry(
+        new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(-180)));
+
+    joystick.setRawAxis(0, 0);
+    joystick.setRawAxis(1, 1);
+    joystick.notifyNewData();
+
+    for (int i = 0; i < 10; i++) {
+      CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
+    }
+
+    //    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getX() + " < " +
+    // SimConstants.fieldLength);
     assertTrue(
         m_swerveDrive.getOdometry().getEstimatedPosition().getX() < SimConstants.fieldLength);
 
@@ -135,7 +132,7 @@ public class SwerveDriveTest extends CommandTestBase {
       Timer.delay(0.02);
     }
 
-//    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY() + " > " + 0);
+    //    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY() + " > " + 0);
     assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() > 0);
   }
 }

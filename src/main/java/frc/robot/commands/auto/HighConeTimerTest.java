@@ -35,19 +35,11 @@ public class HighConeTimerTest extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
                     .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
-<<<<<<< HEAD:src/main/java/frc/robot/commands/auto/ElevatorTimerTest.java
                 new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CONE, vision, swerveDrive)
                     .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
             /** Outakes cone */
             new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CONE, vision, swerveDrive)
-=======
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE, vision, swerveDrive)
-                    .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
-            /** Outakes cone */
-            new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE, vision, swerveDrive)
->>>>>>> DebugginAutoFlip:src/main/java/frc/robot/commands/auto/HighConeTimerTest.java
                 .withTimeout(WAIT.SCORING_CONE.get()),
             new PrintCommand("SCORE"),
             new WaitCommand(WAIT.SCORING_CONE.get()),
@@ -55,11 +47,7 @@ public class HighConeTimerTest extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                     .withTimeout(WAIT.STOW_HIGH_CONE.get()),
-<<<<<<< HEAD:src/main/java/frc/robot/commands/auto/ElevatorTimerTest.java
                 new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-=======
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
->>>>>>> DebugginAutoFlip:src/main/java/frc/robot/commands/auto/HighConeTimerTest.java
                     .withTimeout(WAIT.STOW_HIGH_CONE.get())),
             /** Runs Path with Intaking cube during */
             new PrintCommand("DRIVING"),

@@ -2,13 +2,13 @@ package frc.robot.utils;
 
 import static frc.robot.utils.ChargedUpNodeMask.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static utils.TestUtils.setPrivateField;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.RobotContainer;
 import frc.robot.simulation.SimConstants;
@@ -123,7 +123,8 @@ public class ChargedUpNodeMaskTest {
 
   @Test
   public void TestRedGetRedNodes() {
-    setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
+    DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
+    DriverStationSim.notifyNewData();
     m_controls.periodic();
 
     Pose2d robotPose = new Pose2d(14, 1, Rotation2d.fromDegrees(0));
@@ -157,7 +158,9 @@ public class ChargedUpNodeMaskTest {
 
   @Test
   public void TestBlueGetBlueNodes() {
-    setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Blue);
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.notifyNewData();
+    m_controls.periodic();
 
     Pose2d robotPose = new Pose2d();
     SCORING_STATE state;

@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.AUTOTIMES.WAIT;
-import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
+import frc.robot.Constants.AUTO.WAIT;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
@@ -35,11 +35,11 @@ public class MidCubeTimerTest extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
                     .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.HOLDING_CONE, vision, swerveDrive)
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CONE, vision, swerveDrive)
                     .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
             /** Outakes cone */
             new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.SCORING_CONE, vision, swerveDrive)
+            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CONE, vision, swerveDrive)
                 .withTimeout(WAIT.SCORING_CONE.get()),
             new PrintCommand("SCORE"),
             new WaitCommand(WAIT.SCORING_CONE.get()),
@@ -47,7 +47,7 @@ public class MidCubeTimerTest extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                     .withTimeout(WAIT.STOW_HIGH_CONE.get()),
-                new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive)
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
                     .withTimeout(WAIT.STOW_HIGH_CONE.get())),
             /** Runs Path with Intaking cube during */
             new PrintCommand("DRIVING"),
