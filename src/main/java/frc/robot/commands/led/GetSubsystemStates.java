@@ -4,6 +4,7 @@
 
 package frc.robot.commands.led;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -19,7 +20,7 @@ cubeButton = purple, coneButton = yellow */
 public class GetSubsystemStates extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LEDSubsystem m_led;
-
+  private final Elevator m_elevator; 
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
   private final Wrist m_wrist;
@@ -28,11 +29,12 @@ public class GetSubsystemStates extends CommandBase {
 
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(
-      LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist) {
+      LEDSubsystem led, Intake intake, StateHandler stateHandler, Wrist wrist, Elevator elevator) {
     m_led = led;
     m_stateHandler = stateHandler;
     m_intake = intake;
     m_wrist = wrist;
+    m_elevator = elevator; 
     addRequirements(m_led);
   }
 
@@ -49,7 +51,7 @@ public class GetSubsystemStates extends CommandBase {
     // set in order of priority to be expressed from the least priority to the
     // highest priority
     if (DriverStation.isDisabled()) {
-      if (Math.abs(m_wrist.getPositionDegrees() + 15.0) <= 0.5) {
+      if (Math.abs(m_wrist.getPositionDegrees() + 15.0) <= 0.5 && Units.metersToInches(m_elevator.getHeightMeters()) <= 0.5 ) {
         m_led.expressState(SUPERSTRUCTURE_STATE.WRIST_IS_RESET);
       } else {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);

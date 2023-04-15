@@ -130,10 +130,10 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(25.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(29.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(45.5)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(44.0)),
+      SCORE_MID_CONE(Units.inchesToMeters(26.0)),
+      SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(46.0)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
       INTAKING_EXTENDED_CONE(Units.inchesToMeters(38.0)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.0));
 
@@ -295,7 +295,7 @@ public final class Constants {
     public static final Color8Bit yellow = new Color8Bit(150, 120, 0);
     public static final Color8Bit purple = new Color8Bit(128, 0, 128);
     public static final Color8Bit orange = new Color8Bit(247, 116, 40);
-    public static final Color8Bit pink = new Color8Bit(170, 40, 55);
+    public static final Color8Bit pink = new Color8Bit(190, 30, 35);
     public static final Color8Bit white = new Color8Bit(125, 125, 125);
     public static final Color8Bit turquoise = new Color8Bit(24, 94, 89);
   }
@@ -320,7 +320,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 136.934;
+    public static double frontRightCANCoderOffset = 114.961;
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
@@ -460,7 +460,7 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(90.0)),
+      STOWED(Units.degreesToRadians(95.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
       INTAKING_LOW_CONE(Units.degreesToRadians(13)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
@@ -664,7 +664,7 @@ public final class Constants {
     // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
     // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 136.934; // 41.748;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 114.961; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
   }
