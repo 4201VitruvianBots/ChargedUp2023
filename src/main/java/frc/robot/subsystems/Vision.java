@@ -54,7 +54,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private double startTime, timestamp;
   private boolean timerStart;
 
-  private INTAKE_STATE targetFound = INTAKE_STATE.NONE;
+  private INTAKE_STATE limelightState = INTAKE_STATE.NONE;
 
   private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -269,7 +269,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * resets timer for pipeline finder
    */
   public void resetPipelineSearch() {
-    targetFound = INTAKE_STATE.NONE;
+    limelightState = INTAKE_STATE.NONE;
     searchPipelineTimer.reset();
     searchPipelineTimer.start();
   }
@@ -307,7 +307,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
     if (timestamp != 0 || searchTimer.get() - startTime > 3) {
       if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
-        targetFound = INTAKE_STATE.NONE;
+        limelightState = INTAKE_STATE.NONE;
         searchLimelightPipeline(location);
       }
     }
@@ -317,32 +317,34 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for a pipeline until a clear target is found when intaking
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
-    if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
-      // int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
-      double pipeline = getPipeline(location);
+    // Search
+    if (limelightState == INTAKE_STATE.INTAKING) {
+      int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
-      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
-        setPipeline(location, pipeline);
-        if (getTargetArea(location) > 3.0 && pipeline == 1.0) {
-          targetFound = INTAKE_STATE.CUBE;
-        } else if (getTargetArea(location) > 3.0 && pipeline == 2.0) {
-          targetFound = INTAKE_STATE.CONE;
-        }
+      setPipeline(location, pipeline);
+      // Try to find cube
+      if (pipeline == 1) {
+        if (getTargetArea(location) > 3.0)
+          limelightState = INTAKE_STATE.CUBE;
       }
+      if (pipeline == 2) {
+        if (getTargetArea(location) > 3.0)
+          limelightState = INTAKE_STATE.CONE;
+      }
+    }
 
-      // threshold to lose game object once it's found
-      if (targetFound == INTAKE_STATE.CUBE) {
-        if (getTargetArea(location) < 2.0) {
-          // reconnectLimelightPipeline(location);
-          targetFound = INTAKE_STATE.NONE;
-        }
+    // threshold to lose game object once it's found
+    if (limelightState == INTAKE_STATE.CUBE) {
+      if (getTargetArea(location) < 2.0) {
+        reconnectLimelightPipeline(location);
+        limelightState = INTAKE_STATE.NONE;
       }
-      if (targetFound == INTAKE_STATE.CONE) {
-        if (getTargetArea(location) < 2.0) {
-          // reconnectLimelightPipeline(location);
-          targetFound = INTAKE_STATE.NONE;
-        }
+    }
+    if (limelightState == INTAKE_STATE.CONE) {
+      if (getTargetArea(location) < 2.0) {
+        reconnectLimelightPipeline(location);
+        limelightState = INTAKE_STATE.NONE;
       }
     }
   }
