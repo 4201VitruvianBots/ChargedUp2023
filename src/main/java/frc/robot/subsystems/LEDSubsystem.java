@@ -137,7 +137,8 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
         m_toAnimate = null;
         break;
       default:
-        System.out.println("Incorrect animation type provided to changeAnimation() method");
+        //        System.out.println("Incorrect animation type provided to changeAnimation()
+        // method");
         break;
     }
   }

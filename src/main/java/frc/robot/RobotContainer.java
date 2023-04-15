@@ -229,7 +229,6 @@ public class RobotContainer implements AutoCloseable {
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
     xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE));
-    // TODO: Review this change
     xboxController
         .povDown()
         .onTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE).withTimeout(.25));
@@ -583,7 +582,6 @@ public class RobotContainer implements AutoCloseable {
   public void simulationPeriodic() {
     m_memorylog.simulationPeriodic();
 
-    // TODO: Fix overwrite of currently running auto?
     if (DriverStation.isDisabled()) m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 
