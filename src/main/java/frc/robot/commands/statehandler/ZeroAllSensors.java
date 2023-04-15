@@ -5,7 +5,6 @@
 package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Wrist;
@@ -13,8 +12,10 @@ import frc.robot.subsystems.Wrist;
 public class ZeroAllSensors extends CommandBase {
   /** Creates a new ZeroAll. */
   private final Elevator m_elevator;
+
   private final Wrist m_wrist;
   private final SwerveDrive m_swerve;
+
   public ZeroAllSensors(Elevator elevator, Wrist wrist, SwerveDrive swerveDrive) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_elevator = elevator;
