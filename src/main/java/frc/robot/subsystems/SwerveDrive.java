@@ -225,8 +225,19 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_pigeon.setYaw(pose.getRotation().getDegrees());
     m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
+    if (RobotBase.isSimulation()) {
+      m_pigeon.getSimCollection().setRawHeading(pose.getRotation().getDegrees());
+    } else m_pigeon.setYaw(pose.getRotation().getDegrees());
+
+    for (var position : SWERVE_MODULE_POSITION.values()) {
+      var transform =
+          new Transform2d(
+              SWERVE_DRIVE.kModuleTranslations.get(position), Rotation2d.fromDegrees(0));
+      var modulePose = pose.plus(transform);
+      getSwerveModule(position).resetAngle(pose.getRotation().getDegrees());
+      getSwerveModule(position).setModulePose(modulePose);
+    }
   }
 
   public void setRollOffset() {
@@ -251,9 +262,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public Rotation2d getHeadingRotation2d() {
-    if (DriverStation.isFMSAttached() && Controls.getAllianceColor() == DriverStation.Alliance.Red)
-      return Rotation2d.fromDegrees(getHeadingDegrees()).plus(Rotation2d.fromDegrees(180));
-    else return Rotation2d.fromDegrees(getHeadingDegrees());
+    return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
   public Pose2d getPoseMeters() {

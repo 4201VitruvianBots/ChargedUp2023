@@ -215,7 +215,7 @@ public final class Constants {
       SCORING_CONE(-0.8),
       INTAKING_CUBE(-0.5),
       HOLDING_CUBE(-0.1),
-      SCORING_CUBE(0.1);
+      SCORING_CUBE(0.5);
 
       private final double value;
 

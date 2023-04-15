@@ -41,7 +41,7 @@ public class SubstationTwo extends SequentialCommandGroup {
 
     m_trajectories =
         TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(10), Units.feetToMeters(10)));
+            pathName, new PathConstraints(Units.feetToMeters(13), Units.feetToMeters(13)));
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 

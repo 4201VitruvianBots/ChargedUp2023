@@ -7,7 +7,6 @@ package frc.robot.commands.auto;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
-import frc.robot.simulation.SimConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +15,23 @@ public class PlotAutoTrajectory extends CommandBase {
   private final List<PathPlannerTrajectory> m_trajectories;
   private final String m_pathName;
 
+  private final boolean m_useAllianceFlip;
+
   public PlotAutoTrajectory(
       FieldSim fieldSim, String pathName, List<PathPlannerTrajectory> trajectories) {
+    this(fieldSim, pathName, trajectories, true);
+  }
+
+  public PlotAutoTrajectory(
+      FieldSim fieldSim,
+      String pathName,
+      List<PathPlannerTrajectory> trajectories,
+      boolean useAllainceFlip) {
     m_fieldSim = fieldSim;
     m_pathName = pathName;
     m_trajectories = trajectories;
+
+    m_useAllianceFlip = useAllainceFlip;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_fieldSim);
@@ -30,9 +41,11 @@ public class PlotAutoTrajectory extends CommandBase {
   @Override
   public void initialize() {
     List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-    var isRedPath = m_pathName.startsWith("Red");
-    if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
-    else ppTrajectories.addAll(m_trajectories);
+    //    var isRedPath = m_pathName.startsWith("Red");
+    //    if (isRedPath && m_useAllianceFlip)
+    // ppTrajectories.addAll(SimConstants.absoluteFlip(m_trajectories));
+    //    else ppTrajectories.addAll(m_trajectories);
+    ppTrajectories.addAll(m_trajectories);
 
     m_fieldSim.setTrajectory(ppTrajectories);
   }

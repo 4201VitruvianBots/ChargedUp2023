@@ -44,7 +44,6 @@ import frc.robot.commands.swerve.SetSwerveNeutralMode;
 import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
-import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
@@ -346,13 +345,13 @@ public class RobotContainer implements AutoCloseable {
 
     m_autoChooser.addOption(
         "ElevatorTimerTest",
-        new ElevatorTimerTest(
+        new HighConeTimerTest(
             m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption(
-        "SubstationTwo",
+        "BlueSubstationTwo",
         new SubstationTwo(
-            "SubstationTwo",
+            "BlueSubstationTwo",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -362,9 +361,44 @@ public class RobotContainer implements AutoCloseable {
             m_stateHandler));
 
     m_autoChooser.addOption(
-        "SubstationTwoBalance",
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+    m_autoChooser.addOption(
+        "BlueSubstationThree",
+        new SubstationThree(
+            "BlueSubstationThree",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "BlueSubstationTwoBalance",
         new SubstationTwoBalance(
-            "SubstationTwoBalance",
+            "BlueSubstationTwoBalance",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -449,8 +483,10 @@ public class RobotContainer implements AutoCloseable {
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
       String[] autos = {
-        "SubstationTwo",
-        "SubstationTwoBalance",
+        "BlueSubstationTwo",
+        "BlueSubstationTwoBalance",
+        "RedSubstationTwo",
+        "RedSubstationTwoBalance",
         "CenterOneBalance",
         "CenterOneBalanceCross",
         "BumpOnePickUp",
@@ -458,16 +494,9 @@ public class RobotContainer implements AutoCloseable {
         "TestSimAuto"
       };
       for (var auto : autos) {
-        var isRedPath = auto.startsWith("Red");
-        var fileName = auto.replace("Red", "");
-        fileName = fileName.replace("Blue", "");
-        var trajectories = TrajectoryUtils.readTrajectory(fileName, new PathConstraints(1, 1));
+        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
 
-        List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        if (isRedPath) ppTrajectories.addAll(SimConstants.absoluteFlip(trajectories));
-        else ppTrajectories.addAll(trajectories);
-
-        autoPlotter.addOption(auto, ppTrajectories);
+        autoPlotter.addOption(auto, trajectories);
       }
 
       SmartDashboard.putData("Auto Visualizer", autoPlotter);

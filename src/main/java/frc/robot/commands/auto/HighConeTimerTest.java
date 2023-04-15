@@ -17,9 +17,9 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 
-public class ElevatorTimerTest extends SequentialCommandGroup {
+public class HighConeTimerTest extends SequentialCommandGroup {
 
-  public ElevatorTimerTest(
+  public HighConeTimerTest(
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
       Wrist wrist,

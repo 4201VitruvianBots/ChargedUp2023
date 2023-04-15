@@ -4,7 +4,6 @@
 
 package frc.robot.utils;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.UTIL;
 import frc.robot.commands.util.DeleteAllLogs;
@@ -86,10 +85,12 @@ public class LogManager {
 
   public void createInitTempFile() {
     try {
-      File fileObj = new File(tempPath + UTIL.tempFileName);
-      fileObj.createNewFile();
+      if (!System.getProperty("os.name").equals("Windows")) {
+        File fileObj = new File(tempPath + UTIL.tempFileName);
+        fileObj.createNewFile();
+      }
     } catch (IOException e) {
-      DriverStation.reportWarning("Failed to create init file", e.getStackTrace());
+      //      DriverStation.reportWarning("Failed to create init file", e.getStackTrace());
     }
   }
 

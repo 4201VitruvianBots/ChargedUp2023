@@ -1,7 +1,9 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Controls;
 import frc.robot.subsystems.SwerveDrive;
 import java.util.function.DoubleSupplier;
 
@@ -47,6 +49,12 @@ public class SetSwerveDrive extends CommandBase {
     double rotation =
         MathUtil.applyDeadband(Math.abs(m_rotationInput.getAsDouble()), 0.05)
             * Math.signum(m_rotationInput.getAsDouble());
+
+    if (DriverStation.isFMSAttached()
+        && Controls.getAllianceColor() == DriverStation.Alliance.Red) {
+      throttle *= -1;
+      strafe *= -1;
+    }
 
     m_swerveDrive.drive(throttle, strafe, rotation, true, false);
   }
