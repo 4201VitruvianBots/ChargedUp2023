@@ -343,10 +343,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void resetGyro() {
-    if(DriverStation.isFMSAttached() && Controls.getAllianceColor() == DriverStation.Alliance.Red)
+    if (DriverStation.isFMSAttached() && Controls.getAllianceColor() == DriverStation.Alliance.Red)
       m_pigeon.setYaw(180);
-    else
-      m_pigeon.setYaw(0);
+    else m_pigeon.setYaw(0);
     m_pigeon.setAccumZAngle(0);
   }
 
