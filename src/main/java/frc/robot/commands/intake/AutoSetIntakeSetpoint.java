@@ -33,32 +33,25 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CONE
-        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
+    if (m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CONE) {
       m_intake.setIntakeStateCone(true);
-      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 2.0);
-      m_swerve.enableHeadingTarget(true);
-      m_swerve.setRobotHeadingRadians(
-        m_swerve.getHeadingRotation2d()
-        .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-        .getRadians());
-
-    } else if (m_setpoint == INTAKE.INTAKE_SPEEDS.HOLDING_CUBE
-        || m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
+    } else if ( m_setpoint == INTAKE.INTAKE_SPEEDS.INTAKING_CUBE) {
       m_intake.setIntakeStateCube(true);
-      m_vision.setPipeline(CAMERA_SERVER.INTAKE, 1.0);
-      m_swerve.setRobotHeadingRadians(
-        m_swerve.getHeadingRotation2d()
-        .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-        .getRadians());
     }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_vision.setPipeline(CAMERA_SERVER.INTAKE, 1.0);
     m_intake.setPercentOutput(m_setpoint.get());
-
+      m_swerve.enableHeadingTarget(true);
+      m_swerve.setRobotHeadingRadians(
+          m_swerve
+              .getHeadingRotation2d()
+              .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+              .getRadians());
+              System.out.println("We see cube");
 
   }
 

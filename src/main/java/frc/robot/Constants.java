@@ -186,8 +186,8 @@ public final class Constants {
       SCORE_MID_CONE(0.7),
       SCORE_MID_CUBE(0.7),
 
-      WAIT_TO_PLACE_CONE(1.5), //good
-      WAIT_TO_PLACE_CUBE(1.5), //good
+      WAIT_TO_PLACE_CONE(2), //good
+      WAIT_TO_PLACE_CUBE(2), //good
 
       SCORING_CONE(0.9), // good
       SCORING_CUBE(0.5), //good
@@ -671,10 +671,12 @@ public final class Constants {
     SWERVE_DRIVE.frontRightCANCoderOffset = 153.721; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
+
   }
 
   private static void initAlpha() {
     robotName = "Alpha";
+
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;

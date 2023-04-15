@@ -26,12 +26,13 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BumpOnePickUp;
-import frc.robot.commands.auto.CenterOneBalance;
+// import frc.robot.commands.auto.BumpOnePickUp;
+// import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.ElevatorTimerTest;
 import frc.robot.commands.auto.JustBalance;
+import frc.robot.commands.auto.LimeLightTest;
 import frc.robot.commands.auto.SubstationTwo;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
@@ -348,17 +349,17 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-    m_autoChooser.addOption(
-        "CenterOneBalance",
-        new CenterOneBalance(
-            "CenterOneBalance",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision,
-            m_stateHandler));
+    // m_autoChooser.addOption(
+    //     "CenterOneBalance",
+    //     new CenterOneBalance(
+    //         "CenterOneBalance",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_elevator,
+    //         m_vision,
+    //         m_stateHandler));
 
     m_autoChooser.addOption(
         "CenterOneBalanceCross",
@@ -377,22 +378,26 @@ public class RobotContainer implements AutoCloseable {
         new JustBalance(
             "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
-    m_autoChooser.addOption(
-        "BumpOnePickUp",
-        new BumpOnePickUp(
-            "BumpOnePickUp",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
+    // m_autoChooser.addOption(
+    //     "BumpOnePickUp",
+    //     new BumpOnePickUp(
+    //         "BumpOnePickUp",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator,
+    //         m_stateHandler));
 
     m_autoChooser.addOption(
         "DriveForward",
         new DriveForward(
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
+
+            m_autoChooser.addOption(
+        "Limelight Test",
+        new LimeLightTest(m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 

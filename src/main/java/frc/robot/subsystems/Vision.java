@@ -281,11 +281,11 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     if (getPipeline(location) == 1.0
         && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
       return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 3.0; // target read within threshold
+          && getTargetArea(location) > 1.0; // target read within threshold
     } else if (getPipeline(location) == 2.0
         && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
       return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 3.0; // target read within threshold
+          && getTargetArea(location) > 1.0; // target read within threshold
     }
     return false;
   }
@@ -318,34 +318,46 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     if (m_intakeSub.getIntakeConeState() || m_intakeSub.getIntakeCubeState()) {
-      // int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
-      double pipeline = getPipeline(location);
+      int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
       if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
         setPipeline(location, pipeline);
-        if (getTargetArea(location) > 3.0 && pipeline == 1.0) {
+        if (getTargetArea(location) > 1.0 && pipeline == 1) {
           targetFound = INTAKE_STATE.CUBE;
-        } else if (getTargetArea(location) > 3.0 && pipeline == 2.0) {
+        } else if (getTargetArea(location) > 1.0 && pipeline == 2) {
           targetFound = INTAKE_STATE.CONE;
         }
       }
 
       // threshold to lose game object once it's found
       if (targetFound == INTAKE_STATE.CUBE) {
-        if (getTargetArea(location) < 2.0) {
+        if (getTargetArea(location) < 1.0) {
           // reconnectLimelightPipeline(location);
           targetFound = INTAKE_STATE.NONE;
         }
       }
       if (targetFound == INTAKE_STATE.CONE) {
-        if (getTargetArea(location) < 2.0) {
+        if (getTargetArea(location) < 1.0) {
           // reconnectLimelightPipeline(location);
           targetFound = INTAKE_STATE.NONE;
         }
       }
     }
   }
+
+  public void searchforCube(CAMERA_SERVER location, double pipelineNeed) {
+      if (targetFound == INTAKE_STATE.NONE || targetFound == INTAKE_STATE.INTAKING) {
+        double pipeline = pipelineNeed;
+        setPipeline(location, pipeline);
+        if (getTargetArea(location) > 1.0 && pipeline == 1.0) {
+          targetFound = INTAKE_STATE.CUBE;
+      }
+        if (getTargetArea(location) < 1.0) {
+          targetFound = INTAKE_STATE.NONE;
+        }
+      }
+    }
 
   /*
    * Collects transformation/rotation data from limelight
@@ -544,6 +556,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     updateSmartDashboard();
     updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
     searchLimelightPipeline(CAMERA_SERVER.INTAKE);
+    // searchforCube(CAMERA_SERVER.INTAKE, 1.0);
     logData();
   }
 
