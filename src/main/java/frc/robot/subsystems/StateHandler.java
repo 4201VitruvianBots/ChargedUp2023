@@ -495,8 +495,8 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   public void StowWrist() {
   // Get an average of the intake velocity over the last 0.1 seconds
   // If the average is within our range, we set to stowed
-  if (m_intake.finishedIntaking(m_desiredState))
-    setDesiredSetpoint(SETPOINT.STOWED);
+  // if (m_intake.finishedIntaking(m_desiredState))
+  //   setDesiredSetpoint(SETPOINT.STOWED);
   }
 
   private void initSmartDashboard() {

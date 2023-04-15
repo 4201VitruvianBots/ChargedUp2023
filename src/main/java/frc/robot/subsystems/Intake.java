@@ -33,6 +33,8 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   private boolean isIntakingCube = false;
 
+  private boolean isFinishedIntaking = false;
+
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
   private double m_percentOutput;
 
@@ -162,13 +164,16 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     // TODO: Consolidate this using the INTAKE_STATE enum
     SmartDashboard.putBoolean("Intaking Cone", getIntakeConeState());
     SmartDashboard.putBoolean("Intaking Cube", getIntakeConeState());
+    SmartDashboard.putNumber("Intaking Velocity", intakeMotor.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Intaking Previous Velocity", previousVelocity);
+    SmartDashboard.putBoolean("Is Finished Intaking", getFinishedIntaking());
   }
 
   public void updateLog() {
     currentEntry.append(getMotorOutputCurrent());
   }
 
-  public boolean finishedIntaking(SUPERSTRUCTURE_STATE state) {
+  public void updateFinishedIntaking(SUPERSTRUCTURE_STATE state) {
     // Update velocity variables
     previousVelocity = currentVelocity;
     currentVelocity = intakeMotor.getSelectedSensorVelocity();
@@ -178,16 +183,20 @@ public class Intake extends SubsystemBase implements AutoCloseable {
       if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE && // Check if we are currently intaking a cone
       currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CONE_MIN.get() &&
       currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CONE_MAX.get()) {
-        return true;
+        isFinishedIntaking = true;
       }
 
       else if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE && // Check if we are currently intaking a cube
       currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CUBE_MIN.get() && 
       currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CUBE_MAX.get()) {
-        return true;
+        isFinishedIntaking = true;
       }
     }
-    return false; // If these conditions aren't met, than we have not finished intaking
+    isFinishedIntaking = false; // If these conditions aren't met, than we have not finished intaking
+  }
+
+  public boolean getFinishedIntaking() {
+    return intakeMotor.getSelectedSensorVelocity() < 8000;
   }
 
   @Override
