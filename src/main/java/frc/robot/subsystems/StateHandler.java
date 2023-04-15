@@ -9,6 +9,8 @@ import static frc.robot.Constants.STATE_HANDLER.wristSetpointTolerance;
 import static frc.robot.utils.ChargedUpNodeMask.getTargetNode;
 import static frc.robot.utils.ChargedUpNodeMask.getValidNodes;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -21,18 +23,24 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.INTAKE.VELOCITYTHRESHOLDS;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.Constants.STATE_HANDLER.*;
+import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
+import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.commands.statehandler.ToggleTestIntakeState;
 import frc.robot.utils.SetpointSolver;
-import java.util.ArrayList;
 
 public class StateHandler extends SubsystemBase implements AutoCloseable {
   /**
@@ -59,6 +67,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
+  private double startTime = 0; 
 
   private double m_elevatorDesiredSetpointMeters;
   private double m_wristDesiredSetpointRadians;
@@ -481,6 +490,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
                     m_swerveDrive.getHeadingRotation2d()));
 
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
+  }
+
+  public void StowWrist() {
+  // Get an average of the intake velocity over the last 0.1 seconds
+  // If the average is within our range, we set to stowed
+  // if (m_intake.finishedIntaking(m_desiredState))
+  //   setDesiredSetpoint(SETPOINT.STOWED);
   }
 
   private void initSmartDashboard() {

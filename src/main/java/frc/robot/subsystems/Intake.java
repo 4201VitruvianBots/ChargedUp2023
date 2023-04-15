@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -30,6 +32,10 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private INTAKE_STATE m_state = INTAKE_STATE.NONE;
 
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
+
+  private double previousVelocity;
+
+  private double currentVelocity = intakeMotor.getSelectedSensorVelocity();
 
   //  private final DistanceSensor m_distanceSensor;
 
@@ -185,6 +191,32 @@ public class Intake extends SubsystemBase implements AutoCloseable {
         setPercentOutput(0);
         break;
     }
+  }
+
+  public void updateFinishedIntaking(SUPERSTRUCTURE_STATE state) {
+    // Update velocity variables
+    previousVelocity = currentVelocity;
+    currentVelocity = intakeMotor.getSelectedSensorVelocity();
+    if (previousVelocity > INTAKE.VELOCITYTHRESHOLDS.NONE_MIN.get() && // Check if we were previously intaking with no gamepiece detected
+      previousVelocity < INTAKE.VELOCITYTHRESHOLDS.NONE_MAX.get()) {
+
+      if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE && // Check if we are currently intaking a cone
+      currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CONE_MIN.get() &&
+      currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CONE_MAX.get()) {
+        isFinishedIntaking = true;
+      }
+
+      else if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE && // Check if we are currently intaking a cube
+      currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CUBE_MIN.get() && 
+      currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CUBE_MAX.get()) {
+        isFinishedIntaking = true;
+      }
+    }
+    isFinishedIntaking = false; // If these conditions aren't met, than we have not finished intaking
+  }
+
+  public boolean getFinishedIntaking() {
+    return intakeMotor.getSelectedSensorVelocity() < 8000;
   }
 
   @Override

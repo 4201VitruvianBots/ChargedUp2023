@@ -236,6 +236,8 @@ public final class Constants {
 
     public enum VELOCITYTHRESHOLDS {
       // Units are in raw motor velocity units
+      NONE_MIN(9000),
+      NONE_MAX(11000),
       CONE_MIN(8000),
       CONE_MAX(10000),
       CUBE_MIN(-6000),
