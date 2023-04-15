@@ -67,7 +67,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
-  private double startTime; 
+  private double startTime = 0; 
 
   private double m_elevatorDesiredSetpointMeters;
   private double m_wristDesiredSetpointRadians;
@@ -492,27 +492,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
-  public void StowWrist(INTAKE_SPEEDS speed) {
-  if (m_desiredState == SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE) {
-    if (speed == INTAKE_SPEEDS.INTAKING_CONE && 
-        m_intake.getVelocity() > VELOCITYTHRESHOLDS.CONE_MIN.get() && 
-        m_intake.getVelocity() < VELOCITYTHRESHOLDS.CONE_MAX.get() &&
-        Timer.getFPGATimestamp() - startTime >= 0.5) {
-      setDesiredSetpoint(SETPOINT.STOWED);
-    } else {
-      startTime = Timer.getFPGATimestamp();
-    }
-  } else if (m_desiredState == SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE) {
-    if (speed == INTAKE_SPEEDS.INTAKING_CUBE && 
-        m_intake.getVelocity() > VELOCITYTHRESHOLDS.CUBE_MIN.get() && 
-        m_intake.getVelocity() < VELOCITYTHRESHOLDS.CUBE_MAX.get() &&
-        Timer.getFPGATimestamp() - startTime >= 0.5) {
-      setDesiredSetpoint(SETPOINT.STOWED);
-    } else {
-      startTime = Timer.getFPGATimestamp();
-    }
+  public void StowWrist() {
+  // Get an average of the intake velocity over the last 0.1 seconds
+  // If the average is within our range, we set to stowed
+  if (m_intake.finishedIntaking(m_desiredState))
+    setDesiredSetpoint(SETPOINT.STOWED);
   }
-}
 
   private void initSmartDashboard() {
     var stateHandlerTab =

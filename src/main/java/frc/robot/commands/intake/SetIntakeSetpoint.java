@@ -37,7 +37,7 @@ public class SetIntakeSetpoint extends CommandBase {
   @Override
   public void execute() {
     m_intake.setPercentOutput(m_speed.get());
-    m_StateHandler.StowWrist(m_speed);
+    //m_StateHandler.StowWrist();
   }
 
   // Called once the command ends or is interrupted.
