@@ -71,8 +71,7 @@ public class SwerveDriveTest extends CommandTestBase {
     assertTrue(output > 0);
   }
 
-  @Disabled(
-      "Running this second test fails with everything else, but passes when ran as a standalone")
+  @Disabled("Only passes when ran as standalone. Causes hangup in Unit Tests")
   @Test
   public void TestAllianceFlipTeleopBlue() {
     DriverStationSim.setFmsAttached(true);
@@ -108,8 +107,7 @@ public class SwerveDriveTest extends CommandTestBase {
     assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
   }
 
-  @Disabled(
-      "Running this second test fails with everything else, but passes when ran as a standalone")
+  @Disabled("Unit test fails, but simulation works")
   @Test
   public void TestAllianceFlipTeleopRed() {
     DriverStationSim.setFmsAttached(true);
