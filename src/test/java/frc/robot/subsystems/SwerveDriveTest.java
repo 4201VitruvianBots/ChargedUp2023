@@ -7,21 +7,22 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.JoystickSim;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.CommandTestBase;
-import frc.robot.Constants.USB;
 import frc.robot.RobotContainer;
 import frc.robot.simulation.SimConstants;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class SwerveDriveTest extends CommandTestBase {
   protected RobotContainer m_robotContainer;
   protected SwerveDrive m_swerveDrive;
   protected Controls m_controls;
+  protected Joystick m_leftJoystick;
 
   @BeforeEach
   // this method will run before each test. We Initialize the RobotContainer and get all subsystems
@@ -31,6 +32,7 @@ public class SwerveDriveTest extends CommandTestBase {
     m_robotContainer = new RobotContainer();
     m_swerveDrive = m_robotContainer.getSwerveDrive();
     m_controls = m_robotContainer.getControls();
+    m_leftJoystick = m_robotContainer.getLeftJoystick();
   }
 
   @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -67,19 +69,63 @@ public class SwerveDriveTest extends CommandTestBase {
     assertTrue(output > 0);
   }
 
-  @Disabled
   @Test
-  public void TestAllianceFlipTeleop() {
+  public void TestAllianceFlipTeleopBlue() {
+    setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Blue);
+    m_swerveDrive.setOdometry(new Pose2d());
+
+    var joystick = new JoystickSim(m_leftJoystick);
+    joystick.setRawAxis(0, 0);
+    joystick.setRawAxis(1, 1);
+    joystick.notifyNewData();
+    for(int i = 0; i < 5; i++) {
+      CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
+    }
+
+    assertTrue(
+            m_swerveDrive.getOdometry().getEstimatedPosition().getX() > 0);
+
+    joystick.setRawAxis(0, -1);
+    joystick.setRawAxis(1, 0);
+    joystick.notifyNewData();
+    for(int i = 0; i < 5; i++) {
+      CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
+    }
+
+    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY());
+    assertTrue(
+            m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
+  }
+
+  @Test
+  public void TestAllianceFlipTeleopRed() {
     setPrivateField(m_controls, "allianceColor", DriverStation.Alliance.Red);
     m_swerveDrive.setOdometry(
         new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(-180)));
 
-    for (int i = 0; i < 10; i++) {
-      DriverStationSim.setJoystickAxis(USB.leftJoystick, 1, 0.5);
+    var joystick = new JoystickSim(m_leftJoystick);
+    joystick.setRawAxis(0, 0);
+    joystick.setRawAxis(1, 1);
+    joystick.notifyNewData();
+    for(int i = 0; i < 5; i++) {
       CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
     }
-    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getX());
+
     assertTrue(
         m_swerveDrive.getOdometry().getEstimatedPosition().getX() < SimConstants.fieldLength);
+
+    joystick.setRawAxis(0, 1);
+    joystick.setRawAxis(1, 0);
+    joystick.notifyNewData();
+    for(int i = 0; i < 5; i++) {
+      CommandScheduler.getInstance().run();
+      Timer.delay(0.02);
+    }
+
+    assertTrue(
+            m_swerveDrive.getOdometry().getEstimatedPosition().getY() > 0);
   }
 }

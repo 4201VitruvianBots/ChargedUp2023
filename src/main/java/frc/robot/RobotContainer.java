@@ -515,6 +515,10 @@ public class RobotContainer implements AutoCloseable {
     return m_fieldSim;
   }
 
+  public Joystick getLeftJoystick() {
+    return leftJoystick;
+  }
+
   //  public DistanceSensor getDistanceSensor() {
   //    return m_distanceSensor;
   //  }
