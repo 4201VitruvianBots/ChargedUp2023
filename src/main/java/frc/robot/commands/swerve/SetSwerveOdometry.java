@@ -54,8 +54,8 @@ public class SetSwerveOdometry extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_swerveDrive.setOdometry(m_pose2d);
     if (RobotBase.isSimulation()) m_fieldSim.resetRobotPose(m_pose2d);
+    m_swerveDrive.setOdometry(m_pose2d);
     //    SmartDashboard.putNumber("SwerveInitialPositionX", m_pose2d.getX());
     //    SmartDashboard.putNumber("SwerveInitialPositionY", m_pose2d.getY());
     //    SmartDashboard.putNumber("SwerveInitialPositionRotation",

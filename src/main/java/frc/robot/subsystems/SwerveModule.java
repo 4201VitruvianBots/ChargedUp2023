@@ -153,8 +153,12 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   }
 
   public void resetAngleToAbsolute() {
-    double angle = m_angleEncoder.getAbsolutePosition() - m_angleOffset;
-    m_turnMotor.setSelectedSensorPosition(angle / SWERVE_MODULE.kTurningMotorDistancePerPulse);
+    resetAngle(0);
+  }
+
+  public void resetAngle(double angle) {
+    double newAngle = m_angleEncoder.getAbsolutePosition() - m_angleOffset + angle;
+    m_turnMotor.setSelectedSensorPosition(newAngle / SWERVE_MODULE.kTurningMotorDistancePerPulse);
   }
 
   public double getHeadingDegrees() {
