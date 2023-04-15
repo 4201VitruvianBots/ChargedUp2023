@@ -32,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
-import frc.robot.Constants.INTAKE;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
@@ -333,13 +333,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     // Cube: f(x)=0.00000913468*t^3-0.00232508*t^2-0.0894341*t+16.1239;
     // Cone: f(x)=-0.270347*t+16.8574;
     double horizontalDistance = 0;
-    if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.HOLDING_CONE)
+    if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
       horizontalDistance =
           0.00000913468 * Math.pow(getPositionDegrees(), 3)
               - 0.00232508 * Math.pow(getPositionDegrees(), 2)
               - 0.0894341 * getPositionDegrees()
               + 16.1239;
-    else if (m_intake.getHeldGamepiece() == INTAKE.INTAKE_STATE.CONE)
+    else if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE)
       horizontalDistance =
           //          0.00860801 * Math.pow(getPositionDegrees(), 2) +
           -0.270347 * getPositionDegrees() + 16.8574;
@@ -461,5 +461,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   @Override
   public void close() throws Exception {
     m_wristLigament2d.close();
+    resetSwitch.close();
   }
 }

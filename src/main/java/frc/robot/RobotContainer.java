@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER;
@@ -39,8 +38,7 @@ import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
-import frc.robot.commands.intake.SetIntakeSetpoint;
-import frc.robot.commands.intake.SetIntakeMode;
+import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.SetConditionalSetpoint;
@@ -157,8 +155,20 @@ public class RobotContainer implements AutoCloseable {
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
 
-    xboxController.leftTrigger(0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CUBE, m_stateHandler));
-    xboxController.rightTrigger(0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CONE, m_stateHandler));
+    xboxController
+        .leftTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
+                () -> m_stateHandler.isScoring()));
+    xboxController
+        .rightTrigger(0.1)
+        .whileTrue(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
+                new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
+                () -> m_stateHandler.isScoring()));
 
     // Score button Bindings
 
@@ -203,7 +213,7 @@ public class RobotContainer implements AutoCloseable {
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
-    xboxController.povLeft().whileTrue(new SetIntakeMode(m_intake, INTAKE_STATE.HOLDING_CONE));
+    xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE));
     xboxController.povRight().onTrue(new SwitchTargetNode(m_stateHandler, false));
 
     // Will limit the speed of our elevator or wrist when the corresponding joystick
@@ -223,7 +233,9 @@ public class RobotContainer implements AutoCloseable {
     if (RobotBase.isSimulation()) {
       CommandPS4Controller testController = new CommandPS4Controller(3);
 
-      testController.axisGreaterThan(3, 0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CUBE, m_stateHandler));
+      testController
+          .axisGreaterThan(3, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE));
       testController
           .axisGreaterThan(3, 0.1)
           .whileTrue(
@@ -236,7 +248,9 @@ public class RobotContainer implements AutoCloseable {
                       m_stateHandler.getCurrentState().getZone()
                           == SUPERSTRUCTURE_STATE.ALPHA_ZONE.getZone()));
 
-      testController.axisGreaterThan(4, 0.1).whileTrue(new SetIntakeSetpoint(m_intake, INTAKE_SPEEDS.INTAKING_CONE, m_stateHandler));
+      testController
+          .axisGreaterThan(4, 0.1)
+          .whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE));
       testController
           .axisGreaterThan(4, 0.1)
           .whileTrue(
@@ -395,9 +409,17 @@ public class RobotContainer implements AutoCloseable {
         new DriveForward(
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
-            m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "Limelight Test",
-        new LimeLightTest(m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+        new LimeLightTest(
+            "DriveForward",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 

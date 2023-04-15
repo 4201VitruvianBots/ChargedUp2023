@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import java.util.stream.DoubleStream;
@@ -53,7 +53,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private double startTime, timestamp;
   private boolean timerStart;
 
-  private INTAKE_STATE limelightState = INTAKE_STATE.NONE;
+  private INTAKE.INTAKE_STATE limelightINTAKINGState = INTAKE.INTAKE_STATE.NONE;
 
   private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -267,7 +267,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * resets timer for pipeline finder
    */
   public void resetPipelineSearch() {
-    limelightState = INTAKE_STATE.NONE;
+    limelightINTAKINGState = INTAKE.INTAKE_STATE.NONE;
     searchPipelineTimer.reset();
     searchPipelineTimer.start();
   }
@@ -276,15 +276,15 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for any target
    */
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
-    if (getPipeline(location) == 1.0
-        && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
-      return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 1.0; // target read within threshold
-    } else if (getPipeline(location) == 2.0
-        && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
-      return getValidTargetType(location) == 1.0
-          && getTargetArea(location) > 1.0; // target read within threshold
-    }
+    //    if (getPipeline(location) == 1.0
+    //        && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
+    //      return getValidTargetType(location) == 1.0
+    //          && getTargetArea(location) > 1.0; // target read within threshold
+    //    } else if (getPipeline(location) == 2.0
+    //        && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
+    //      return getValidTargetType(location) == 1.0
+    //          && getTargetArea(location) > 1.0; // target read within threshold
+    //    }
     return false;
   }
 
@@ -305,7 +305,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
     if (timestamp != 0 || searchTimer.get() - startTime > 3) {
       if (timerStart && searchTimer.get() - timestamp > 0.1 || searchTimer.get() - startTime > 2) {
-        limelightState = INTAKE_STATE.NONE;
+        limelightINTAKINGState = INTAKE.INTAKE_STATE.NONE;
         searchLimelightPipeline(location);
       }
     }
@@ -316,7 +316,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public void searchLimelightPipeline(CAMERA_SERVER location) {
     // Search
-    if (limelightState == INTAKE_STATE.INTAKING) {
+    if (limelightINTAKINGState == INTAKE.INTAKE_STATE.INTAKING_CONE
+        || limelightINTAKINGState == INTAKE.INTAKE_STATE.INTAKING_CUBE) {
       int pipeline = (int) (Math.floor(searchPipelineTimer.get() / searchPipelineWindow) % 2) + 1;
 
       // threshold to find game object
@@ -324,25 +325,25 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       // Try to find cube
       if (pipeline == 1) {
         if (getTargetArea(location) > 3.0)
-          limelightState = INTAKE_STATE.HOLDING_CONE;
+          limelightINTAKINGState = INTAKE.INTAKE_STATE.INTAKING_CONE;
       }
       if (pipeline == 2) {
         if (getTargetArea(location) > 3.0)
-          limelightState = INTAKE_STATE.CONE;
+          limelightINTAKINGState = INTAKE.INTAKE_STATE.INTAKING_CUBE;
       }
     }
 
     // threshold to lose game object once it's found
-    if (limelightState == INTAKE_STATE.HOLDING_CONE) {
+    if (limelightINTAKINGState == INTAKE.INTAKE_STATE.INTAKING_CONE) {
       if (getTargetArea(location) < 2.0) {
         reconnectLimelightPipeline(location);
-        limelightState = INTAKE_STATE.NONE;
+        limelightINTAKINGState = INTAKE.INTAKE_STATE.NONE;
       }
     }
-    if (limelightState == INTAKE_STATE.CONE) {
+    if (limelightINTAKINGState == INTAKE.INTAKE_STATE.INTAKING_CUBE) {
       if (getTargetArea(location) < 2.0) {
         reconnectLimelightPipeline(location);
-        limelightState = INTAKE_STATE.NONE;
+        limelightINTAKINGState = INTAKE.INTAKE_STATE.NONE;
       }
     }
   }

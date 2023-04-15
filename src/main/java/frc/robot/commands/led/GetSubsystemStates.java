@@ -6,6 +6,7 @@ package frc.robot.commands.led;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -42,8 +43,8 @@ public class GetSubsystemStates extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isIntakingCone = m_intake.getIntakeConeState();
-    isIntakingCube = m_intake.getIntakeCubeState();
+    isIntakingCone = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
+    isIntakingCube = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
     // the prioritized state to be expressed to the LEDs
     // set in order of priority to be expressed from the least priority to the
     // highest priority

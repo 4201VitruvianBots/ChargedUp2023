@@ -59,7 +59,8 @@
 //         /** Stows Wrist, Elevator, and Stops intake */
 //         new ParallelCommandGroup(
 //             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.8),
-//             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP, vision, swerveDrive).withTimeout(1.8)),
+//             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.NONE, vision,
+// swerveDrive).withTimeout(1.8)),
 //         new WaitCommand(0.48),
 
 //         /** Runs Path with Intaking cube during */
@@ -68,7 +69,8 @@
 //             new SequentialCommandGroup(
 //                 new WaitCommand(3),
 //                 new ParallelCommandGroup(
-//                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CONE)
+//                     new AutoSetSetpoint(stateHandler, elevator, wrist,
+// SETPOINT.INTAKING_LOW_CONE)
 //                         .withTimeout(2),
 //                     new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.INTAKING_CONE)
 //                         .withTimeout(2)))),

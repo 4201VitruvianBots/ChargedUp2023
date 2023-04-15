@@ -17,46 +17,45 @@ import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
-
 import java.util.List;
 
 public class LimeLightTest extends SequentialCommandGroup {
-    private final List<PathPlannerTrajectory> m_trajectories;
-    public LimeLightTest(
-        String pathName,
-        SwerveDrive swerveDrive,
-        FieldSim fieldSim,
-        Wrist wrist,
-        Intake intake,
-        Vision vision,
-        Elevator elevator,
-        StateHandler stateHandler) {
+  private final List<PathPlannerTrajectory> m_trajectories;
 
-        m_trajectories =
-                TrajectoryUtils.readTrajectory(
-                        pathName,
-                        new PathConstraints(
-                                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5,
-                                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5));
+  public LimeLightTest(
+      String pathName,
+      SwerveDrive swerveDrive,
+      FieldSim fieldSim,
+      Wrist wrist,
+      Intake intake,
+      Vision vision,
+      Elevator elevator,
+      StateHandler stateHandler) {
 
-        List<PPSwerveControllerCommand> swerveCommands =
-                TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
+    m_trajectories =
+        TrajectoryUtils.readTrajectory(
+            pathName,
+            new PathConstraints(
+                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5,
+                Constants.SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.5));
+
+    List<PPSwerveControllerCommand> swerveCommands =
+        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
         /** Setting Up Auto Zeros robot to path flips path if necessary */
         new SetSwerveOdometry(
-                swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
+            swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
-        new InstantCommand(()-> vision.setPipeline(Constants.VISION.CAMERA_SERVER.INTAKE, 2)),
+        new InstantCommand(() -> vision.setPipeline(Constants.VISION.CAMERA_SERVER.INTAKE, 2)),
         new InterruptingCommand(
-                swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, ()-> 0.2).until(()->intake.getIntakeState() == Constants.INTAKE.INTAKE_STATE.HOLDING_CONE),
-                ()->vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)
-            )
-        );
+            swerveCommands.get(0),
+            new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.2)
+                .until(() -> intake.getIntakeState() == Constants.INTAKE.INTAKE_STATE.HOLDING_CONE),
+            () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)));
   }
 
-    public List<PathPlannerTrajectory> getTrajectories() {
-        return m_trajectories;
-    }
+  public List<PathPlannerTrajectory> getTrajectories() {
+    return m_trajectories;
+  }
 }

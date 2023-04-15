@@ -180,27 +180,24 @@ public final class Constants {
   public static class AUTOTIMES {
 
     public enum WAIT {
-
-      SCORE_HIGH_CONE(0.65), //good
-      SCORE_HIGH_CUBE(0.65), //good
+      SCORE_HIGH_CONE(0.65), // good
+      SCORE_HIGH_CUBE(0.65), // good
       SCORE_MID_CONE(0.7),
       SCORE_MID_CUBE(0.7),
 
-      WAIT_TO_PLACE_CONE(2), //good
-      WAIT_TO_PLACE_CUBE(2), //good
+      WAIT_TO_PLACE_CONE(2), // good
+      WAIT_TO_PLACE_CUBE(2), // good
 
       SCORING_CONE(0.9), // good
-      SCORING_CUBE(0.5), //good
-
+      SCORING_CUBE(0.5), // good
 
       STOW_HIGH_CONE(0.55), // good
-      STOW_HIGH_CUBE(0.55), //good
+      STOW_HIGH_CUBE(0.55), // good
 
       STOW_MID_CONE(0.3),
       STOW_MID_CUBE(0.3),
 
       INTAKE_TO_STOW(0.5); // good
-
 
       public double value;
 
@@ -224,17 +221,7 @@ public final class Constants {
     public static double kF = 0;
     public static double kP = 0.2;
 
-    public enum INTAKE_STATE {
-      NONE,
-      INTAKING_CONE,
-      INTAKING_CUBE,
-      HOLDING_CONE,
-      HOLDING_CUBE,
-      SCORING_CONE,
-      SCORING_CUBE
-    }
-
-    public enum VELOCITYTHRESHOLDS {
+    public enum VELOCITY_THRESHOLDS {
       // Units are in raw motor velocity units
       NONE_MIN(9000),
       NONE_MAX(11000),
@@ -245,7 +232,7 @@ public final class Constants {
 
       private final double value;
 
-      VELOCITYTHRESHOLDS(final double value) {
+      VELOCITY_THRESHOLDS(final double value) {
         this.value = value;
       }
 
@@ -254,19 +241,19 @@ public final class Constants {
       }
     }
 
-    public enum INTAKE_SPEEDS {
+    public enum INTAKE_STATE {
       // Units are in Percent Output
+      NONE(0),
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
-      STOP(0),
       INTAKING_CUBE(-0.5),
       HOLDING_CUBE(-0.1),
       SCORING_CUBE(0.1);
 
       private final double value;
 
-      INTAKE_SPEEDS(final double value) {
+      INTAKE_STATE(final double value) {
         this.value = value;
       }
 
@@ -676,12 +663,10 @@ public final class Constants {
     SWERVE_DRIVE.frontRightCANCoderOffset = 153.721; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
-
   }
 
   private static void initAlpha() {
     robotName = "Alpha";
-
 
     SWERVE_DRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 222.9785; // 41.748;

@@ -42,7 +42,8 @@
 
 //     addCommands(
 //         /** Setting Up Auto Zeros robot to path flips path if necessary */
-//         new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(), fieldSim),
+//         new SetSwerveOdometry(swerveDrive, trajectories.get(0).getInitialHolonomicPose(),
+// fieldSim),
 //         new PlotAutoTrajectory(fieldSim, pathName, trajectories),
 
 //         /** Brings elevator & wrist to High Pulls up cone */
@@ -56,7 +57,7 @@
 //         /** Stows Wrist, Elevator, and Stops intake */
 //         new ParallelCommandGroup(
 //             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(1.8),
-//             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.STOP).withTimeout(1.8)),
+//             new AutoSetIntakeSetpoint(intake, INTAKE_SPEEDS.NONE).withTimeout(1.8)),
 //         new WaitCommand(0.75),
 //         swerveCommands.get(0),
 //         new AutoBalance(swerveDrive),

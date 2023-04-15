@@ -21,15 +21,13 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.INTAKE.INTAKE_SPEEDS;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
-  private boolean isIntaking = false;
+  private boolean m_isIntaking = false;
 
-  private INTAKE_STATE m_state = INTAKE_STATE.NONE;
+  private INTAKE_STATE m_speed = INTAKE_STATE.NONE;
 
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
 
@@ -75,24 +73,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     m_intakeLigament2d.setColor(new Color8Bit(255, 114, 118)); // Light red
   }
 
-  public INTAKE.INTAKE_STATE getHeldGamepiece() {
-    //    double leftConeSensorValue =
-    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.leftConeSensorId) / 1000.0;
-    //    double rightConeSensorValue =
-    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.rightConeSensorId) / 1000.0;
-    //    double cubeSensorValue =
-    //        m_distanceSensor.getSensorValueMillimeters(INTAKE.cubeSensorId) / 1000.0;
-
-    //    if (leftConeSensorValue + rightConeSensorValue <= INTAKE.innerIntakeWidth) {
-    //      return INTAKE.INTAKE_STATE.CONE;
-    //    } else if (cubeSensorValue <= INTAKE.innerIntakeWidth - 1) {
-    //      return INTAKE_STATE.CUBE;
-    //    } else {
-    //      return INTAKE_STATE.NONE;
-    //    }
-    return INTAKE_STATE.NONE;
-  }
-
   // Returns a pose where the center of the gamepiece should be
   public Pose2d getGamepiecePose(Pose2d intakePose) {
     return new Pose2d(
@@ -111,24 +91,20 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   // control mode function
-  public boolean isManualControl() {
-    return isIntaking;
+  public void setIntaking(boolean isIntaking) {
+    m_isIntaking = isIntaking;
   }
 
-  public boolean hasGamepiece() {
-    return false;
+  public boolean isIntaking() {
+    return m_isIntaking;
   }
 
-  public boolean getIntakeConeState() {
-    return isIntaking;
-  }
-
-  public void setIntakingState(INTAKE_STATE state) {
-    m_state = state;
+  public void setIntakingState(INTAKE_STATE speed) {
+    m_speed = speed;
   }
 
   public INTAKE_STATE getIntakeState() {
-    return m_state;
+    return m_speed;
   }
 
   public double getMotorOutputCurrent() {
@@ -144,6 +120,21 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.set(ControlMode.PercentOutput, value);
   }
 
+  private void updateIntakeState() {
+    if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
+      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CONE_MIN.get())
+        setIntakingState(INTAKE_STATE.HOLDING_CONE);
+    }
+
+    if (getIntakeState()
+        == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
+      if (currentVelocity < INTAKE.VELOCITY_THRESHOLDS.CUBE_MIN.get())
+        setIntakingState(INTAKE_STATE.HOLDING_CUBE);
+    }
+
+    setPercentOutput(getIntakeState().get());
+  }
+
   // Shuffleboard or SmartDashboard function
   public void initSmartDashboard() {}
 
@@ -153,70 +144,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public void updateLog() {
     currentEntry.append(getMotorOutputCurrent());
-  }
-
-  private boolean checkIntakingSpeed(INTAKE_STATE state) {
-
-  }
-
-  private void updateIntakeState() {
-    switch (m_state) {
-      case INTAKING_CONE:
-        setPercentOutput(INTAKE.INTAKE_SPEEDS.INTAKING_CONE.get());
-        if(checkIntakingSpeed(m_state)) {
-          m_state = INTAKE_STATE.HOLDING_CONE;
-        }
-        break;
-      case INTAKING_CUBE:
-        setPercentOutput(INTAKE.INTAKE_SPEEDS.INTAKING_CUBE.get());
-        if(checkIntakingSpeed(m_state)) {
-          m_state = INTAKE_STATE.HOLDING_CUBE;
-        }
-
-        break;
-      case HOLDING_CONE:
-
-
-      case HOLDING_CUBE:
-        break;
-      case :
-
-
-      case HOLDING_CUBE:
-        break;
-
-
-      default:
-      case NONE:
-        setPercentOutput(0);
-        break;
-    }
-  }
-
-  public void updateFinishedIntaking(SUPERSTRUCTURE_STATE state) {
-    // Update velocity variables
-    previousVelocity = currentVelocity;
-    currentVelocity = intakeMotor.getSelectedSensorVelocity();
-    if (previousVelocity > INTAKE.VELOCITYTHRESHOLDS.NONE_MIN.get() && // Check if we were previously intaking with no gamepiece detected
-      previousVelocity < INTAKE.VELOCITYTHRESHOLDS.NONE_MAX.get()) {
-
-      if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE && // Check if we are currently intaking a cone
-      currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CONE_MIN.get() &&
-      currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CONE_MAX.get()) {
-        isFinishedIntaking = true;
-      }
-
-      else if (state == SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE && // Check if we are currently intaking a cube
-      currentVelocity > INTAKE.VELOCITYTHRESHOLDS.CUBE_MIN.get() && 
-      currentVelocity < INTAKE.VELOCITYTHRESHOLDS.CUBE_MAX.get()) {
-        isFinishedIntaking = true;
-      }
-    }
-    isFinishedIntaking = false; // If these conditions aren't met, than we have not finished intaking
-  }
-
-  public boolean getFinishedIntaking() {
-    return intakeMotor.getSelectedSensorVelocity() < 8000;
   }
 
   @Override
