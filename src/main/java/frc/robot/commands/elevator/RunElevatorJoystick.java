@@ -11,7 +11,7 @@ import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
 public class RunElevatorJoystick extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. This is our default command */
+  /** Creates a new RunElevatorJoystick. This is our default command */
   private final Elevator m_elevator;
 
   private final DoubleSupplier m_joystickY;

@@ -10,7 +10,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
 
 public class ToggleElevatorTestMode extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
+  /** Creates a new ToggleElevatorTestMode. */
   private final Elevator m_elevator;
 
   private final StateHandler m_stateHandler;

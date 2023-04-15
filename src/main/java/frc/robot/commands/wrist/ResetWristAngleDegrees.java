@@ -12,7 +12,7 @@ public class ResetWristAngleDegrees extends CommandBase {
 
   private final double m_angle;
 
-  /** Creates a new RunWrist. */
+  /** Creates a new ResetWristAngleDegrees. */
   public ResetWristAngleDegrees(Wrist wrist, double angle) {
     m_wrist = wrist;
     m_angle = angle;

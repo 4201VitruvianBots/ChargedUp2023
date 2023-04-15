@@ -9,7 +9,7 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.subsystems.Wrist;
 
 public class ToggleWristControlMode extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
+  /** Creates a new ToggleWristControlMode. */
   private final Wrist m_wrist;
 
   public ToggleWristControlMode(Wrist wrist) {

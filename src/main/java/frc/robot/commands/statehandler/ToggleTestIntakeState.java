@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StateHandler;
 
 public class ToggleTestIntakeState extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
+  /** Creates a new ToggleTestIntakeState. */
   private final StateHandler m_stateHandler;
 
   public ToggleTestIntakeState(StateHandler stateHandler) {

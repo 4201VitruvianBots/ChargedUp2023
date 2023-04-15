@@ -16,8 +16,6 @@ import frc.robot.subsystems.StateHandler;
 
 public class RunElevatorTestMode extends CommandBase {
   private final Elevator m_elevator;
-
-  // Add a reference to the state handler
   private final StateHandler m_stateHandler;
 
   private final DoubleSubscriber kSetpointSub,

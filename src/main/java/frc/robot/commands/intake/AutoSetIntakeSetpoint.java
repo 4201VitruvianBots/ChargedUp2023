@@ -15,10 +15,10 @@ import frc.robot.subsystems.Vision;
 
 public class AutoSetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Intake m_intake;
-
-  private final Vision m_vision;
   private final SwerveDrive m_swerve;
+
+  private final Intake m_intake;
+  private final Vision m_vision;
 
   private INTAKE.INTAKE_STATE m_state;
 

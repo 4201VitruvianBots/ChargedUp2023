@@ -10,7 +10,7 @@ import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class ToggleWristTestMode extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
+  /** Creates a new ToggleWristTestMode. */
   private final Wrist m_wrist;
 
   private final StateHandler m_stateHandler;

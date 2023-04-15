@@ -16,8 +16,6 @@ import frc.robot.subsystems.Wrist;
 
 public class RunWristTestMode extends CommandBase {
   private final Wrist m_wrist;
-
-  // Add a reference to the state handler
   private final StateHandler m_stateHandler;
 
   private final DoubleSubscriber kSetpointSub,

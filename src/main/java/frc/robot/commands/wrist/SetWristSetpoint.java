@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 public class SetWristSetpoint extends CommandBase {
   private final Wrist m_wrist;
+
   private final DoubleSupplier m_input;
   private final double m_setpoint;
 
