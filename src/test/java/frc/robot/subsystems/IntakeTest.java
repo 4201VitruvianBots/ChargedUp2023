@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.HAL;
@@ -72,8 +73,8 @@ public class IntakeTest extends CommandTestBase {
     m_timer.start();
     while (m_timer.get() < 1) {
       CommandScheduler.getInstance().run();
-      assertTrue(m_stateHandler.getDesiredSetpoint() == SETPOINT.INTAKING_LOW_CUBE);
-      assertTrue(m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CUBE);
+      assertSame(m_stateHandler.getDesiredSetpoint(), SETPOINT.INTAKING_LOW_CUBE);
+      assertSame(m_intake.getIntakeState(), INTAKE_STATE.INTAKING_CUBE);
     }
     m_intake.getIntakeMotor().getSimCollection().setIntegratedSensorVelocity(0);
     CommandScheduler.getInstance().run();

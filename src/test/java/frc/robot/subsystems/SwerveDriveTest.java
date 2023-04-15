@@ -45,7 +45,6 @@ public class SwerveDriveTest extends CommandTestBase {
     m_robotContainer.close();
   }
 
-  @Disabled("Works, but breaks next test")
   @Test
   public void TestPIDControllers() {
     var xPidController = m_swerveDrive.getXPidController();
