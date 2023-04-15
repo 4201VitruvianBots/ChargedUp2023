@@ -34,6 +34,7 @@ import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.commands.statehandler.ToggleTestIntakeState;
 import frc.robot.utils.SetpointSolver;
@@ -595,6 +596,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           setDesiredSetpoint(SETPOINT.STOWED);
         }
       }
+    }
+
+    if (m_intake.getRetractIntake()) {
+      m_intake.setRetractIntake(false);
+      var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
+      retractCmd.schedule();
     }
 
     if (m_smartScoringEnabled) {

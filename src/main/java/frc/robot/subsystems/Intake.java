@@ -27,13 +27,11 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private boolean m_isIntaking = false;
 
-  private INTAKE_STATE m_speed = INTAKE_STATE.NONE;
+  private boolean m_retractIntake = false;
+
+  private INTAKE_STATE m_state = INTAKE_STATE.NONE;
 
   private final TalonFX intakeMotor = new TalonFX(CAN.intakeMotor);
-
-  private double previousVelocity;
-
-  private double currentVelocity = intakeMotor.getSelectedSensorVelocity();
 
   //  private final DistanceSensor m_distanceSensor;
 
@@ -100,11 +98,11 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   public void setIntakingState(INTAKE_STATE speed) {
-    m_speed = speed;
+    m_state = speed;
   }
 
   public INTAKE_STATE getIntakeState() {
-    return m_speed;
+    return m_state;
   }
 
   public double getMotorOutputCurrent() {
@@ -126,17 +124,29 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   private void updateIntakeState() {
     if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
-      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CONE_MIN.get())
+      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CONE_MIN.get()) {
         setIntakingState(INTAKE_STATE.HOLDING_CONE);
+        m_retractIntake = true;
+      }
     }
 
     if (getIntakeState()
         == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
-      if (currentVelocity < INTAKE.VELOCITY_THRESHOLDS.CUBE_MIN.get())
+      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CUBE_MIN.get()) {
         setIntakingState(INTAKE_STATE.HOLDING_CUBE);
+        m_retractIntake = true;
+      }
     }
 
     setPercentOutput(getIntakeState().get());
+  }
+
+  public boolean getRetractIntake() {
+    return m_retractIntake;
+  }
+
+  public void setRetractIntake(boolean value) {
+    m_retractIntake = value;
   }
 
   // Shuffleboard or SmartDashboard function
