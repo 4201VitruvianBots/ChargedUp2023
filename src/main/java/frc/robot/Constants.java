@@ -7,7 +7,12 @@ package frc.robot;
 import static frc.robot.Constants.CONSTANTS.kCANCoderSensorUnitsPerRotation;
 import static frc.robot.Constants.CONSTANTS.kFalconSensorUnitsPerRotation;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -22,9 +27,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Map;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -283,7 +285,7 @@ public final class Constants {
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
     public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 114.961;
+    public static double frontRightCANCoderOffset = 62.051;
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
@@ -654,7 +656,7 @@ public final class Constants {
   private static void initBeta() {
     robotName = "Beta";
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
-    SWERVE_DRIVE.frontRightCANCoderOffset = 114.961; // 41.748;
+    SWERVE_DRIVE.frontRightCANCoderOffset = 62.051; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
   }
