@@ -582,7 +582,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     if (m_intake.getRetractIntake()) {
       var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
       retractCmd.schedule();
-      m_intake.setRetractIntake(false);
+      if(m_currentState == SUPERSTRUCTURE_STATE.STOWED) {
+        m_intake.setRetractIntake(false);
+      }
     }
 
     if (m_smartScoringEnabled) {
