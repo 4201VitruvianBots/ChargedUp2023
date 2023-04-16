@@ -35,8 +35,6 @@ import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.statehandler.SetSetpoint;
-import frc.robot.commands.statehandler.ToggleSmartScoring;
-import frc.robot.commands.statehandler.ToggleTestIntakeState;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -138,8 +136,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       } catch (Exception e) {
         //        System.out.println("Ignoring WPILib Error");
       }
-      SmartDashboard.putData(new ToggleTestIntakeState(this));
-      SmartDashboard.putData(new ToggleSmartScoring(this));
       SmartDashboard.putData("SuperStructure Sim", m_superStructureMech2d);
       m_simTimer.reset();
       m_simTimer.start();

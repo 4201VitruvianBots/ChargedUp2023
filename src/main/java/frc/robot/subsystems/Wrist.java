@@ -35,7 +35,6 @@ import frc.robot.Constants.DIO;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.THRESHOLD;
-import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
 
@@ -365,7 +364,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   private void initSmartDashboard() {
     SmartDashboard.putData(this);
-    SmartDashboard.putData("Reset90", new ResetWristAngleDegrees(this, Units.degreesToRadians(90)));
 
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");

@@ -60,7 +60,8 @@ public class TrajectoryUtils {
 
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
-        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, false);
+        //        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " +
+        // fileName, false);
         return new ArrayList<>();
       }
     }

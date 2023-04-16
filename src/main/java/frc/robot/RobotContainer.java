@@ -45,9 +45,7 @@ import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
-import frc.robot.commands.statehandler.SetConditionalSetpoint;
-import frc.robot.commands.statehandler.SetSetpoint;
-import frc.robot.commands.statehandler.ZeroAllSensors;
+import frc.robot.commands.statehandler.*;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
 import frc.robot.commands.swerve.ResetOdometry;
@@ -127,14 +125,6 @@ public class RobotContainer implements AutoCloseable {
     m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
     m_led.setDefaultCommand(
         new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist, m_elevator));
-
-    SmartDashboard.putData(new ResetElevatorHeight(m_elevator, 0));
-    SmartDashboard.putData(new ResetWristAngleDegrees(m_wrist, -15.0));
-
-    if (RobotBase.isSimulation()) {
-      SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
-      SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
-    }
   }
 
   private void resetSubsystemPositions() {
@@ -254,12 +244,19 @@ public class RobotContainer implements AutoCloseable {
     xboxController.leftStick().whileTrue(new LimitElevatorJoystickInput(m_elevator));
     xboxController.rightStick().whileTrue(new LimitWristJoystickInput(m_wrist));
 
+    // Add Smartdashboard Buttons
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
-    SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
-    SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
     SmartDashboard.putData(new ZeroAllSensors(m_elevator, m_wrist, m_swerveDrive));
+    SmartDashboard.putData("ResetWrist90", new ResetWristAngleDegrees(m_wrist, 90));
+
+    if (!DriverStation.isFMSAttached()) {
+      SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
+      SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
+      SmartDashboard.putData(new ToggleTestIntakeState(m_stateHandler));
+      SmartDashboard.putData(new ToggleSmartScoring(m_stateHandler));
+    }
     initTestController();
   }
 
@@ -567,13 +564,17 @@ public class RobotContainer implements AutoCloseable {
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
       String[] autos = {
+        "BlueBumpOnePickUp",
+        "BlueCenterOneBalance",
+        "BlueCenterOneBalanceCross",
+        "BlueSubstationThree",
         "BlueSubstationTwo",
         "BlueSubstationTwoBalance",
+        "RedBumpOnePickUp",
+        "RedCenterOneBalance",
+        "RedCenterOneBalanceCross",
+        "RedSubstationThree",
         "RedSubstationTwo",
-        "RedSubstationTwoBalance",
-        "CenterOneBalance",
-        "CenterOneBalanceCross",
-        "BumpOnePickUp",
         "DriveForward",
         "TestSimAuto"
       };
