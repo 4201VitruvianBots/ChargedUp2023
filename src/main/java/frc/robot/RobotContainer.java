@@ -44,6 +44,7 @@ import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.SetIntakeState;
+import frc.robot.commands.intake.SetUseCubeSetpoint;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.*;
@@ -220,8 +221,8 @@ public class RobotContainer implements AutoCloseable {
             new SetSetpoint(
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
-    xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE));
-    xboxController.povDown().onTrue(new RunIntakeCone(m_intake, 0.2).withTimeout(.25)); 
+    xboxController.povLeft().whileTrue(new SetUseCubeSetpoint(m_intake));
+    xboxController.povDown().onTrue(new RunIntakeCone(m_intake, 0.2).withTimeout(.25));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press

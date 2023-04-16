@@ -31,6 +31,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
   private boolean m_isIntaking = false;
 
+  private boolean m_useCubeSetpoint = false;
   private boolean m_retractIntake = false;
 
   private INTAKE_STATE m_state = INTAKE_STATE.NONE;
@@ -155,6 +156,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public void setRetractIntake(boolean value) {
     m_retractIntake = value;
+  }
+
+  public boolean isUsingCubeSetpoint() {
+    return m_useCubeSetpoint;
+  }
+
+  public void setUsingCubeSetpoint(boolean state) {
+    m_useCubeSetpoint = state;
   }
 
   // Shuffleboard or SmartDashboard function
