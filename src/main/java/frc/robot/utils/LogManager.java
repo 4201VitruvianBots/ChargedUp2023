@@ -30,12 +30,17 @@ public class LogManager {
     ArrayList<String> filePaths = new ArrayList<>();
 
     File folder = new File(mainPath);
-    File[] allFiles = folder.listFiles();
+    try {
+      File[] allFiles = folder.listFiles();
 
-    for (File file : allFiles) {
-      if (file.isFile() && file.getName().contains("wpilog")) {
-        filePaths.add(file.getAbsolutePath());
+      assert allFiles != null;
+      for (File file : allFiles) {
+        if (file.isFile() && file.getName().contains("wpilog")) {
+          filePaths.add(file.getAbsolutePath());
+        }
       }
+    } catch (Exception ignored) {
+
     }
 
     return filePaths;

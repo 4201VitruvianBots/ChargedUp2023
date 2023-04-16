@@ -42,9 +42,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
   private boolean m_wristInitialized = false;
 
-  // Timer for wrist reset (if button is up for 100ms, reset the wrist)
-  private DigitalInput resetSwitch = new DigitalInput(DIO.resetWristSwitch);
-  private Timer timer = new Timer();
+  private final DigitalInput resetSwitch = new DigitalInput(DIO.resetWristSwitch);
 
   private double m_desiredSetpointRadians;
   private double m_lowerLimitRadians = THRESHOLD.ABSOLUTE_MIN.get();
@@ -296,18 +294,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     wristMotor.setSelectedSensorPosition(angleDegrees / WRIST.encoderUnitsToDegrees);
   }
 
-  public void handleButtonPress() {
-    if (resetSwitch.get()) {
-      timer.start(); // start the timer when the button is up
-    } else {
-      if (timer.hasElapsed(0.1)) { // check if the button has been up for 100ms
-        resetAngleDegrees(-15.0); // run the command to zero the wrist
-        timer.stop(); // stop the timer
-        timer.reset(); // reset the timer for the next button press
-      }
-    }
-  }
-
   public void setLowerLimit(double radians) {
     m_lowerLimitRadians = radians;
   }
@@ -322,10 +308,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   public double getUpperLimit() {
     return m_upperLimitRadians;
-  }
-
-  public boolean isScoring() {
-    return (getPositionDegrees() > 170);
   }
 
   // TODO: Recalculate values using new intake/elevator

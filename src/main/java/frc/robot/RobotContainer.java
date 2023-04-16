@@ -567,6 +567,7 @@ public class RobotContainer implements AutoCloseable {
 
       try {
         File[] filePaths = new File(Filesystem.getDeployDirectory(), "pathplanner/").listFiles();
+        assert filePaths != null;
         for (var filepath : filePaths) {
           var filename = filepath.getName();
           if (filename.endsWith(".path")) {

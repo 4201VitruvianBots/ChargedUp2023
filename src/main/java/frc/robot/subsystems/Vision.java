@@ -111,7 +111,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       m_limelightLigament2d =
           m_chassisRoot2d.append(new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
       m_limelightLigament2d.setColor(new Color8Bit(0, 180, 40)); // Green
-    } catch (Exception m_ignored) {
+    } catch (Exception ignored) {
 
     }
   }

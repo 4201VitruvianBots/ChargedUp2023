@@ -119,11 +119,6 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints m_Constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
 
-    public enum SPEED {
-      SLOW,
-      FAST
-    }
-
     public enum SETPOINT {
       STOWED(Units.inchesToMeters(0.0)),
       INTAKING_LOW(STOWED.get()),
@@ -168,41 +163,6 @@ public final class Constants {
       private final double value;
 
       THRESHOLD(final double value) {
-        this.value = value;
-      }
-
-      public double get() {
-        return value;
-      }
-    }
-  }
-
-  public static class AUTOTIMES {
-
-    public enum WAIT {
-      SCORE_HIGH_CONE(0.65), // good
-      SCORE_HIGH_CUBE(0.65), // good
-      SCORE_MID_CONE(0.45),
-      SCORE_MID_CUBE(0.45),
-
-      WAIT_TO_PLACE_CONE(1.7), // good
-      WAIT_TO_PLACE_CUBE(1.7), // good
-      WAIT_TO_PLACE_CUBE_MID(1),
-
-      SCORING_CONE(0.85), // good
-      SCORING_CUBE(0.5), // good
-
-      STOW_HIGH_CONE(0.55), // good
-      STOW_HIGH_CUBE(0.55), // good
-
-      STOW_MID_CONE(0.3),
-      STOW_MID_CUBE(0.3),
-
-      INTAKE_TO_STOW(0.5); // good
-
-      public double value;
-
-      WAIT(double value) {
         this.value = value;
       }
 
@@ -653,7 +613,7 @@ public final class Constants {
 
       INTAKE_TO_STOW(0.5); // good
 
-      public double value;
+      private final double value;
 
       WAIT(double value) {
         this.value = value;
@@ -691,10 +651,6 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    // SWERVE_DRIVE.frontLeftCANCoderOffset = 81.431; // 85.957;
-    // SWERVE_DRIVE.frontRightCANCoderOffset = 219.4625; // 41.748;
-    // SWERVE_DRIVE.backLeftCANCoderOffset = 191.382; // 261.475;
-    // SWERVE_DRIVE.backRightCANCoderOffset = 32.6515;
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 114.961; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;

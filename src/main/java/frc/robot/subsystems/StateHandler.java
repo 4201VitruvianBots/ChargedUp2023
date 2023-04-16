@@ -63,7 +63,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
-  private double startTime = 0;
 
   private double m_elevatorDesiredSetpointMeters;
   private double m_wristDesiredSetpointRadians;

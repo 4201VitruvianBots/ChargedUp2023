@@ -80,10 +80,8 @@ public class MemoryLog {
       updateMemoryValues();
 
       // Prints the amount of megabytes being used by the robot code
-      System.out.println(
-          "Amount of memory used by robot code: "
-              + Long.toString(this.usedMemory / 1048576)
-              + " MB");
+      System.out.printf(
+          "Amount of memory used by robot code: %04f MB\n", this.usedMemory / 1048576.0);
       // Checks if the robot code is using more than 192 MB of memory (3/4 of the roboRIO's memory)
       if (this.usedMemory / 1048576 > 192) {
         throwError();
@@ -94,10 +92,9 @@ public class MemoryLog {
 
       // Writes to the log list
       writeToLogFile(
-          Long.toString((timeAtLastMemoryLog - startTime) / 1000000000L)
-              + "s : "
-              + Long.toString(freeMemory / 1048576)
-              + " MB\n");
+          String.format(
+              "%04fs : %04f MB\n",
+              (timeAtLastMemoryLog - startTime) / 1000000000.0, freeMemory / 1048576.0));
     } else if (timeSinceLastMemoryLog
         >= 57000000000L) { // Garbage collects 3 seconds before memory log
       garbageCollect();
