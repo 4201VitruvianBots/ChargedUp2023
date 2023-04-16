@@ -124,21 +124,21 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   }
 
   private void updateIntakeState() {
-    if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
-      if (getIntakeVelocity() < THRESHOLDS.CONE_MIN.get()) {
-        setIntakingState(INTAKE_STATE.HOLDING_CONE);
-        m_retractIntake = true;
-      }
-    }
-
-    if (getIntakeState()
-        == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
-      if (getIntakeVelocity() < THRESHOLDS.CUBE_MIN.get()) {
-        setIntakingState(INTAKE_STATE.HOLDING_CUBE);
-        m_retractIntake = true;
-      }
-    }
-    setPercentOutput(getIntakeState().get());
+//    if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
+//      if (getIntakeVelocity() < THRESHOLDS.CONE_MIN.get()) {
+//        setIntakingState(INTAKE_STATE.HOLDING_CONE);
+//        m_retractIntake = true;
+//      }
+//    }
+//
+//    if (getIntakeState()
+//        == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
+//      if (getIntakeVelocity() < THRESHOLDS.CUBE_MIN.get()) {
+//        setIntakingState(INTAKE_STATE.HOLDING_CUBE);
+//        m_retractIntake = true;
+//      }
+//    }
+//    setPercentOutput(getIntakeState().get());
   }
 
   public boolean getRetractIntake() {

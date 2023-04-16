@@ -23,6 +23,11 @@ public class ZeroAllSensors extends CommandBase {
     m_swerve = swerveDrive;
   }
 
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -42,6 +47,6 @@ public class ZeroAllSensors extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

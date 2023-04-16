@@ -163,7 +163,7 @@ public class RobotContainer implements AutoCloseable {
 
     xboxController
         .leftTrigger(0.1)
-        .onTrue(
+        .whileTrue(
             new ConditionalCommand(
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
@@ -177,7 +177,7 @@ public class RobotContainer implements AutoCloseable {
                 () -> m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CUBE));
     xboxController
         .rightTrigger(0.1)
-        .onTrue(
+        .whileTrue(
             new ConditionalCommand(
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
