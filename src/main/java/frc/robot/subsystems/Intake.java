@@ -137,7 +137,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     //        m_retractIntake = true;
     //      }
     //    }
-    //    setPercentOutput(getIntakeState().get());
+       setPercentOutput(getIntakeState().get());
   }
 
   public boolean getRetractIntake() {
@@ -153,6 +153,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   public void updateSmartDashboard() {
     SmartDashboard.putString("Intake State", getIntakeState().toString());
+    SmartDashboard.putNumber("Intake Velocity", getIntakeVelocity());
   }
 
   public void updateLog() {
