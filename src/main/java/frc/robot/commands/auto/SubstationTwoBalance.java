@@ -77,17 +77,17 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
                         .withTimeout(0.5),
                     new AutoSetIntakeSetpoint(
                             intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)
-                        .withTimeout(0.5)))),
+                        .withTimeout(1)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive),
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                 .withTimeout(WAIT.INTAKE_TO_STOW.get())),
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
-                .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_MID_CUBE)
+                .withTimeout(WAIT.SCORE_MID_CUBE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
+                .withTimeout(WAIT.SCORE_MID_CUBE.get())),
         /** Outakes cone */
         new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
         new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
@@ -96,10 +96,10 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+                .withTimeout(WAIT.STOW_MID_CUBE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
-        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
+                .withTimeout(WAIT.STOW_MID_CUBE.get())),
+        new WaitCommand(WAIT.STOW_MID_CUBE.get()),
         swerveCommands.get(2),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

@@ -109,7 +109,7 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.11;
+    public static final double kP = 0.05;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
@@ -215,9 +215,9 @@ public final class Constants {
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
-      INTAKING_CUBE(-0.5),
-      HOLDING_CUBE(-0.1),
-      SCORING_CUBE(0.5);
+      INTAKING_CUBE(-0.8),
+      HOLDING_CUBE(-0.3),
+      SCORING_CUBE(0.8);
 
       private final double value;
 
@@ -619,20 +619,21 @@ public final class Constants {
     public enum WAIT {
       SCORE_HIGH_CONE(0.65), // good
       SCORE_HIGH_CUBE(0.65), // good
-      SCORE_MID_CONE(0.7),
-      SCORE_MID_CUBE(0.7),
+      SCORE_MID_CONE(0.4),
+      SCORE_MID_CUBE(0.4),
 
-      WAIT_TO_PLACE_CONE(2), // good
-      WAIT_TO_PLACE_CUBE(2), // good
+      WAIT_TO_PLACE_CONE(1), // good
+      WAIT_TO_PLACE_CUBE(1.5),
+      WAIT_TO_PLACE_CUBE_MID(0.7), // good
 
-      SCORING_CONE(0.9), // good
-      SCORING_CUBE(0.5), // good
+      SCORING_CONE(0.65), // good
+      SCORING_CUBE(0.4), // good
 
       STOW_HIGH_CONE(0.55), // good
       STOW_HIGH_CUBE(0.55), // good
 
       STOW_MID_CONE(0.3),
-      STOW_MID_CUBE(0.3),
+      STOW_MID_CUBE(0.1),
 
       INTAKE_TO_STOW(0.5); // good
 
