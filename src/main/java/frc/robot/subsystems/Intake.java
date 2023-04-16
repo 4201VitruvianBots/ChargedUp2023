@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.INTAKE.THRESHOLDS;
 
 public class Intake extends SubsystemBase implements AutoCloseable {
   /** Creates a new Intake. */
@@ -124,7 +125,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
   private void updateIntakeState() {
     if (getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
-      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CONE_MIN.get()) {
+      if (getIntakeVelocity() < THRESHOLDS.CONE_MIN.get()) {
         setIntakingState(INTAKE_STATE.HOLDING_CONE);
         m_retractIntake = true;
       }
@@ -132,7 +133,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     if (getIntakeState()
         == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
-      if (getIntakeVelocity() < INTAKE.VELOCITY_THRESHOLDS.CUBE_MIN.get()) {
+      if (getIntakeVelocity() < THRESHOLDS.CUBE_MIN.get()) {
         setIntakingState(INTAKE_STATE.HOLDING_CUBE);
         m_retractIntake = true;
       }

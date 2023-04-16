@@ -187,7 +187,7 @@ public final class Constants {
     public static double kF = 0;
     public static double kP = 0.2;
 
-    public enum VELOCITY_THRESHOLDS {
+    public enum THRESHOLDS {
       // Units are in raw motor velocity units
       NONE_MIN(9000),
       NONE_MAX(11000),
@@ -198,7 +198,7 @@ public final class Constants {
 
       private final double value;
 
-      VELOCITY_THRESHOLDS(final double value) {
+      THRESHOLDS(final double value) {
         this.value = value;
       }
 
