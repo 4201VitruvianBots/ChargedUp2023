@@ -93,6 +93,8 @@ public final class Constants {
     public static final double carriageOffset = Units.inchesToMeters(11);
     public static final int mech2dAngleDegrees = 35;
 
+    public static final double kMaxReverseOutput = -0.45;
+
     // PID
     public static final double kMaxVel = Units.inchesToMeters(238);
     public static final double kMaxAccel = Units.inchesToMeters(520);

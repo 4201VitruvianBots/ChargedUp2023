@@ -134,11 +134,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
       // Setting hard limits as to how fast the elevator can move forward and backward
       //      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
-      motor.configPeakOutputReverse(-0.45, ELEVATOR.kTimeoutMs);
       // TODO: Review after new elevator is integrated
       motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
     }
-
+    elevatorMotors[0].configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
+    
     // Setting the right motor to output the same as the left motor
     elevatorMotors[0].setInverted(ELEVATOR.mainMotorInversionType);
     // elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
