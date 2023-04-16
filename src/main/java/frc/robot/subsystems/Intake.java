@@ -132,7 +132,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     }
 
     if (getIntakeState()
-            == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
+        == INTAKE_STATE.INTAKING_CUBE) { // Check if we are currently intaking a cube
       if (getIntakeVelocity() < THRESHOLDS.CUBE_MIN.get()) {
         setIntakingState(INTAKE_STATE.HOLDING_CUBE);
         m_retractIntake = true;

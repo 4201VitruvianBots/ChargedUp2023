@@ -26,8 +26,7 @@ public class SetIntakeState extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(!m_intake.getRetractIntake())
-      m_intake.setIntakingState(m_state);
+    if (!m_intake.getRetractIntake()) m_intake.setIntakingState(m_state);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
