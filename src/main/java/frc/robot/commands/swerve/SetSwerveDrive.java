@@ -49,11 +49,11 @@ public class SetSwerveDrive extends CommandBase {
         MathUtil.applyDeadband(Math.abs(m_rotationInput.getAsDouble()), 0.05)
             * Math.signum(m_rotationInput.getAsDouble());
 
-    if (DriverStation.isFMSAttached()
-        && Controls.getAllianceColor() == DriverStation.Alliance.Red) {
-      throttle *= -1;
-      strafe *= -1;
-    }
+//    if (DriverStation.isFMSAttached()
+//        && Controls.getAllianceColor() == DriverStation.Alliance.Red) {
+//      throttle *= -1;
+//      strafe *= -1;
+//    }
 
     m_swerveDrive.drive(throttle, strafe, rotation, true, false);
   }
