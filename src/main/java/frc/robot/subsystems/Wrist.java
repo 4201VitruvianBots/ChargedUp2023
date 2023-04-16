@@ -58,7 +58,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   private final Intake m_intake;
-  private final Elevator m_elevator;
 
   private TrapezoidProfile.Constraints m_currentConstraints = WRIST.m_constraints;
 
@@ -117,9 +116,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private StringPublisher currentCommandStatePub;
 
   /** Creates a new Wrist. */
-  public Wrist(Intake intake, Elevator elevator) {
+  public Wrist(Intake intake) {
     m_intake = intake;
-    m_elevator = elevator;
 
     // Factory default configs
     wristMotor.configFactoryDefault();
@@ -155,6 +153,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       if (Math.abs(getPositionDegrees() - wristResetAngleDegrees) <= 0.05)
         m_wristInitialized = true;
     }
+  }
+
+  public void setWristInitialized(boolean state) {
+    m_wristInitialized = state;
   }
 
   public MechanismLigament2d getLigament() {

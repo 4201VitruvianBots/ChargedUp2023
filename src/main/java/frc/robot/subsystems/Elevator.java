@@ -122,7 +122,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       motor.configFactoryDefault();
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      motor.setSelectedSensorPosition(0.0);
+      //      motor.setSelectedSensorPosition(0.0);
 
       // Config PID
       motor.selectProfileSlot(ELEVATOR.kSlotIdx, ELEVATOR.kPIDLoopIdx);
