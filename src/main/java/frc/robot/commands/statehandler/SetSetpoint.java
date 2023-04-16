@@ -12,7 +12,7 @@ import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.Wrist;
 
 public class SetSetpoint extends CommandBase {
-  /** Creates a new SetStateHandlerState. */
+  /** Creates a new SetSetpoint. */
   private final Elevator m_elevator;
 
   private final Wrist m_wrist;

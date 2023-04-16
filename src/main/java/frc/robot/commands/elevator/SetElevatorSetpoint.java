@@ -12,7 +12,7 @@ import frc.robot.subsystems.Elevator;
 import java.util.function.DoubleSupplier;
 
 public class SetElevatorSetpoint extends CommandBase {
-  /** Creates a new IncrementElevatorHeight. */
+  /** Creates a new SetElevatorSetpoint. */
   private final Elevator m_elevator;
 
   private final DoubleSupplier m_input;

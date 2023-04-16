@@ -34,6 +34,7 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.DIO;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.WRIST;
+import frc.robot.Constants.WRIST.THRESHOLD;
 import frc.robot.commands.wrist.ResetWristAngleDegrees;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
@@ -47,8 +48,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private Timer timer = new Timer();
 
   private double m_desiredSetpointRadians;
-  private double m_lowerLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MIN.get();
-  private double m_upperLimitRadians = WRIST.THRESHOLD.ABSOLUTE_MAX.get();
+  private double m_lowerLimitRadians = THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitRadians = THRESHOLD.ABSOLUTE_MAX.get();
 
   private CONTROL_MODE m_controlMode = CONTROL_MODE.CLOSED_LOOP;
   private boolean m_testMode = false;
@@ -58,7 +59,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private boolean m_userSetpoint;
 
   private final Intake m_intake;
-  private final Elevator m_elevator;
 
   private TrapezoidProfile.Constraints m_currentConstraints = WRIST.m_constraints;
 
@@ -87,8 +87,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
           WRIST.gearRatio,
           SingleJointedArmSim.estimateMOI(WRIST.length, WRIST.mass),
           WRIST.length,
-          WRIST.THRESHOLD.ABSOLUTE_MIN.get(),
-          WRIST.THRESHOLD.ABSOLUTE_MAX.get(),
+          THRESHOLD.ABSOLUTE_MIN.get(),
+          THRESHOLD.ABSOLUTE_MAX.get(),
           false
           // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
           );
@@ -117,9 +117,8 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private StringPublisher currentCommandStatePub;
 
   /** Creates a new Wrist. */
-  public Wrist(Intake intake, Elevator elevator) {
+  public Wrist(Intake intake) {
     m_intake = intake;
-    m_elevator = elevator;
 
     // Factory default configs
     wristMotor.configFactoryDefault();
@@ -155,6 +154,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
       if (Math.abs(getPositionDegrees() - wristResetAngleDegrees) <= 0.05)
         m_wristInitialized = true;
     }
+  }
+
+  public void setWristInitialized(boolean state) {
+    m_wristInitialized = state;
   }
 
   public MechanismLigament2d getLigament() {

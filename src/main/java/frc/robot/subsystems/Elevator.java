@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
+import frc.robot.Constants.ELEVATOR.THRESHOLD;
 import frc.robot.Constants.STATE_HANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
@@ -61,8 +62,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
   // Positional limits set by the state handler
-  private double m_lowerLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get();
-  private double m_upperLimitMeters = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get();
+  private double m_lowerLimitMeters = THRESHOLD.ABSOLUTE_MIN.get();
+  private double m_upperLimitMeters = THRESHOLD.ABSOLUTE_MAX.get();
 
   // Controlled by open loop
   private double m_joystickInput;
@@ -92,8 +93,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
           ELEVATOR.gearRatio,
           ELEVATOR.massKg,
           ELEVATOR.drumRadiusMeters,
-          ELEVATOR.THRESHOLD.ABSOLUTE_MIN.get(),
-          ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get(),
+          THRESHOLD.ABSOLUTE_MIN.get(),
+          THRESHOLD.ABSOLUTE_MAX.get(),
           true);
 
   // Shuffleboard setup
@@ -122,7 +123,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       motor.configFactoryDefault();
       motor.setNeutralMode(NeutralMode.Brake);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      motor.setSelectedSensorPosition(0.0);
+      //      motor.setSelectedSensorPosition(0.0);
 
       // Config PID
       motor.selectProfileSlot(ELEVATOR.kSlotIdx, ELEVATOR.kPIDLoopIdx);

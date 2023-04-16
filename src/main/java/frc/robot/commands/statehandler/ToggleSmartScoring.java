@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StateHandler;
 
 public class ToggleSmartScoring extends CommandBase {
-  /** Creates a new SetElevatorControlLoop. */
+  /** Creates a new ToggleSmartScoring. */
   private final StateHandler m_stateHandler;
 
   public ToggleSmartScoring(StateHandler stateHandler) {

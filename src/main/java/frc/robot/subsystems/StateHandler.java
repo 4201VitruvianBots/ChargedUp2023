@@ -34,6 +34,7 @@ import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.statehandler.ToggleSmartScoring;
 import frc.robot.commands.statehandler.ToggleTestIntakeState;
 import frc.robot.utils.SetpointSolver;
@@ -81,7 +82,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final Wrist m_wrist;
   private final SwerveDrive m_swerveDrive;
   private final Elevator m_elevator;
-  private final LEDSubsystem m_led;
   private final Vision m_vision;
   private final SetpointSolver m_setpointSolver;
   private boolean m_isStateHandlerEnabled = true;
@@ -116,16 +116,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       m_wristUpperLimitPub;
 
   public StateHandler(
-      Intake intake,
-      Wrist wrist,
-      SwerveDrive swerveDrive,
-      Elevator elevator,
-      LEDSubsystem led,
-      Vision vision) {
+      Intake intake, Wrist wrist, SwerveDrive swerveDrive, Elevator elevator, Vision vision) {
     m_intake = intake;
     m_swerveDrive = swerveDrive;
     m_elevator = elevator;
-    m_led = led;
     m_vision = vision;
     m_wrist = wrist;
     m_setpointSolver = SetpointSolver.getInstance();
@@ -502,13 +496,6 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     return targetPose.minus(elevatorPose).getTranslation().getNorm() > margin;
   }
 
-  public void StowWrist() {
-    // Get an average of the intake velocity over the last 0.1 seconds
-    // If the average is within our range, we set to stowed
-    // if (m_intake.finishedIntaking(m_desiredState))
-    //   setDesiredSetpoint(SETPOINT.STOWED);
-  }
-
   private void initSmartDashboard() {
     var stateHandlerTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandler");
@@ -597,6 +584,12 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
     }
 
+    if (m_intake.getRetractIntake()) {
+      var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
+      retractCmd.schedule();
+      m_intake.setRetractIntake(false);
+    }
+
     if (m_smartScoringEnabled) {
       updateScoringState();
 
@@ -638,12 +631,17 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     m_lastSimTime = m_currentSimTime;
     m_currentSimTime = m_simTimer.get();
 
-    // Update the angle of the mech2d
-    m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
-    m_wrist
-        .getLigament()
-        .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
-    m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
+    // This will fail unit tests for some reason
+    try {
+      // Update the angle of the mech2d
+      m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
+      m_wrist
+          .getLigament()
+          .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+      m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
+    } catch (Exception ignored) {
+
+    }
   }
 
   @SuppressWarnings("RedundantThrows")

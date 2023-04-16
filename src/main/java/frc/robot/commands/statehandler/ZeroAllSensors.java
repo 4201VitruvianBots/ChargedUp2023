@@ -11,10 +11,10 @@ import frc.robot.subsystems.Wrist;
 
 public class ZeroAllSensors extends CommandBase {
   /** Creates a new ZeroAll. */
-  private final Elevator m_elevator;
-
-  private final Wrist m_wrist;
   private final SwerveDrive m_swerve;
+
+  private final Elevator m_elevator;
+  private final Wrist m_wrist;
 
   public ZeroAllSensors(Elevator elevator, Wrist wrist, SwerveDrive swerveDrive) {
     // Use addRequirements() here to declare subsystem dependencies.

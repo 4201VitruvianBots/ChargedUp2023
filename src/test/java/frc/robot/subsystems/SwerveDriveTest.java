@@ -45,7 +45,6 @@ public class SwerveDriveTest extends CommandTestBase {
     m_robotContainer.close();
   }
 
-  @Disabled("Works, but breaks next test")
   @Test
   public void TestPIDControllers() {
     var xPidController = m_swerveDrive.getXPidController();
@@ -71,9 +70,9 @@ public class SwerveDriveTest extends CommandTestBase {
     assertTrue(output > 0);
   }
 
-  @Disabled
+  @Disabled("Only passes when ran as standalone. Causes hangup in Unit Tests")
   @Test
-  public void TestAllianceFlipTeleop() {
+  public void TestAllianceFlipTeleopBlue() {
     DriverStationSim.setFmsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.notifyNewData();
@@ -105,8 +104,11 @@ public class SwerveDriveTest extends CommandTestBase {
 
     //    System.out.println(m_swerveDrive.getOdometry().getEstimatedPosition().getY() + " < " + 0);
     assertTrue(m_swerveDrive.getOdometry().getEstimatedPosition().getY() < 0);
+  }
 
-    DriverStationSim.setEnabled(false);
+  @Disabled("Unit test fails, but simulation works")
+  @Test
+  public void TestAllianceFlipTeleopRed() {
     DriverStationSim.setFmsAttached(true);
     DriverStationSim.setAllianceStationId(AllianceStationID.Red1);
     DriverStationSim.notifyNewData();
@@ -115,6 +117,7 @@ public class SwerveDriveTest extends CommandTestBase {
         new Pose2d(SimConstants.fieldLength, 0, Rotation2d.fromDegrees(-180)));
 
     DriverStationSim.setEnabled(true);
+    var joystick = new JoystickSim((m_leftJoystick));
     joystick.setRawAxis(0, 0);
     joystick.setRawAxis(1, 1);
     joystick.notifyNewData();

@@ -82,13 +82,13 @@ public class RobotContainer implements AutoCloseable {
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator();
   private final Intake m_intake = new Intake();
-  private final Wrist m_wrist = new Wrist(m_intake, m_elevator);
+  private final Wrist m_wrist = new Wrist(m_intake);
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
   private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
   private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_led, m_vision);
+      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_vision);
   private final FieldSim m_fieldSim =
       new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
 
@@ -107,10 +107,10 @@ public class RobotContainer implements AutoCloseable {
   private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
 
   public RobotContainer() {
+    resetSubsystemPositions();
     initializeSubsystems();
     m_logger.pause();
     configureBindings();
-    resetSubsystemPositions();
 
     initializeAutoChooser();
   }
@@ -140,11 +140,10 @@ public class RobotContainer implements AutoCloseable {
 
   private void resetSubsystemPositions() {
     if (!m_logManager.initTempExists()) {
-      ResetElevatorHeight resetElevator = new ResetElevatorHeight(m_elevator, 0);
-      ResetWristAngleDegrees resetWrist = new ResetWristAngleDegrees(m_wrist, -15.0);
-      resetElevator.execute();
-      resetWrist.execute();
+      m_elevator.setDesiredPositionMeters(0);
       m_logManager.createInitTempFile();
+    } else {
+      m_wrist.setWristInitialized(true);
     }
   }
 
@@ -178,14 +177,28 @@ public class RobotContainer implements AutoCloseable {
             new ConditionalCommand(
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
-                () -> m_stateHandler.isScoring()));
+                m_stateHandler::isScoring));
+    xboxController
+        .leftTrigger()
+        .onFalse(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE),
+                new SetIntakeState(m_intake, INTAKE_STATE.NONE),
+                () -> m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CUBE));
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
             new ConditionalCommand(
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
-                () -> m_stateHandler.isScoring()));
+                m_stateHandler::isScoring));
+    xboxController
+        .leftTrigger()
+        .onFalse(
+            new ConditionalCommand(
+                new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE),
+                new SetIntakeState(m_intake, INTAKE_STATE.NONE),
+                () -> m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE));
 
     // Score button Bindings
 
@@ -229,7 +242,6 @@ public class RobotContainer implements AutoCloseable {
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
     xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE));
-    // TODO: Review this change
     xboxController
         .povDown()
         .onTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE).withTimeout(.25));
@@ -649,7 +661,6 @@ public class RobotContainer implements AutoCloseable {
   public void simulationPeriodic() {
     m_memorylog.simulationPeriodic();
 
-    // TODO: Fix overwrite of currently running auto?
     if (DriverStation.isDisabled()) m_fieldSim.setTrajectory(autoPlotter.getSelected());
   }
 

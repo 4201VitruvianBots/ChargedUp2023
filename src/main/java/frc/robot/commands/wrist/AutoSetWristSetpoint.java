@@ -13,7 +13,7 @@ public class AutoSetWristSetpoint extends CommandBase {
 
   private final double m_setpoint;
 
-  /** Creates a new RunWrist. */
+  /** Creates a new AutoSetWristSetpoint. */
   public AutoSetWristSetpoint(Wrist wrist, double setpoint) {
     m_wrist = wrist;
     m_setpoint = setpoint;

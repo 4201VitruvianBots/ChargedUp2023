@@ -23,7 +23,6 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
-// TODO: Rewrite without AutoBuilder
 public class CenterOneBalance extends SequentialCommandGroup {
   public CenterOneBalance(
       String pathName,
