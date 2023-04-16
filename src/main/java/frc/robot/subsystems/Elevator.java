@@ -18,7 +18,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -165,7 +164,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   private void initElevatorMotorFollower() {
-    MedianFilter
     if (DriverStation.isDisabled() && m_elevatorInitialized) {
       elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
       elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
