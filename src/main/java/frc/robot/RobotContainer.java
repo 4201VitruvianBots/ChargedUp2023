@@ -58,6 +58,7 @@ import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -563,25 +564,20 @@ public class RobotContainer implements AutoCloseable {
       List<PathPlannerTrajectory> dummy = new ArrayList<>() {};
       dummy.add(new PathPlannerTrajectory());
       autoPlotter.setDefaultOption("None", dummy);
-      String[] autos = {
-        "BlueBumpOnePickUp",
-        "BlueCenterOneBalance",
-        "BlueCenterOneBalanceCross",
-        "BlueSubstationThree",
-        "BlueSubstationTwo",
-        "BlueSubstationTwoBalance",
-        "RedBumpOnePickUp",
-        "RedCenterOneBalance",
-        "RedCenterOneBalanceCross",
-        "RedSubstationThree",
-        "RedSubstationTwo",
-        "DriveForward",
-        "TestSimAuto"
-      };
-      for (var auto : autos) {
-        var trajectories = TrajectoryUtils.readTrajectory(auto, new PathConstraints(1, 1));
 
-        autoPlotter.addOption(auto, trajectories);
+      try {
+        File[] filePaths = new File(Filesystem.getDeployDirectory(), "pathplanner/").listFiles();
+        for (var filepath : filePaths) {
+          var filename = filepath.getName();
+          if (filename.toString().endsWith(".path")) {
+            filename = filename.replace(".path", "");
+            var trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
+
+            autoPlotter.addOption(filename, trajectories);
+          }
+        }
+      } catch (Exception ignored) {
+
       }
 
       SmartDashboard.putData("Auto Visualizer", autoPlotter);
