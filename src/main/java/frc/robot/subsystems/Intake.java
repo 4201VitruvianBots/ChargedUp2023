@@ -11,14 +11,20 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.unmanaged.Unmanaged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -38,6 +44,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   // Log setup
   private final DataLog log = DataLogManager.getLog();
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
+
+  private final FlywheelSim m_intakeSim =
+          new FlywheelSim(
+                  // Sim Values
+                  LinearSystemId.identifyVelocitySystem(0.8, 0.6),
+                  INTAKE.gearBox,
+                  INTAKE.gearRatio);
+  private double m_simDistance;
 
   // Mech2d setup
   private final MechanismLigament2d m_intakeLigament2d =
@@ -62,7 +76,6 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     intakeMotor.configVoltageCompSaturation(10);
     intakeMotor.enableVoltageCompensation(true);
 
-    intakeMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     intakeMotor.config_kF(0, INTAKE.kF);
     intakeMotor.config_kP(0, INTAKE.kP);
 
@@ -154,6 +167,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void updateSmartDashboard() {
     SmartDashboard.putString("Intake State", getIntakeState().toString());
     SmartDashboard.putNumber("Intake Velocity", getIntakeVelocity());
+    SmartDashboard.putNumber("Intake Percent Output", intakeMotor.getMotorOutputPercent());
   }
 
   public void updateLog() {
@@ -168,6 +182,31 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     updateIntakeState();
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
     // hold the game piece in.
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    m_intakeSim.setInputVoltage(MathUtil.clamp(intakeMotor.getMotorOutputVoltage(), -12, 12));
+
+    double dt = StateHandler.getSimDt();
+    m_intakeSim.update(dt);
+    m_simDistance += m_intakeSim.getAngularVelocityRadPerSec() * dt;
+
+    Unmanaged.feedEnable(20);
+
+
+    intakeMotor
+            .getSimCollection()
+            .setIntegratedSensorRawPosition(
+                    (int) (m_simDistance
+                                    / INTAKE.kMotorDistancePerPulse));
+    intakeMotor
+            .getSimCollection()
+            .setIntegratedSensorVelocity(
+                    (int) (m_intakeSim.getAngularVelocityRadPerSec()
+                                    / (INTAKE.kMotorDistancePerPulse * 10)));
+
+    intakeMotor.getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
   }
 
   @SuppressWarnings("RedundantThrows")

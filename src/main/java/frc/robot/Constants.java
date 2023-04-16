@@ -181,6 +181,11 @@ public final class Constants {
     public static final int cubeSensorId = 3;
     public static final double length = Units.inchesToMeters(9.5);
 
+    public static final double gearRatio = 48.0/16.0;
+    public static final DCMotor gearBox = DCMotor.getFalcon500(1);
+    public static final double kMotorDistancePerPulse =
+            360.0 / (kFalconSensorUnitsPerRotation * gearRatio);
+
     public static double kF = 0;
     public static double kP = 0.2;
 
