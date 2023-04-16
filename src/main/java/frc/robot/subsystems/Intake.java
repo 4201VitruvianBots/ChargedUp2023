@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -46,11 +44,9 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry currentEntry = new DoubleLogEntry(log, "/intake/current");
 
   private final FlywheelSim m_intakeSim =
-          new FlywheelSim(
-                  // Sim Values
-                  LinearSystemId.identifyVelocitySystem(0.8, 0.6),
-                  INTAKE.gearBox,
-                  INTAKE.gearRatio);
+      new FlywheelSim(
+          // Sim Values
+          LinearSystemId.identifyVelocitySystem(0.8, 0.6), INTAKE.gearBox, INTAKE.gearRatio);
   private double m_simDistance;
 
   // Mech2d setup
@@ -150,7 +146,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     //        m_retractIntake = true;
     //      }
     //    }
-       setPercentOutput(getIntakeState().get());
+    setPercentOutput(getIntakeState().get());
   }
 
   public boolean getRetractIntake() {
@@ -194,17 +190,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 
     Unmanaged.feedEnable(20);
 
-
     intakeMotor
-            .getSimCollection()
-            .setIntegratedSensorRawPosition(
-                    (int) (m_simDistance
-                                    / INTAKE.kMotorDistancePerPulse));
+        .getSimCollection()
+        .setIntegratedSensorRawPosition((int) (m_simDistance / INTAKE.kMotorDistancePerPulse));
     intakeMotor
-            .getSimCollection()
-            .setIntegratedSensorVelocity(
-                    (int) (m_intakeSim.getAngularVelocityRadPerSec()
-                                    / (INTAKE.kMotorDistancePerPulse * 10)));
+        .getSimCollection()
+        .setIntegratedSensorVelocity(
+            (int)
+                (m_intakeSim.getAngularVelocityRadPerSec() / (INTAKE.kMotorDistancePerPulse * 10)));
 
     intakeMotor.getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
   }
