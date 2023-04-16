@@ -9,6 +9,7 @@ import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
+import frc.robot.Constants.VISION.PIPELINE;
 import frc.robot.commands.InterruptingCommand;
 import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.statehandler.SetSetpoint;
@@ -54,7 +55,7 @@ public class LimeLightTest extends SequentialCommandGroup {
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
         new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE),
         new SetIntakeState(intake, INTAKE_STATE.INTAKING_CUBE),
-        new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, 2)),
+        new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
         new InterruptingCommand(
             swerveCommands.get(0),
             new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.2)

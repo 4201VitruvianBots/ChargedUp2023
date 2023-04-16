@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
+import frc.robot.Constants.VISION.PIPELINE;
 import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase implements AutoCloseable {
@@ -323,10 +324,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       // threshold to find game object
       setPipeline(location, pipeline);
       // Try to find cube
-      if (pipeline == 1) {
+      if (pipeline == PIPELINE.CUBE.get()) {
         if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.INTAKING_CUBE;
       }
-      if (pipeline == 2) {
+      if (pipeline == PIPELINE.CONE.get()) {
         if (getTargetArea(location) > 3.0) limelightState = INTAKE_STATE.INTAKING_CONE;
       }
     }

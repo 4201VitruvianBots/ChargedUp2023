@@ -342,6 +342,22 @@ public final class Constants {
       PHOTONVISION
     }
 
+    public enum PIPELINE {
+      DEFAULT(0),
+      CUBE(1),
+      CONE(2);
+
+      private final int pipeline;
+
+      PIPELINE(final int pipeline) {
+        this.pipeline = pipeline;
+      }
+
+      public int get() {
+        return pipeline;
+      }
+    }
+
     public enum CAMERA_SERVER {
       INTAKE("10.42.1.11"),
       LEFT_LOCALIZER("10.42.1.12"),
