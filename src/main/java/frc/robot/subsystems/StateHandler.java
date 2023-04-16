@@ -34,7 +34,6 @@ import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.STATE_HANDLER.ZONE;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.utils.SetpointSolver;
 import java.util.ArrayList;
 
@@ -579,13 +578,13 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       }
     }
 
-//    if (m_intake.getRetractIntake()) {
-//      var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
-//      retractCmd.schedule();
-//      if (m_currentState == SUPERSTRUCTURE_STATE.STOWED) {
-//        m_intake.setRetractIntake(false);
-//      }
-//    }
+    //    if (m_intake.getRetractIntake()) {
+    //      var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
+    //      retractCmd.schedule();
+    //      if (m_currentState == SUPERSTRUCTURE_STATE.STOWED) {
+    //        m_intake.setRetractIntake(false);
+    //      }
+    //    }
 
     if (m_smartScoringEnabled) {
       updateScoringState();
