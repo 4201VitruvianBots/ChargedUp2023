@@ -188,7 +188,7 @@ public final class Constants {
       WAIT_TO_PLACE_CONE(1.7), // good
       WAIT_TO_PLACE_CUBE(1.7), // good
       WAIT_TO_PLACE_CUBE_MID(1),
-      
+
       SCORING_CONE(0.85), // good
       SCORING_CUBE(0.5), // good
 

@@ -34,7 +34,6 @@ import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.HighConeTimerTest;
 import frc.robot.commands.auto.HighCubeTimerTest;
-import frc.robot.commands.auto.JustBalance;
 import frc.robot.commands.auto.LimeLightTest;
 import frc.robot.commands.auto.MidCubeTimerTest;
 import frc.robot.commands.auto.SubstationThree;
@@ -374,16 +373,16 @@ public class RobotContainer implements AutoCloseable {
         new HighConeTimerTest(
             m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
-            m_autoChooser.addOption(
-              "HighCubeTimerTest",
-              new HighCubeTimerTest(
-                  m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
-                  
-                  m_autoChooser.addOption(
-                    "MidCubeTimerTest",
-                    new MidCubeTimerTest(
-                        m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
-            
+    m_autoChooser.addOption(
+        "HighCubeTimerTest",
+        new HighCubeTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
+    m_autoChooser.addOption(
+        "MidCubeTimerTest",
+        new MidCubeTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
     m_autoChooser.addOption(
         "BlueSubstationTwo",
         new SubstationTwo(
@@ -407,8 +406,6 @@ public class RobotContainer implements AutoCloseable {
             m_vision,
             m_elevator,
             m_stateHandler));
-
-        
 
     m_autoChooser.addOption(
         "BlueSubstationTwoBalance",
@@ -463,82 +460,77 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_stateHandler));
 
-
-
-            m_autoChooser.addOption(
-              "RedSubstationTwo",
-              new SubstationTwo(
-                  "RedSubstationTwo",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_vision,
-                  m_elevator,
-                  m_stateHandler));
-
-            m_autoChooser.addOption(
-              "RedSubstationThree",
-              new SubstationThree(
-                  "RedSubstationThree",
-                  m_swerveDrive,
-                  m_fieldSim,
-                  m_wrist,
-                  m_intake,
-                  m_vision,
-                  m_elevator,
-                  m_stateHandler));
-
-                  
     m_autoChooser.addOption(
-      "RedSubstationTwoBalance",
-      new SubstationTwoBalance(
-          "RedSubstationTwoBalance",
-          m_swerveDrive,
-          m_fieldSim,
-          m_wrist,
-          m_intake,
-          m_vision,
-          m_elevator,
-          m_stateHandler));
+        "RedSubstationTwo",
+        new SubstationTwo(
+            "RedSubstationTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
-          m_autoChooser.addOption(
+    m_autoChooser.addOption(
+        "RedSubstationThree",
+        new SubstationThree(
+            "RedSubstationThree",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedSubstationTwoBalance",
+        new SubstationTwoBalance(
+            "RedSubstationTwoBalance",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedCenterOneBalance",
+        new CenterOneBalance(
             "RedCenterOneBalance",
-            new CenterOneBalance(
-                "RedCenterOneBalance",
-                m_swerveDrive,
-                m_fieldSim,
-                m_wrist,
-                m_intake,
-                m_elevator,
-                m_vision,
-                m_stateHandler));
-    
-        m_autoChooser.addOption(
-            "RedCenterOneBalanceCross",
-            new CenterOneBalanceCross(
-                "RedCenterOneBalanceCross",
-                m_swerveDrive,
-                m_fieldSim,
-                m_wrist,
-                m_intake,
-                m_elevator,
-                m_vision,
-                m_stateHandler));
-    
-    
-        m_autoChooser.addOption(
-            "RedBumpOnePickUp",
-            new BumpOnePickUp(
-                "RedBumpOnePickUp",
-                m_swerveDrive,
-                m_fieldSim,
-                m_wrist,
-                m_intake,
-                m_vision,
-                m_elevator,
-                m_stateHandler));
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision,
+            m_stateHandler));
 
+    m_autoChooser.addOption(
+        "RedCenterOneBalanceCross",
+        new CenterOneBalanceCross(
+            "RedCenterOneBalanceCross",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision,
+            m_stateHandler));
+
+    m_autoChooser.addOption(
+        "RedBumpOnePickUp",
+        new BumpOnePickUp(
+            "RedBumpOnePickUp",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     m_autoChooser.addOption(
         "DriveForward",
