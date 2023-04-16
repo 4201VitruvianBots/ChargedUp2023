@@ -424,7 +424,7 @@ public final class Constants {
     // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
     // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
 
-    public static final double kMaxVel = Units.degreesToRadians(400);
+    public static final double kMaxVel = Units.degreesToRadians(720);
     public static final double kMaxAccel = Units.degreesToRadians(250);
 
     public static final TrapezoidProfile.Constraints m_constraints =
