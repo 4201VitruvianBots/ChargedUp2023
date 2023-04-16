@@ -7,12 +7,7 @@ package frc.robot;
 import static frc.robot.Constants.CONSTANTS.kCANCoderSensorUnitsPerRotation;
 import static frc.robot.Constants.CONSTANTS.kFalconSensorUnitsPerRotation;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Map;
-
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -27,6 +22,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Map;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
