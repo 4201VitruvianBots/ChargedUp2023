@@ -16,7 +16,7 @@ public class DriveForwardWithVisionInput extends CommandBase {
   private final DoubleSupplier m_throttleInput;
 
   private final PIDController strafePIDController =
-      new PIDController(SWERVE_DRIVE.kP_Y, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
+      new PIDController(0.1, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
 
   public DriveForwardWithVisionInput(
       SwerveDrive swerveDrive, Vision vision, DoubleSupplier throttleInput) {
@@ -37,7 +37,7 @@ public class DriveForwardWithVisionInput extends CommandBase {
   public void execute() {
     double strafeOutput = 0;
     if (m_vision.getValidTarget(CAMERA_SERVER.INTAKE))
-      strafeOutput = strafePIDController.calculate(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE));
+      strafeOutput = strafePIDController.calculate(-m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE));
 
     var chassisSpeeds = new ChassisSpeeds(m_throttleInput.getAsDouble(), strafeOutput, 0);
     var states = SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
