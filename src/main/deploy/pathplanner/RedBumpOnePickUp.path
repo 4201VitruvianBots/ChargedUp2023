@@ -1,0 +1,103 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 14.79175,
+        "y": 0.5296454878624047
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 14.748317528819125,
+        "y": 0.5296454878624047
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 13.03175,
+        "y": 0.8705087585613768
+      },
+      "prevControl": {
+        "x": 13.086168981365796,
+        "y": 0.9793232236295261
+      },
+      "nextControl": {
+        "x": 12.91559950048009,
+        "y": 0.6382579123409913
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 12.35175,
+        "y": 0.8705087585613768
+      },
+      "prevControl": {
+        "x": 12.433374345187806,
+        "y": 0.7526282337275285
+      },
+      "nextControl": {
+        "x": 12.165832746961366,
+        "y": 1.1390073702615473
+      },
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 9.55175,
+        "y": 0.9158500773141907
+      },
+      "prevControl": {
+        "x": 9.83719512983777,
+        "y": 0.9158500773141907
+      },
+      "nextControl": null,
+      "holonomicAngle": 180.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "SetWristIntaking",
+          "SetElevatorIntaking",
+          "RunIntakeCube"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": []
+}
