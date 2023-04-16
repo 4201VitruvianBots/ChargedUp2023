@@ -183,7 +183,7 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
                 m_stateHandler::isScoring));
     xboxController
-        .leftTrigger()
+        .rightTrigger()
         .onFalse(
             new ConditionalCommand(
                 new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE),
@@ -249,7 +249,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
-    SmartDashboard.putData(new ZeroAllSensors(m_elevator, m_wrist, m_swerveDrive));
+    SmartDashboard.putData(new ZeroAllSensors(m_swerveDrive, m_elevator, m_wrist));
     SmartDashboard.putData("ResetWrist90", new ResetWristAngleDegrees(m_wrist, 90));
 
     if (!DriverStation.isFMSAttached()) {

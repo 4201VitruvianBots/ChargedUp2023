@@ -186,10 +186,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean isScoring() {
-    return getDesiredSetpoint() != SETPOINT.SCORE_MID_CONE
-        || getDesiredSetpoint() != SETPOINT.SCORE_MID_CUBE
-        || getDesiredSetpoint() != SETPOINT.SCORE_HIGH_CONE
-        || getDesiredSetpoint() != SETPOINT.SCORE_HIGH_CUBE;
+    return getDesiredSetpoint() == SETPOINT.SCORE_MID_CONE
+        || getDesiredSetpoint() == SETPOINT.SCORE_MID_CUBE
+        || getDesiredSetpoint() == SETPOINT.SCORE_HIGH_CONE
+        || getDesiredSetpoint() == SETPOINT.SCORE_HIGH_CUBE;
   }
 
   public void setTestScoringState(boolean state) {

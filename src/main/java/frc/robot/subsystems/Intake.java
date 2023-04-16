@@ -138,7 +138,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
 //        m_retractIntake = true;
 //      }
 //    }
-//    setPercentOutput(getIntakeState().get());
+    setPercentOutput(getIntakeState().get());
   }
 
   public boolean getRetractIntake() {

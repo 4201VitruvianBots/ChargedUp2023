@@ -12,15 +12,14 @@ import frc.robot.subsystems.Wrist;
 public class ZeroAllSensors extends CommandBase {
   /** Creates a new ZeroAll. */
   private final SwerveDrive m_swerve;
-
   private final Elevator m_elevator;
   private final Wrist m_wrist;
 
-  public ZeroAllSensors(Elevator elevator, Wrist wrist, SwerveDrive swerveDrive) {
+  public ZeroAllSensors(SwerveDrive swerveDrive, Elevator elevator, Wrist wrist) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_swerve = swerveDrive;
     m_elevator = elevator;
     m_wrist = wrist;
-    m_swerve = swerveDrive;
   }
 
   @Override
@@ -32,8 +31,8 @@ public class ZeroAllSensors extends CommandBase {
   @Override
   public void initialize() {
     m_swerve.resetGyro();
-    m_wrist.resetAngleDegrees(-15.0);
     m_elevator.setSensorPosition(0.0);
+    m_wrist.resetAngleDegrees(-15.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
