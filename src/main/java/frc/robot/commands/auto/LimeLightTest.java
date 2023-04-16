@@ -6,9 +6,12 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.commands.InterruptingCommand;
+import frc.robot.commands.intake.SetIntakeState;
+import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.DriveForwardWithVisionInput;
 import frc.robot.commands.swerve.SetSwerveOdometry;
 import frc.robot.simulation.FieldSim;
@@ -49,12 +52,16 @@ public class LimeLightTest extends SequentialCommandGroup {
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
+        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE),
+        new SetIntakeState(intake, INTAKE_STATE.INTAKING_CUBE),
         new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, 2)),
         new InterruptingCommand(
             swerveCommands.get(0),
             new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.2)
-                .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE),
-            () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)));
+                .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE).withTimeout(m_trajectories.get(0).getTotalTimeSeconds()),
+            () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
+            new SetIntakeState(intake, INTAKE_STATE.HOLDING_CUBE),
+        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.STOWED));
   }
 
   public List<PathPlannerTrajectory> getTrajectories() {
