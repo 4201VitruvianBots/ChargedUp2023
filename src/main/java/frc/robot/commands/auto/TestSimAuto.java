@@ -36,8 +36,6 @@ public class TestSimAuto extends SequentialCommandGroup {
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
-    var testWait = new WaitCommand(8);
-    testWait.addRequirements(swerveDrive);
     addCommands(
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
