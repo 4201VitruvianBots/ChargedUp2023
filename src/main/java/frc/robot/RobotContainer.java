@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static frc.robot.simulation.SimConstants.absoluteFlip;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -563,6 +565,13 @@ public class RobotContainer implements AutoCloseable {
             var trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
 
             autoPlotter.addOption(filename, trajectories);
+
+            if (filename.startsWith("Blue")) {
+              filename = filename.replace("Blue", "Red");
+              trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
+
+              autoPlotter.addOption(filename, trajectories);
+            }
           }
         }
       } catch (Exception ignored) {

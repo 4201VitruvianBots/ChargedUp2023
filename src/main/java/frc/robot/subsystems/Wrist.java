@@ -93,7 +93,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Mech2d setup
   private final MechanismLigament2d m_wristGearboxLigament2d =
-          new MechanismLigament2d("FourbarGearbox", WRIST.fourbarGearboxHeight, 90);
+      new MechanismLigament2d("FourbarGearbox", WRIST.fourbarGearboxHeight, 90);
   private final MechanismLigament2d m_wristLigament2d =
       new MechanismLigament2d("Fourbar", WRIST.length, WRIST.fourbarAngleDegrees);
 

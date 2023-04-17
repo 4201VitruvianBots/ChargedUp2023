@@ -89,7 +89,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           "ChassisRoot", STATE_HANDLER.mechanism2dXOffset, STATE_HANDLER.mechanism2dYOffset);
   public static final MechanismRoot2d m_elevatorRoot2d =
       m_superStructureMech2d.getRoot(
-          "ElevatorRoot", STATE_HANDLER.mechanism2dXOffset, STATE_HANDLER.mechanism2dYOffset + Units.inchesToMeters(3));
+          "ElevatorRoot",
+          STATE_HANDLER.mechanism2dXOffset,
+          STATE_HANDLER.mechanism2dYOffset + Units.inchesToMeters(3));
 
   private static final Timer m_simTimer = new Timer();
   private static double m_lastSimTime;

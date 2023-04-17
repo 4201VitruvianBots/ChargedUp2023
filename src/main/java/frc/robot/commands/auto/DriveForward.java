@@ -5,6 +5,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
@@ -27,9 +28,16 @@ public class DriveForward extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
+    double maxVel = Units.feetToMeters(6);
+    double maxAccel = Units.feetToMeters(6);
+    if (RobotBase.isSimulation()) {
+      maxVel = Units.feetToMeters(4);
+      maxAccel = Units.feetToMeters(4);
+    }
+    PathConstraints constraints = new PathConstraints(maxVel, maxAccel);
+
     List<PathPlannerTrajectory> trajectories =
-        TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(4), Units.feetToMeters(4)));
+        TrajectoryUtils.readTrajectory(pathName, constraints);
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, trajectories);
 
