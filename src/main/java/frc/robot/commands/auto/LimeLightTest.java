@@ -53,7 +53,8 @@ public class LimeLightTest extends SequentialCommandGroup {
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
-        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE).withTimeout(2),
+        new SetSetpoint(stateHandler, elevator, wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE)
+            .withTimeout(2),
         new SetIntakeState(intake, INTAKE_STATE.INTAKING_CUBE),
         new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
         new InterruptingCommand(
