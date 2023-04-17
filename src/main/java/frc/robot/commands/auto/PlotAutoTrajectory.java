@@ -5,13 +5,10 @@
 package frc.robot.commands.auto;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
-import frc.robot.simulation.SimConstants;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PlotAutoTrajectory extends CommandBase {
   private final FieldSim m_fieldSim;
@@ -44,11 +41,12 @@ public class PlotAutoTrajectory extends CommandBase {
   @Override
   public void initialize() {
     List<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-//    var isRedPath = m_pathName.startsWith("Red");
-//    if (isRedPath && m_useAllianceFlip)
-//      ppTrajectories.addAll(
-//              ppTrajectories.stream().map(t ->SimConstants.allianceFlip((Trajectory)t)).collect(Collectors.toList());
-//    else ppTrajectories.addAll(m_trajectories);
+    //    var isRedPath = m_pathName.startsWith("Red");
+    //    if (isRedPath && m_useAllianceFlip)
+    //      ppTrajectories.addAll(
+    //              ppTrajectories.stream().map(t
+    // ->SimConstants.allianceFlip((Trajectory)t)).collect(Collectors.toList());
+    //    else ppTrajectories.addAll(m_trajectories);
     ppTrajectories.addAll(m_trajectories);
 
     m_fieldSim.setTrajectory(ppTrajectories);

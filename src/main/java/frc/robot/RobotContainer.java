@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import static frc.robot.simulation.SimConstants.absoluteFlip;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
