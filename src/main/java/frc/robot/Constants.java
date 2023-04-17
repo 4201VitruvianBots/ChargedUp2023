@@ -633,7 +633,8 @@ public final class Constants {
       SCORING_CUBE(0.4), // good
 
       STOW_HIGH_CONE(0.55), // good
-      STOW_HIGH_CUBE(0.55), // good
+      STOW_HIGH_CUBE(0.55),
+      STOW_HIGH_CUBE_FAST(0.36666666666), // good
 
       STOW_MID_CONE(0.3),
       STOW_MID_CUBE(0.1),
