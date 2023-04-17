@@ -88,8 +88,8 @@ public final class Constants {
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
-    public static final double centerOffset = Units.inchesToMeters(10);
-    public static final double carriageDistance = Units.inchesToMeters(6.5);
+    public static final double centerOffset = Units.inchesToMeters(14);
+    public static final double carriageDistance = Units.inchesToMeters(7);
     public static final double carriageOffset = Units.inchesToMeters(11);
     public static final int mech2dAngleDegrees = 35;
 
@@ -179,7 +179,7 @@ public final class Constants {
     public static final int leftConeSensorId = 1;
     public static final int rightConeSensorId = 2;
     public static final int cubeSensorId = 3;
-    public static final double length = Units.inchesToMeters(9.5);
+    public static final double length = Units.inchesToMeters(12);
 
     public static final double gearRatio = 48.0 / 16.0;
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
@@ -405,8 +405,8 @@ public final class Constants {
         360.0 / (kFalconSensorUnitsPerRotation * gearRatio);
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
-    public static final double length = Units.inchesToMeters(22);
-    public static final double fourbarLength = Units.inchesToMeters(19);
+    public static final double length = Units.inchesToMeters(20);
+    public static final double fourbarGearboxHeight = Units.inchesToMeters(4);
     public static final double fourbarAngleDegrees = 180;
     public static final int kTimeoutMs = 0;
 
@@ -522,10 +522,10 @@ public final class Constants {
 
     public static boolean limitCanUtilization = false;
 
-    public static final double mechanism2dXSize = SWERVE_DRIVE.kWheelBase * 2;
+    public static final double mechanism2dXSize = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2;
     public static final double mechanism2dYSize = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2;
-    public static final double mechanism2dXOffset = -mechanism2dXSize/4 + Units.inchesToMeters(15);
-    public static final double mechanism2dYOffset = Units.inchesToMeters(3);
+    public static final double mechanism2dXOffset = Units.inchesToMeters(3);
+    public static final double mechanism2dYOffset = Units.inchesToMeters(11);
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED

@@ -89,9 +89,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
           "ChassisRoot", STATE_HANDLER.mechanism2dXOffset, STATE_HANDLER.mechanism2dYOffset);
   public static final MechanismRoot2d m_elevatorRoot2d =
       m_superStructureMech2d.getRoot(
-          "ElevatorRoot",
-              -STATE_HANDLER.mechanism2dXSize/3,
-          STATE_HANDLER.mechanism2dYOffset + Units.inchesToMeters(3));
+          "ElevatorRoot", STATE_HANDLER.mechanism2dXOffset, STATE_HANDLER.mechanism2dYOffset + Units.inchesToMeters(3));
 
   private static final Timer m_simTimer = new Timer();
   private static double m_lastSimTime;
@@ -129,8 +127,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       initializeMainStateChooser();
       // Attach the ligaments of the mech2d together
       try {
-        m_elevator.getLigament().append(m_wrist.getLigament());
-        m_wrist.getLigament().append(m_intake.getLigament());
+        m_elevator.getLigament().append(m_wrist.getGearboxLigament());
+        m_wrist.getGearboxLigament().append(m_wrist.getWristLigament());
+        m_wrist.getWristLigament().append(m_intake.getLigament());
       } catch (Exception e) {
         //        System.out.println("Ignoring WPILib Error");
       }
@@ -632,9 +631,9 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       // Update the angle of the mech2d
       m_elevator.getLigament().setLength(m_elevator.getHeightMeters() + ELEVATOR.carriageOffset);
       m_wrist
-          .getLigament()
-          .setAngle(180 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
-      m_intake.getLigament().setAngle(m_wrist.getLigament().getAngle() * -1.5);
+          .getWristLigament()
+          .setAngle(90 - m_elevator.getLigament().getAngle() - m_wrist.getPositionDegrees());
+      m_intake.getLigament().setAngle(215 - m_wrist.getWristLigament().getAngle());
     } catch (Exception ignored) {
 
     }
