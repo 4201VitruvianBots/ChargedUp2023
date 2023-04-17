@@ -522,7 +522,10 @@ public final class Constants {
 
     public static boolean limitCanUtilization = false;
 
-    public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
+    public static final double mechanism2dXSize = SWERVE_DRIVE.kWheelBase * 2;
+    public static final double mechanism2dYSize = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2;
+    public static final double mechanism2dXOffset = -mechanism2dXSize/4 + Units.inchesToMeters(15);
+    public static final double mechanism2dYOffset = Units.inchesToMeters(3);
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
