@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static frc.robot.simulation.SimConstants.absoluteFlip;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -42,7 +44,9 @@ import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
 import frc.robot.commands.intake.IntakeVisionAlignment;
+import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.SetIntakeState;
+import frc.robot.commands.intake.SetUseCubeSetpoint;
 import frc.robot.commands.led.GetSubsystemStates;
 import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.*;
@@ -168,13 +172,7 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
                 m_stateHandler::isScoring));
-    xboxController
-        .leftTrigger()
-        .onFalse(
-            new ConditionalCommand(
-                new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE),
-                new SetIntakeState(m_intake, INTAKE_STATE.NONE),
-                () -> m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CUBE));
+    xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
@@ -182,13 +180,7 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CONE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CUBE),
                 m_stateHandler::isScoring));
-    xboxController
-        .rightTrigger()
-        .onFalse(
-            new ConditionalCommand(
-                new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE),
-                new SetIntakeState(m_intake, INTAKE_STATE.NONE),
-                () -> m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE));
+    xboxController.rightTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
 
     // Score button Bindings
 
@@ -231,10 +223,8 @@ public class RobotContainer implements AutoCloseable {
             new SetSetpoint(
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
-    xboxController.povLeft().whileTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CUBE));
-    xboxController
-        .povDown()
-        .onTrue(new SetIntakeState(m_intake, INTAKE_STATE.HOLDING_CONE).withTimeout(.25));
+    xboxController.povLeft().whileTrue(new SetUseCubeSetpoint(m_intake));
+    xboxController.povDown().onTrue(new RunIntakeCone(m_intake, 0.2).withTimeout(.25));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
@@ -575,6 +565,13 @@ public class RobotContainer implements AutoCloseable {
             var trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
 
             autoPlotter.addOption(filename, trajectories);
+
+            if (filename.startsWith("Blue")) {
+              filename = filename.replace("Blue", "Red");
+              trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
+
+              autoPlotter.addOption(filename, trajectories);
+            }
           }
         }
       } catch (Exception ignored) {

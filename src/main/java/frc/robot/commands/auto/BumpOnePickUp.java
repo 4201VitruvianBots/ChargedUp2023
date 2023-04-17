@@ -3,6 +3,7 @@ package frc.robot.commands.auto;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -36,9 +37,15 @@ public class BumpOnePickUp extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    var m_trajectories =
-        TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(6), Units.feetToMeters(6)));
+    double maxVel = Units.feetToMeters(6);
+    double maxAccel = Units.feetToMeters(6);
+    if (RobotBase.isSimulation()) {
+      maxVel = Units.feetToMeters(4);
+      maxAccel = Units.feetToMeters(4);
+    }
+    PathConstraints constraints = new PathConstraints(maxVel, maxAccel);
+
+    var m_trajectories = TrajectoryUtils.readTrajectory(pathName, constraints);
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 

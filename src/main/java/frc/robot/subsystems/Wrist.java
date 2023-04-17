@@ -92,8 +92,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private static int m_simEncoderSign = 1;
 
   // Mech2d setup
+  private final MechanismLigament2d m_wristGearboxLigament2d =
+      new MechanismLigament2d("FourbarGearbox", WRIST.fourbarGearboxHeight, 90);
   private final MechanismLigament2d m_wristLigament2d =
-      new MechanismLigament2d("Fourbar", WRIST.fourbarLength, WRIST.fourbarAngleDegrees);
+      new MechanismLigament2d("Fourbar", WRIST.length, WRIST.fourbarAngleDegrees);
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -157,7 +159,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_wristInitialized = state;
   }
 
-  public MechanismLigament2d getLigament() {
+  public MechanismLigament2d getGearboxLigament() {
+    return m_wristGearboxLigament2d;
+  }
+
+  public MechanismLigament2d getWristLigament() {
     return m_wristLigament2d;
   }
 

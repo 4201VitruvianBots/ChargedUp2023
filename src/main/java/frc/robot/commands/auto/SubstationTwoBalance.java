@@ -3,6 +3,7 @@ package frc.robot.commands.auto;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -37,9 +38,15 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    var m_trajectories =
-        TrajectoryUtils.readTrajectory(
-            pathName, new PathConstraints(Units.feetToMeters(16), Units.feetToMeters(13)));
+    double maxVel = Units.feetToMeters(16);
+    double maxAccel = Units.feetToMeters(13);
+    if (RobotBase.isSimulation()) {
+      maxVel = Units.feetToMeters(4);
+      maxAccel = Units.feetToMeters(4);
+    }
+    PathConstraints constraints = new PathConstraints(maxVel, maxAccel);
+
+    var m_trajectories = TrajectoryUtils.readTrajectory(pathName, constraints);
     var swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
@@ -77,17 +84,17 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
                         .withTimeout(0.5),
                     new AutoSetIntakeSetpoint(
                             intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)
-                        .withTimeout(0.5)))),
+                        .withTimeout(1)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive),
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                 .withTimeout(WAIT.INTAKE_TO_STOW.get())),
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
-                .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_MID_CUBE)
+                .withTimeout(WAIT.SCORE_MID_CUBE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
+                .withTimeout(WAIT.SCORE_MID_CUBE.get())),
         /** Outakes cone */
         new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
         new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
@@ -96,10 +103,10 @@ public class SubstationTwoBalance extends SequentialCommandGroup {
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+                .withTimeout(WAIT.STOW_MID_CUBE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
-        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
+                .withTimeout(WAIT.STOW_MID_CUBE.get())),
+        new WaitCommand(WAIT.STOW_MID_CUBE.get()),
         swerveCommands.get(2),
         new AutoBalance(swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)

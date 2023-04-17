@@ -88,8 +88,8 @@ public final class Constants {
     public static final double massKg = 4.0;
     public static final double drumRadiusMeters = Units.inchesToMeters(1.5);
     public static final Rotation2d mountAngleRadians = Rotation2d.fromDegrees(40);
-    public static final double centerOffset = Units.inchesToMeters(10);
-    public static final double carriageDistance = Units.inchesToMeters(6.5);
+    public static final double centerOffset = Units.inchesToMeters(14);
+    public static final double carriageDistance = Units.inchesToMeters(7);
     public static final double carriageOffset = Units.inchesToMeters(11);
     public static final int mech2dAngleDegrees = 35;
 
@@ -109,7 +109,7 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.11;
+    public static final double kP = 0.05;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
@@ -179,7 +179,12 @@ public final class Constants {
     public static final int leftConeSensorId = 1;
     public static final int rightConeSensorId = 2;
     public static final int cubeSensorId = 3;
-    public static final double length = Units.inchesToMeters(9.5);
+    public static final double length = Units.inchesToMeters(12);
+
+    public static final double gearRatio = 48.0 / 16.0;
+    public static final DCMotor gearBox = DCMotor.getFalcon500(1);
+    public static final double kMotorDistancePerPulse =
+        360.0 / (kFalconSensorUnitsPerRotation * gearRatio);
 
     public static double kF = 0;
     public static double kP = 0.2;
@@ -210,9 +215,9 @@ public final class Constants {
       INTAKING_CONE(0.6),
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
-      INTAKING_CUBE(-0.5),
-      HOLDING_CUBE(-0.1),
-      SCORING_CUBE(0.5);
+      INTAKING_CUBE(-0.8),
+      HOLDING_CUBE(-0.3),
+      SCORING_CUBE(0.8);
 
       private final double value;
 
@@ -287,7 +292,7 @@ public final class Constants {
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
-    public static final double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
+    public static double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;
     public static final double kMaxRotationRadiansPerSecondSquared = Math.PI * 2.0;
@@ -400,8 +405,8 @@ public final class Constants {
         360.0 / (kFalconSensorUnitsPerRotation * gearRatio);
     public static final DCMotor gearBox = DCMotor.getFalcon500(1);
     public static final double mass = Units.lbsToKilograms(20);
-    public static final double length = Units.inchesToMeters(22);
-    public static final double fourbarLength = Units.inchesToMeters(19);
+    public static final double length = Units.inchesToMeters(20);
+    public static final double fourbarGearboxHeight = Units.inchesToMeters(4);
     public static final double fourbarAngleDegrees = 180;
     public static final int kTimeoutMs = 0;
 
@@ -419,7 +424,7 @@ public final class Constants {
     // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
     // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
 
-    public static final double kMaxVel = Units.degreesToRadians(400);
+    public static final double kMaxVel = Units.degreesToRadians(720);
     public static final double kMaxAccel = Units.degreesToRadians(250);
 
     public static final TrapezoidProfile.Constraints m_constraints =
@@ -517,7 +522,10 @@ public final class Constants {
 
     public static boolean limitCanUtilization = false;
 
-    public static final double mechanism2dOffset = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 0.5;
+    public static final double mechanism2dXSize = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2;
+    public static final double mechanism2dYSize = ELEVATOR.THRESHOLD.ABSOLUTE_MAX.get() * 2;
+    public static final double mechanism2dXOffset = Units.inchesToMeters(3);
+    public static final double mechanism2dYOffset = Units.inchesToMeters(11);
 
     public enum SUPERSTRUCTURE_STATE {
       // UNDEFINED
@@ -614,20 +622,21 @@ public final class Constants {
     public enum WAIT {
       SCORE_HIGH_CONE(0.65), // good
       SCORE_HIGH_CUBE(0.65), // good
-      SCORE_MID_CONE(0.7),
-      SCORE_MID_CUBE(0.7),
+      SCORE_MID_CONE(0.4),
+      SCORE_MID_CUBE(0.4),
 
-      WAIT_TO_PLACE_CONE(2), // good
-      WAIT_TO_PLACE_CUBE(2), // good
+      WAIT_TO_PLACE_CONE(1), // good
+      WAIT_TO_PLACE_CUBE(1.5),
+      WAIT_TO_PLACE_CUBE_MID(0.7), // good
 
-      SCORING_CONE(0.9), // good
-      SCORING_CUBE(0.5), // good
+      SCORING_CONE(0.65), // good
+      SCORING_CUBE(0.4), // good
 
       STOW_HIGH_CONE(0.55), // good
       STOW_HIGH_CUBE(0.55), // good
 
       STOW_MID_CONE(0.3),
-      STOW_MID_CUBE(0.3),
+      STOW_MID_CUBE(0.1),
 
       INTAKE_TO_STOW(0.5); // good
 

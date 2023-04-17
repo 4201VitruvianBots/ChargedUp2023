@@ -104,8 +104,9 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private double m_rotationOutput;
 
   ChassisSpeeds chassisSpeeds;
-  private double m_maxVelocity = SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
-  private double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
+  private final double m_maxVelocity = SWERVE_DRIVE.kMaxSpeedMetersPerSecond;
+  private final double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
+  private double m_currentMaxVelocity = m_maxVelocity;
 
   public SwerveDrive() {
     m_pigeon.configFactoryDefault();
@@ -157,8 +158,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       strafe *= m_limitedVelocity;
       rotation *= SWERVE_DRIVE.kLimitedRotationRadiansPerSecond;
     } else {
-      throttle *= m_maxVelocity;
-      strafe *= m_maxVelocity;
+      throttle *= m_currentMaxVelocity;
+      strafe *= m_currentMaxVelocity;
       rotation *= SWERVE_DRIVE.kMaxRotationRadiansPerSecond;
     }
 
@@ -179,16 +180,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
         ModuleMap.of(SWERVE_DRIVE.kSwerveKinematics.toSwerveModuleStates(chassisSpeeds));
 
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), m_maxVelocity);
+        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), m_currentMaxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(moduleStates.get(module.getModulePosition()), isOpenLoop);
   }
 
-  /*
-   * Set robot heading to a clear target
-   */
-
+  /** Set robot heading to a clear target */
   public void setRobotHeadingRadians(double radians) {
     m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
   }
@@ -209,7 +207,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setSwerveModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, m_maxVelocity);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, m_currentMaxVelocity);
 
     for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules))
       module.setDesiredState(states[module.getModulePosition().ordinal()], isOpenLoop);
@@ -225,10 +223,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
     if (RobotBase.isSimulation()) {
       m_pigeon.getSimCollection().setRawHeading(pose.getRotation().getDegrees());
     } else m_pigeon.setYaw(pose.getRotation().getDegrees());
+    m_odometry.resetPosition(getHeadingRotation2d(), getSwerveDriveModulePositionsArray(), pose);
 
     for (var position : SWERVE_MODULE_POSITION.values()) {
       var transform =
@@ -335,7 +333,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void setMaxVelocity(double mps) {
-    m_maxVelocity = mps;
+    m_currentMaxVelocity = mps;
   }
 
   public SwerveDrivePoseEstimator getOdometry() {
@@ -343,9 +341,11 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   }
 
   public void resetGyro() {
-    if (DriverStation.isFMSAttached() && Controls.getAllianceColor() == DriverStation.Alliance.Red)
-      m_pigeon.setYaw(180);
-    else m_pigeon.setYaw(0);
+    //    if (DriverStation.isFMSAttached() && Controls.getAllianceColor() ==
+    // DriverStation.Alliance.Red)
+    //      m_pigeon.setYaw(180);
+    //    else
+    m_pigeon.setYaw(0);
     m_pigeon.setAccumZAngle(0);
   }
 

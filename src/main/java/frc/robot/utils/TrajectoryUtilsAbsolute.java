@@ -11,12 +11,13 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants.SWERVE_DRIVE;
+import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.SwerveDrive;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrajectoryUtils {
+public class TrajectoryUtilsAbsolute {
   public static List<PathPlannerTrajectory> readTrajectory(
       String fileName, PathConstraints segmentConstraints) {
     return readTrajectory(fileName, segmentConstraints, segmentConstraints);
@@ -41,24 +42,26 @@ public class TrajectoryUtils {
             "TrajectoryUtils::readTrajectory failed for " + fileName, false);
         fileName = fileName.replace("Red", "Blue");
 
+        file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+        if (!file.exists()) {
+          fileName = fileName.replace("Blue", "");
+        }
         var pathGroup = PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
 
-        ArrayList<PathPlannerTrajectory> ppTrajectories = new ArrayList<>();
-        for (var trajectory : pathGroup) {
-          ppTrajectories.add(
-              PathPlannerTrajectory.transformTrajectoryForAlliance(
-                  trajectory, DriverStation.Alliance.Red));
-        }
-        return ppTrajectories;
+        return SimConstants.absoluteFlip(pathGroup);
       }
       return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
     } else {
       try {
         var file = new File(Filesystem.getDeployDirectory(), "pathplanner/" + fileName + ".path");
+        if (!file.exists()) {
+          fileName = fileName.replace("Blue", "");
+        }
 
         return PathPlanner.loadPathGroup(fileName, pathConstraint, segmentConstraints);
       } catch (Exception e) {
-        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " + fileName, null);
+        //        DriverStation.reportError("TrajectoryUtils::readTrajectory failed for " +
+        // fileName, false);
         return new ArrayList<>();
       }
     }
@@ -85,7 +88,7 @@ public class TrajectoryUtils {
               swerveDrive.getYPidController(),
               swerveDrive.getThetaPidController(),
               swerveDrive::setSwerveModuleStatesAuto,
-              true,
+              false,
               swerveDrive);
 
       commands.add(swerveCommand);

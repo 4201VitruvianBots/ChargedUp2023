@@ -6,7 +6,6 @@ package frc.robot.commands.statehandler;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.subsystems.Elevator;
@@ -54,17 +53,17 @@ public class SetConditionalSetpoint extends CommandBase {
   public void execute() {
     switch (m_desiredState) {
       case INTAKE_EXTENDED:
-        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
+        if (m_intake.isUsingCubeSetpoint())
           m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.INTAKING_EXTENDED_CONE);
         break;
       case HIGH:
-        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
+        if (m_intake.isUsingCubeSetpoint())
           m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_HIGH_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_HIGH_CONE);
         break;
       case MID:
-        if (m_intake.getIntakeState() == INTAKE_STATE.HOLDING_CONE)
+        if (m_intake.isUsingCubeSetpoint())
           m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_MID_CUBE);
         else m_stateHandler.setDesiredSetpoint(SETPOINT.SCORE_MID_CONE);
         break;
