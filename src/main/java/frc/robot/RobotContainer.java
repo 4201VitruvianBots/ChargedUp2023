@@ -26,18 +26,12 @@ import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
-import frc.robot.commands.auto.BumpOnePickUp;
-import frc.robot.commands.auto.CenterOneBalance;
+import frc.robot.commands.auto.BumpTwo;
 // import frc.robot.commands.auto.BumpOnePickUp;
 // import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
-import frc.robot.commands.auto.HighConeTimerTest;
-import frc.robot.commands.auto.HighCubeTimerTest;
-import frc.robot.commands.auto.LimeLightTest;
-import frc.robot.commands.auto.MidCubeTimerTest;
 import frc.robot.commands.auto.SubstationThree;
-import frc.robot.commands.auto.SubstationTwo;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
@@ -352,39 +346,13 @@ public class RobotContainer implements AutoCloseable {
 
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
-    m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
+
+    // Main Autos
 
     m_autoChooser.addOption(
-        "HighConeTimerTest",
-        new HighConeTimerTest(
-            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
-
-    m_autoChooser.addOption(
-        "HighCubeTimerTest",
-        new HighCubeTimerTest(
-            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
-
-    m_autoChooser.addOption(
-        "MidCubeTimerTest",
-        new MidCubeTimerTest(
-            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
-
-    m_autoChooser.addOption(
-        "BlueSubstationTwo",
-        new SubstationTwo(
-            "BlueSubstationTwo",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "BlueSubstationThree",
+        "SubstationThree",
         new SubstationThree(
-            "BlueSubstationThree",
+            "SubstationThree",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -394,9 +362,9 @@ public class RobotContainer implements AutoCloseable {
             m_stateHandler));
 
     m_autoChooser.addOption(
-        "BlueSubstationTwoBalance",
+        "SubstationTwoBalance",
         new SubstationTwoBalance(
-            "BlueSubstationTwoBalance",
+            "SubstationTwoBalance",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -406,21 +374,9 @@ public class RobotContainer implements AutoCloseable {
             m_stateHandler));
 
     m_autoChooser.addOption(
-        "BlueCenterOneBalance",
-        new CenterOneBalance(
-            "BlueCenterOneBalance",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "BlueCenterOneBalanceCross",
+        "CenterOneBalanceCross",
         new CenterOneBalanceCross(
-            "BlueCenterOneBalanceCross",
+            "CenterOneBalanceCross",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -428,114 +384,104 @@ public class RobotContainer implements AutoCloseable {
             m_elevator,
             m_vision,
             m_stateHandler));
+
+    m_autoChooser.addOption(
+        "BumpTwo",
+        new BumpTwo(
+            "BumpTwo",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+
+    // Back Up Autos
 
     // m_autoChooser.addOption(
-    //     "JustBalance",
-    //     new JustBalance(
-    //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
+    //   "SubstationTwo",
+    //   new SubstationTwo(
+    //       "SubstationTwo",
+    //       m_swerveDrive,
+    //       m_fieldSim,
+    //       m_wrist,
+    //       m_intake,
+    //       m_vision,
+    //       m_elevator,
+    //       m_stateHandler));
 
-    m_autoChooser.addOption(
-        "BlueBumpOnePickUp",
-        new BumpOnePickUp(
-            "BlueBumpOnePickUp",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
+    // m_autoChooser.addOption(
+    //     "CenterOneBalance",
+    //     new CenterOneBalance(
+    //         "CenterOneBalance",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_elevator,
+    //         m_vision,
+    //         m_stateHandler));
 
-    m_autoChooser.addOption(
-        "RedSubstationTwo",
-        new SubstationTwo(
-            "RedSubstationTwo",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "RedSubstationThree",
-        new SubstationThree(
-            "RedSubstationThree",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "RedSubstationTwoBalance",
-        new SubstationTwoBalance(
-            "RedSubstationTwoBalance",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "RedCenterOneBalance",
-        new CenterOneBalance(
-            "RedCenterOneBalance",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "RedCenterOneBalanceCross",
-        new CenterOneBalanceCross(
-            "RedCenterOneBalanceCross",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_elevator,
-            m_vision,
-            m_stateHandler));
-
-    m_autoChooser.addOption(
-        "RedBumpOnePickUp",
-        new BumpOnePickUp(
-            "RedBumpOnePickUp",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
+    // m_autoChooser.addOption(
+    //   "BumpOnePickUp",
+    //   new BumpOnePickUp(
+    //       "BumpOnePickUp",
+    //       m_swerveDrive,
+    //       m_fieldSim,
+    //       m_wrist,
+    //       m_intake,
+    //       m_vision,
+    //       m_elevator,
+    //       m_stateHandler));
 
     m_autoChooser.addOption(
         "DriveForward",
         new DriveForward(
             "DriveForward", m_swerveDrive, m_fieldSim, m_wrist, m_elevator, m_stateHandler));
 
-    m_autoChooser.addOption(
-        "Limelight Test",
-        new LimeLightTest(
-            "DriveForward",
-            m_swerveDrive,
-            m_fieldSim,
-            m_wrist,
-            m_intake,
-            m_vision,
-            m_elevator,
-            m_stateHandler));
+    m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
 
-    m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
+    // Test Autos
+
+    // m_autoChooser.addOption(
+    //     "JustBalance",
+    //     new JustBalance(
+    //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
+
+    //   m_autoChooser.addOption(
+    //     "HighConeTimerTest",
+    //     new HighConeTimerTest(
+    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
+    // m_autoChooser.addOption(
+    //     "HighCubeTimerTest",
+    //     new HighCubeTimerTest(
+    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
+    // m_autoChooser.addOption(
+    //     "MidCubeTimerTest",
+    //     new MidCubeTimerTest(
+    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+
+    // m_autoChooser.addOption(
+    //     "JustBalance",
+    //     new JustBalance(
+    //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
+
+    // m_autoChooser.addOption(
+    //     "Limelight Test",
+    //     new LimeLightTest(
+    //         "DriveForward",
+    //         m_swerveDrive,
+    //         m_fieldSim,
+    //         m_wrist,
+    //         m_intake,
+    //         m_vision,
+    //         m_elevator,
+    //         m_stateHandler));
+
+    // m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 
     if (RobotBase.isSimulation()) {
       m_autoChooser.setDefaultOption(

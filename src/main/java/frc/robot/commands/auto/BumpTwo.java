@@ -25,9 +25,9 @@ import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
-public class BumpOnePickUp extends SequentialCommandGroup {
+public class BumpTwo extends SequentialCommandGroup {
 
-  public BumpOnePickUp(
+  public BumpTwo(
       String pathName,
       SwerveDrive swerveDrive,
       FieldSim fieldSim,
@@ -37,8 +37,8 @@ public class BumpOnePickUp extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(6);
-    double maxAccel = Units.feetToMeters(6);
+    double maxVel = Units.feetToMeters(16);
+    double maxAccel = Units.feetToMeters(13);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
@@ -78,19 +78,34 @@ public class BumpOnePickUp extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             swerveCommands.get(0),
             new SequentialCommandGroup(
-                new WaitCommand(3),
+                new WaitCommand(2.5),
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE)
-                        .withTimeout(2),
+                        .withTimeout(0.5),
                     new AutoSetIntakeSetpoint(
                             intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)
-                        .withTimeout(2)))),
-
-        /** Stows and Stops Intake */
+                        .withTimeout(0.5)))),
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
+            swerveCommands.get(1),
+            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+                .withTimeout(WAIT.INTAKE_TO_STOW.get())),
+        new ParallelCommandGroup(
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
+                .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                .withTimeout(0.5)),
+                .withTimeout(WAIT.SCORE_HIGH_CUBE.get())),
+        /** Outakes cone */
+        new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
+        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
+            .withTimeout(WAIT.SCORING_CUBE.get()),
+        new WaitCommand(WAIT.SCORING_CUBE.get()),
+        /** Stows Wrist, Elevator, and Stops intake */
+        new ParallelCommandGroup(
+            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+                .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
+                .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
+        new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
