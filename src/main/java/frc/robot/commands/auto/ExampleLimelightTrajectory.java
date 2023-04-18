@@ -3,10 +3,7 @@ package frc.robot.commands.auto;
 import com.pathplanner.lib.PathConstraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants;
 import frc.robot.commands.DelayedInterruptingCommand;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
@@ -48,7 +45,9 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
             () ->
                 vision.setPipeline(
                     Constants.VISION.CAMERA_SERVER.INTAKE, Constants.VISION.PIPELINE.CUBE.get())),
-        new ParallelCommandGroup(
+        new ParallelDeadlineGroup(
+                // Use the trajectory's normal time as the deadline
+                new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds())),
                 new DelayedInterruptingCommand(
                     // Run normal auto for 3 seconds, then check if we should interrupt with
                     // limelight
@@ -58,9 +57,9 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
                             () ->
                                 intake.getIntakeState()
                                     == Constants.INTAKE.INTAKE_STATE.HOLDING_CUBE),
-                    3,
+                    3,  // Put the delay for the limelight here
                     () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)),
-                // Move the intake at the same time.
+                // Move the wrist/intake at the same time.
                 new SequentialCommandGroup(
                     new WaitCommand(0.75),
                     new ParallelCommandGroup(
@@ -73,8 +72,7 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
                             intake,
                             Constants.INTAKE.INTAKE_STATE.INTAKING_CUBE,
                             vision,
-                            swerveDrive))))
-                // Kill this entire routine after a timeout
-            .withTimeout(m_trajectories.get(0).getTotalTimeSeconds()));
+                            swerveDrive)))
+    );
   }
 }
