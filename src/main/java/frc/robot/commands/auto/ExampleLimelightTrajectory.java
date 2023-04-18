@@ -47,25 +47,30 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
                     Constants.VISION.CAMERA_SERVER.INTAKE, Constants.VISION.PIPELINE.CUBE.get())),
         new ParallelDeadlineGroup(
             // Use the trajectory's normal time as the deadline
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds())),
-        new DelayedInterruptingCommand(
-            // Run normal auto for 3 seconds, then check if we should interrupt with
-            // limelight
-            swerveCommands.get(0),
-            new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                .until(() -> intake.getIntakeState() == Constants.INTAKE.INTAKE_STATE.HOLDING_CUBE),
-            3, // Put the delay for the limelight here
-            () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)),
-        // Move the wrist/intake at the same time.
-        new SequentialCommandGroup(
-            new WaitCommand(0.75),
-            new ParallelCommandGroup(
-                new AutoSetSetpoint(
-                    stateHandler,
-                    elevator,
-                    wrist,
-                    Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE),
-                new AutoSetIntakeSetpoint(
-                    intake, Constants.INTAKE.INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive))));
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds()),
+            new DelayedInterruptingCommand(
+                // Run normal auto for 3 seconds, then check if we should interrupt with
+                // limelight
+                swerveCommands.get(0),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
+                    .until(
+                        () ->
+                            intake.getIntakeState() == Constants.INTAKE.INTAKE_STATE.HOLDING_CUBE),
+                3, // Put the delay for the limelight here
+                () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)),
+            // Move the wrist/intake at the same time.
+            new SequentialCommandGroup(
+                new WaitCommand(0.75),
+                new ParallelCommandGroup(
+                    new AutoSetSetpoint(
+                        stateHandler,
+                        elevator,
+                        wrist,
+                        Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE),
+                    new AutoSetIntakeSetpoint(
+                        intake,
+                        Constants.INTAKE.INTAKE_STATE.INTAKING_CUBE,
+                        vision,
+                        swerveDrive)))));
   }
 }
