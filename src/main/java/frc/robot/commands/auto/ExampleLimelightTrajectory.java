@@ -74,7 +74,7 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
                             Constants.INTAKE.INTAKE_STATE.INTAKING_CUBE,
                             vision,
                             swerveDrive))))
-                // Kill this entire routine after a timeout
+            // Kill this entire routine after a timeout
             .withTimeout(m_trajectories.get(0).getTotalTimeSeconds()));
   }
 }
