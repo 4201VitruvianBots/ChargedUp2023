@@ -48,9 +48,8 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
         new ParallelDeadlineGroup(
             // Use the trajectory's normal time as the deadline
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds()),
+            // Run normal auto for 3 seconds, then check if we should interrupt with limelight
             new DelayedInterruptingCommand(
-                // Run normal auto for 3 seconds, then check if we should interrupt with
-                // limelight
                 swerveCommands.get(0),
                 new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
                     .until(
