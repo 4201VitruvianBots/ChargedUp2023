@@ -31,6 +31,9 @@ import frc.robot.commands.auto.BumpTwo;
 // import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.HighConeTimerTest;
+import frc.robot.commands.auto.HighCubeTimerTest;
+import frc.robot.commands.auto.MidCubeTimerTest;
 import frc.robot.commands.auto.SubstationThree;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
@@ -450,20 +453,20 @@ public class RobotContainer implements AutoCloseable {
     //     new JustBalance(
     //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
-    //   m_autoChooser.addOption(
-    //     "HighConeTimerTest",
-    //     new HighConeTimerTest(
-    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+      m_autoChooser.addOption(
+        "TEST: HighConeTimer",
+        new HighConeTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
-    // m_autoChooser.addOption(
-    //     "HighCubeTimerTest",
-    //     new HighCubeTimerTest(
-    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+    m_autoChooser.addOption(
+        "TEST: HighCubeTimer",
+        new HighCubeTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
-    // m_autoChooser.addOption(
-    //     "MidCubeTimerTest",
-    //     new MidCubeTimerTest(
-    //         m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
+    m_autoChooser.addOption(
+        "TEST: MidCubeTimer",
+        new MidCubeTimerTest(
+            m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
 
     // m_autoChooser.addOption(
     //     "JustBalance",
