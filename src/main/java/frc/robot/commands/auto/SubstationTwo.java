@@ -5,14 +5,12 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants.AUTO.WAIT;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
+import frc.robot.Constants.VISION.PIPELINE;
 import frc.robot.commands.DelayedInterruptingCommand;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
@@ -78,36 +76,23 @@ public class SubstationTwo extends SequentialCommandGroup {
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
                 .withTimeout(WAIT.STOW_HIGH_CONE.get())),
         new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
-        new InstantCommand(
-            () ->
-                vision.setPipeline(
-                    Constants.VISION.CAMERA_SERVER.INTAKE, Constants.VISION.PIPELINE.CUBE.get())),
+        new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
 
         /** Runs Path with Intaking cube during */
-        new ParallelCommandGroup(
-                new DelayedInterruptingCommand(
-                    swerveCommands.get(0),
-                    new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                        .until(
-                            () ->
-                                intake.getIntakeState()
-                                    == Constants.INTAKE.INTAKE_STATE.HOLDING_CUBE),
-                    1.25,
-                    () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)),
-                new SequentialCommandGroup(
-                    new WaitCommand(0.75),
-                    new ParallelCommandGroup(
-                        new AutoSetSetpoint(
-                            stateHandler,
-                            elevator,
-                            wrist,
-                            Constants.STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE),
-                        new AutoSetIntakeSetpoint(
-                            intake,
-                            Constants.INTAKE.INTAKE_STATE.INTAKING_CUBE,
-                            vision,
-                            swerveDrive))))
-            .withTimeout(m_trajectories.get(0).getTotalTimeSeconds()),
+        new ParallelDeadlineGroup(
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
+            new DelayedInterruptingCommand(
+                swerveCommands.get(0),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
+                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
+                1.25,
+                () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
+            new SequentialCommandGroup(
+                new WaitCommand(0.75),
+                new ParallelCommandGroup(
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
+                    new AutoSetIntakeSetpoint(
+                        intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
         new ParallelCommandGroup(
             swerveCommands.get(1),
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
