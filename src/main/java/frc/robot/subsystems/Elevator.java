@@ -60,6 +60,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_testMode = false;
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
+  private NeutralMode m_neutralMode = NeutralMode.Brake;
 
   // Positional limits set by the state handler
   private double m_lowerLimitMeters = THRESHOLD.ABSOLUTE_MIN.get();
@@ -121,7 +122,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public Elevator() {
     for (TalonFX motor : elevatorMotors) {
       motor.configFactoryDefault();
-      motor.setNeutralMode(NeutralMode.Brake);
+      motor.setNeutralMode(m_neutralMode);
       motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
       //      motor.setSelectedSensorPosition(0.0);
 
@@ -249,6 +250,16 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Usually used to zero the motors if the robot is started in a non-stowed position
   public void setSensorPosition(double meters) {
     elevatorMotors[0].setSelectedSensorPosition(meters / ELEVATOR.encoderCountsToMeters);
+  }
+
+  public void setNeutralMode(NeutralMode mode) {
+    m_neutralMode = mode;
+    elevatorMotors[0].setNeutralMode(mode);
+    elevatorMotors[1].setNeutralMode(mode);
+  }
+
+  public NeutralMode getNeutralMode() {
+    return m_neutralMode;
   }
 
   public void setDesiredPositionMeters(double meters) {

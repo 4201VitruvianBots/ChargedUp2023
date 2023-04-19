@@ -233,6 +233,7 @@ public class RobotContainer implements AutoCloseable {
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
     SmartDashboard.putData(new ZeroAllSensors(m_swerveDrive, m_elevator, m_wrist));
     SmartDashboard.putData("ResetWrist90", new ResetWristAngleDegrees(m_wrist, 90));
+    SmartDashboard.putData(new ToggleElevatorNeutralMode(m_elevator));
 
     if (!DriverStation.isFMSAttached()) {
       SmartDashboard.putData(new ToggleElevatorTestMode(m_elevator, m_stateHandler));
