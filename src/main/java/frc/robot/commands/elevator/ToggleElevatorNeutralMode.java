@@ -5,14 +5,13 @@
 package frc.robot.commands.elevator;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Elevator;
 
 public class ToggleElevatorNeutralMode extends CommandBase {
   /** Creates a new ToggleElevatorCoastMode. */
   private final Elevator m_elevator;
-  
+
   public ToggleElevatorNeutralMode(Elevator elevator) {
     m_elevator = elevator;
     // Use addRequirements() here to declare subsystem dependencies.
