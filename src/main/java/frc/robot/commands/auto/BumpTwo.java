@@ -90,10 +90,10 @@ public class BumpTwo extends SequentialCommandGroup {
                             () ->
                                 intake.getIntakeState()
                                     == Constants.INTAKE.INTAKE_STATE.HOLDING_CUBE),
-                    3,
+                    1.5,
                     () -> vision.getValidTarget(Constants.VISION.CAMERA_SERVER.INTAKE)),
                 new SequentialCommandGroup(
-                    new WaitCommand(2.5),
+                    new WaitCommand(1.25),
                     new ParallelCommandGroup(
                         new AutoSetSetpoint(
                             stateHandler,
