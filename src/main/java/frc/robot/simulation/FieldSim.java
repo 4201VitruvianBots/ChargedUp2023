@@ -77,23 +77,23 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
-    if (!m_displayedTrajectories.equals(trajectories) || !m_displayedAlliance.equals(Controls.getAllianceColor())) {
+    if (!m_displayedTrajectories.equals(trajectories)
+        || !m_displayedAlliance.equals(Controls.getAllianceColor())) {
       List<Pose2d> trajectoryPoses = new ArrayList<>();
 
-      if(Controls.getAllianceColor() == DriverStation.Alliance.Red)
+      if (Controls.getAllianceColor() == DriverStation.Alliance.Red)
         for (var trajectory : trajectories) {
           trajectoryPoses.addAll(
-                  trajectory.getStates().stream()
-                          .map(state -> SimConstants.pathPlannerFlip(state.poseMeters))
-                          .collect(Collectors.toList()));
+              trajectory.getStates().stream()
+                  .map(state -> SimConstants.pathPlannerFlip(state.poseMeters))
+                  .collect(Collectors.toList()));
         }
-
-      else{
+      else {
         for (var trajectory : trajectories) {
           trajectoryPoses.addAll(
-                  trajectory.getStates().stream()
-                          .map(state -> state.poseMeters)
-                          .collect(Collectors.toList()));
+              trajectory.getStates().stream()
+                  .map(state -> state.poseMeters)
+                  .collect(Collectors.toList()));
         }
       }
 

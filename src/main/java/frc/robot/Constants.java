@@ -626,7 +626,7 @@ public final class Constants {
       SCORE_MID_CUBE(0.4),
 
       WAIT_TO_PLACE_CONE(1), // good
-      WAIT_TO_PLACE_CUBE(1.5),
+      WAIT_TO_PLACE_CUBE(1),
       WAIT_TO_PLACE_CUBE_MID(0.7), // good
 
       SCORING_CONE(0.65), // good

@@ -358,10 +358,7 @@ public final class SimConstants {
 
   public static Pose2d pathPlannerFlip(Pose2d pose) {
     if (Controls.getAllianceColor() == DriverStation.Alliance.Red) {
-      return new Pose2d(
-              pose.getX(),
-              fieldWidth - pose.getY(),
-              pose.getRotation());
+      return new Pose2d(pose.getX(), fieldWidth - pose.getY(), pose.getRotation());
     } else {
       return pose;
     }

@@ -231,7 +231,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   public void updatePipeline() {
-    m_intakeNt.getEntry("pipeline").setDouble(1); 
+    m_intakeNt.getEntry("pipeline").setDouble(1);
   }
 
   public double getPipeline(CAMERA_SERVER location) {

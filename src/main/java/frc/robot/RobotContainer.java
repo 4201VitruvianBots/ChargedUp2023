@@ -355,7 +355,7 @@ public class RobotContainer implements AutoCloseable {
     // Main Autos
 
     m_autoChooser.addOption(
-        "SubstationThree",
+        "SubstationTwoPickup",
         new SubstationThree(
             "SubstationTwoPickup",
             m_swerveDrive,
@@ -514,8 +514,8 @@ public class RobotContainer implements AutoCloseable {
             var trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
 
             autoPlotter.addOption(filename, trajectories);
-            }
           }
+        }
       } catch (Exception ignored) {
 
       }

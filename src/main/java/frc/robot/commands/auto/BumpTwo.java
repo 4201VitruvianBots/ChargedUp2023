@@ -77,7 +77,6 @@ public class BumpTwo extends SequentialCommandGroup {
         new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
 
         /** Runs Path with Intaking cube during */
-
         new ParallelDeadlineGroup(
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
