@@ -55,6 +55,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private boolean timerStart;
 
   private INTAKE_STATE limelightState = INTAKE_STATE.NONE;
+  private double m_pipeline;
 
   private final Pose2d defaultPose = new Pose2d(-5, -5, new Rotation2d());
 
@@ -226,11 +227,11 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Pipeline 2 = cone
    */
   public void setPipeline(CAMERA_SERVER location, double pipeline) {
-    switch (location) {
-      case INTAKE:
-        m_intakeNt.getEntry("pipeline").setDouble(pipeline);
-        break;
-    }
+    m_pipeline = pipeline;
+  }
+
+  public void updatePipeline() {
+    m_intakeNt.getEntry("pipeline").setDouble(1); 
   }
 
   public double getPipeline(CAMERA_SERVER location) {
@@ -542,8 +543,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         });
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
-    searchLimelightPipeline(CAMERA_SERVER.INTAKE);
+    // updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
+    // searchLimelightPipeline(CAMERA_SERVER.INTAKE);
+    updatePipeline();
     // searchforCube(CAMERA_SERVER.INTAKE, 1.0);
     logData();
   }

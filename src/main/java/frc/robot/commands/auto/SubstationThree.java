@@ -37,8 +37,8 @@ public class SubstationThree extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(18);
-    double maxAccel = Units.feetToMeters(16);
+    double maxVel = Units.feetToMeters(9); //16,16
+    double maxAccel = Units.feetToMeters(9);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);

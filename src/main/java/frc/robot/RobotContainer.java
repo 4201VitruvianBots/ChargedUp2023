@@ -27,6 +27,7 @@ import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.auto.BumpTwo;
+import frc.robot.commands.auto.CenterOneBalance;
 // import frc.robot.commands.auto.BumpOnePickUp;
 // import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
@@ -415,17 +416,17 @@ public class RobotContainer implements AutoCloseable {
     //       m_elevator,
     //       m_stateHandler));
 
-    // m_autoChooser.addOption(
-    //     "CenterOneBalance",
-    //     new CenterOneBalance(
-    //         "CenterOneBalance",
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_intake,
-    //         m_elevator,
-    //         m_vision,
-    //         m_stateHandler));
+    m_autoChooser.addOption(
+        "CenterOneBalance",
+        new CenterOneBalance(
+            "CenterOneBalance",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_elevator,
+            m_vision,
+            m_stateHandler));
 
     // m_autoChooser.addOption(
     //   "BumpOnePickUp",
