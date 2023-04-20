@@ -454,7 +454,7 @@ public class RobotContainer implements AutoCloseable {
     //     new JustBalance(
     //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
-      m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "TEST: HighConeTimer",
         new HighConeTimerTest(
             m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_vision, m_elevator, m_stateHandler));
