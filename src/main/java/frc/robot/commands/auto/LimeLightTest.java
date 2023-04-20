@@ -60,7 +60,6 @@ public class LimeLightTest extends SequentialCommandGroup {
         new InterruptingCommand(
             swerveCommands.get(0),
             new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE)
                 .withTimeout(5),
             () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
         new SetIntakeState(intake, INTAKE_STATE.HOLDING_CUBE),
