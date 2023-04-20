@@ -51,8 +51,7 @@ public class ExampleLimelightTrajectory extends SequentialCommandGroup {
             // Run normal auto for 3 seconds, then check if we should interrupt with limelight
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
                 3, // Put the delay for the limelight here
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             // Move the wrist/intake at the same time.

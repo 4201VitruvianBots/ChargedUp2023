@@ -1,0 +1,57 @@
+{
+  "NetworkTables": {
+    "retained": {
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto Selector": "String Chooser",
+      "/SmartDashboard/Delete All Logs": "Command",
+      "/SmartDashboard/Elevator Subsystem": "Subsystem",
+      "/SmartDashboard/Field2d": "Field2d",
+      "/SmartDashboard/LED Sim": "Mechanism2d",
+      "/SmartDashboard/ResetOdometry": "Command",
+      "/SmartDashboard/ResetWrist90": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SetRollOffset": "Command",
+      "/SmartDashboard/SetSwerveNeutralMode": "Command",
+      "/SmartDashboard/SwerveDrive": "Subsystem",
+      "/SmartDashboard/ToggleElevatorNeutralMode": "Command",
+      "/SmartDashboard/ToggleElevatorTestMode": "Command",
+      "/SmartDashboard/ToggleSmartScoring": "Command",
+      "/SmartDashboard/ToggleTestIntakeState": "Command",
+      "/SmartDashboard/ToggleWristTestMode": "Command",
+      "/SmartDashboard/Vision": "Subsystem",
+      "/SmartDashboard/Wrist": "Subsystem",
+      "/SmartDashboard/ZeroAllSensors": "Command"
+    },
+    "windows": {
+      "/SmartDashboard/Auto Selector": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/ToggleWristTestMode": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/ZeroAllSensors": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "4201"
+  }
+}

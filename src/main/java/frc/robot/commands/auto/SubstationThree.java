@@ -37,8 +37,8 @@ public class SubstationThree extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(18);
-    double maxAccel = Units.feetToMeters(16);
+    double maxVel = Units.feetToMeters(9); //16,16
+    double maxAccel = Units.feetToMeters(9);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
@@ -79,8 +79,7 @@ public class SubstationThree extends SequentialCommandGroup {
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
@@ -114,8 +113,7 @@ public class SubstationThree extends SequentialCommandGroup {
             new WaitCommand(m_trajectories.get(2).getTotalTimeSeconds() + 0.1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(2),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(

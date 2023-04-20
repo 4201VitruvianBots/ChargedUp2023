@@ -80,9 +80,8 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
-                3,
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
+                2.5,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
                 new WaitCommand(2),

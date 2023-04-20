@@ -83,8 +83,7 @@ public class SubstationTwo extends SequentialCommandGroup {
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4)
-                    .until(() -> intake.getIntakeState() == INTAKE_STATE.HOLDING_CUBE),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
