@@ -38,7 +38,7 @@ public class SubstationThree extends SequentialCommandGroup {
       StateHandler stateHandler) {
 
     double maxVel = Units.feetToMeters(16); 
-    double maxAccel = Units.feetToMeters(13);
+    double maxAccel = Units.feetToMeters(16);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
@@ -68,6 +68,9 @@ public class SubstationThree extends SequentialCommandGroup {
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
+
+
+
                 .withTimeout(WAIT.STOW_HIGH_CONE.get()),
             new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
                 .withTimeout(WAIT.STOW_HIGH_CONE.get())),
@@ -76,7 +79,7 @@ public class SubstationThree extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.8),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
                 new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
