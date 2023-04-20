@@ -37,8 +37,8 @@ public class SubstationThree extends SequentialCommandGroup {
       Elevator elevator,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(9); //16,16
-    double maxAccel = Units.feetToMeters(9);
+    double maxVel = Units.feetToMeters(16); 
+    double maxAccel = Units.feetToMeters(13);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
@@ -76,10 +76,10 @@ public class SubstationThree extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
@@ -110,10 +110,10 @@ public class SubstationThree extends SequentialCommandGroup {
                 .withTimeout(WAIT.STOW_HIGH_CUBE.get())),
         new WaitCommand(WAIT.STOW_HIGH_CUBE.get()),
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(2).getTotalTimeSeconds() + 0.1),
+            new WaitCommand(m_trajectories.get(2).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
                 swerveCommands.get(2),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
@@ -122,27 +122,7 @@ public class SubstationThree extends SequentialCommandGroup {
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
                     new AutoSetIntakeSetpoint(
                         intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
-        new ParallelCommandGroup(
-            swerveCommands.get(3),
-            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                .withTimeout(WAIT.INTAKE_TO_STOW.get())),
-        new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_MID_CUBE)
-                .withTimeout(WAIT.SCORE_MID_CUBE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                .withTimeout(WAIT.SCORE_MID_CUBE.get())),
-        /** Outakes cone */
-        new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
-        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
-            .withTimeout(WAIT.SCORING_CUBE.get()),
-        new WaitCommand(WAIT.SCORING_CUBE.get()),
-        /** Stows Wrist, Elevator, and Stops intake */
-        new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                .withTimeout(WAIT.STOW_MID_CUBE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                .withTimeout(WAIT.STOW_MID_CUBE.get())),
-        new WaitCommand(WAIT.STOW_MID_CUBE.get()),
+
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

@@ -38,8 +38,8 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
       Vision vision,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(6);
-    double maxAccel = Units.feetToMeters(6);
+    double maxVel = Units.feetToMeters(10);
+    double maxAccel = Units.feetToMeters(10);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
@@ -77,10 +77,10 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
                 2.5,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(

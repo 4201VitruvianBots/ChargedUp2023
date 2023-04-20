@@ -77,24 +77,12 @@ public class BumpTwo extends SequentialCommandGroup {
         new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
 
         /** Runs Path with Intaking cube during */
+
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
-                3,
-                () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
-            new SequentialCommandGroup(
-                new WaitCommand(2.5),
-                new ParallelCommandGroup(
-                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
-                    new AutoSetIntakeSetpoint(
-                        intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
-        new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
-            new DelayedInterruptingCommand(
-                swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
                 1.5,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(

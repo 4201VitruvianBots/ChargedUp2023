@@ -357,7 +357,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "SubstationThree",
         new SubstationThree(
-            "SubstationThree",
+            "SubstationTwoPickup",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
