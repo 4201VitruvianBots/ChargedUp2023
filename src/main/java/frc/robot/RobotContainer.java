@@ -513,15 +513,8 @@ public class RobotContainer implements AutoCloseable {
             var trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
 
             autoPlotter.addOption(filename, trajectories);
-
-            if (filename.startsWith("Blue")) {
-              filename = filename.replace("Blue", "Red");
-              trajectories = TrajectoryUtils.readTrajectory(filename, new PathConstraints(1, 1));
-
-              autoPlotter.addOption(filename, trajectories);
             }
           }
-        }
       } catch (Exception ignored) {
 
       }

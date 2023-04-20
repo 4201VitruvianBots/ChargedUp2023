@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +34,7 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
 
   private final Field2d m_field2d = new Field2d();
   private List<PathPlannerTrajectory> m_displayedTrajectories = new ArrayList<>();
+  private DriverStation.Alliance m_displayedAlliance = DriverStation.Alliance.Blue;
 
   private ArrayList<Pose2d> m_displayedNodes = new ArrayList<>();
   private Pose2d m_highlightedNode = new Pose2d(0, 0, new Rotation2d(0));
@@ -75,18 +77,29 @@ public class FieldSim extends SubsystemBase implements AutoCloseable {
   }
 
   public void setTrajectory(List<PathPlannerTrajectory> trajectories) {
-    if (!m_displayedTrajectories.equals(trajectories)) {
+    if (!m_displayedTrajectories.equals(trajectories) || !m_displayedAlliance.equals(Controls.getAllianceColor())) {
       List<Pose2d> trajectoryPoses = new ArrayList<>();
 
-      for (var trajectory : trajectories) {
-        trajectoryPoses.addAll(
-            trajectory.getStates().stream()
-                .map(state -> state.poseMeters)
-                .collect(Collectors.toList()));
+      if(Controls.getAllianceColor() == DriverStation.Alliance.Red)
+        for (var trajectory : trajectories) {
+          trajectoryPoses.addAll(
+                  trajectory.getStates().stream()
+                          .map(state -> SimConstants.pathPlannerFlip(state.poseMeters))
+                          .collect(Collectors.toList()));
+        }
+
+      else{
+        for (var trajectory : trajectories) {
+          trajectoryPoses.addAll(
+                  trajectory.getStates().stream()
+                          .map(state -> state.poseMeters)
+                          .collect(Collectors.toList()));
+        }
       }
 
       m_field2d.getObject("trajectory").setPoses(trajectoryPoses);
       m_displayedTrajectories = trajectories;
+      m_displayedAlliance = Controls.getAllianceColor();
     }
   }
 
