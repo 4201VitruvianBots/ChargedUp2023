@@ -617,7 +617,7 @@ public final class Constants {
 
   public static class AUTO {
     public static double kAutoBalanceTimeout = 2.0;
-    public static final double kAutoBalanceAngleThresholdDegrees = 1.5;
+    public static final double kAutoBalanceAngleThresholdDegrees = 2.0;
 
     public enum WAIT {
       SCORE_HIGH_CONE(0.65), // good

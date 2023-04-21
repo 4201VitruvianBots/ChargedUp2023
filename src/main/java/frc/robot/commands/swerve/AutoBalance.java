@@ -16,7 +16,6 @@ public class AutoBalance extends CommandBase {
 
   private final Timer m_timer = new Timer();
   private boolean timerStart = false;
-  private double timestamp = 0;
 
   SwerveModuleState[] states;
 
@@ -48,8 +47,6 @@ public class AutoBalance extends CommandBase {
     m_swerveDrive.setSwerveModuleStates(states, false);
     outputCalculator.setSetpoint(0);
     outputCalculator.setTolerance(3);
-    m_timer.reset();
-    m_timer.start();
     timerStart = false;
   }
 
@@ -75,10 +72,15 @@ public class AutoBalance extends CommandBase {
     double balanceDeltaDegrees =
         Math.abs(m_swerveDrive.getRollDegrees() + m_swerveDrive.getRollOffsetDegrees());
     if (balanceDeltaDegrees < kAutoBalanceAngleThresholdDegrees && !timerStart) {
+      m_timer.reset();
+      m_timer.start();
       timerStart = true;
-      timestamp = m_timer.get();
+      outputCalculator.setP(0.00025);
     } else if (balanceDeltaDegrees >= kAutoBalanceAngleThresholdDegrees && timerStart) {
+      m_timer.reset();
+      m_timer.stop();
       timerStart = false;
+      outputCalculator.setP(0.0005);
     }
   }
 
@@ -102,7 +104,7 @@ public class AutoBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_timer.get() - timestamp > 2;
+    return m_timer.hasElapsed(2) && timerStart;
   }
 
   public double getOutput() {

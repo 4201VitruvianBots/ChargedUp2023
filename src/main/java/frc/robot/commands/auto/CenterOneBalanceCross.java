@@ -38,8 +38,8 @@ public class CenterOneBalanceCross extends SequentialCommandGroup {
       Vision vision,
       StateHandler stateHandler) {
 
-    double maxVel = Units.feetToMeters(10);
-    double maxAccel = Units.feetToMeters(10);
+    double maxVel = Units.feetToMeters(8);
+    double maxAccel = Units.feetToMeters(8);
     if (RobotBase.isSimulation()) {
       maxVel = Units.feetToMeters(4);
       maxAccel = Units.feetToMeters(4);
