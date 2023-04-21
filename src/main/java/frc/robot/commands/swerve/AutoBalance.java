@@ -19,7 +19,7 @@ public class AutoBalance extends CommandBase {
 
   SwerveModuleState[] states;
 
-  private final PIDController outputCalculator = new PIDController(0.02, 0, 0);
+  private final PIDController outputCalculator = new PIDController(0.0225, 0, 0);
   private double m_output = 0;
 
   /**
@@ -80,7 +80,7 @@ public class AutoBalance extends CommandBase {
       m_timer.reset();
       m_timer.stop();
       timerStart = false;
-      outputCalculator.setP(0.0005);
+      outputCalculator.setP(0.001);
     }
   }
 
