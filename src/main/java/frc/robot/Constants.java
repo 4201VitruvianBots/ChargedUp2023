@@ -683,7 +683,7 @@ public final class Constants {
     SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 62.051; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
-    SWERVE_DRIVE.backRightCANCoderOffset = 31.904;
+    SWERVE_DRIVE.backRightCANCoderOffset = 31.113;
   }
 
   private static void initAlpha() {
