@@ -55,7 +55,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  private boolean m_smartScoringEnabled;
+  private boolean m_smartScoringEnabled = true;
   private boolean m_canScore;
   private boolean m_isOnTarget;
 
@@ -214,11 +214,11 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
       else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_MID_CUBE) {
         if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.MID_CONE;
-        else if (intakeState == INTAKE_STATE.INTAKING_CUBE) m_scoringState = SCORING_STATE.MID_CUBE;
+        else if (intakeState == INTAKE_STATE.HOLDING_CUBE) m_scoringState = SCORING_STATE.MID_CUBE;
       } else if (getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CONE
           || getDesiredState() == SUPERSTRUCTURE_STATE.SCORE_HIGH_CUBE) {
         if (intakeState == INTAKE_STATE.HOLDING_CONE) m_scoringState = SCORING_STATE.HIGH_CONE;
-        else if (intakeState == INTAKE_STATE.INTAKING_CUBE)
+        else if (intakeState == INTAKE_STATE.HOLDING_CUBE)
           m_scoringState = SCORING_STATE.HIGH_CUBE;
       } else {
         m_scoringState = SCORING_STATE.STOWED;

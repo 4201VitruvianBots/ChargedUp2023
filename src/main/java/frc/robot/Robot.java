@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
     if (RobotBase.isSimulation()) {
       addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
     }
-    //    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
+    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
     //    if (m_robotContainer.getDistanceSensor().isInitialized())
     //      addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.1,
     // 0.05);

@@ -6,7 +6,6 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
@@ -20,7 +19,7 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   private final Intake m_intake;
   private final Vision m_vision;
 
-  private INTAKE.INTAKE_STATE m_state;
+  private final INTAKE_STATE m_state;
 
   /** Creates a new RunIntake. */
   public AutoSetIntakeSetpoint(
@@ -43,19 +42,19 @@ public class AutoSetIntakeSetpoint extends CommandBase {
   @Override
   public void execute() {
     m_vision.setPipeline(CAMERA_SERVER.INTAKE, 1.0);
-    m_intake.setPercentOutput(m_state.get());
-    m_swerve.enableHeadingTarget(true);
-    m_swerve.setRobotHeadingRadians(
-        m_swerve
-            .getHeadingRotation2d()
-            .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
-            .getRadians());
+//    m_intake.setPercentOutput(m_state.get());
+//    m_swerve.enableHeadingTarget(true);
+//    m_swerve.setRobotHeadingRadians(
+//        m_swerve
+//            .getHeadingRotation2d()
+//            .minus(Rotation2d.fromDegrees(m_vision.getTargetXAngle(CAMERA_SERVER.INTAKE)))
+//            .getRadians());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (m_state == INTAKE.INTAKE_STATE.INTAKING_CONE)
+    if (m_state == INTAKE_STATE.INTAKING_CONE)
       m_intake.setIntakingState(INTAKE_STATE.HOLDING_CONE);
     else if (m_state == INTAKE_STATE.INTAKING_CUBE)
       m_intake.setIntakingState(INTAKE_STATE.HOLDING_CUBE);
