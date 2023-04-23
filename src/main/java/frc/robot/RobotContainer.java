@@ -44,7 +44,6 @@ import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.intake.SetUseCubeSetpoint;
 import frc.robot.commands.led.GetSubsystemStates;
-import frc.robot.commands.sim.fieldsim.SwitchTargetNode;
 import frc.robot.commands.statehandler.*;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
@@ -291,7 +290,7 @@ public class RobotContainer implements AutoCloseable {
               new SetSetpoint(
                   m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CONE));
 
-      // Score MID Setpoints  
+      // Score MID Setpoints
       testController
           .circle()
           .whileTrue(

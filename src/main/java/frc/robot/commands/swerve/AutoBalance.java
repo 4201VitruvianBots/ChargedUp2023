@@ -93,7 +93,7 @@ public class AutoBalance extends CommandBase {
               SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(
               SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(  
+          new SwerveModuleState(
               SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(-45)),
           new SwerveModuleState(
               SWERVE_DRIVE.kMaxSpeedMetersPerSecond * 0.011, Rotation2d.fromDegrees(45)),

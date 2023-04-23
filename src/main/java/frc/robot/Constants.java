@@ -218,7 +218,6 @@ public final class Constants {
       INTAKING_CUBE(-0.8),
       HOLDING_CUBE(-0.3),
       SCORING_CUBE(0.8);
-      
 
       private final double value;
 
