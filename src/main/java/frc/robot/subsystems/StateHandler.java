@@ -55,7 +55,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
-  private boolean m_smartScoringEnabled = true;
+  private boolean m_smartScoringEnabled = false;
   private boolean m_canScore;
   private boolean m_isOnTarget;
 
@@ -239,7 +239,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   }
 
   public boolean canScore() {
-    return m_canScore;
+    if(isSmartScoring())
+      return m_canScore;
+    else
+      return false;
   }
 
   public boolean isOnTarget() {

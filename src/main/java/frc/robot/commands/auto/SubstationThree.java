@@ -53,8 +53,8 @@ public class SubstationThree extends SequentialCommandGroup {
         new SetSwerveOdometry(
             swerveDrive, m_trajectories.get(0).getInitialHolonomicPose(), fieldSim),
         new PlotAutoTrajectory(fieldSim, pathName, m_trajectories),
-
         /** Brings elevator & wrist to High Pulls up cone */
+        new InstantCommand(()->stateHandler.setSmartScoring(true)),
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
                 .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
@@ -66,6 +66,7 @@ public class SubstationThree extends SequentialCommandGroup {
             .withTimeout(WAIT.SCORING_CONE.get()),
         new WaitCommand(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
+        new InstantCommand(()->stateHandler.setSmartScoring(false)),
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                 .withTimeout(WAIT.STOW_HIGH_CONE.get()),
@@ -92,6 +93,7 @@ public class SubstationThree extends SequentialCommandGroup {
             swerveCommands.get(1),
             new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                 .withTimeout(WAIT.INTAKE_TO_STOW.get())),
+        new InstantCommand(()->stateHandler.setSmartScoring(true)),
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
                 .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
@@ -103,6 +105,7 @@ public class SubstationThree extends SequentialCommandGroup {
             .withTimeout(WAIT.SCORING_CUBE.get()),
         new WaitCommand(WAIT.SCORING_CUBE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
+        new InstantCommand(()->stateHandler.setSmartScoring(false)),
         new ParallelCommandGroup(
             new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
                 .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
