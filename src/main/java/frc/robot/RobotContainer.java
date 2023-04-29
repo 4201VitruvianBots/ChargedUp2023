@@ -60,6 +60,7 @@ import frc.robot.utils.TrajectoryUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -114,15 +115,15 @@ public class RobotContainer implements AutoCloseable {
 
   public void initializeSubsystems() {
     m_swerveDrive.setDefaultCommand(
-        new SetSwerveDrive(
-            m_swerveDrive,
-            () -> leftJoystick.getRawAxis(1),
-            () -> leftJoystick.getRawAxis(0),
-            () -> rightJoystick.getRawAxis(0)));
+      new SetSwerveDrive(
+          m_swerveDrive,
+          () -> xboxController.getLeftY(),
+          () -> xboxController.getLeftX(),
+          () -> xboxController.getRightX()));
 
     // Control elevator height by moving the joystick up and down
-    m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, xboxController::getLeftY));
-    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, xboxController::getRightY));
+    m_elevator.setDefaultCommand(new RunElevatorJoystick(m_elevator, () -> leftJoystick.getRawAxis(1)));
+    m_wrist.setDefaultCommand(new RunWristJoystick(m_wrist, () -> rightJoystick.getRawAxis(1)));
     m_led.setDefaultCommand(
         new GetSubsystemStates(m_led, m_intake, m_stateHandler, m_wrist, m_elevator));
   }
