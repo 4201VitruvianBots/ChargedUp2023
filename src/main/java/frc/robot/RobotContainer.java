@@ -27,6 +27,7 @@ import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.Constants.USB;
 import frc.robot.Constants.WRIST;
 import frc.robot.commands.auto.BumpTwo;
+import frc.robot.commands.auto.CatBarking;
 import frc.robot.commands.auto.CenterOneBalance;
 // import frc.robot.commands.auto.BumpOnePickUp;
 // import frc.robot.commands.auto.CenterOneBalance;
@@ -44,6 +45,7 @@ import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.intake.SetUseCubeSetpoint;
 import frc.robot.commands.led.GetSubsystemStates;
+import frc.robot.commands.orchestra.SetSong;
 import frc.robot.commands.statehandler.*;
 import frc.robot.commands.swerve.AutoBalance;
 import frc.robot.commands.swerve.LimitSwerveJoystickInput;
@@ -73,6 +75,8 @@ public class RobotContainer implements AutoCloseable {
   // Initialize used utils
   private final MemoryLog m_memorylog = new MemoryLog();
   private final LogManager m_logManager = new LogManager();
+  private final TalonOrchestra m_talonOrchestra = new TalonOrchestra();
+
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
   // The robot's subsystems and commands are defined here...
@@ -350,6 +354,9 @@ public class RobotContainer implements AutoCloseable {
 
   /** Use this to pass the autonomous command to the main {@link Robot} class. */
   public void initializeAutoChooser() {
+    m_autoChooser.addOption("songTest", new SetSong(m_talonOrchestra, "rickroll.chrp"));
+    m_autoChooser.addOption(
+        "CatBarking", new CatBarking(m_talonOrchestra, "fireflies.chrp", m_swerveDrive));
 
     // Main Autos
 
