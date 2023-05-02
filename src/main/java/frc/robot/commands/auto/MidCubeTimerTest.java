@@ -39,9 +39,9 @@ public class MidCubeTimerTest extends SequentialCommandGroup {
             /** Brings elevator & wrist to High Pulls up cone */
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_MID_CUBE)
-                    .withTimeout(WAIT.SCORE_MID_CUBE.get()),
+                    ,
                 new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                    .withTimeout(WAIT.SCORE_MID_CUBE.get())),
+                    ).withTimeout(WAIT.SCORE_MID_CUBE.get()),
 
             /** Outakes cone */
             new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
@@ -53,10 +53,9 @@ public class MidCubeTimerTest extends SequentialCommandGroup {
             /** Stows Wrist, Elevator, and Stops intake */
             new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                    .withTimeout(WAIT.STOW_MID_CUBE.get()),
+                    ,
                 new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                    .withTimeout(WAIT.STOW_MID_CUBE.get())),
-            new WaitCommand(WAIT.STOW_MID_CUBE.get()),
+                    ).withTimeout(WAIT.STOW_MID_CUBE.get()),
 
             /** Runs Path with Intaking cube during */
             new PrintCommand(String.format("Command Ends at: %f", timer.get()))));
