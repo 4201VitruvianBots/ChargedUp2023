@@ -39,10 +39,10 @@ public class HighCubeTimerTest extends SequentialCommandGroup {
 
             /** Brings elevator & wrist to High Pulls up cone */
             new ParallelCommandGroup(
-                new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE)
-                    ,
-                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                    ).withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CUBE),
+                    new AutoSetIntakeSetpoint(
+                        intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive))
+                .withTimeout(WAIT.SCORE_HIGH_CUBE.get()),
 
             /** Outakes cone */
             new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
@@ -53,10 +53,9 @@ public class HighCubeTimerTest extends SequentialCommandGroup {
             new PrintCommand(String.format("Object Scoring finishes at: %f", timer.get())),
             /** Stows Wrist, Elevator, and Stops intake */
             new ParallelCommandGroup(
-                new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                    ,
-                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                    ).withTimeout(WAIT.STOW_HIGH_CUBE.get()),
+                    new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
+                    new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive))
+                .withTimeout(WAIT.STOW_HIGH_CUBE.get()),
 
             /** Runs Path with Intaking cube during */
             new PrintCommand(String.format("Command Ends at: %f", timer.get()))));
