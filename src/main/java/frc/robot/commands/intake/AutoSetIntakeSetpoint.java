@@ -10,8 +10,8 @@ import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
 
 public class AutoSetIntakeSetpoint extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})

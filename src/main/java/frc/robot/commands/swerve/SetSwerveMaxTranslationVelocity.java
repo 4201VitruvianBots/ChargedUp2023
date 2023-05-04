@@ -2,7 +2,7 @@ package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.SWERVE_DRIVE;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
 
 /** Sets the drivetrain to neutral (coast/brake) */
 public class SetSwerveMaxTranslationVelocity extends CommandBase {

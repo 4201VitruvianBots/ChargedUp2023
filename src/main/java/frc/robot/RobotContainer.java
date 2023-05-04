@@ -56,6 +56,7 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.io.File;

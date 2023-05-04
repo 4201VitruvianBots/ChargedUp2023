@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.SCORING_STATE;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Controls;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
+
 import org.junit.jupiter.api.*;
 import utils.TestUtils;
 

@@ -8,8 +8,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
-import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
+
 import java.util.function.DoubleSupplier;
 
 public class IntakeVisionAlignment extends CommandBase {

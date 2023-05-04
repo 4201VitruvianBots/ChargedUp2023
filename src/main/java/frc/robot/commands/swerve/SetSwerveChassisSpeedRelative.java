@@ -3,7 +3,8 @@ package frc.robot.commands.swerve;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.SWERVE_DRIVE;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
+
 import java.util.function.DoubleSupplier;
 
 public class SetSwerveChassisSpeedRelative extends CommandBase {

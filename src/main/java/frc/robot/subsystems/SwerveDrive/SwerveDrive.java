@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.SwerveDrive;
 
 import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
 
@@ -36,6 +36,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +77,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private double m_rollOffset;
+  
+  private final GyroIO gyroIO;
+  private final GyroIOInputsAutoLogged gyroInputs =
+  new GyroIOInputsAutoLogged();
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
@@ -111,7 +116,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private final double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
   private double m_currentMaxVelocity = m_maxVelocity;
 
-  public SwerveDrive() {
+  public SwerveDrive(GyroIO gyroIO) {
+    this.gyroIO = gyroIO;
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =

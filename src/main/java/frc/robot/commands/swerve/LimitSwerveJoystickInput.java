@@ -5,7 +5,7 @@
 package frc.robot.commands.swerve;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
 
 public class LimitSwerveJoystickInput extends CommandBase {
   private final SwerveDrive m_swerveDrive;

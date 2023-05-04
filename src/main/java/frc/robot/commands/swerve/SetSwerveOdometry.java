@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
-import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.SwerveDrive.SwerveDrive;
 
 /** Sets the robot's position */
 public class SetSwerveOdometry extends CommandBase {
