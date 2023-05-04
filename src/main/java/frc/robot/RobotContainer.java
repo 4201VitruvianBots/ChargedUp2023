@@ -32,6 +32,7 @@ import frc.robot.commands.auto.CenterOneBalance;
 // import frc.robot.commands.auto.CenterOneBalance;
 import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
+import frc.robot.commands.auto.FakeCycles;
 import frc.robot.commands.auto.HighConeTimerTest;
 import frc.robot.commands.auto.HighCubeTimerTest;
 import frc.robot.commands.auto.MidCubeTimerTest;
@@ -357,6 +358,17 @@ public class RobotContainer implements AutoCloseable {
         "SubstationThree",
         new SubstationThree(
             "SubstationTwoPickup",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
+             m_autoChooser.addOption(
+        "FakeCycles",
+        new FakeCycles(
+            "FakeCycles",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
