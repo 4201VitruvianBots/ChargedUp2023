@@ -5,7 +5,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.elevator.Elevator;
 
 // Limit the percent output of the elevator joystick when the stick is pressed down to make small
 // adjustments

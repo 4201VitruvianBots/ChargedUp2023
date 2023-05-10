@@ -6,7 +6,7 @@ package frc.robot.commands.elevator;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.elevator.Elevator;
 
 public class ToggleElevatorNeutralMode extends CommandBase {
   /** Creates a new ToggleElevatorCoastMode. */

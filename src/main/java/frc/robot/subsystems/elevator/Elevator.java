@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.elevator;
 
 import static frc.robot.Constants.ELEVATOR.centerOffset;
 import static frc.robot.subsystems.StateHandler.m_elevatorRoot2d;
@@ -40,6 +40,7 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.ELEVATOR.THRESHOLD;
+import frc.robot.subsystems.StateHandler;
 import frc.robot.Constants.STATE_HANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
