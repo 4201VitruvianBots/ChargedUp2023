@@ -7,6 +7,8 @@ package frc.robot.subsystems.elevator;
 import static frc.robot.Constants.ELEVATOR.centerOffset;
 import static frc.robot.subsystems.StateHandler.m_elevatorRoot2d;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -44,16 +46,14 @@ import frc.robot.subsystems.StateHandler;
 import frc.robot.Constants.STATE_HANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
-
-  // Initializing both motors
-  private final TalonFX[] elevatorMotors = {
-    new TalonFX(CAN.elevatorMotorLeft), new TalonFX(CAN.elevatorMotorRight)
-  };
-  private boolean m_elevatorInitialized;
+  //private boolean m_elevatorInitialized;
 
   // Initializing limit switch at bottom of elevator
   //  private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
   //  private boolean lowerLimitSwitchTriggered = false;
+
+  public final ElevatorIO m_io;
+  private final ElevatorIOInputsAutoLogged m_inputs = new ElevatorIOInputsAutoLogged();
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
 
@@ -61,7 +61,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private boolean m_testMode = false;
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
-  private NeutralMode m_neutralMode = NeutralMode.Brake;
 
   // Positional limits set by the state handler
   private double m_lowerLimitMeters = THRESHOLD.ABSOLUTE_MIN.get();
@@ -120,39 +119,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry positionMetersEntry = new DoubleLogEntry(log, "/elevator/position");
 
   /* Constructs a new Elevator. Mostly motor setup */
-  public Elevator() {
-    for (TalonFX motor : elevatorMotors) {
-      motor.configFactoryDefault();
-      motor.setNeutralMode(m_neutralMode);
-      motor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-      //      motor.setSelectedSensorPosition(0.0);
-
-      // Config PID
-      motor.selectProfileSlot(ELEVATOR.kSlotIdx, ELEVATOR.kPIDLoopIdx);
-      motor.config_kP(ELEVATOR.kSlotIdx, ELEVATOR.kP, ELEVATOR.kTimeoutMs);
-      motor.config_kI(ELEVATOR.kSlotIdx, ELEVATOR.kI, ELEVATOR.kTimeoutMs);
-      motor.config_kD(ELEVATOR.kSlotIdx, ELEVATOR.kD, ELEVATOR.kTimeoutMs);
-      // motor.config_IntegralZone(ELEVATOR.kSlotIdx, 0);
-
-      // Setting hard limits as to how fast the elevator can move forward and backward
-      //      motor.configPeakOutputForward(ELEVATOR.kMaxForwardOutput, ELEVATOR.kTimeoutMs);
-      // TODO: Review after new elevator is integrated
-      motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 50, 0.1));
-    }
-    elevatorMotors[0].configPeakOutputReverse(ELEVATOR.kMaxReverseOutput, ELEVATOR.kTimeoutMs);
-
-    // Setting the right motor to output the same as the left motor
-    elevatorMotors[0].setInverted(ELEVATOR.mainMotorInversionType);
-    // elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
-    // elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
-    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_1_General, 255);
-    elevatorMotors[1].setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+  public Elevator(ElevatorIO io) {
+    m_io = io;
 
     initShuffleboard();
     m_timer.reset();
     m_timer.start();
-
-    m_simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
 
     try {
       m_elevatorLigament2d =
@@ -165,22 +137,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  private void initElevatorMotorFollower() {
-    if (DriverStation.isDisabled() && m_elevatorInitialized) {
-      elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
-      elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
-
-      if (elevatorMotors[1].getControlMode() == ControlMode.Follower) m_elevatorInitialized = true;
-    }
-  }
-
   // Elevator's motor output as a percentage
   public double getPercentOutput() {
-    return elevatorMotors[0].getMotorOutputPercent();
-  }
-
-  public void setPercentOutput(double output) {
-    setPercentOutput(output, false);
+    return m_inputs.percentOutput;
   }
 
   // Setting the raw output of the motors
@@ -195,21 +154,13 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       if (getHeightMeters() < (getLowerLimitMeters() + 0.005)) output = Math.max(output, 0);
     }
 
-    elevatorMotors[0].set(ControlMode.PercentOutput, output);
+    m_io.setPercentOutput(output);
   }
 
-  // Sets the calculated trapezoid state of the motors
-  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-    // TODO: Find out why feedforward is no longer needed?
-    elevatorMotors[0].set(
-        TalonFXControlMode.Position,
-        state.position / ELEVATOR.encoderCountsToMeters,
-        DemandType.ArbitraryFeedForward,
-        //        calculateFeedforward(state)
-        0);
-    elevatorMotors[1].set(ControlMode.PercentOutput, elevatorMotors[0].getMotorOutputPercent());
+  public void setPercentOutput(double output) {
+    setPercentOutput(output, false);
   }
-
+  
   private double calculateFeedforward(TrapezoidProfile.State state) {
     return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
@@ -226,12 +177,12 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Returns the elevator's velocity in meters per second.
   public double getVelocityMetersPerSecond() {
-    return elevatorMotors[0].getSelectedSensorVelocity() * ELEVATOR.encoderCountsToMeters * 10;
+    return m_inputs.velocityMetersPerSec;
   }
 
   // Returns the raw sensor position with no conversions
   public double getHeightEncoderCounts() {
-    return elevatorMotors[0].getSelectedSensorPosition();
+    return m_inputs.heightEncoderCounts;
   }
 
   // Returns true if elevator is within half of an inch of its set position
@@ -247,20 +198,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return false;
   }
 
-  // Sets the perceived position of the motors
-  // Usually used to zero the motors if the robot is started in a non-stowed position
-  public void setSensorPosition(double meters) {
-    elevatorMotors[0].setSelectedSensorPosition(meters / ELEVATOR.encoderCountsToMeters);
-  }
-
-  public void setNeutralMode(NeutralMode mode) {
-    m_neutralMode = mode;
-    elevatorMotors[0].setNeutralMode(mode);
-    elevatorMotors[1].setNeutralMode(mode);
-  }
-
   public NeutralMode getNeutralMode() {
-    return m_neutralMode;
+    return m_inputs.neutralMode;
   }
 
   public void setDesiredPositionMeters(double meters) {
@@ -293,14 +232,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   public void setTestMode(boolean mode) {
     m_testMode = mode;
-  }
-
-  public void setPIDvalues(double f, double p, double i, double d, double iZone) {
-    elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
-    elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, p);
-    elevatorMotors[0].config_kI(ELEVATOR.kSlotIdx, i);
-    elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, d);
-    elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, iZone);
   }
 
   public void setSimpleMotorFeedForward(double g, double v, double a) {
@@ -400,7 +331,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateLog() {
-    outputCurrentEntry.append(elevatorMotors[0].getStatorCurrent());
+    outputCurrentEntry.append(m_inputs.outputCurrent);
     setpointMetersEntry.append(m_desiredPositionMeters);
     positionMetersEntry.append(getHeightMeters());
   }
@@ -433,6 +364,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (!m_testMode) {
       updateHeightMeters();
     }
+    
+    m_io.updateInputs(m_inputs);
+    Logger.getInstance().processInputs("Elevator", m_inputs);
 
     switch (m_controlMode) {
         // Called when setting to open loop
@@ -459,14 +393,14 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
         m_setpoint = m_currentProfile.calculate(m_currentTimestamp - m_lastTimestamp);
         m_lastTimestamp = m_currentTimestamp;
 
-        setSetpointTrapezoidState(m_setpoint);
+        m_io.setSetpointTrapezoidState(m_setpoint);
         break;
     }
   }
 
   @Override
   public void simulationPeriodic() {
-    elevatorSim.setInput(MathUtil.clamp(elevatorMotors[0].getMotorOutputVoltage(), -12, 12));
+    elevatorSim.setInput(MathUtil.clamp(m_inputs.outputVoltage, -12, 12));
 
     double dt = StateHandler.getSimDt();
     elevatorSim.update(dt);

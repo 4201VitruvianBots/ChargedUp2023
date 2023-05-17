@@ -5,4 +5,4 @@
 package frc.robot.subsystems.elevator;
 
 /** Add your docs here. */
-public class ElevatorIOSim {}
+public class ElevatorIOSim extends ElevatorIOReal {}
