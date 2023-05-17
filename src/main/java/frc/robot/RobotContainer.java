@@ -79,19 +79,18 @@ public class RobotContainer implements AutoCloseable {
   private final LogManager m_logManager = new LogManager();
   //  private final DistanceSensor m_distanceSensor = new DistanceSensor();
 
-  // The robot's subsystems and commands are defined here...
-  private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private Elevator m_elevator;
-  private final Intake m_intake = new Intake();
-  private final Wrist m_wrist = new Wrist(m_intake);
-  private final Controls m_controls = new Controls();
-  private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
-  private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();
-  private final LEDSubsystem m_led = new LEDSubsystem(m_controls);
-  private final StateHandler m_stateHandler =
-      new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_vision);
-  private final FieldSim m_fieldSim =
-      new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
+
+  // The robot's subsystems and commands are defined here...
+  private SwerveDrive m_swerveDrive;
+  private Intake m_intake;
+  private Wrist m_wrist;
+  private Controls m_controls;
+  private Vision m_vision;
+  private SendableChooser<Command> m_autoChooser;
+  private LEDSubsystem m_led;
+  private StateHandler m_stateHandler;
+  private FieldSim m_fieldSim;
 
   private SendableChooser<List<PathPlannerTrajectory>> autoPlotter;
 
@@ -108,8 +107,8 @@ public class RobotContainer implements AutoCloseable {
   private final Trigger[] rightJoystickTriggers = new Trigger[2]; // right joystick buttons
 
   public RobotContainer() {
-    resetSubsystemPositions();
     initializeSubsystems();
+    resetSubsystemPositions();
     m_logger.pause();
     configureBindings();
 
@@ -118,9 +117,31 @@ public class RobotContainer implements AutoCloseable {
 
   public void initializeSubsystems() {
     if (RobotBase.isReal()) {
+      m_swerveDrive = new SwerveDrive();
+      m_intake = new Intake();
       m_elevator = new Elevator(new ElevatorIOReal());
+      m_wrist = new Wrist(m_intake);
+      m_controls = new Controls();
+      m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
+      m_autoChooser = new SendableChooser<>();
+      m_led = new LEDSubsystem(m_controls);
+      m_stateHandler =
+          new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_vision);
+      m_fieldSim =
+          new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
     } else {
+      m_swerveDrive = new SwerveDrive();
+      m_intake = new Intake();
       m_elevator = new Elevator(new ElevatorIOSim());
+      m_wrist = new Wrist(m_intake);
+      m_controls = new Controls();
+      m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
+      m_autoChooser = new SendableChooser<>();
+      m_led = new LEDSubsystem(m_controls);
+      m_stateHandler =
+          new StateHandler(m_intake, m_wrist, m_swerveDrive, m_elevator, m_vision);
+      m_fieldSim =
+          new FieldSim(m_swerveDrive, m_vision, m_elevator, m_wrist, m_stateHandler, m_controls);
     }
 
     m_swerveDrive.setDefaultCommand(
