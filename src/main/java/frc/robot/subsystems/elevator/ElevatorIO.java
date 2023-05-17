@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.AutoLog;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 
 /** Add your docs here. */
 public interface ElevatorIO {
@@ -37,5 +38,18 @@ public interface ElevatorIO {
 
     // Sets the calculated trapezoid state of the motors
     public default void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+    }
+
+    public default void simulationPeriodic() {
+    }
+
+    public default MechanismLigament2d getLigament() {
+        return null;
+    }
+
+    public default void setLigament(MechanismLigament2d ligament) {
+    }
+
+    public default void close() throws Exception {
     }
 }

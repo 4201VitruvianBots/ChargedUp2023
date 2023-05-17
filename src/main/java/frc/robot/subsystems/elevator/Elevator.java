@@ -81,22 +81,10 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private SimpleMotorFeedforward m_currentFeedForward = m_feedForward;
   // This timer is used to calculate the time since the previous periodic run to determine our new
   // setpoint
-  private static int m_simEncoderSign = 1;
   private final Timer m_timer = new Timer();
   private boolean m_unitTestBoolean = false; // DO NOT MAKE FINAL. WILL BREAK UNIT TESTS
   private double m_lastTimestamp = 0;
   private double m_currentTimestamp = 0;
-
-  // Simulation setup
-  private final ElevatorSim elevatorSim =
-      new ElevatorSim(
-          ELEVATOR.gearbox,
-          ELEVATOR.gearRatio,
-          ELEVATOR.massKg,
-          ELEVATOR.drumRadiusMeters,
-          THRESHOLD.ABSOLUTE_MIN.get(),
-          THRESHOLD.ABSOLUTE_MAX.get(),
-          true);
 
   // Shuffleboard setup
   private DoublePublisher kHeightPub,
@@ -108,9 +96,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
       kCurrentVelPub;
   private StringPublisher kClosedLoopModePub, currentCommandStatePub;
   private BooleanPublisher lowerLimitSwitchPub;
-
-  // Mechanism2d visualization setup
-  private MechanismLigament2d m_elevatorLigament2d;
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -125,16 +110,6 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     initShuffleboard();
     m_timer.reset();
     m_timer.start();
-
-    try {
-      m_elevatorLigament2d =
-          m_elevatorRoot2d.append(
-              new MechanismLigament2d(
-                  "Elevator", 0 + ELEVATOR.carriageDistance, ELEVATOR.mech2dAngleDegrees));
-      m_elevatorLigament2d.setColor(new Color8Bit(180, 0, 0)); // Red
-    } catch (Exception m_ignored) {
-
-    }
   }
 
   // Elevator's motor output as a percentage
@@ -278,11 +253,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
 
   // Returns the ligament of the elevator to update in StateHandler
   public MechanismLigament2d getLigament() {
-    return m_elevatorLigament2d;
+    return m_io.getLigament();
   }
 
   public void setLigament(MechanismLigament2d ligament) {
-    m_elevatorLigament2d = ligament;
+    m_io.setLigament(ligament);
   }
 
   // Initializes shuffleboard values. Does not update them
@@ -354,6 +329,11 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     resetTrapezoidState();
   }
 
+  @Override
+  public void simulationPeriodic() {
+    m_io.simulationPeriodic();
+  }
+
   // This method will be called once per scheduler run
   @Override
   public void periodic() {
@@ -399,48 +379,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   @Override
-  public void simulationPeriodic() {
-    elevatorSim.setInput(MathUtil.clamp(m_inputs.outputVoltage, -12, 12));
-
-    double dt = StateHandler.getSimDt();
-    elevatorSim.update(dt);
-
-    // Internally sets the position of the motors in encoder counts based on our current height in
-    // meters
-    elevatorMotors[0]
-        .getSimCollection()
-        .setIntegratedSensorRawPosition(
-            (int)
-                (m_simEncoderSign
-                    * elevatorSim.getPositionMeters()
-                    / ELEVATOR.encoderCountsToMeters));
-
-    // Internally sets the velocity of the motors in encoder counts per 100 ms based on our velocity
-    // in meters per second (1000 ms)
-    elevatorMotors[0]
-        .getSimCollection()
-        .setIntegratedSensorVelocity(
-            (int)
-                (m_simEncoderSign
-                    * elevatorSim.getVelocityMetersPerSecond()
-                    / ELEVATOR.encoderCountsToMeters
-                    * 10));
-
-    // Sets the simulated voltage of the roboRio based on our current draw from the elevator
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
-
-    elevatorMotors[0].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
-    elevatorMotors[1].getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
-
-    if (m_elevatorLigament2d != null)
-      m_elevatorLigament2d.setLength(elevatorSim.getPositionMeters());
-  }
-
-  @Override
   // Safely closes the subsystem
   public void close() throws Exception {
-    //    lowerLimitSwitch.close();
-    if (m_elevatorLigament2d != null) m_elevatorLigament2d.close();
+    m_io.close();
   }
 }

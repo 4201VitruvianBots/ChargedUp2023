@@ -21,7 +21,7 @@ import frc.robot.Constants.ELEVATOR;
 /** Add your docs here. */
 public class ElevatorIOReal implements ElevatorIO {
   // Initializing both motors
-  private final TalonFX[] elevatorMotors = {
+  protected final TalonFX[] elevatorMotors = {
     new TalonFX(CAN.elevatorMotorLeft), new TalonFX(CAN.elevatorMotorRight)
   };
 
