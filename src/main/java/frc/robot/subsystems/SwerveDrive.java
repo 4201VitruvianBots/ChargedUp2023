@@ -386,11 +386,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     pitchPub.set(getPitchDegrees());
     rollPub.set(getRollDegrees() + getRollOffsetDegrees());
     yawPub.set(getHeadingDegrees());
-    odometryPublisher.set(new double[] {
-      getPoseMeters().getX(),
-      getPoseMeters().getY(),
-      getPoseMeters().getRotation().getDegrees()
-    });
+    odometryPublisher.set(
+        new double[] {
+          getPoseMeters().getX(), getPoseMeters().getY(), getPoseMeters().getRotation().getDegrees()
+        });
     if (!m_limitCanUtil) {
       // Put not required stuff here
       odometryXPub.set(getOdometry().getEstimatedPosition().getX());

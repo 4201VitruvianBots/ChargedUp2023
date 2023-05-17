@@ -12,9 +12,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.ELEVATOR;
 
@@ -60,24 +58,26 @@ public class ElevatorIOReal implements ElevatorIO {
   @Override
   public void updateInputs(ElevatorIOInputs inputs) {
     inputs.percentOutput = elevatorMotors[0].getMotorOutputPercent();
-    inputs.velocityMetersPerSec = elevatorMotors[0].getSelectedSensorVelocity() * ELEVATOR.encoderCountsToMeters * 10;
+    inputs.velocityMetersPerSec =
+        elevatorMotors[0].getSelectedSensorVelocity() * ELEVATOR.encoderCountsToMeters * 10;
     inputs.heightEncoderCounts = elevatorMotors[0].getSelectedSensorPosition();
     inputs.heightMeters = inputs.heightEncoderCounts * ELEVATOR.encoderCountsToMeters;
     inputs.outputVoltage = elevatorMotors[0].getMotorOutputVoltage();
-    inputs.outputCurrent = elevatorMotors[0].getStatorCurrent();  
+    inputs.outputCurrent = elevatorMotors[0].getStatorCurrent();
     inputs.simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
     inputs.neutralMode = m_neutralMode;
   }
-  
+
   private void initElevatorMotorFollower() {
     // if (DriverStation.isDisabled() && m_elevatorInitialized) {
     //   elevatorMotors[1].set(TalonFXControlMode.Follower, elevatorMotors[0].getDeviceID());
     //   elevatorMotors[1].setInverted(TalonFXInvertType.OpposeMaster);
 
-    //   if (elevatorMotors[1].getControlMode() == ControlMode.Follower) m_elevatorInitialized = true;
+    //   if (elevatorMotors[1].getControlMode() == ControlMode.Follower) m_elevatorInitialized =
+    // true;
     // }
   }
-  
+
   // Setting the raw output of the motors
   @Override
   public void setPercentOutput(double output) {
@@ -109,6 +109,7 @@ public class ElevatorIOReal implements ElevatorIO {
     elevatorMotors[1].setNeutralMode(mode);
   }
 
+  @Override
   public void setPIDvalues(double f, double p, double i, double d, double iZone) {
     elevatorMotors[0].config_kF(ELEVATOR.kSlotIdx, f);
     elevatorMotors[0].config_kP(ELEVATOR.kSlotIdx, p);
@@ -116,5 +117,4 @@ public class ElevatorIOReal implements ElevatorIO {
     elevatorMotors[0].config_kD(ELEVATOR.kSlotIdx, d);
     elevatorMotors[0].config_IntegralZone(ELEVATOR.kSlotIdx, iZone);
   }
-
 }

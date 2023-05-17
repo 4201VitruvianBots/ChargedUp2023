@@ -5,20 +5,8 @@
 package frc.robot.subsystems.elevator;
 
 import static frc.robot.Constants.ELEVATOR.centerOffset;
-import static frc.robot.subsystems.StateHandler.m_elevatorRoot2d;
 
-import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -31,29 +19,24 @@ import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.CAN;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.ELEVATOR.THRESHOLD;
-import frc.robot.subsystems.StateHandler;
 import frc.robot.Constants.STATE_HANDLER;
+import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
-  //private boolean m_elevatorInitialized;
+  // private boolean m_elevatorInitialized;
 
   // Initializing limit switch at bottom of elevator
   //  private final DigitalInput lowerLimitSwitch = new DigitalInput(DIO.elevatorLowerLimitSwitch);
   //  private boolean lowerLimitSwitchTriggered = false;
 
   public final ElevatorIO m_io;
-  private final ElevatorIOInputsAutoLogged m_inputs = new ElevatorIOInputsAutoLogged();
+  private final ElevatorIOInputs m_inputs = new ElevatorIOInputs();
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
 
@@ -135,7 +118,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public void setPercentOutput(double output) {
     setPercentOutput(output, false);
   }
-  
+
   private double calculateFeedforward(TrapezoidProfile.State state) {
     return (m_feedForward.calculate(state.position, state.velocity) / 12.0);
   }
@@ -158,6 +141,18 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   // Returns the raw sensor position with no conversions
   public double getHeightEncoderCounts() {
     return m_inputs.heightEncoderCounts;
+  }
+
+  public void setPIDvalues(double f, double p, double i, double d, double iZone) {
+    m_io.setPIDvalues(f, p, i, d, iZone);
+  }
+
+  public void setNeutralMode(NeutralMode mode) {
+    m_io.setNeutralMode(mode);
+  }
+
+  public void setSensorPosition(double meters) {
+    m_io.setSensorPosition(meters);
   }
 
   // Returns true if elevator is within half of an inch of its set position
@@ -344,9 +339,9 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     if (!m_testMode) {
       updateHeightMeters();
     }
-    
+
     m_io.updateInputs(m_inputs);
-    Logger.getInstance().processInputs("Elevator", m_inputs);
+    // Logger.getInstance().processInputs("Elevator", m_inputs);
 
     switch (m_controlMode) {
         // Called when setting to open loop

@@ -57,6 +57,8 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOReal;
+import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.io.File;
@@ -79,7 +81,7 @@ public class RobotContainer implements AutoCloseable {
 
   // The robot's subsystems and commands are defined here...
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
-  private final Elevator m_elevator = new Elevator();
+  private Elevator m_elevator;
   private final Intake m_intake = new Intake();
   private final Wrist m_wrist = new Wrist(m_intake);
   private final Controls m_controls = new Controls();
@@ -115,6 +117,12 @@ public class RobotContainer implements AutoCloseable {
   }
 
   public void initializeSubsystems() {
+    if (RobotBase.isReal()) {
+      m_elevator = new Elevator(new ElevatorIOReal());
+    } else {
+      m_elevator = new Elevator(new ElevatorIOSim());
+    }
+
     m_swerveDrive.setDefaultCommand(
         new SetSwerveDrive(
             m_swerveDrive,
@@ -366,7 +374,7 @@ public class RobotContainer implements AutoCloseable {
             m_vision,
             m_elevator,
             m_stateHandler));
-             m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "FakeCycles",
         new FakeCycles(
             "FakeCycles",

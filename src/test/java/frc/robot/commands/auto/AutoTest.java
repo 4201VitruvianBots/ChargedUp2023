@@ -9,7 +9,6 @@ import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.SimConstants;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Elevator;
-
 import org.junit.jupiter.api.*;
 
 public class AutoTest {
