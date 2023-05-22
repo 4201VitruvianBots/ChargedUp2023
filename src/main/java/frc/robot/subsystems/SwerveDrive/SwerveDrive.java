@@ -77,10 +77,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private final Pigeon2 m_pigeon = new Pigeon2(CAN.pigeon, "rio");
   private double m_rollOffset;
-  
-  private final GyroIO gyroIO;
-  private final GyroIOInputsAutoLogged gyroInputs =
-  new GyroIOInputsAutoLogged();
 
   private final boolean m_limitCanUtil = STATE_HANDLER.limitCanUtilization;
 
@@ -116,8 +112,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private final double m_limitedVelocity = SWERVE_DRIVE.kLimitedSpeedMetersPerSecond;
   private double m_currentMaxVelocity = m_maxVelocity;
 
-  public SwerveDrive(GyroIO gyroIO) {
-    this.gyroIO = gyroIO;
+  public SwerveDrive() {
     m_pigeon.configFactoryDefault();
     m_pigeon.setYaw(0);
     m_odometry =

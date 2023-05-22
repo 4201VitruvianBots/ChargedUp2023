@@ -238,7 +238,10 @@ public final class Constants {
       CONNECTED // The sensor is connected and is reading an expected value (between 0-8192)
     }
   }
-
+  public static final class IO{
+    public static final double loopPeriodSecs = 0.02;
+    public static final boolean tuningMode = false;
+  }
   public static final class LED {
 
     public static final int LEDcount = 72;
