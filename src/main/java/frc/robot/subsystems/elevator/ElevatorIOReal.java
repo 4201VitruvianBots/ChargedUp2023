@@ -65,7 +65,7 @@ public class ElevatorIOReal implements ElevatorIO {
     inputs.outputVoltage = elevatorMotors[0].getMotorOutputVoltage();
     inputs.outputCurrent = elevatorMotors[0].getStatorCurrent();
     inputs.simEncoderSign = elevatorMotors[0].getInverted() ? -1 : 1;
-    inputs.neutralMode = m_neutralMode;
+    inputs.neutralMode = m_neutralMode.name();
   }
 
   private void initElevatorMotorFollower() {

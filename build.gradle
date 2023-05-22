@@ -72,6 +72,9 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
     testImplementation 'org.mockito:mockito-core:4.1.0'
+
+    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+    annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 }
 
 test {

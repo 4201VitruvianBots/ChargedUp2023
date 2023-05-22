@@ -21,8 +21,8 @@ public interface ElevatorIO {
     public double outputVoltage = 0;
     public double outputCurrent = 0;
 
-    public int simEncoderSign = 1;
-    public NeutralMode neutralMode = NeutralMode.Brake;
+    public double simEncoderSign = 1;
+    public String neutralMode = "Brake";
   }
 
   /** Updates the set of loggable inputs. */

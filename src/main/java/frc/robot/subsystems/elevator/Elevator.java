@@ -6,6 +6,8 @@ package frc.robot.subsystems.elevator;
 
 import static frc.robot.Constants.ELEVATOR.centerOffset;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,7 +28,6 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.ELEVATOR.THRESHOLD;
 import frc.robot.Constants.STATE_HANDLER;
-import frc.robot.subsystems.elevator.ElevatorIO.ElevatorIOInputs;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {
   // private boolean m_elevatorInitialized;
@@ -36,7 +37,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   //  private boolean lowerLimitSwitchTriggered = false;
 
   public final ElevatorIO m_io;
-  private final ElevatorIOInputs m_inputs = new ElevatorIOInputs();
+  private final ElevatorIOInputsAutoLogged m_inputs = new ElevatorIOInputsAutoLogged();
 
   private double m_desiredPositionMeters; // The height in meters our robot is trying to reach
 
@@ -168,8 +169,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     return false;
   }
 
+  // This is so incredibly scuffed but it'll have to do
   public NeutralMode getNeutralMode() {
-    return m_inputs.neutralMode;
+    switch (m_inputs.neutralMode) {
+      case "Brake":
+        return NeutralMode.Brake;
+      case "Coast":
+        return NeutralMode.Coast;
+      default:
+      case "EEPROM":
+        return NeutralMode.EEPROMSetting;
+    }
   }
 
   public void setDesiredPositionMeters(double meters) {
@@ -341,7 +351,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     }
 
     m_io.updateInputs(m_inputs);
-    // Logger.getInstance().processInputs("Elevator", m_inputs);
+    Logger.getInstance().processInputs("Elevator", m_inputs);
 
     switch (m_controlMode) {
         // Called when setting to open loop
