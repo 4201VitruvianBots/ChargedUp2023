@@ -42,6 +42,8 @@ import frc.robot.utils.ModuleMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
+
 public class SwerveDriveIO extends SubsystemBase implements AutoCloseable {
 
   private final HashMap<SWERVE_MODULE_POSITION, SwerveModule> m_swerveModules =
@@ -76,10 +78,22 @@ public class SwerveDriveIO extends SubsystemBase implements AutoCloseable {
                   new CANCoder(CAN.backRightCanCoder),
                   SWERVE_DRIVE.backRightCANCoderOffset)));
 
-  
+                  private final HashMap<SWERVE_MODULE_POSITION, ModuleIOInputsAutoLogged> m_swerveModuleInputs =
+                  new HashMap<>(
+                      Map.of(
+                          SWERVE_MODULE_POSITION.FRONT_LEFT,
+                          new ModuleIOInputsAutoLogged(),
+                          SWERVE_MODULE_POSITION.FRONT_RIGHT,
+                          new ModuleIOInputsAutoLogged(),
+                          SWERVE_MODULE_POSITION.BACK_LEFT,
+                          new ModuleIOInputsAutoLogged(),
+                          SWERVE_MODULE_POSITION.BACK_RIGHT,
+                          new ModuleIOInputsAutoLogged()));
+                
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs =
   new GyroIOInputsAutoLogged();
+  
 
   private final LoggedTunableNumber SwerveKp_X = 
   new LoggedTunableNumber("Swerve/SwerveKp_X");
@@ -137,10 +151,15 @@ public class SwerveDriveIO extends SubsystemBase implements AutoCloseable {
 
   @Override
   public void periodic() {
-
-
     updateOdometry();
     updateSmartDashboard();
+    gyroIO.updateInputs(gyroInputs);
+    for (SWERVE_MODULE_POSITION i : SWERVE_MODULE_POSITION.values()) {
+      
+    }
+    Logger.getInstance().processInputs("Drive/Gyro", gyroInputs);
+
+
   }
 
   @Override
