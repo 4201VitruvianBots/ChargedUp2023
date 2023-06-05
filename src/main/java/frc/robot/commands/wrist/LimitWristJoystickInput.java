@@ -5,7 +5,7 @@
 package frc.robot.commands.wrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 // Limit the percent output of the wrist joystick when the stick is pressed down to make small
 // adjustments

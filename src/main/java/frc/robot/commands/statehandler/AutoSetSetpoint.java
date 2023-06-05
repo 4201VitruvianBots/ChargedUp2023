@@ -10,7 +10,7 @@ import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 public class AutoSetSetpoint extends CommandBase {
   /** Creates a new AutoSetSetpoint. */

@@ -11,7 +11,7 @@ import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 public class SetConditionalSetpoint extends CommandBase {
   /** Creates a new SetConditionalSetpoint. */

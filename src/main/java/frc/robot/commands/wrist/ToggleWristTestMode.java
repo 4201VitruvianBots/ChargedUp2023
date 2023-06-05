@@ -7,7 +7,7 @@ package frc.robot.commands.wrist;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 public class ToggleWristTestMode extends CommandBase {
   /** Creates a new ToggleWristTestMode. */

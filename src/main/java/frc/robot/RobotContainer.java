@@ -56,6 +56,7 @@ import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.utils.LogManager;
 import frc.robot.utils.TrajectoryUtils;
 import java.io.File;
@@ -365,7 +366,7 @@ public class RobotContainer implements AutoCloseable {
             m_vision,
             m_elevator,
             m_stateHandler));
-             m_autoChooser.addOption(
+    m_autoChooser.addOption(
         "FakeCycles",
         new FakeCycles(
             "FakeCycles",

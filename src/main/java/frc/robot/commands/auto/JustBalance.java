@@ -12,7 +12,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.utils.TrajectoryUtils;
 
 public class JustBalance extends SequentialCommandGroup {

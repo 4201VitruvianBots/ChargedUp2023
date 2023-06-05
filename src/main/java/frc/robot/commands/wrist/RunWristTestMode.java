@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.WRIST;
 import frc.robot.subsystems.StateHandler;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 public class RunWristTestMode extends CommandBase {
   private final Wrist m_wrist;

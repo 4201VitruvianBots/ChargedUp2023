@@ -7,7 +7,8 @@ package frc.robot.commands.wrist;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
+
 import java.util.function.DoubleSupplier;
 
 public class RunWristJoystick extends CommandBase {

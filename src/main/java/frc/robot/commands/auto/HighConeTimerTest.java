@@ -17,7 +17,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.StateHandler;
 import frc.robot.subsystems.SwerveDrive;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.wrist.Wrist;
 
 public class HighConeTimerTest extends SequentialCommandGroup {
 

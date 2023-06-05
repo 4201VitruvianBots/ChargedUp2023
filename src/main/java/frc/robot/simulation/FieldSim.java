@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.wrist.Wrist;
 import frc.robot.utils.ChargedUpNodeMask;
 import frc.robot.utils.ModuleMap;
 import java.util.ArrayList;
