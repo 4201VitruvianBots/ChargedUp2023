@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.wrist;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -35,13 +35,16 @@ import frc.robot.Constants.DIO;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.WRIST;
 import frc.robot.Constants.WRIST.THRESHOLD;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
 
   // Initialize single wrist motor
-  private static final TalonFX wristMotor = new TalonFX(CAN.wristMotor);
+  
   private boolean m_wristInitialized = false;
 
+  private final WristIO m_io;
   private final DigitalInput resetSwitch = new DigitalInput(DIO.resetWristSwitch);
 
   private double m_desiredSetpointRadians;
@@ -77,25 +80,11 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private double m_currentKI = 0;
   private double m_newKI = 0;
 
-  // Simulation setup
-  private final SingleJointedArmSim m_armSim =
-      new SingleJointedArmSim(
-          WRIST.gearBox,
-          WRIST.gearRatio,
-          SingleJointedArmSim.estimateMOI(WRIST.length, WRIST.mass),
-          WRIST.length,
-          THRESHOLD.ABSOLUTE_MIN.get(),
-          THRESHOLD.ABSOLUTE_MAX.get(),
-          false
-          // VecBuilder.fill(2.0 * Math.PI / 2048.0) // Add noise with a std-dev of 1 tick
-          );
-  private static int m_simEncoderSign = 1;
+ 
+  
+  
 
-  // Mech2d setup
-  private final MechanismLigament2d m_wristGearboxLigament2d =
-      new MechanismLigament2d("FourbarGearbox", WRIST.fourbarGearboxHeight, 90);
-  private final MechanismLigament2d m_wristLigament2d =
-      new MechanismLigament2d("Fourbar", WRIST.length, WRIST.fourbarAngleDegrees);
+  
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -119,29 +108,14 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public Wrist(Intake intake) {
     m_intake = intake;
 
-    // Factory default configs
-    wristMotor.configFactoryDefault();
-    wristMotor.setNeutralMode(NeutralMode.Brake);
-    wristMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
-    wristMotor.config_kP(0, WRIST.kP);
-    wristMotor.config_kI(0, WRIST.kI);
-    wristMotor.config_kD(0, WRIST.kD);
-    wristMotor.configPeakOutputForward(WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
-    wristMotor.configPeakOutputReverse(-WRIST.kMaxPercentOutput, WRIST.kTimeoutMs);
-    wristMotor.setInverted(WRIST.motorInversionType);
-
-    // TODO: Review limits, test to see what is appropriate or not
-    wristMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 40, 30, 0.2));
-
-    wristMotor.configAllowableClosedloopError(0, 1 / WRIST.encoderUnitsToDegrees);
+    
 
     initSmartDashboard();
     m_timer.reset();
     m_timer.start();
 
-    m_simEncoderSign = wristMotor.getInverted() ? -1 : 1;
 
-    m_wristLigament2d.setColor(new Color8Bit(144, 238, 144)); // Light green
+    
   }
 
   // Workaround for wrist not setting angle properly/inversion race condition
@@ -159,13 +133,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_wristInitialized = state;
   }
 
-  public MechanismLigament2d getGearboxLigament() {
-    return m_wristGearboxLigament2d;
-  }
-
-  public MechanismLigament2d getWristLigament() {
-    return m_wristLigament2d;
-  }
+  
 
   public void setUserInput(double input) {
     m_joystickInput = input;
@@ -195,24 +163,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return m_controlMode == CONTROL_MODE.CLOSED_LOOP;
   }
 
-  public void setPercentOutput(double output) {
-    setPercentOutput(output, false);
-  }
-
-  // set percent output function with a boolean to enforce limits
-  private void setPercentOutput(double output, boolean enforceLimits) {
-    if (enforceLimits) {
-      if (getPositionRadians() > (getUpperLimit() - Units.degreesToRadians(1))) {
-        output = Math.min(output, 0);
-      }
-      if (getPositionRadians() < (getLowerLimit() + Units.degreesToRadians(0.1))) {
-        output = Math.max(output, 0);
-      }
-    }
-
-    wristMotor.set(ControlMode.PercentOutput, output);
-  }
-
   // code to limit the minimum/maximum setpoint of the wrist/ might be status frames
   // Returns the amount of voltage the motors are outputting.
   public double getMotorOutputVoltage() {
@@ -224,14 +174,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     return wristMotor.getSupplyCurrent();
   }
 
-  // Sets the setpoint of the wrist using a state calculated in periodic
-  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-    wristMotor.set(
-        ControlMode.Position,
-        Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
-        DemandType.ArbitraryFeedForward,
-        calculateFeedforward(state));
-  }
 
   private double calculateFeedforward(TrapezoidProfile.State state) {
     return (m_currentFeedForward.calculate(state.position, state.velocity) / 12.0);
@@ -241,13 +183,6 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     m_testMode = mode;
   }
 
-  public void setPIDvalues(double f, double p, double i, double d, double izone) {
-    wristMotor.config_kF(WRIST.kSlotIdx, f);
-    wristMotor.config_kP(WRIST.kSlotIdx, p);
-    wristMotor.config_kI(WRIST.kSlotIdx, i);
-    wristMotor.config_kD(WRIST.kSlotIdx, d);
-    wristMotor.config_IntegralZone(WRIST.kSlotIdx, izone);
-  }
 
   public void setArmMotorFeedForward(double s, double g, double v, double a) {
     m_currentFeedForward = new ArmFeedforward(s, g, v, a);
@@ -402,7 +337,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
         if (m_limitJoystickInput)
           percentOutput = m_joystickInput * WRIST.kLimitedPercentOutputMultiplier;
 
-        setPercentOutput(percentOutput, true);
+        
         break;
       case CLOSED_LOOP:
       default:
@@ -416,35 +351,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  @Override
-  public void simulationPeriodic() {
-    m_armSim.setInputVoltage(MathUtil.clamp(wristMotor.getMotorOutputVoltage(), -12, 12));
-
-    double dt = StateHandler.getSimDt();
-    m_armSim.update(dt);
-
-    Unmanaged.feedEnable(20);
-
-    // Using negative sensor units to match physical behavior
-    wristMotor
-        .getSimCollection()
-        .setIntegratedSensorRawPosition(
-            (int)
-                (m_simEncoderSign
-                    * Units.radiansToDegrees(m_armSim.getAngleRads())
-                    / WRIST.encoderUnitsToDegrees));
-
-    wristMotor
-        .getSimCollection()
-        .setIntegratedSensorVelocity(
-            (int)
-                (m_simEncoderSign
-                    * Units.radiansToDegrees(m_armSim.getVelocityRadPerSec())
-                    / WRIST.encoderUnitsToDegrees
-                    * 10.0));
-
-    wristMotor.getSimCollection().setBusVoltage(RobotController.getBatteryVoltage());
-  }
+ 
 
   @SuppressWarnings("RedundantThrows")
   @Override
