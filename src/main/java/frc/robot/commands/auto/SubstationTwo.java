@@ -31,6 +31,8 @@ import java.util.List;
 public class SubstationTwo extends SequentialCommandGroup {
   private final List<PathPlannerTrajectory> m_trajectories;
 
+  // TODO: Need to refactor; it's old code
+
   public SubstationTwo(
       String pathName,
       SwerveDrive swerveDrive,

@@ -58,10 +58,9 @@ public class BumpOnePickUp extends SequentialCommandGroup {
 
         /** Brings elevator & wrist to High Pulls up cone */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE)
-                .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CONE, vision, swerveDrive)
-                .withTimeout(WAIT.SCORE_HIGH_CONE.get())),
+                new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.SCORE_HIGH_CONE),
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CONE, vision, swerveDrive))
+            .withTimeout(WAIT.SCORE_HIGH_CONE.get()),
         /** Outakes cone */
         new WaitCommand(WAIT.WAIT_TO_PLACE_CONE.get()),
         new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CONE, vision, swerveDrive)
@@ -69,32 +68,31 @@ public class BumpOnePickUp extends SequentialCommandGroup {
         new WaitCommand(WAIT.SCORING_CONE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
-            new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED)
-                .withTimeout(WAIT.STOW_HIGH_CONE.get()),
-            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive)
-                .withTimeout(WAIT.STOW_HIGH_CONE.get())),
-        new WaitCommand(WAIT.STOW_HIGH_CONE.get()),
+                new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive))
+            .withTimeout(WAIT.STOW_HIGH_CONE.get()),
         new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.1),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.5),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.4),
-                3,
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
+                1.5,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
-                new WaitCommand(2.5),
+                new WaitCommand(1.25),
                 new ParallelCommandGroup(
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
                     new AutoSetIntakeSetpoint(
                         intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
+
         /** Stows and Stops Intake */
         new ParallelCommandGroup(
-            new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED).withTimeout(0.5),
-            new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive)
-                .withTimeout(0.5)),
+                new SetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
+                new AutoSetIntakeSetpoint(intake, INTAKE_STATE.HOLDING_CUBE, vision, swerveDrive))
+            .withTimeout(0.5),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
