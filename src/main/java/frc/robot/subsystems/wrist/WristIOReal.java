@@ -47,47 +47,29 @@ public class WristIOReal implements WristIO {
       inputs.wristOutputVoltage = wristMotor.getMotorOutputVoltage();
       inputs.wristOutputCurrent = wristMotor.getStatorCurrent();
       inputs.simEncoderSign = wristMotor.getInverted() ? -1 : 1;
+      inputs.positionRadians = 
     }
 
     public void setPercentOutput(double output) {
-        setPercentOutput(output, false);
+        wristMotor.set(ControlMode.PercentOutput, output);
       }
 
     // set percent output function with a boolean to enforce limits
-  private void setPercentOutput(double output, boolean enforceLimits) {
-    if (enforceLimits) {
-      if (getPositionRadians() > (getUpperLimit() - Units.degreesToRadians(1))) {
-        output = Math.min(output, 0);
-      }
-      if (getPositionRadians() < (getLowerLimit() + Units.degreesToRadians(0.1))) {
-        output = Math.max(output, 0);
-      }
-    }
-
-    wristMotor.set(ControlMode.PercentOutput, output);
-  }
-
-  setPercentOutput(percentOutput, true);
+  public void setPercentOutput(double output, boolean enforceLimits) {}
 
   
 
   
 
   // Sets the setpoint of the wrist using a state calculated in periodic
-  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
-    wristMotor.set(
-        ControlMode.Position,
-        Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
-        DemandType.ArbitraryFeedForward,
-        calculateFeedforward(state));
-  }
-
+    public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+      wristMotor.set(
+          ControlMode.Position,
+          Units.radiansToDegrees(state.position) / WRIST.encoderUnitsToDegrees,
+          DemandType.ArbitraryFeedForward,
+          calculateFeedforward(state));
+    }
   
-
- 
-
-  
-
   public void setPIDvalues(double f, double p, double i, double d, double izone) {
     wristMotor.config_kF(WRIST.kSlotIdx, f);
     wristMotor.config_kP(WRIST.kSlotIdx, p);

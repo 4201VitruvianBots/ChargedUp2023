@@ -14,13 +14,12 @@ public interface WristIO {
     public static class WristIOInputs {
         public double wristPercentOutput = 0;
         public double positionRadians = 0;
+        public double angleDegrees = 0;
 
         public double wristOutputVoltage = 0;
         public double wristOutputCurrent = 0;
         
         public double simEncoderSign = 1;
-
-
     }
 
     /*Updates the loggable inputs */
@@ -28,7 +27,13 @@ public interface WristIO {
 
     public default void setPercentOutput(double output){}
 
+    public default void setSetpointPositionRadians (double desiredAngleRadians) {}
+
+    public default void setSetpointangleDegrees(double angleDegrees) {}
+
     public default void setSetpointTrapezoidState(TrapezoidProfile.State state) {}
 
     public default void setPIDValues(double f, double p, double i, double d, double iZone) {}
+
+    public default void simulationPeriodic() {}
 } 
