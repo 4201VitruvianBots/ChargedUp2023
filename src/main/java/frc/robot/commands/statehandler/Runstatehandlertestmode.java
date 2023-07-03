@@ -4,21 +4,41 @@
 
 package frc.robot.commands.statehandler;
 
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.StateHandler;
 
 public class Runstatehandlertestmode extends CommandBase {
   /** Creates a new Runstatehandlertestmode. */
-  public Runstatehandlertestmode() {
-    // Use addRequirements() here to declare subsystem dependencies.
+  private final StateHandler m_stateHandler;
+
+  private DoubleSubscriber Low, Mid, High;
+  private double testLow, testMid, testHigh;
+
+  public Runstatehandlertestmode(StateHandler stateHandler) {
+    m_stateHandler = stateHandler;
+    addRequirements(m_stateHandler);
+
+    NetworkTable stateHandlerNtTab =
+        NetworkTableInstance.getDefault()
+            .getTable("Shuffleboard")
+            .getSubTable("StateHandlerTestMode");
   }
 
   // Called when the command is initially scheduled.
+  //
+  //                                            Rizz
   @Override
   public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    DriverStation.reportWarning("USING Statehandler TEST MODE!", false);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
