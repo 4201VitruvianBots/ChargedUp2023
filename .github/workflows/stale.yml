@@ -13,7 +13,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           days-before-stale: 8 # Number of days before an issue becomes stale
-          days-before-close: 50 # Number of days before a stale issue is closed
+          days-before-close: 120 # Number of days before a stale issue is closed
           stale-issue-message: 'This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions.'
           close-issue-message: 'This issue has been automatically closed because it has not had recent activity. If you believe this was done in error, please comment or reopen the issue. Thank you for your contributions.'
           stale-issue-label: 'stale'
