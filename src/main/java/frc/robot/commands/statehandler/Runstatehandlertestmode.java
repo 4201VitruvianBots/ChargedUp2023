@@ -4,20 +4,25 @@
 
 package frc.robot.commands.statehandler;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.subsystems.StateHandler;
 
-public class RunStatehandlerTestMode extends CommandBase {
+public class RunStateHandlerTestMode extends CommandBase {
   private final StateHandler m_stateHandler;
   private final SendableChooser<SETPOINT> m_StateChooser = new SendableChooser<>();
   private SETPOINT m_currentState;
 
-  public RunStatehandlerTestMode(StateHandler stateHandler) {
+  public RunStateHandlerTestMode(StateHandler stateHandler) {
 
     m_stateHandler = stateHandler;
+    addRequirements(m_stateHandler);
+
+    NetworkTable statehandlerNTtab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandlerControl");
   }
   // Called when the command is initially scheduled.
   @Override
@@ -29,7 +34,7 @@ public class RunStatehandlerTestMode extends CommandBase {
 
     m_StateChooser.setDefaultOption("STOWED", SETPOINT.STOWED);
 
-    SmartDashboard.putData(" State Selector", m_StateChooser);
+    SmartDashboard.putData("State Selector", m_StateChooser);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
