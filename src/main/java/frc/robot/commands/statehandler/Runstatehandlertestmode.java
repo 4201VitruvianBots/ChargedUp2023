@@ -22,7 +22,10 @@ public class RunStateHandlerTestMode extends CommandBase {
     m_stateHandler = stateHandler;
     addRequirements(m_stateHandler);
 
-    NetworkTable statehandlerNTtab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("StateHandlerControl");
+    NetworkTable statehandlerNTtab =
+        NetworkTableInstance.getDefault()
+            .getTable("Shuffleboard")
+            .getSubTable("StateHandlerControl");
   }
   // Called when the command is initially scheduled.
   @Override

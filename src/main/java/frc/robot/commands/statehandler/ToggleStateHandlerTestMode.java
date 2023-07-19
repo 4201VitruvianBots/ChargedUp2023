@@ -4,8 +4,6 @@
 
 package frc.robot.commands.statehandler;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.StateHandler;
@@ -24,8 +22,6 @@ public class ToggleStateHandlerTestMode extends CommandBase {
     m_defaultCommand = m_stateHandler.getDefaultCommand();
 
     addRequirements(m_stateHandler);
-
-
   }
 
   @Override
