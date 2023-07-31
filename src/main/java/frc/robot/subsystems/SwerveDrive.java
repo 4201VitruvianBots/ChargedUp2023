@@ -166,13 +166,11 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     /** Setting field vs Robot Relative */
     if (useHeadingTarget) {
       rotation = m_rotationOutput;
-      chassisSpeeds =
-          ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d());
+      chassisSpeeds = fromDiscreteSpeeds(throttle, strafe, rotation, 0.02);
     } else {
       chassisSpeeds =
           isFieldRelative
-              ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                  throttle, strafe, rotation, getHeadingRotation2d())
+              ? fromDiscreteSpeeds(throttle, strafe, rotation, 0.02)
               : new ChassisSpeeds(throttle, strafe, rotation);
     }
 
@@ -189,6 +187,20 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   /** Set robot heading to a clear target */
   public void setRobotHeadingRadians(double radians) {
     m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
+  }
+
+  public static ChassisSpeeds fromDiscreteSpeeds(
+      double vxMetersPerSecond,
+      double vyMetersPerSecond,
+      double omegaRadiansPerSecond,
+      double dtSeconds) {
+    var desiredDeltaPose =
+        new Pose2d(
+            vxMetersPerSecond * dtSeconds,
+            vyMetersPerSecond * dtSeconds,
+            new Rotation2d(omegaRadiansPerSecond * dtSeconds));
+    var twist = new Pose2d().log(desiredDeltaPose);
+    return new ChassisSpeeds(twist.dx / dtSeconds, twist.dy / dtSeconds, twist.dtheta / dtSeconds);
   }
 
   public void calculateRotationSpeed() {
