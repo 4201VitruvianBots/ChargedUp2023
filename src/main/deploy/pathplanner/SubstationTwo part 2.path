@@ -1,0 +1,102 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 6.9399999999999995,
+        "y": 4.605
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.914979832589881,
+        "y": 4.605
+      },
+      "holonomicAngle": -3.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "SetWristIntaking",
+          "RunIntakeCube",
+          "SetElevatorIntaking"
+        ],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.2439474352632915,
+        "y": 4.745
+      },
+      "prevControl": {
+        "x": 5.3214194999818565,
+        "y": 4.753865162016039
+      },
+      "nextControl": {
+        "x": 2.916558015809092,
+        "y": 4.73407858250143
+      },
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 1.7,
+        "y": 4.455
+      },
+      "prevControl": {
+        "x": 2.5252120013011954,
+        "y": 4.94468624253038
+      },
+      "nextControl": null,
+      "holonomicAngle": 0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "markers": [
+    {
+      "position": 0.1200000000000001,
+      "names": [
+        "SetWristStowed",
+        "SetElevatorStowed"
+      ]
+    },
+    {
+      "position": -0.509090909090909,
+      "names": [
+        "SetWristIntaking",
+        "SetElevatorIntaking",
+        "RunIntakeCube"
+      ]
+    },
+    {
+      "position": -0.3181818181818181,
+      "names": [
+        "SetWristIntaking",
+        "SetElevatorIntaking",
+        "RunIntakeCube"
+      ]
+    }
+  ]
+}

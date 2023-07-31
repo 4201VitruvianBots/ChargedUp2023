@@ -1,0 +1,59 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands.auto;
+
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.Constants.AUTO.WAIT;
+import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.STATE_HANDLER.SETPOINT;
+import frc.robot.Constants.VISION.CAMERA_SERVER;
+import frc.robot.Constants.VISION.PIPELINE;
+import frc.robot.commands.DelayedInterruptingCommand;
+import frc.robot.commands.intake.AutoSetIntakeSetpoint;
+import frc.robot.commands.statehandler.AutoSetSetpoint;
+import frc.robot.commands.statehandler.SetSetpoint;
+import frc.robot.commands.swerve.AutoBalance;
+import frc.robot.commands.swerve.DriveForwardWithVisionInput;
+import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.SetSwerveOdometry;
+import frc.robot.simulation.FieldSim;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.StateHandler;
+import frc.robot.subsystems.SwerveDrive;
+import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.Wrist;
+import frc.robot.utils.TrajectoryUtils;
+
+public class SubstationTwoRemaster extends CommandBase {
+  /** Creates a new SubstationTwoButBetter. */
+  public SubstationTwoRizz() {
+    String pathName,
+    SwerveDrive swerveDrive,
+    FieldSim fieldSim,
+    Wrist wrist,
+    Intake intake,
+    Vision vision,
+    Elevator elevator,
+    StateHandler stateHandler
+  }
+  {Trajectory trajectory1 =
+  PathPlanner.loadPath(
+      "SubstationTwo part 1", Units.feetToMeters(9), Units.feetToMeters(7), true);
+VitruvianRamseteCommand command1 =
+  TrajectoryUtils.generateRamseteCommand(driveTrain, trajectory1);
+
+}
+  
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}

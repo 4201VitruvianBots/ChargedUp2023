@@ -47,7 +47,7 @@ public class SubstationThree extends SequentialCommandGroup {
 
     var m_trajectories = TrajectoryUtils.readTrajectory(pathName, constraints);
     var swerveCommands =
-        TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
+    TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
 
     addCommands(
         new SetSwerveOdometry(

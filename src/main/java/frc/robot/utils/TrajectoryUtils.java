@@ -8,6 +8,8 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Constants.SWERVE_DRIVE;
@@ -72,10 +74,10 @@ public class TrajectoryUtils {
   }
 
   public static List<PPSwerveControllerCommand> generatePPSwerveControllerCommand(
-      SwerveDrive swerveDrive, List<PathPlannerTrajectory> trajectories) {
+      SwerveDrive swerveDrive, List<PathPlannerTrajectory> m_trajectories) {
     List<PPSwerveControllerCommand> commands = new ArrayList<>();
 
-    for (var trajectory : trajectories) {
+    for (var trajectory : m_trajectories) {
       PPSwerveControllerCommand swerveCommand =
           new PPSwerveControllerCommand(
               trajectory,
