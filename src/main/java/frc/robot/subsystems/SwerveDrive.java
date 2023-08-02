@@ -171,7 +171,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       
       chassisSpeeds =
           isFieldRelative
-              ? fromDiscreteSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d()), 0.02)
+              ? fromDiscreteSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d()), 0.0125)
               : new ChassisSpeeds(throttle, strafe, rotation);
     }
 
