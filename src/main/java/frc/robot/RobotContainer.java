@@ -81,7 +81,7 @@ public class RobotContainer implements AutoCloseable {
   private final SwerveDrive m_swerveDrive = new SwerveDrive();
   private final Elevator m_elevator = new Elevator();
   private final Intake m_intake = new Intake();
-  private final Wrist m_wrist = new Wrist(m_intake);
+  private final Wrist m_wrist = new Wrist();
   private final Controls m_controls = new Controls();
   private final Vision m_vision = new Vision(m_swerveDrive, m_logger, m_controls, m_intake);
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>();

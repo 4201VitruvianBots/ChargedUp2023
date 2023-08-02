@@ -41,8 +41,7 @@ import frc.robot.subsystems.wrist.WristIO.WristIOInputs;
 
 public class Wrist extends SubsystemBase implements AutoCloseable {
 
-
-  Fprivate boolean m_wristInitialized = false;
+  private boolean m_wristInitialized = false;
 
   private final WristIO m_io;
   private final WristIOInputsAutoLogged m_inputs = new WristIOInputsAutoLogged();
@@ -126,7 +125,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private void initializeWristAngle() {
     if (DriverStation.isDisabled() && !m_wristInitialized) {
       double wristResetAngleDegrees = -15.0;
-      resetAngleDegrees(wristResetAngleDegrees);
+      m_io.resetAngleDegrees(wristResetAngleDegrees);
 
       if (Math.abs(getPositionDegrees() - wristResetAngleDegrees) <= 0.05)
         m_wristInitialized = true;
@@ -217,7 +216,7 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public void resetTrapezoidState() {
     m_setpoint =
         new TrapezoidProfile.State(
-            getPositionRadians(), Units.degreesToRadians(getVelocityDegreesPerSecond()));
+            getPositionRadians(), Units.degreesToRadians(m_inputs.velocityDegreesPerSecond));
   }
 
   public void setSetpointPositionRadians(double desiredAngleRadians) {
@@ -233,27 +232,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   }
 
   public double getPositionDegrees() {
-    return getSensorPosition() * WRIST.encoderUnitsToDegrees;
+    return Units.radiansToDegrees(m_inputs.positionRadians);
   }
-
-  public double getVelocityDegreesPerSecond() {
-    return wristMotor.getSelectedSensorVelocity() * WRIST.encoderUnitsToDegrees * 10;
-  }
-
+  
   // Converts the angle of the wrist into a Rotation2d object to be applied to a Pose2d
   public Rotation2d getWristAngleRotation2d() {
     return Rotation2d.fromDegrees(getPositionDegrees());
-  }
-
-  // Returns the raw sensor value in encoder counts
-  private double getSensorPosition() {
-    return wristMotor.getSelectedSensorPosition();
-  }
-
-  // reset angle of the wrist. ~-15 degrees is the position of the wrist when the intake is touching
-  // the ground.
-  public void resetAngleDegrees(double angleDegrees) {
-    wristMotor.setSelectedSensorPosition(angleDegrees / WRIST.encoderUnitsToDegrees);
   }
 
   public void setLowerLimit(double radians) {
@@ -301,9 +285,21 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     else if (getPositionDegrees() >= 30) m_newKI = 0;
 
     if (m_currentKI != m_newKI) {
-      wristMotor.config_kI(0, m_newKI);
+      m_io.setIValue(m_newKI);
       m_currentKI = m_newKI;
     }
+  }
+
+  public void setSetpointTrapezoidState(TrapezoidProfile.State state) {
+    m_io.setSetpointTrapezoidState(state, calculateFeedforward(state));
+  }
+
+  public void setPIDValues(double f, double p, double i, double d, double iZone) {
+    m_io.setPIDValues(f, p, i, d, iZone);
+  }
+
+  public void resetAngleDegrees(double angleDegrees) {
+    m_io.resetAngleDegrees(angleDegrees);
   }
 
   private void initSmartDashboard() {

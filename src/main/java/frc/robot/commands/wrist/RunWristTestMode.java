@@ -126,7 +126,7 @@ public class RunWristTestMode extends CommandBase {
 
     if (testKF != newKF
         || (testKP != newKP || testKI != newKI || testKD != newKD || newIZone != newIZone)) {
-      m_wrist.setPIDvalues(newKF, newKP, newKI, newKD, newIZone);
+      m_wrist.setPIDValues(newKF, newKP, newKI, newKD, newIZone);
       testKF = newKF;
       testKP = newKP;
       testKI = newKI;
