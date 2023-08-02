@@ -168,9 +168,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       rotation = m_rotationOutput;
       chassisSpeeds = fromDiscreteSpeeds(throttle, strafe, rotation, 0.02);
     } else {
+      
       chassisSpeeds =
           isFieldRelative
-              ? fromDiscreteSpeeds(throttle, strafe, rotation, 0.02)
+              ? fromDiscreteSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(throttle, strafe, rotation, getHeadingRotation2d()), 0.02)
               : new ChassisSpeeds(throttle, strafe, rotation);
     }
 
@@ -187,6 +188,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   /** Set robot heading to a clear target */
   public void setRobotHeadingRadians(double radians) {
     m_desiredHeadingRadians = MathUtil.inputModulus(radians, -Math.PI, Math.PI);
+  }
+
+  public static ChassisSpeeds fromDiscreteSpeeds(ChassisSpeeds chassisSpeeds, double dtSeconds) {
+    return fromDiscreteSpeeds(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond, dtSeconds);
   }
 
   public static ChassisSpeeds fromDiscreteSpeeds(
