@@ -131,8 +131,8 @@ public final class Constants {
       SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(31.59)),
-      INTAKING_EXTENDED_CUBE(Units.inchesToMeters(37.0));
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(33.59)),
+      INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
 
@@ -444,15 +444,15 @@ public final class Constants {
 
     public enum SETPOINT {
       // Units are in Radians
-      STOWED(Units.degreesToRadians(95.0)),
+      STOWED(Units.degreesToRadians(98.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(13)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(16)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(142.0)),
+      SCORE_MID_CONE(Units.degreesToRadians(150.5)),
       SCORE_MID_CUBE(Units.degreesToRadians(132.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(139.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(151.5)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(147.0)),
       INTAKING_EXTENDED_CONE(Units.degreesToRadians(121.3)),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
@@ -475,7 +475,7 @@ public final class Constants {
       ALPHA_MIN(ABSOLUTE_MIN.get()),
       ALPHA_MAX(Units.degreesToRadians(110.0)),
       BETA_MIN(Units.degreesToRadians(25.0)),
-      BETA_MAX(Units.degreesToRadians(146.0)),
+      BETA_MAX(Units.degreesToRadians(150.0)),
       GAMMA_MIN(
           Units.degreesToRadians(
               40.0)), // TODO: Maybe change this to 25.0 like it was before as extended
