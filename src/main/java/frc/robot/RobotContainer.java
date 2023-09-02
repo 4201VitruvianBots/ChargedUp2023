@@ -40,6 +40,7 @@ import frc.robot.commands.auto.SubstationThree;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
 import frc.robot.commands.elevator.*;
+import frc.robot.commands.intake.AutoRunIntakeVision;
 import frc.robot.commands.intake.IntakeVisionAlignment;
 import frc.robot.commands.intake.RunIntakeCone;
 import frc.robot.commands.intake.SetIntakeState;
@@ -151,13 +152,14 @@ public class RobotContainer implements AutoCloseable {
 
     leftJoystickTriggers[0].whileTrue(new AutoBalance(m_swerveDrive));
 
+    
     leftJoystickTriggers[1].whileTrue(
-        new IntakeVisionAlignment(
-            m_vision,
-            m_swerveDrive,
-            () -> leftJoystick.getRawAxis(1),
-            () -> leftJoystick.getRawAxis(0),
-            () -> rightJoystick.getRawAxis(0)));
+      new IntakeVisionAlignment(
+        m_vision,
+        m_swerveDrive,
+        () -> leftJoystick.getRawAxis(1),
+        () -> leftJoystick.getRawAxis(0),
+        () -> rightJoystick.getRawAxis(0), 1));
 
     rightJoystickTriggers[0].whileTrue(new LimitSwerveJoystickInput(m_swerveDrive));
 
@@ -169,6 +171,28 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
                 m_stateHandler::isScoring));
     xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
+
+xboxController
+        .leftBumper()
+        .whileTrue(
+       new IntakeVisionAlignment(
+        m_vision,
+        m_swerveDrive,
+        () -> leftJoystick.getRawAxis(1),
+        () -> leftJoystick.getRawAxis(0),
+        () -> rightJoystick.getRawAxis(0), 1));
+
+        xboxController
+        .rightBumper()
+        .whileTrue(
+       new IntakeVisionAlignment(
+        m_vision,
+        m_swerveDrive,
+        () -> leftJoystick.getRawAxis(1),
+        () -> leftJoystick.getRawAxis(0),
+        () -> rightJoystick.getRawAxis(0), 0));
+
+        
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
@@ -477,7 +501,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "Limelight Test",
         new LimeLightTest(
-            "SubstationTwoPickup",
+            "LimelightTest",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,

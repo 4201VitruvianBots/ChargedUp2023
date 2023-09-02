@@ -305,9 +305,9 @@ public final class Constants {
     public static final double kI_Y = 0;
     public static final double kD_Y = 0;
 
-    public static double kP_Theta = 4.0;
+    public static double kP_Theta = 5.0;
     public static double kI_Theta = 0;
-    public static double kD_Theta = 0.01;
+    public static double kD_Theta = 0.3;
 
     public enum SWERVE_MODULE_POSITION {
       FRONT_LEFT,
@@ -452,7 +452,7 @@ public final class Constants {
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
       SCORE_MID_CONE(Units.degreesToRadians(142.0)),
       SCORE_MID_CUBE(Units.degreesToRadians(132.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(139.0)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(145.0)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(147.0)),
       INTAKING_EXTENDED_CONE(Units.degreesToRadians(121.3)),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());

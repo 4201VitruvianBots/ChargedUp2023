@@ -17,6 +17,8 @@ public class IntakeVisionAlignment extends CommandBase {
   private final SwerveDrive m_swerve;
 
   private final Vision m_vision;
+   
+  int m_pipeline;
 
   private final DoubleSupplier m_throttleInput, m_strafeInput, m_rotationInput;
 
@@ -25,19 +27,23 @@ public class IntakeVisionAlignment extends CommandBase {
       SwerveDrive swerve,
       DoubleSupplier throttleInput,
       DoubleSupplier strafeInput,
-      DoubleSupplier rotationInput) {
+      DoubleSupplier rotationInput,
+      int pipeline) {
     m_vision = vision;
     m_swerve = swerve;
     m_throttleInput = throttleInput;
     m_strafeInput = strafeInput;
     m_rotationInput = rotationInput;
+    m_pipeline = pipeline;
 
     addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_vision.setPipeline(CAMERA_SERVER.INTAKE, m_pipeline);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

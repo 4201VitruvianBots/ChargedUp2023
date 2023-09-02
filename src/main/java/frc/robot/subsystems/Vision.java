@@ -231,7 +231,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   public void updatePipeline() {
-    m_intakeNt.getEntry("pipeline").setDouble(1);
+    m_intakeNt.getEntry("pipeline").setDouble(m_pipeline);
   }
 
   public double getPipeline(CAMERA_SERVER location) {
@@ -278,15 +278,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Look for any target
    */
   public boolean searchLimelightTarget(CAMERA_SERVER location) {
-    //    if (getPipeline(location) == 1.0
-    //        && m_intakeSub.getIntakeCubeState()) { // CUBE and if we're looking for cube
-    //      return getValidTargetType(location) == 1.0
-    //          && getTargetArea(location) > 1.0; // target read within threshold
-    //    } else if (getPipeline(location) == 2.0
-    //        && m_intakeSub.getIntakeConeState()) { // CONE and if we're looking for cone
-    //      return getValidTargetType(location) == 1.0
-    //          && getTargetArea(location) > 1.0; // target read within threshold
-    //    }
+       if (getPipeline(location) == 1.0) { // CUBE and if we're looking for cube
+         return getValidTargetType(location) == 1.0
+             && getTargetArea(location) > 1.0; // target read within threshold
+       } else if (getPipeline(location) == 2.0) { // CONE and if we're looking for cone
+         return getValidTargetType(location) == 1.0
+             && getTargetArea(location) > 1.0; // target read within threshold
+       }
     return false;
   }
 

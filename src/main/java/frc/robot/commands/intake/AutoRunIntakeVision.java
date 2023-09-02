@@ -18,15 +18,17 @@ public class AutoRunIntakeVision extends CommandBase {
   private final Intake m_intake;
   private final Vision m_vision;
 
+  private final int m_pipeline;
   private final double m_PercentOutput;
 
   /** Creates a new RunIntake. */
   public AutoRunIntakeVision(
-      SwerveDrive swerve, Vision vision, Intake intake, double PercentOutput) {
+      SwerveDrive swerve, Vision vision, Intake intake, double PercentOutput, int pipeline) {
     m_swerve = swerve;
     m_vision = vision;
     m_intake = intake;
     m_PercentOutput = PercentOutput;
+    m_pipeline = pipeline;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_intake);
@@ -34,7 +36,9 @@ public class AutoRunIntakeVision extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_vision.setPipeline(CAMERA_SERVER.INTAKE, m_pipeline);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

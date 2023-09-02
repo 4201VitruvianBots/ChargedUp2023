@@ -3,7 +3,6 @@ package frc.robot.commands.auto;
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -12,15 +11,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AUTO.WAIT;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
-import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.Constants.VISION.PIPELINE;
 import frc.robot.commands.DelayedInterruptingCommand;
-import frc.robot.commands.InterruptingCommand;
 import frc.robot.commands.intake.AutoSetIntakeSetpoint;
-import frc.robot.commands.intake.SetIntakeState;
 import frc.robot.commands.statehandler.AutoSetSetpoint;
 import frc.robot.commands.statehandler.SetSetpoint;
 import frc.robot.commands.swerve.DriveForwardWithVisionInput;
@@ -47,17 +42,13 @@ public class LimeLightTest extends SequentialCommandGroup {
       Vision vision,
       Elevator elevator,
       StateHandler stateHandler) {
-        
-        double maxVel = Units.feetToMeters(9);
-        double maxAccel = Units.feetToMeters(9);
-        double maxVisionVelocity = Units.feetToMeters(4);
+
+    double maxVel = Units.feetToMeters(9);
+    double maxAccel = Units.feetToMeters(9);
+    double maxVisionVelocity = Units.feetToMeters(3.2);
 
     m_trajectories =
-        TrajectoryUtils.readTrajectory(
-            pathName,
-            new PathConstraints(
-                maxVel
-                ,maxAccel));
+        TrajectoryUtils.readTrajectory(pathName, new PathConstraints(maxVel, maxAccel));
 
     List<PPSwerveControllerCommand> swerveCommands =
         TrajectoryUtils.generatePPSwerveControllerCommand(swerveDrive, m_trajectories);
@@ -73,7 +64,8 @@ public class LimeLightTest extends SequentialCommandGroup {
         // new InstantCommand(() -> vision.setPipeline(CAMERA_SERVER.INTAKE, PIPELINE.CUBE.get())),
         // new InterruptingCommand(
         //     swerveCommands.get(0),
-        //     new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.7).withTimeout(4), //0.4 //5
+        //     new DriveForwardWithVisionInput(swerveDrive, vision, () -> 0.7).withTimeout(4), //0.4
+        // //5
         //     () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
         // new SetIntakeState(intake, INTAKE_STATE.HOLDING_CUBE),
         // new SetIntakeState(intake, INTAKE_STATE.NONE),
