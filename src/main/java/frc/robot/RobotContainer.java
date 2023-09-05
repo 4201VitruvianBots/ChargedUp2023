@@ -35,6 +35,7 @@ import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.HighConeTimerTest;
 import frc.robot.commands.auto.HighCubeTimerTest;
 import frc.robot.commands.auto.MidCubeTimerTest;
+import frc.robot.commands.auto.SpeedyAutoPlacement;
 import frc.robot.commands.auto.SubstationThree;
 import frc.robot.commands.auto.SubstationTwoBalance;
 import frc.robot.commands.auto.TestSimAuto;
@@ -352,7 +353,17 @@ public class RobotContainer implements AutoCloseable {
   public void initializeAutoChooser() {
 
     // Main Autos
-
+    m_autoChooser.addOption(
+      "SpeedyAutoPlacement",
+      new SpeedyAutoPlacement(
+          m_swerveDrive,
+          m_fieldSim,
+          m_wrist,
+          m_intake,
+          m_vision,
+          m_elevator,
+          m_stateHandler));
+          
     m_autoChooser.addOption(
         "SubstationThree",
         new SubstationThree(
@@ -364,6 +375,10 @@ public class RobotContainer implements AutoCloseable {
             m_vision,
             m_elevator,
             m_stateHandler));
+
+
+       
+            
 
     m_autoChooser.addOption(
         "SubstationTwoBalance",
