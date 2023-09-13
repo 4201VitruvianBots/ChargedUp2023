@@ -131,8 +131,7 @@ public final class Constants {
       SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(34.34)
-      ),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(34.34)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
