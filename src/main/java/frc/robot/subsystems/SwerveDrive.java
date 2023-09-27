@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -29,7 +27,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.STATE_HANDLER;
@@ -126,16 +123,6 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     }
 
     initSmartDashboard();
-
-    try {
-      m_swerveChassis2d =
-          m_chassisRoot2d.append(
-              new MechanismLigament2d("SwerveChassis", SWERVE_DRIVE.kTrackWidth, 0));
-      // Change the color of the mech2d
-      m_swerveChassis2d.setColor(new Color8Bit(173, 216, 230)); // Light blue
-    } catch (Exception m_ignored) {
-
-    }
   }
 
   private void resetModulesToAbsolute() {
@@ -407,8 +394,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
         SWERVE_DRIVE.kSwerveKinematics.toChassisSpeeds(
             ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
 
-    double dt = StateHandler.getSimDt();
-    m_simYaw += chassisSpeed.omegaRadiansPerSecond * dt;
+    m_simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
 
     Unmanaged.feedEnable(20);
     m_pigeon.getSimCollection().setRawHeading(-Units.radiansToDegrees(m_simYaw));

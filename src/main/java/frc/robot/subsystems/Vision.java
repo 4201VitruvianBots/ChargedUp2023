@@ -4,22 +4,17 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.VISION;
@@ -29,8 +24,6 @@ import java.util.stream.DoubleStream;
 
 public class Vision extends SubsystemBase implements AutoCloseable {
   private final SwerveDrive m_swerveDrive;
-  private final Controls m_controls;
-  private final Intake m_intakeSub;
 
   // Mech2d setup
   private MechanismLigament2d m_limelightLigament2d;
@@ -69,11 +62,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   double[] tagPosX = new double[10];
   double[] tagPosY = new double[10];
 
-  public Vision(SwerveDrive swerveDrive, DataLog logger, Controls controls, Intake intake) {
+  public Vision(SwerveDrive swerveDrive, DataLog logger) {
     m_swerveDrive = swerveDrive;
-    m_controls = controls;
-    m_intakeSub = intake;
-
     m_intakeNt = NetworkTableInstance.getDefault().getTable("limelight");
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
@@ -108,14 +98,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     resetSearch();
     resetPipelineSearch();
     initSmartDashboard();
-
-    try {
-      m_limelightLigament2d =
-          m_chassisRoot2d.append(new MechanismLigament2d("Limelight", Units.inchesToMeters(8), 90));
-      m_limelightLigament2d.setColor(new Color8Bit(0, 180, 40)); // Green
-    } catch (Exception ignored) {
-
-    }
   }
 
   public MechanismLigament2d getLimelightLigament() {
@@ -352,7 +334,6 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    * Collects transformation/rotation data from limelight
    */
   public double[] getBotPose(CAMERA_SERVER location) {
-    DriverStation.Alliance allianceColor = Controls.getAllianceColor();
     double[] botPose = new double[0];
     switch (location) {
       case LEFT_LOCALIZER:

@@ -270,12 +270,11 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     m_turnMotorSim.setInputVoltage(MathUtil.clamp(m_turnMotor.getMotorOutputVoltage(), -12, 12));
     m_driveMotorSim.setInputVoltage(MathUtil.clamp(m_driveMotor.getMotorOutputVoltage(), -12, 12));
 
-    double dt = StateHandler.getSimDt();
-    m_turnMotorSim.update(dt);
-    m_driveMotorSim.update(dt);
+    m_turnMotorSim.update(0.02);
+    m_driveMotorSim.update(0.02);
 
-    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * dt;
-    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * dt;
+    m_turnMotorSimDistance += m_turnMotorSim.getAngularVelocityRadPerSec() * 0.02;
+    m_driveMotorSimDistance += m_driveMotorSim.getAngularVelocityRadPerSec() * 0.02;
 
     Unmanaged.feedEnable(20);
 

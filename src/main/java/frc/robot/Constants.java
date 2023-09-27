@@ -287,11 +287,11 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 62.051;
-    public static double backLeftCANCoderOffset = 190.635;
-    public static double backRightCANCoderOffset = 31.904;
-
+            public static double frontLeftCANCoderOffset = 125.068;
+            public static double frontRightCANCoderOffset = 62.051;
+            public static double backLeftCANCoderOffset = 190.635;
+            public static double backRightCANCoderOffset = 31.904;
+            
     public static double kMaxSpeedMetersPerSecond = Units.feetToMeters(18);
     public static final double kLimitedSpeedMetersPerSecond = kMaxSpeedMetersPerSecond / 5;
     public static final double kMaxRotationRadiansPerSecond = Math.PI * 2.0;

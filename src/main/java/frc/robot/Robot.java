@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,9 +34,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     SmartDashboard.putData(CommandScheduler.getInstance());
     DataLogManager.start();
-    if (RobotBase.isSimulation()) {
-      addPeriodic(() -> m_robotContainer.getWrist().updateHorizontalTranslation(), 0.04, 0.01);
-    }
     //    addPeriodic(() -> m_robotContainer.getFieldSim().updateValidNodes(), 0.04, 0.01);
     //    if (m_robotContainer.getDistanceSensor().isInitialized())
     //      addPeriodic(() -> m_robotContainer.getDistanceSensor().pollDistanceSensors(), 0.1,
