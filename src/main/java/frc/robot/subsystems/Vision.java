@@ -30,7 +30,9 @@ import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.Constants.VISION.PIPELINE;
 import frc.robot.libraries.LimelightHelpers;
 
+import java.sql.Driver;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.DoubleStream;
 
 import org.apache.commons.lang3.ObjectUtils.Null;
@@ -204,8 +206,24 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  public Pose2d getBlueBotPose(){
-    return LimelightHelpers.getBotPose2d_wpiBlue("10.42.01.11");
+  public Pose2d getBotPose(DriverStation.Alliance allianceColor){
+    switch (allianceColor) {
+      case Red:
+        return LimelightHelpers.getBotPose2d_wpiRed(CAMERA_SERVER.INTAKE.toString());
+      default:
+      case Blue:
+        return LimelightHelpers.getBotPose2d_wpiBlue(CAMERA_SERVER.INTAKE.toString());
+    }
+  }
+
+  public double[] getBotPoseArray(DriverStation.Alliance allianceColor) {
+    switch (allianceColor) {
+      case Red:
+        return LimelightHelpers.getBotPose_wpiRed(CAMERA_SERVER.INTAKE.toString());
+      default:
+      case Blue:
+        return LimelightHelpers.getBotPose_wpiBlue(CAMERA_SERVER.INTAKE.toString());
+    }
   }
 
   /*
@@ -531,7 +549,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updateSmartDashboard() {
     SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
-    SmartDashboard.putString("Blue Bot Pose", getBlueBotPose().toString());
+    SmartDashboard.putString("Bot Pose", getBotPose(DriverStation.getAlliance()).toString());
+    SmartDashboard.putString("Bot Pose Array", getBotPoseArray(DriverStation.getAlliance()).toString());
   }
 
   @Override
