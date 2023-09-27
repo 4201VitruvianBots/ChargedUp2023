@@ -22,10 +22,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants;
+import frc.robot.Constants.CONSTANTS;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.Constants.VISION.PIPELINE;
+import frc.robot.libraries.LimelightHelpers;
+
+import java.util.ArrayList;
 import java.util.stream.DoubleStream;
+
+import org.apache.commons.lang3.ObjectUtils.Null;
 
 public class Vision extends SubsystemBase implements AutoCloseable {
   private final SwerveDrive m_swerveDrive;
@@ -194,6 +202,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
       default:
         return 0;
     }
+  }
+
+  public Pose2d getBlueBotPose(){
+    return LimelightHelpers.getBotPose2d_wpiBlue("10.42.01.11");
   }
 
   /*
@@ -519,6 +531,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updateSmartDashboard() {
     SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
+    SmartDashboard.putString("Blue Bot Pose", getBlueBotPose().toString());
   }
 
   @Override
