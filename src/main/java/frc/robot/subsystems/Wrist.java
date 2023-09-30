@@ -166,6 +166,10 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   public MechanismLigament2d getWristLigament() {
     return m_wristLigament2d;
   }
+  
+  public double getPercentOutput() {
+    return wristMotor.getMotorOutputPercent();
+  }
 
   public void setUserInput(double input) {
     m_joystickInput = input;
@@ -362,12 +366,20 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
     currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
     currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
+    
+    SmartDashboard.putNumber("WristPercentOutput", getPercentOutput());
+    SmartDashboard.putNumber("Wrist m_setpoint", m_setpoint.position*180/Math.PI);
+    SmartDashboard.putNumber("Wrist Error", (m_setpoint.position*180/Math.PI)-getPositionDegrees());
+
   }
 
   public void updateSmartDashboard() {
     SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControlMode().name());
     SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
+    SmartDashboard.putNumber("Wrist m_setpoint", m_setpoint.position*180/Math.PI);
+    SmartDashboard.putNumber("Wrist Error", (m_setpoint.position*180/Math.PI)-getPositionDegrees());
 
+    SmartDashboard.putNumber("WristPercentOutput", getPercentOutput());
     currentCommandStatePub.set(getClosedLoopControlMode().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
     kCurrentAngleDegreesPub.set(getPositionDegrees());

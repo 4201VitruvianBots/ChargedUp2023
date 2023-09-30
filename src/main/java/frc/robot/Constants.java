@@ -96,8 +96,8 @@ public final class Constants {
     public static final double kMaxReverseOutput = -0.45;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(238);
-    public static final double kMaxAccel = Units.inchesToMeters(520);
+    public static final double kMaxVel = Units.inchesToMeters(400); 
+    public static final double kMaxAccel = Units.inchesToMeters(800);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -424,8 +424,8 @@ public final class Constants {
     // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
     // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
 
-    public static final double kMaxVel = Units.degreesToRadians(720);
-    public static final double kMaxAccel = Units.degreesToRadians(250);
+    public static final double kMaxVel = Units.degreesToRadians(1600);
+    public static final double kMaxAccel = Units.degreesToRadians(800);
 
     public static final TrapezoidProfile.Constraints m_constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
@@ -435,9 +435,9 @@ public final class Constants {
     public static final double FFkV = 1.6;
     public static final double kA = 0.02;
 
-    public static final double kP = 0.04;
-    public static final double kI = 0.0;
-    public static final double kD = 1.0;
+    public static final double kP = 0.05;
+    public static final double kI = 0.001;
+    public static final double kD = 4.5;
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
