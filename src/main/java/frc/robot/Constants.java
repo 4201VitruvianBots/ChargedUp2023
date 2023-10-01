@@ -424,8 +424,8 @@ public final class Constants {
     // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
     // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
 
-    public static final double kMaxVel = Units.degreesToRadians(1600);
-    public static final double kMaxAccel = Units.degreesToRadians(800);
+    public static final double kMaxVel = Units.degreesToRadians(2000);
+    public static final double kMaxAccel = Units.degreesToRadians(1000);
 
     public static final TrapezoidProfile.Constraints m_constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
@@ -434,10 +434,10 @@ public final class Constants {
     public static final double kG = 0.54;
     public static final double FFkV = 1.6;
     public static final double kA = 0.02;
-
-    public static final double kP = 0.05;
-    public static final double kI = 0.001;
-    public static final double kD = 4.5;
+    
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 10;
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
