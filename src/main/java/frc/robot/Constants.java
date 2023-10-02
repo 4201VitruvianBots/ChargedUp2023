@@ -96,8 +96,8 @@ public final class Constants {
     public static final double kMaxReverseOutput = -0.45;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(400); 
-    public static final double kMaxAccel = Units.inchesToMeters(800);
+    public static final double kMaxVel = Units.inchesToMeters(1000); 
+    public static final double kMaxAccel = Units.inchesToMeters(1800);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -109,7 +109,7 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.05;
+    public static final double kP = 0.06;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
@@ -131,7 +131,7 @@ public final class Constants {
       SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(34.34)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(36.19)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
@@ -435,9 +435,9 @@ public final class Constants {
     public static final double FFkV = 1.6;
     public static final double kA = 0.02;
     
-    public static final double kP = 0.1;
+    public static final double kP = 0.085;
     public static final double kI = 0.0;
-    public static final double kD = 10;
+    public static final double kD = 13;
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
@@ -446,7 +446,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(98.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(16)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(19)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
