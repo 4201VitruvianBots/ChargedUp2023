@@ -219,7 +219,7 @@ public class RobotContainer implements AutoCloseable {
                 m_stateHandler, m_elevator, m_wrist, STATE_HANDLER.SETPOINT.INTAKING_LOW_CUBE));
 
     xboxController.povLeft().whileTrue(new SetUseCubeSetpoint(m_intake));
-    xboxController.povDown().onTrue(new RunIntakeCone(m_intake, 0.2).withTimeout(.25));
+    xboxController.povDown().whileTrue(new RunIntakeCone(m_intake, 0.2));
 
     // Will switch our target node on the field sim to the adjacent node on D-pad
     // press
