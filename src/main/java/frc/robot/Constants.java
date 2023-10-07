@@ -131,7 +131,7 @@ public final class Constants {
       SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(36.19)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(32.19)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
@@ -216,7 +216,7 @@ public final class Constants {
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
       INTAKING_CUBE(-0.8),
-      HOLDING_CUBE(-0.3),
+      HOLDING_CUBE(-0.1),
       SCORING_CUBE(0.8);
 
       private final double value;
@@ -446,7 +446,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(98.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(19)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(22)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
@@ -454,10 +454,11 @@ public final class Constants {
       SCORE_MID_CUBE(Units.degreesToRadians(132.0)),
       SCORE_HIGH_CONE(Units.degreesToRadians(151.5)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(147.0)),
-      INTAKING_EXTENDED_CONE(Units.degreesToRadians(121.3)),
+      INTAKING_EXTENDED_CONE(Units.degreesToRadians(140.5)),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
+
 
       SETPOINT(final double value) {
         this.value = value;
@@ -629,8 +630,8 @@ public final class Constants {
       WAIT_TO_PLACE_CUBE(1),
       WAIT_TO_PLACE_CUBE_MID(0.7), // good
 
-      SCORING_CONE(0.65), // good
-      SCORING_CUBE(0.65), // good
+      SCORING_CONE(0.75), // good
+      SCORING_CUBE(0.75), // good
 
       STOW_HIGH_CONE(1.1), // 1.1 // good
       STOW_HIGH_CUBE(1.1), // 1.1

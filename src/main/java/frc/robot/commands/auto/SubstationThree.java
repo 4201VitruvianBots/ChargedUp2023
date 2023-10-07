@@ -73,7 +73,7 @@ public class SubstationThree extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 0.95),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
                 new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
@@ -107,7 +107,7 @@ public class SubstationThree extends SequentialCommandGroup {
             new DelayedInterruptingCommand(
                 swerveCommands.get(2),
                 new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
-                1.25,
+                1.5,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
                 new WaitCommand(0.75),
