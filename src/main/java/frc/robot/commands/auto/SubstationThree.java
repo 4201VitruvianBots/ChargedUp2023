@@ -97,6 +97,8 @@ public class SubstationThree extends SequentialCommandGroup {
         new WaitCommand(WAIT.WAIT_TO_PLACE_CUBE.get()),
         new AutoSetIntakeSetpoint(intake, INTAKE_STATE.SCORING_CUBE, vision, swerveDrive)
             .withTimeout(WAIT.SCORING_CUBE.get()),
+
+            new WaitCommand(WAIT.SCORING_CUBE.get()),
         /** Stows Wrist, Elevator, and Stops intake */
         new ParallelCommandGroup(
                 new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.STOWED),
