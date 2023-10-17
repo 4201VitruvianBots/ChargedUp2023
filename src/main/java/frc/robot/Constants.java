@@ -96,7 +96,7 @@ public final class Constants {
     public static final double kMaxReverseOutput = -0.45;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(1000); 
+    public static final double kMaxVel = Units.inchesToMeters(1000);
     public static final double kMaxAccel = Units.inchesToMeters(1800);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
@@ -127,7 +127,7 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(24.030800 )),
+      SCORE_MID_CONE(Units.inchesToMeters(24.030800)),
       SCORE_MID_CUBE(Units.inchesToMeters(26.890057)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.816762)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.087556)),
@@ -434,7 +434,7 @@ public final class Constants {
     public static final double kG = 0.54;
     public static final double FFkV = 1.6;
     public static final double kA = 0.02;
-    
+
     public static final double kP = 0.085;
     public static final double kI = 0.0;
     public static final double kD = 13;
@@ -458,7 +458,6 @@ public final class Constants {
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
-
 
       SETPOINT(final double value) {
         this.value = value;
