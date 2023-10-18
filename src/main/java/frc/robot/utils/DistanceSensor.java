@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.INTAKE;
-import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.INTAKE.SENSOR_STATUS;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.simulation.SimConstants;
@@ -203,11 +202,11 @@ public class DistanceSensor implements AutoCloseable {
   }
 
   public double getConeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE_STATE.INTAKING_CONE);
+    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.HOLDING_CONE);
   }
 
   public double getCubeDistanceInches() {
-    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.HOLDING_CONE);
+    return getGamepieceDistanceInches(INTAKE.INTAKE_STATE.HOLDING_CUBE);
   }
 
   private void initSmartDashboard() {
@@ -329,13 +328,13 @@ public class DistanceSensor implements AutoCloseable {
 
       //      }
     } catch (SocketTimeoutException ex) {
-      //      System.out.println("DistanceSensor-SocketTimeoutError");
+      System.out.println("DistanceSensor-SocketTimeoutError");
       //      ex.printStackTrace();
     } catch (IOException ex) {
-      //      System.out.println("DistanceSensor-IOError");
+      System.out.println("DistanceSensor-IOError");
       //      ex.printStackTrace();
     } catch (Exception ex) {
-      //      System.out.println("DistanceSensor-UnknownError");
+      System.out.println("DistanceSensor-UnknownError");
       //      ex.printStackTrace();
     }
   }
