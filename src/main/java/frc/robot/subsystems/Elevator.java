@@ -381,6 +381,7 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   public void updateShuffleboard() {
     SmartDashboard.putBoolean("Elevator Closed Loop", isClosedLoopControl());
     SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
+    SmartDashboard.putNumber("motorspeed", getPercentOutput());
 
     kClosedLoopModePub.set(getClosedLoopControlMode().toString());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));

@@ -16,7 +16,7 @@ public class DriveForwardWithVisionInput extends CommandBase {
   private final DoubleSupplier m_throttleInput;
 
   private final PIDController strafePIDController =
-      new PIDController(0.1, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
+      new PIDController(0.075, SWERVE_DRIVE.kI_Y, SWERVE_DRIVE.kD_Y);
 
   public DriveForwardWithVisionInput(
       SwerveDrive swerveDrive, Vision vision, DoubleSupplier throttleInput) {

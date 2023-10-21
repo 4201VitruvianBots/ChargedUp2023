@@ -96,8 +96,8 @@ public final class Constants {
     public static final double kMaxReverseOutput = -0.45;
 
     // PID
-    public static final double kMaxVel = Units.inchesToMeters(238);
-    public static final double kMaxAccel = Units.inchesToMeters(520);
+    public static final double kMaxVel = Units.inchesToMeters(1000);
+    public static final double kMaxAccel = Units.inchesToMeters(1800);
     public static final int kSlotIdx = 0;
     public static final int kPIDLoopIdx = 0;
     public static final int kTimeoutMs = 0;
@@ -109,7 +109,7 @@ public final class Constants {
     public static final double kV = 20.0; // 12.57;
     public static final double kA = 0.02; // 0.04;
 
-    public static final double kP = 0.05;
+    public static final double kP = 0.06;
     public static final double kI = 0.00;
     public static final double kD = 0.00;
 
@@ -127,11 +127,11 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(24.0)),
-      SCORE_MID_CUBE(Units.inchesToMeters(30.0)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(44.0)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(45.0)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(34.34)),
+      SCORE_MID_CONE(Units.inchesToMeters(24.030800)),
+      SCORE_MID_CUBE(Units.inchesToMeters(26.890057)),
+      SCORE_HIGH_CONE(Units.inchesToMeters(44.816762)),
+      SCORE_HIGH_CUBE(Units.inchesToMeters(45.087556)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(33.69)),
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
@@ -216,7 +216,7 @@ public final class Constants {
       HOLDING_CONE(0.2),
       SCORING_CONE(-0.8),
       INTAKING_CUBE(-0.8),
-      HOLDING_CUBE(-0.3),
+      HOLDING_CUBE(-0.1),
       SCORING_CUBE(0.8);
 
       private final double value;
@@ -424,8 +424,8 @@ public final class Constants {
     // public static final double kMaxFastVel = Units.degreesToRadians(400 * 1.25);
     // public static final double kMaxFastAccel = Units.degreesToRadians(290 * 1.25);
 
-    public static final double kMaxVel = Units.degreesToRadians(720);
-    public static final double kMaxAccel = Units.degreesToRadians(250);
+    public static final double kMaxVel = Units.degreesToRadians(2000);
+    public static final double kMaxAccel = Units.degreesToRadians(1000);
 
     public static final TrapezoidProfile.Constraints m_constraints =
         new TrapezoidProfile.Constraints(kMaxVel, kMaxAccel);
@@ -435,9 +435,9 @@ public final class Constants {
     public static final double FFkV = 1.6;
     public static final double kA = 0.02;
 
-    public static final double kP = 0.04;
+    public static final double kP = 0.085;
     public static final double kI = 0.0;
-    public static final double kD = 1.0;
+    public static final double kD = 13;
 
     public static final double kMaxPercentOutput = 1.0;
     public static final double kSetpointMultiplier = Units.degreesToRadians(60.0);
@@ -446,15 +446,15 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(98.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(16)),
+      INTAKING_LOW_CONE(Units.degreesToRadians(20.5)),
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(150.5)),
-      SCORE_MID_CUBE(Units.degreesToRadians(132.0)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(151.5)),
-      SCORE_HIGH_CUBE(Units.degreesToRadians(147.0)),
-      INTAKING_EXTENDED_CONE(Units.degreesToRadians(121.3)),
+      SCORE_MID_CONE(Units.degreesToRadians(160.523643)),
+      SCORE_MID_CUBE(Units.degreesToRadians(163.425064)),
+      SCORE_HIGH_CONE(Units.degreesToRadians(146.489296)),
+      SCORE_HIGH_CUBE(Units.degreesToRadians(165.329990)),
+      INTAKING_EXTENDED_CONE(Units.degreesToRadians(140.5)),
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
@@ -629,8 +629,8 @@ public final class Constants {
       WAIT_TO_PLACE_CUBE(1),
       WAIT_TO_PLACE_CUBE_MID(0.7), // good
 
-      SCORING_CONE(0.65), // good
-      SCORING_CUBE(0.65), // good
+      SCORING_CONE(0.75), // good
+      SCORING_CUBE(0.75), // good
 
       STOW_HIGH_CONE(1.1), // 1.1 // good
       STOW_HIGH_CUBE(1.1), // 1.1
