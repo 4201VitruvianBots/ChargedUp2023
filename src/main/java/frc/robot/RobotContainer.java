@@ -243,6 +243,7 @@ public class RobotContainer implements AutoCloseable {
       SmartDashboard.putData(new ToggleWristTestMode(m_wrist, m_stateHandler));
       SmartDashboard.putData(new ToggleTestIntakeState(m_stateHandler));
       SmartDashboard.putData(new ToggleSmartScoring(m_stateHandler));
+      SmartDashboard.putData(new ToggleStateHandlerTestMode(m_stateHandler));
     }
     initTestController();
   }

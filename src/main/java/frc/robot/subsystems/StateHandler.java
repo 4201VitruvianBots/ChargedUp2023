@@ -58,7 +58,7 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private boolean m_smartScoringEnabled;
   private boolean m_canScore;
   private boolean m_isOnTarget;
-
+  private boolean m_isAutoStowEnabled = true;
   private final Timer m_inactiveTimer = new Timer();
   private boolean inactiveTimerEnabled = false;
   private double timestamp;
@@ -252,6 +252,14 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
   public void disable() {
     m_isStateHandlerEnabled = false;
+  }
+
+  public boolean getisAutostowedEnabled() {
+    return m_isAutoStowEnabled;
+  }
+
+  public void setIsAutoStowedEnabled(boolean enabled) {
+    m_isAutoStowEnabled = enabled;
   }
 
   public boolean getIsStateHandlerEnabled() {
@@ -562,23 +570,24 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     zoneAdvancement();
 
     // If no user input for more than one second, then reset elevator to stowed
-    if (!DriverStation.isAutonomous()) {
-      if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
-          && !inactiveTimerEnabled) {
-        inactiveTimerEnabled = true;
-        timestamp = m_inactiveTimer.get();
-      } else if (inactiveTimerEnabled
-          && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
-        inactiveTimerEnabled = false;
-        timestamp = 0;
-      }
-      if (inactiveTimerEnabled) {
-        if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
-          setDesiredSetpoint(SETPOINT.STOWED);
+    if (m_isAutoStowEnabled) {
+      if (!DriverStation.isAutonomous()) {
+        if ((!m_elevator.isUserControlled() && !m_wrist.isUserControlled())
+            && !inactiveTimerEnabled) {
+          inactiveTimerEnabled = true;
+          timestamp = m_inactiveTimer.get();
+        } else if (inactiveTimerEnabled
+            && (m_elevator.isUserControlled() || m_wrist.isUserControlled())) {
+          inactiveTimerEnabled = false;
+          timestamp = 0;
+        }
+        if (inactiveTimerEnabled) {
+          if (m_inactiveTimer.get() - timestamp > 1 && timestamp != 0) {
+            setDesiredSetpoint(SETPOINT.STOWED);
+          }
         }
       }
     }
-
     //    if (m_intake.getRetractIntake()) {
     //      var retractCmd = new SetSetpoint(this, m_elevator, m_wrist, SETPOINT.STOWED);
     //      retractCmd.schedule();
