@@ -4,16 +4,23 @@
 
 package frc.robot.commands.swerve;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.SwerveDrive;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ToogleSwerveTestMode extends SequentialCommandGroup {
   /** Creates a new ToogleSwerveTestMode. */
-  public ToogleSwerveTestMode() {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+  private final SwerveDrive m_swerveDrive;
+
+  public ToogleSwerveTestMode(SwerveDrive swerveDriveSubsystem) {
+    m_swerveDrive = swerveDriveSubsystem;
+    addRequirements(m_swerveDrive);
+    addCommands(
+        new SwerveSetTest(swerveDriveSubsystem),
+        new SetSwerveNeutralMode(swerveDriveSubsystem, NeutralMode.Brake)
+            .andThen(() -> swerveDriveSubsystem.drive(0, 0, 0, false, false)));
   }
 }

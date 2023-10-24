@@ -51,6 +51,7 @@ import frc.robot.commands.swerve.ResetOdometry;
 import frc.robot.commands.swerve.SetRollOffset;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.commands.swerve.SetSwerveNeutralMode;
+import frc.robot.commands.swerve.ToogleSwerveTestMode;
 import frc.robot.commands.wrist.*;
 import frc.robot.simulation.FieldSim;
 import frc.robot.simulation.MemoryLog;
@@ -232,6 +233,7 @@ public class RobotContainer implements AutoCloseable {
 
     // Add Smartdashboard Buttons
     SmartDashboard.putData(new ResetOdometry(m_swerveDrive));
+    SmartDashboard.putData(new ToogleSwerveTestMode(m_swerveDrive));
     SmartDashboard.putData(new SetSwerveNeutralMode(m_swerveDrive, NeutralMode.Coast));
     SmartDashboard.putData(new SetRollOffset(m_swerveDrive));
     SmartDashboard.putData(new ZeroAllSensors(m_swerveDrive, m_elevator, m_wrist));
