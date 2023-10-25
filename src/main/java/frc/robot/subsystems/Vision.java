@@ -18,6 +18,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -587,7 +588,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         });
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    // updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
+    updateVisionPose(CAMERA_SERVER.BACK_LIMELIGHT, DriverStation.getAlliance());
     // searchLimelightPipeline(CAMERA_SERVER.INTAKE);
     updatePipeline();
     // searchforCube(CAMERA_SERVER.INTAKE, 1.0);
