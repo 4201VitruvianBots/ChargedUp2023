@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
@@ -206,25 +207,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     }
   }
 
-  public Pose2d getBotPose(DriverStation.Alliance allianceColor){
-    switch (allianceColor) {
-      case Red:
-        return LimelightHelpers.getBotPose2d_wpiRed(CAMERA_SERVER.INTAKE.toString());
-      default:
-      case Blue:
-        return LimelightHelpers.getBotPose2d_wpiBlue(CAMERA_SERVER.INTAKE.toString());
-    }
-  }
 
-  public double[] getBotPoseArray(DriverStation.Alliance allianceColor) {
-    switch (allianceColor) {
-      case Red:
-        return LimelightHelpers.getBotPose_wpiRed(CAMERA_SERVER.INTAKE.toString());
-      default:
-      case Blue:
-        return LimelightHelpers.getBotPose_wpiBlue(CAMERA_SERVER.INTAKE.toString());
-    }
-  }
+
+  
 
   /*
    * Target Area (0% of image to 100% of image)
@@ -444,7 +429,17 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public Pose2d getRobotPose2d(CAMERA_SERVER location) {
     double[] pose = getBotPose(location);
     return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[5]));
+    
   }
+  public Pose2d getRobotPose2d_Blue() {
+    double[] pose_blue = LimelightHelpers.getBotPose_wpiBlue("limelight");
+    return new Pose2d(pose_blue[0], pose_blue[1], Rotation2d.fromDegrees(pose_blue[5]));
+  }
+  public Pose2d getRobotPose2d_Red() {
+    double[] pose_red = LimelightHelpers.getBotPose_wpiRed("limelight");
+    return new Pose2d(pose_red[0], pose_red[1], Rotation2d.fromDegrees(pose_red[5]));
+  }
+
 
   public Pose2d[] getRobotPoses2d(CAMERA_SERVER location) {
     Pose2d[] poseArray = {defaultPose};
@@ -532,12 +527,28 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     return tags;
   }
 
-  private void updateVisionPose(CAMERA_SERVER location) {
-    if (getValidTarget(location))
+  private void updateVisionPose(CAMERA_SERVER location, DriverStation.Alliance allianceColor) {
+    if (getValidTarget(location)){
+      switch (allianceColor) {
+
+        case Blue:
+        m_swerveDrive
+        .getOdometry()
+        .addVisionMeasurement(getRobotPose2d_Blue(), getDetectionTimestamp(location));
+ 
+        default:
+        case Red:
       m_swerveDrive
           .getOdometry()
-          .addVisionMeasurement(getRobotPose2d(location), getDetectionTimestamp(location));
+          .addVisionMeasurement(getRobotPose2d_Red(), getDetectionTimestamp(location));
+   
+
+   
+      }
+    }
   }
+
+
 
   private void logData() {
     limelightTargetValid.append(getValidTargetType(CAMERA_SERVER.INTAKE));
@@ -549,12 +560,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updateSmartDashboard() {
     SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
-    SmartDashboard.putString("Bot Pose", getBotPose(DriverStation.getAlliance()).toString());
-    SmartDashboard.putString("Bot Pose Array", getBotPoseArray(DriverStation.getAlliance()).toString());
-  }
+}
 
   @Override
   public void periodic() {
+
+    
+
     m_leftLocalizerPositionPub.set(
         new double[] {
           VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
