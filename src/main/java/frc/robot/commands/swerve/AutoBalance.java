@@ -23,7 +23,7 @@ public class AutoBalance extends CommandBase {
   private double m_output = 0;
 
   /**
-   * Creates a new ExampleCommand.
+   * Creates a new ExampleCommand.\
    *
    * @param swerveDriveSubsystem The subsystem used by this command.
    */

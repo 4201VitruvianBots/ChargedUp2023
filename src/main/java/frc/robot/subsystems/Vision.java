@@ -51,6 +51,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
   private final NetworkTable m_fLocalizer;
+  private final NetworkTable m_backlimelight;
 
   private final DoubleArrayPublisher m_leftLocalizerPositionPub;
   private final DoubleArrayPublisher m_rightLocalizerPositionPub;
@@ -90,6 +91,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
     m_fLocalizer = NetworkTableInstance.getDefault().getTable("fusedLocalizer");
+    m_backlimelight = NetworkTableInstance.getDefault().getTable("blimelight");
+    
 
     PortForwarder.add(5800, CAMERA_SERVER.INTAKE.toString(), 5800);
     PortForwarder.add(5801, CAMERA_SERVER.INTAKE.toString(), 5801);
@@ -101,6 +104,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     PortForwarder.add(5807, CAMERA_SERVER.LEFT_LOCALIZER.toString(), 5801);
     PortForwarder.add(5808, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5800);
     PortForwarder.add(5809, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5801);
+    
+    PortForwarder.add(5810, CAMERA_SERVER.BACK_LIMELIGHT.toString(), 5800);
+    PortForwarder.add(5811, CAMERA_SERVER.BACK_LIMELIGHT.toString(), 5801);
 
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
@@ -143,6 +149,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     return getValidTargetType(location) > 0;
   }
 
+  public double[] getValidAprilTagTarget(CAMERA_SERVER location) {
+    return getAprilTagIds(location);
+  }
+
   /*
    * Whether the limelight has any valid targets (0 or 1)
    */
@@ -156,6 +166,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         return m_rightLocalizer.getEntry("tv").getDouble(0);
       case FUSED_LOCALIZER:
         return m_fLocalizer.getEntry("tv").getDouble(0);
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tv").getDouble(0);
       default:
         return 0;
     }
@@ -167,6 +179,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         return m_leftLocalizer.getEntry("tid").getDoubleArray(defaultDoubleArray);
       case RIGHT_LOCALIZER:
         return m_rightLocalizer.getEntry("tid").getDoubleArray(defaultDoubleArray);
+
+        case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tid").getDoubleArray(defaultDoubleArray);
       default:
         return defaultDoubleArray;
     }
@@ -203,10 +218,25 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNt.getEntry("tl").getDouble(0);
+
+        
       default:
         return 0;
     }
   }
+
+  public double getCameraLatencyAprilTags(CAMERA_SERVER location) {
+    switch (location) {
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tl").getDouble(0);
+
+        
+      default:
+        return 0;
+    }
+  }
+
+  
 
 
 
@@ -248,12 +278,22 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updatePipeline() {
     m_intakeNt.getEntry("pipeline").setDouble(1);
+    m_backlimelight.getEntry("pipeline").setDouble(1);
   }
 
   public double getPipeline(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNt.getEntry("pipeline").getDouble(0);
+      default:
+        return 0.0;
+    }
+  }
+
+  public double getPipelineAprilTags(CAMERA_SERVER location) {
+    switch (location) {
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("pipeline").getDouble(0);
       default:
         return 0.0;
     }
@@ -416,6 +456,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public double getDetectionTimestamp(CAMERA_SERVER location) {
     switch (location) {
+      
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("timestamp").getDouble(0);
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("timestamp").getDouble(0);
       case RIGHT_LOCALIZER:
@@ -588,8 +631,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         });
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    updateVisionPose(CAMERA_SERVER.BACK_LIMELIGHT, DriverStation.getAlliance());
+  
+
     // searchLimelightPipeline(CAMERA_SERVER.INTAKE);
+    updateVisionPose(CAMERA_SERVER.BACK_LIMELIGHT, DriverStation.getAlliance());
     updatePipeline();
     // searchforCube(CAMERA_SERVER.INTAKE, 1.0);
     logData();
