@@ -76,7 +76,7 @@ public class SubstationThree extends SequentialCommandGroup {
             new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 1),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1.25),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
