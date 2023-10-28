@@ -364,7 +364,7 @@ public final class Constants {
     }
 
     public enum CAMERA_SERVER {
-      INTAKE("10.42.1.11"),
+      INTAKE("10.42.1.38"),
       LEFT_LOCALIZER("10.42.1.12"),
       RIGHT_LOCALIZER("10.42.1.13"),
       FUSED_LOCALIZER("10.42.1.12");
