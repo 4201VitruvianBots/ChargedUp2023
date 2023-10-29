@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -90,6 +91,8 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
   private double m_simYaw;
   private double m_simRoll;
   private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
+
+  private DoubleArrayPublisher odometryPublisher;
 
   private boolean useHeadingTarget = false;
   private double m_desiredHeadingRadians;
@@ -372,6 +375,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     odometryXPub = swerveTab.getDoubleTopic("Odometry X").publish();
     odometryYPub = swerveTab.getDoubleTopic("Odometry Y").publish();
     odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
+    odometryPublisher = swerveTab.getDoubleArrayTopic("Odometry").publish();
   }
 
   private void updateSmartDashboard() {
@@ -382,7 +386,10 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     pitchPub.set(getPitchDegrees());
     rollPub.set(getRollDegrees() + getRollOffsetDegrees());
     yawPub.set(getHeadingDegrees());
-
+    odometryPublisher.set(
+        new double[] {
+          getPoseMeters().getX(), getPoseMeters().getY(), getPoseMeters().getRotation().getDegrees()
+        });
     if (!m_limitCanUtil) {
       // Put not required stuff here
       odometryXPub.set(getOdometry().getEstimatedPosition().getX());

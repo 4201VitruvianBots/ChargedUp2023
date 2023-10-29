@@ -7,7 +7,7 @@ package frc.robot.commands.elevator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.CONTROL_MODE;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.elevator.Elevator;
 import java.util.function.DoubleSupplier;
 
 public class RunElevatorJoystick extends CommandBase {

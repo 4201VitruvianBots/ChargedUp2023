@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.elevator.Elevator;
 
 /*scoring = flashing white, intakingCube = blue,
 intakingCone = orange, locked on = flashing green,

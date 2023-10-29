@@ -11,8 +11,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELEVATOR;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StateHandler;
+import frc.robot.subsystems.elevator.Elevator;
 
 public class RunElevatorTestMode extends CommandBase {
   private final Elevator m_elevator;

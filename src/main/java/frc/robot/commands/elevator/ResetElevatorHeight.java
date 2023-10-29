@@ -6,7 +6,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.elevator.Elevator;
 
 public class ResetElevatorHeight extends CommandBase {
   /** Creates a new IncrementElevatorHeight. */
