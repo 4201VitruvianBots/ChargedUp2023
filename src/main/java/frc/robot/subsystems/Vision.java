@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.PortForwarder;
@@ -17,15 +18,26 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants;
+import frc.robot.Constants.CONSTANTS;
+import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.VISION;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.Constants.VISION.PIPELINE;
+import frc.robot.libraries.LimelightHelpers;
+
+import java.sql.Driver;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.DoubleStream;
+
+import org.apache.commons.lang3.ObjectUtils.Null;
 
 public class Vision extends SubsystemBase implements AutoCloseable {
   private final SwerveDrive m_swerveDrive;
@@ -39,6 +51,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   private final NetworkTable m_leftLocalizer;
   private final NetworkTable m_rightLocalizer;
   private final NetworkTable m_fLocalizer;
+  private final NetworkTable m_backlimelight;
 
   private final DoubleArrayPublisher m_leftLocalizerPositionPub;
   private final DoubleArrayPublisher m_rightLocalizerPositionPub;
@@ -78,6 +91,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     m_leftLocalizer = NetworkTableInstance.getDefault().getTable("lLocalizer");
     m_rightLocalizer = NetworkTableInstance.getDefault().getTable("rLocalizer");
     m_fLocalizer = NetworkTableInstance.getDefault().getTable("fusedLocalizer");
+    m_backlimelight = NetworkTableInstance.getDefault().getTable("blimelight");
+    
 
     PortForwarder.add(5800, CAMERA_SERVER.INTAKE.toString(), 5800);
     PortForwarder.add(5801, CAMERA_SERVER.INTAKE.toString(), 5801);
@@ -89,6 +104,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     PortForwarder.add(5807, CAMERA_SERVER.LEFT_LOCALIZER.toString(), 5801);
     PortForwarder.add(5808, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5800);
     PortForwarder.add(5809, CAMERA_SERVER.RIGHT_LOCALIZER.toString(), 5801);
+    
+    PortForwarder.add(5810, CAMERA_SERVER.BACK_LIMELIGHT.toString(), 5800);
+    PortForwarder.add(5811, CAMERA_SERVER.BACK_LIMELIGHT.toString(), 5801);
 
     limelightTargetValid = new DoubleLogEntry(logger, "/vision/limelight_tv");
     leftLocalizerTargetValid = new DoubleLogEntry(logger, "/vision/fLocalizer_tv");
@@ -131,6 +149,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     return getValidTargetType(location) > 0;
   }
 
+  public double[] getValidAprilTagTarget(CAMERA_SERVER location) {
+    return getAprilTagIds(location);
+  }
+
   /*
    * Whether the limelight has any valid targets (0 or 1)
    */
@@ -144,6 +166,8 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         return m_rightLocalizer.getEntry("tv").getDouble(0);
       case FUSED_LOCALIZER:
         return m_fLocalizer.getEntry("tv").getDouble(0);
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tv").getDouble(0);
       default:
         return 0;
     }
@@ -155,6 +179,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         return m_leftLocalizer.getEntry("tid").getDoubleArray(defaultDoubleArray);
       case RIGHT_LOCALIZER:
         return m_rightLocalizer.getEntry("tid").getDoubleArray(defaultDoubleArray);
+
+        case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tid").getDoubleArray(defaultDoubleArray);
       default:
         return defaultDoubleArray;
     }
@@ -191,10 +218,29 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     switch (location) {
       case INTAKE:
         return m_intakeNt.getEntry("tl").getDouble(0);
+
+        
       default:
         return 0;
     }
   }
+
+  public double getCameraLatencyAprilTags(CAMERA_SERVER location) {
+    switch (location) {
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("tl").getDouble(0);
+
+        
+      default:
+        return 0;
+    }
+  }
+
+  
+
+
+
+  
 
   /*
    * Target Area (0% of image to 100% of image)
@@ -232,12 +278,22 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updatePipeline() {
     m_intakeNt.getEntry("pipeline").setDouble(1);
+    m_backlimelight.getEntry("pipeline").setDouble(1);
   }
 
   public double getPipeline(CAMERA_SERVER location) {
     switch (location) {
       case INTAKE:
         return m_intakeNt.getEntry("pipeline").getDouble(0);
+      default:
+        return 0.0;
+    }
+  }
+
+  public double getPipelineAprilTags(CAMERA_SERVER location) {
+    switch (location) {
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("pipeline").getDouble(0);
       default:
         return 0.0;
     }
@@ -400,6 +456,9 @@ public class Vision extends SubsystemBase implements AutoCloseable {
    */
   public double getDetectionTimestamp(CAMERA_SERVER location) {
     switch (location) {
+      
+      case BACK_LIMELIGHT:
+        return m_backlimelight.getEntry("timestamp").getDouble(0);
       case LEFT_LOCALIZER:
         return m_leftLocalizer.getEntry("timestamp").getDouble(0);
       case RIGHT_LOCALIZER:
@@ -414,7 +473,17 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   public Pose2d getRobotPose2d(CAMERA_SERVER location) {
     double[] pose = getBotPose(location);
     return new Pose2d(pose[0], pose[1], Rotation2d.fromDegrees(pose[5]));
+    
   }
+  public Pose2d getRobotPose2d_Blue() {
+    double[] pose_blue = LimelightHelpers.getBotPose_wpiBlue("limelight");
+    return new Pose2d(pose_blue[0], pose_blue[1], Rotation2d.fromDegrees(pose_blue[5]));
+  }
+  public Pose2d getRobotPose2d_Red() {
+    double[] pose_red = LimelightHelpers.getBotPose_wpiRed("limelight");
+    return new Pose2d(pose_red[0], pose_red[1], Rotation2d.fromDegrees(pose_red[5]));
+  }
+
 
   public Pose2d[] getRobotPoses2d(CAMERA_SERVER location) {
     Pose2d[] poseArray = {defaultPose};
@@ -502,12 +571,28 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     return tags;
   }
 
-  private void updateVisionPose(CAMERA_SERVER location) {
-    if (getValidTarget(location))
+  private void updateVisionPose(CAMERA_SERVER location, DriverStation.Alliance allianceColor) {
+    if (getValidTarget(location)){
+      switch (allianceColor) {
+
+        case Blue:
+        m_swerveDrive
+        .getOdometry()
+        .addVisionMeasurement(getRobotPose2d_Blue(), getDetectionTimestamp(location));
+ 
+        default:
+        case Red:
       m_swerveDrive
           .getOdometry()
-          .addVisionMeasurement(getRobotPose2d(location), getDetectionTimestamp(location));
+          .addVisionMeasurement(getRobotPose2d_Red(), getDetectionTimestamp(location));
+   
+
+   
+      }
+    }
   }
+
+
 
   private void logData() {
     limelightTargetValid.append(getValidTargetType(CAMERA_SERVER.INTAKE));
@@ -519,10 +604,13 @@ public class Vision extends SubsystemBase implements AutoCloseable {
 
   public void updateSmartDashboard() {
     SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
-  }
+}
 
   @Override
   public void periodic() {
+
+    
+
     m_leftLocalizerPositionPub.set(
         new double[] {
           VISION.LOCALIZER_CAMERA_POSITION[0].getTranslation().getX(),
@@ -543,8 +631,10 @@ public class Vision extends SubsystemBase implements AutoCloseable {
         });
     // This method will be called once per scheduler run
     updateSmartDashboard();
-    // updateVisionPose(CAMERA_SERVER.FUSED_LOCALIZER);
+  
+
     // searchLimelightPipeline(CAMERA_SERVER.INTAKE);
+    updateVisionPose(CAMERA_SERVER.BACK_LIMELIGHT, DriverStation.getAlliance());
     updatePipeline();
     // searchforCube(CAMERA_SERVER.INTAKE, 1.0);
     logData();
