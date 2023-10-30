@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.STATE_HANDLER.SETPOINT;
 import frc.robot.subsystems.StateHandler;

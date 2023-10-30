@@ -17,16 +17,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
@@ -108,12 +109,12 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry positionDegreesEntry =
       new DoubleLogEntry(log, "/wrist/positionDegrees");
 
-  private DoublePublisher kCommandedAngleDegreesPub;
-  private DoublePublisher kDesiredAngleDegreesPub;
-  private DoublePublisher kCurrentAngleDegreesPub;
-  private DoublePublisher currentTrapezoidVelocity;
-  private DoublePublisher currentTrapezoidAcceleration;
-  private StringPublisher currentCommandStatePub;
+  private AdvantageDoublePublisher kCommandedAngleDegreesPub;
+  private AdvantageDoublePublisher kDesiredAngleDegreesPub;
+  private AdvantageDoublePublisher kCurrentAngleDegreesPub;
+  private AdvantageDoublePublisher currentTrapezoidVelocity;
+  private AdvantageDoublePublisher currentTrapezoidAcceleration;
+  private AdvantageStringPublisher currentCommandStatePub;
 
   /** Creates a new Wrist. */
   public Wrist(Intake intake) {
@@ -360,27 +361,27 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
-    kCommandedAngleDegreesPub = wristTab.getDoubleTopic("Commanded Angle Degrees").publish();
-    kDesiredAngleDegreesPub = wristTab.getDoubleTopic("Desired Angle Degrees").publish();
-    kCurrentAngleDegreesPub = wristTab.getDoubleTopic("Current Angle Degrees").publish();
-    currentCommandStatePub = wristTab.getStringTopic("Command State").publish();
-    currentTrapezoidAcceleration = wristTab.getDoubleTopic("Trapezoid Acceleration").publish();
-    currentTrapezoidVelocity = wristTab.getDoubleTopic("Trapezoid Velocity").publish();
+    kCommandedAngleDegreesPub.publish(wristTab, "Commanded Angle Degrees");
+    kDesiredAngleDegreesPub.publish(wristTab, "Desired Angle Degrees");
+    kCurrentAngleDegreesPub.publish(wristTab, "Current Angle Degrees");
+    currentCommandStatePub.publish(wristTab, "Command State");
+    currentTrapezoidAcceleration.publish(wristTab, "Trapezoid Acceleration");
+    currentTrapezoidVelocity.publish(wristTab, "Trapezoid Velocity");
 
-    SmartDashboard.putNumber("WristPercentOutput", getPercentOutput());
-    SmartDashboard.putNumber("Wrist m_setpoint", m_setpoint.position * 180 / Math.PI);
-    SmartDashboard.putNumber(
+    LoggingUtils.putNumber("WristPercentOutput", getPercentOutput());
+    LoggingUtils.putNumber("Wrist m_setpoint", m_setpoint.position * 180 / Math.PI);
+    LoggingUtils.putNumber(
         "Wrist Error", (m_setpoint.position * 180 / Math.PI) - getPositionDegrees());
   }
 
   public void updateSmartDashboard() {
-    SmartDashboard.putString("Wrist Closed Loop", getClosedLoopControlMode().name());
-    SmartDashboard.putNumber("Wrist Angles Degrees", getPositionDegrees());
-    SmartDashboard.putNumber("Wrist m_setpoint", m_setpoint.position * 180 / Math.PI);
-    SmartDashboard.putNumber(
+    LoggingUtils.putString("Wrist Closed Loop", getClosedLoopControlMode().name());
+    LoggingUtils.putNumber("Wrist Angles Degrees", getPositionDegrees());
+    LoggingUtils.putNumber("Wrist m_setpoint", m_setpoint.position * 180 / Math.PI);
+    LoggingUtils.putNumber(
         "Wrist Error", (m_setpoint.position * 180 / Math.PI) - getPositionDegrees());
 
-    SmartDashboard.putNumber("WristPercentOutput", getPercentOutput());
+    LoggingUtils.putNumber("WristPercentOutput", getPercentOutput());
     currentCommandStatePub.set(getClosedLoopControlMode().toString());
     kDesiredAngleDegreesPub.set(Units.radiansToDegrees(getDesiredPositionRadians()));
     kCurrentAngleDegreesPub.set(getPositionDegrees());

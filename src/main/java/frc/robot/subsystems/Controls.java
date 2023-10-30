@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.networktables.BooleanPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -10,8 +10,8 @@ import frc.robot.Constants;
 
 @SuppressWarnings("RedundantThrows")
 public class Controls extends SubsystemBase implements AutoCloseable {
-  private StringPublisher allianceString;
-  private BooleanPublisher allianceBoolean;
+  private AdvantageStringPublisher allianceString;
+  private AdvantageBooleanPublisher allianceBoolean;
 
   private boolean isInit;
   private static DriverStation.Alliance allianceColor = DriverStation.Alliance.Red;
@@ -55,8 +55,8 @@ public class Controls extends SubsystemBase implements AutoCloseable {
   private void initSmartDashboard() {
     var controlsTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
-    allianceString = controlsTab.getStringTopic("alliance_string").publish();
-    allianceBoolean = controlsTab.getBooleanTopic("Alliance").publish();
+    allianceString.publish(controlsTab, "alliance_string");
+    allianceBoolean.publish(controlsTab, "Alliance");
     try {
       controlsTab.getStringTopic("Robot Name").publish().set(Constants.robotName);
     } catch (Exception m_ignored) {

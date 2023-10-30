@@ -61,7 +61,7 @@ public class SetSwerveDriveBalance extends CommandBase {
           new SwerveModuleState(output, Rotation2d.fromDegrees(0)),
         };
     m_swerveDrive.setSwerveModuleStates(states, false);
-    //    SmartDashboard.putNumber("Balance output", output);
+    //    LoggingUtils.putNumber("Balance output", output);
   }
 
   // Called once the command ends or is interrupted.

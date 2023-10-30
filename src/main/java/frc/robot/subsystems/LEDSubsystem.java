@@ -20,13 +20,14 @@ import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.ctre.phoenix.led.TwinkleOffAnimation;
 import com.ctre.phoenix.led.TwinkleOffAnimation.TwinkleOffPercent;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
@@ -44,7 +45,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
   private boolean setSolid;
   private Animation m_toAnimate = null;
 
-  private final StringPublisher ledStatePub;
+  private AdvantageStringPublisher ledStatePub;
 
   // Mechanism2d visualization setup
   public final Mechanism2d m_mech2d = new Mechanism2d(1, 1);
@@ -75,7 +76,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_7_TopPixels, 255);
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
-    ledStatePub = nt_instance.getStringTopic("LED State").publish();
+    ledStatePub.publish(nt_instance, "LED State");
 
     // Initialize visualization
     m_ligament2d.setLineWeight(1000); // making the line THICK
@@ -219,7 +220,7 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
       }
     }
 
-    SmartDashboard.putString("LED Mode", currentRobotState.toString());
+    LoggingUtils.putString("LED Mode", currentRobotState.toString());
   }
 
   @SuppressWarnings("RedundantThrows")

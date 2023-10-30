@@ -6,13 +6,14 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -47,8 +48,8 @@ public class DistanceSensor implements AutoCloseable {
   private Object obj;
 
   // Shuffleboard setup
-  StringPublisher rawStringPub;
-  DoublePublisher sensor1InchPub,
+  AdvantageStringPublisher rawStringPub;
+  AdvantageDoublePublisher sensor1InchPub,
       sensor2InchPub,
       sensor3InchPub,
       sensor1MMPub,
@@ -213,15 +214,15 @@ public class DistanceSensor implements AutoCloseable {
   private void initSmartDashboard() {
     var distanceSensorTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("DistanceSensor");
-    rawStringPub = distanceSensorTab.getStringTopic("Raw String Data").publish();
-    sensor1MMPub = distanceSensorTab.getDoubleTopic("Sensor1MM").publish();
-    sensor2MMPub = distanceSensorTab.getDoubleTopic("Sensor2MM").publish();
-    sensor3MMPub = distanceSensorTab.getDoubleTopic("Sensor3MM").publish();
-    sensor1InchPub = distanceSensorTab.getDoubleTopic("Sensor1Inches").publish();
-    sensor2InchPub = distanceSensorTab.getDoubleTopic("Sensor2Inches").publish();
-    sensor3InchPub = distanceSensorTab.getDoubleTopic("Sensor3Inches").publish();
-    coneInchesPub = distanceSensorTab.getDoubleTopic("ConeDistanceInches").publish();
-    cubeInchesPub = distanceSensorTab.getDoubleTopic("CubeDistanceInches").publish();
+    rawStringPub.publish(distanceSensorTab, "Raw String Data");
+    sensor1MMPub.publish(distanceSensorTab, "Sensor1MM");
+    sensor2MMPub.publish(distanceSensorTab, "Sensor2MM");
+    sensor3MMPub.publish(distanceSensorTab, "Sensor3MM");
+    sensor1InchPub.publish(distanceSensorTab, "Sensor1Inches");
+    sensor2InchPub.publish(distanceSensorTab, "Sensor2Inches");
+    sensor3InchPub.publish(distanceSensorTab, "Sensor3Inches");
+    coneInchesPub.publish(distanceSensorTab, "ConeDistanceInches");
+    cubeInchesPub.publish(distanceSensorTab, "CubeDistanceInches");
 
     coneIntakeLig.setColor(new Color8Bit(128, 0, 0));
     cubeIntakeLig.setColor(new Color8Bit(128, 0, 0));

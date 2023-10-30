@@ -13,16 +13,17 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
@@ -71,15 +72,15 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   private double m_currentTimestamp = 0;
 
   // Shuffleboard setup
-  private DoublePublisher kHeightPub,
+  private AdvantageDoublePublisher kHeightPub,
       kEncoderCountsPub,
       kDesiredHeightPub,
       kHeightInchesPub,
       kPercentOutputPub,
       kCurrentAccelPub,
       kCurrentVelPub;
-  private StringPublisher kClosedLoopModePub, currentCommandStatePub;
-  private BooleanPublisher lowerLimitSwitchPub;
+  private AdvantageStringPublisher kClosedLoopModePub, currentCommandStatePub;
+  private AdvantageBooleanPublisher lowerLimitSwitchPub;
 
   // Logging setup
   private final DataLog log = DataLogManager.getLog();
@@ -272,16 +273,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
-    kHeightPub = elevatorNtTab.getDoubleTopic("Height Meters").publish();
-    kHeightInchesPub = elevatorNtTab.getDoubleTopic("Height Inches").publish();
-    kDesiredHeightPub = elevatorNtTab.getDoubleTopic("Desired Height Inches").publish();
-    kEncoderCountsPub = elevatorNtTab.getDoubleTopic("Encoder Counts").publish();
-    kPercentOutputPub = elevatorNtTab.getDoubleTopic("Percent Output").publish();
-    kClosedLoopModePub = elevatorNtTab.getStringTopic("Closed-Loop Mode").publish();
-    currentCommandStatePub = elevatorNtTab.getStringTopic("Current Command State").publish();
-    lowerLimitSwitchPub = elevatorNtTab.getBooleanTopic("Lower Limit Switch").publish();
-    kCurrentAccelPub = elevatorNtTab.getDoubleTopic("Current Acceleration").publish();
-    kCurrentVelPub = elevatorNtTab.getDoubleTopic("Current Velocity").publish();
+    kHeightPub.publish(elevatorNtTab, "Height Meters");
+    // kHeightPub.publish(elevatorNtTab, "Height Meters");
+    kHeightInchesPub.publish(elevatorNtTab, "Height Inches");
+    kDesiredHeightPub.publish(elevatorNtTab, "Desired Height Inches");
+    kEncoderCountsPub.publish(elevatorNtTab, "Encoder Counts");
+    kPercentOutputPub.publish(elevatorNtTab, "Percent Output");
+    kClosedLoopModePub.publish(elevatorNtTab, "Closed-Loop Mode");
+    currentCommandStatePub.publish(elevatorNtTab, "Current Command State");
+    lowerLimitSwitchPub.publish(elevatorNtTab, "Lower Limit Switch");
+    kCurrentAccelPub.publish(elevatorNtTab, "Current Acceleration");
+    kCurrentVelPub.publish(elevatorNtTab, "Current Velocity");
 
     try {
       elevatorNtTab.getDoubleTopic("setpoint").publish().set(0);
@@ -291,8 +293,8 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateShuffleboard() {
-    SmartDashboard.putBoolean("Elevator Closed Loop", isClosedLoopControl());
-    SmartDashboard.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
+    LoggingUtils.putBoolean("Elevator Closed Loop", isClosedLoopControl());
+    LoggingUtils.putNumber("Elevator Height Inches", Units.metersToInches(getHeightMeters()));
 
     kClosedLoopModePub.set(getClosedLoopControlMode().toString());
     kHeightInchesPub.set(Units.metersToInches(getHeightMeters()));

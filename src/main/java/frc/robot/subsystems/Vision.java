@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -518,7 +519,7 @@ public class Vision extends SubsystemBase implements AutoCloseable {
   }
 
   public void updateSmartDashboard() {
-    SmartDashboard.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
+    LoggingUtils.putNumber("pipeline", getPipeline(CAMERA_SERVER.INTAKE));
   }
 
   @Override

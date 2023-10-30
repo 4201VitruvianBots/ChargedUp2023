@@ -19,8 +19,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -81,8 +81,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private final DoubleLogEntry moduleTurnCurrentEntry;
   private final DoubleLogEntry moduleDriveCurrentEntry;
 
-  private DoublePublisher moduleMotorHeadingPub, moduleEncoderHeadingPub;
-  private BooleanPublisher moduleEncoderHealthPub;
+  private AdvantageDoublePublisher moduleMotorHeadingPub, moduleEncoderHeadingPub;
+  private AdvantageBooleanPublisher moduleEncoderHealthPub;
 
   public SwerveModule(
       SWERVE_MODULE_POSITION modulePosition,
@@ -234,16 +234,13 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private void initSmartDashboard() {
     var moduleTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
-    moduleEncoderHeadingPub =
-        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Heading").publish();
+    moduleEncoderHeadingPub.publish(moduleTab, "Module (" + m_moduleNumber + ") Encoder Heading");
     moduleTab
         .getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset")
         .publish()
         .set(m_angleOffset);
-    moduleEncoderHealthPub =
-        moduleTab.getBooleanTopic("Module (" + m_moduleNumber + ") Encoder Health").publish();
-    moduleMotorHeadingPub =
-        moduleTab.getDoubleTopic("Module (" + m_moduleNumber + ") Motor Heading").publish();
+    moduleEncoderHealthPub.publish(moduleTab, "Module (" + m_moduleNumber + ") Encoder Health");
+    moduleMotorHeadingPub.publish(moduleTab, "Module (" + m_moduleNumber + ") Motor Heading");
   }
 
   private void updateSmartDashboard() {

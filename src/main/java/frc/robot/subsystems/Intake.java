@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
@@ -170,9 +170,9 @@ public class Intake extends SubsystemBase implements AutoCloseable {
   public void initSmartDashboard() {}
 
   public void updateSmartDashboard() {
-    SmartDashboard.putString("Intake State", getIntakeState().toString());
-    SmartDashboard.putNumber("Intake Velocity", getIntakeVelocity());
-    SmartDashboard.putNumber("Intake Percent Output", intakeMotor.getMotorOutputPercent());
+    LoggingUtils.putString("Intake State", getIntakeState().toString());
+    LoggingUtils.putNumber("Intake Velocity", getIntakeVelocity());
+    LoggingUtils.putNumber("Intake Percent Output", intakeMotor.getMotorOutputPercent());
   }
 
   public void updateLog() {

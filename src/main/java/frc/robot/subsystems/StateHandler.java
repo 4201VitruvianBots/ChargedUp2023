@@ -14,10 +14,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StringPublisher;
+import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
@@ -102,10 +103,10 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
   private final SendableChooser<SCORING_STATE> m_scoringStateChooser = new SendableChooser<>();
   private boolean m_testScoringState;
 
-  private StringPublisher m_currentStatePub, m_desiredStatePub, m_currentZonePub;
+  private AdvantageStringPublisher m_currentStatePub, m_desiredStatePub, m_currentZonePub;
 
-  private BooleanPublisher m_isEnabledPub;
-  private DoublePublisher m_elevatorHeightMetersPub,
+  private AdvantageBooleanPublisher m_isEnabledPub;
+  private AdvantageDoublePublisher m_elevatorHeightMetersPub,
       m_elevatorLowerLimitPub,
       m_elevatorUpperLimitPub,
       m_wristAnglePub,
@@ -510,20 +511,20 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
 
     }
 
-    m_isEnabledPub = stateHandlerTab.getBooleanTopic("isEnabled").publish();
-    m_currentStatePub = stateHandlerTab.getStringTopic("currentState").publish();
-    m_desiredStatePub = stateHandlerTab.getStringTopic("desiredState").publish();
-    m_currentZonePub = stateHandlerTab.getStringTopic("currentZone").publish();
-    m_elevatorHeightMetersPub = stateHandlerTab.getDoubleTopic("elevatorHeightInches").publish();
-    m_elevatorLowerLimitPub = stateHandlerTab.getDoubleTopic("elevatorMinLimit").publish();
-    m_elevatorUpperLimitPub = stateHandlerTab.getDoubleTopic("elevatorMaxLimit").publish();
-    m_wristAnglePub = stateHandlerTab.getDoubleTopic("wristAngleDegrees").publish();
-    m_wristLowerLimitPub = stateHandlerTab.getDoubleTopic("wristMinLimit").publish();
-    m_wristUpperLimitPub = stateHandlerTab.getDoubleTopic("wristMaxLimit").publish();
+    m_isEnabledPub.publish(stateHandlerTab, "isEnabled");
+    m_currentStatePub.publish(stateHandlerTab, "currentState");
+    m_desiredStatePub.publish(stateHandlerTab, "desiredState");
+    m_currentZonePub.publish(stateHandlerTab, "currentZone");
+    m_elevatorHeightMetersPub.publish(stateHandlerTab, "elevatorHeightInches");
+    m_elevatorLowerLimitPub.publish(stateHandlerTab, "elevatorMinLimit");
+    m_elevatorUpperLimitPub.publish(stateHandlerTab, "elevatorMaxLimit");
+    m_wristAnglePub.publish(stateHandlerTab, "wristAngleDegrees");
+    m_wristLowerLimitPub.publish(stateHandlerTab, "wristMinLimit");
+    m_wristUpperLimitPub.publish(stateHandlerTab, "wristMaxLimit");
   }
 
   private void updateSmartDashboard() {
-    SmartDashboard.putString("Superstructure State", getCurrentState().toString());
+    LoggingUtils.putString("Superstructure State", getCurrentState().toString());
     m_isEnabledPub.set(getIsStateHandlerEnabled());
     m_currentStatePub.set(getCurrentDisplayedState().toString());
     m_desiredStatePub.set(getDesiredState().toString());

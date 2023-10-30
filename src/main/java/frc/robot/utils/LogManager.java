@@ -4,7 +4,7 @@
 
 package frc.robot.utils;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import frc.robot.Constants.UTIL;
 import frc.robot.commands.util.DeleteAllLogs;
 import java.io.File;
@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class LogManager {

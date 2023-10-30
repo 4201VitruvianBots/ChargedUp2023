@@ -23,13 +23,14 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.DoublePublisher;
+import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
@@ -90,7 +91,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
   private double m_simYaw;
   private double m_simRoll;
-  private DoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
+  private AdvantageDoublePublisher pitchPub, rollPub, yawPub, odometryXPub, odometryYPub, odometryYawPub;
 
   private DoubleArrayPublisher odometryPublisher;
 
@@ -369,19 +370,19 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
     var swerveTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
-    pitchPub = swerveTab.getDoubleTopic("Pitch").publish();
-    rollPub = swerveTab.getDoubleTopic("Roll").publish();
-    yawPub = swerveTab.getDoubleTopic("Yaw").publish();
-    odometryXPub = swerveTab.getDoubleTopic("Odometry X").publish();
-    odometryYPub = swerveTab.getDoubleTopic("Odometry Y").publish();
-    odometryYawPub = swerveTab.getDoubleTopic("Odometry Yaw").publish();
+    pitchPub.publish(swerveTab, "Pitch");
+    rollPub.publish(swerveTab, "Roll");
+    yawPub.publish(swerveTab, "Yaw");
+    odometryXPub.publish(swerveTab, "Odometry X");
+    odometryYPub.publish(swerveTab, "Odometry Y");
+    odometryYawPub.publish(swerveTab, "Odometry Yaw");
     odometryPublisher = swerveTab.getDoubleArrayTopic("Odometry").publish();
   }
 
   private void updateSmartDashboard() {
-    SmartDashboard.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
-    SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
-    SmartDashboard.putNumber("Roll Offset", m_rollOffset);
+    LoggingUtils.putNumber("gyro " + m_pigeon + " heading", getHeadingDegrees());
+    LoggingUtils.putBoolean("Swerve Module Init Status", getModuleInitStatus());
+    LoggingUtils.putNumber("Roll Offset", m_rollOffset);
 
     pitchPub.set(getPitchDegrees());
     rollPub.set(getRollDegrees() + getRollOffsetDegrees());

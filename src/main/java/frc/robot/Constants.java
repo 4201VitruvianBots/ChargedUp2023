@@ -19,7 +19,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
 import java.net.InetAddress;
@@ -741,7 +741,7 @@ public final class Constants {
       STATE_HANDLER.limitCanUtilization = false;
     }
 
-    SmartDashboard.putString("Robot Name", robotName);
+    LoggingUtils.putString("Robot Name", robotName);
   }
 
   public static final String alphaRobotMAC = "00:80:2F:25:BC:FD";
