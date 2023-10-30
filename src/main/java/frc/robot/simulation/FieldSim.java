@@ -15,13 +15,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VISION.CAMERA_SERVER;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.utils.ChargedUpNodeMask;
 import frc.robot.utils.ModuleMap;
+import frc.robot.utils.logging.LoggingUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -19,9 +19,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.utils.ModuleMap;
+import frc.robot.utils.logging.LoggingUtils;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Map;

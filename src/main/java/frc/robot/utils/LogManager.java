@@ -4,9 +4,10 @@
 
 package frc.robot.utils;
 
-import frc.robot.utils.LoggingUtils;
 import frc.robot.Constants.UTIL;
 import frc.robot.commands.util.DeleteAllLogs;
+import frc.robot.utils.logging.LoggingUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

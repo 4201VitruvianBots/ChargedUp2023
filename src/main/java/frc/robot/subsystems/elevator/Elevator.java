@@ -13,21 +13,21 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
-import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CONTROL_MODE;
 import frc.robot.Constants.ELEVATOR;
 import frc.robot.Constants.ELEVATOR.THRESHOLD;
+import frc.robot.utils.logging.AdvantageBooleanPublisher;
+import frc.robot.utils.logging.AdvantageDoublePublisher;
+import frc.robot.utils.logging.AdvantageStringPublisher;
+import frc.robot.utils.logging.LoggingUtils;
 import frc.robot.Constants.STATE_HANDLER;
 
 public class Elevator extends SubsystemBase implements AutoCloseable {

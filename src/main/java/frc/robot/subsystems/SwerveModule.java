@@ -19,8 +19,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
-import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -35,6 +33,8 @@ import frc.robot.Constants.SWERVE_DRIVE;
 import frc.robot.Constants.SWERVE_DRIVE.SWERVE_MODULE_POSITION;
 import frc.robot.Constants.SWERVE_MODULE;
 import frc.robot.utils.CtreUtils;
+import frc.robot.utils.logging.AdvantageBooleanPublisher;
+import frc.robot.utils.logging.AdvantageDoublePublisher;
 
 public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private final SWERVE_MODULE_POSITION m_modulePosition;

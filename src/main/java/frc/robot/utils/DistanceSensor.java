@@ -6,20 +6,21 @@ package frc.robot.utils;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import frc.robot.utils.LoggingUtils.AdvantageDoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.utils.LoggingUtils;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Constants.INTAKE;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
 import frc.robot.Constants.INTAKE.SENSOR_STATUS;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.simulation.SimConstants;
+import frc.robot.utils.logging.AdvantageDoublePublisher;
+import frc.robot.utils.logging.AdvantageStringPublisher;
+import frc.robot.utils.logging.LoggingUtils;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.DatagramPacket;

@@ -1,12 +1,12 @@
 package frc.robot.subsystems;
 
-import frc.robot.utils.LoggingUtils.AdvantageBooleanPublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.utils.LoggingUtils.AdvantageStringPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utils.logging.AdvantageBooleanPublisher;
+import frc.robot.utils.logging.AdvantageStringPublisher;
 
 @SuppressWarnings("RedundantThrows")
 public class Controls extends SubsystemBase implements AutoCloseable {
