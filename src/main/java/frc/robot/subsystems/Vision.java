@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.subsystems.StateHandler.m_chassisRoot2d;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -571,27 +572,40 @@ public class Vision extends SubsystemBase implements AutoCloseable {
     return tags;
   }
 
+  public List<AprilTag> getAprilTags(CAMERA_SERVER location) {
+    double[] tagIds = getAprilTagIds(location);
+    List<AprilTag> tags = new ArrayList<>();
+    for (double tagId : tagIds) {
+      // Assuming Pose3d is a class representing the pose of the AprilTag.
+      // You need to replace it with the correct class from your implementation.
+      Pose3d pose = new Pose3d(); // Create a new Pose3d object.
+      tags.add(new AprilTag((int) tagId, pose));
+    }
+    return tags;
+  }
+  
   private void updateVisionPose(CAMERA_SERVER location, DriverStation.Alliance allianceColor) {
     if (getValidTarget(location)){
-      switch (allianceColor) {
-
-        case Blue:
-        m_swerveDrive
-        .getOdometry()
-        .addVisionMeasurement(getRobotPose2d_Blue(), getDetectionTimestamp(location));
- 
-        default:
-        case Red:
-      m_swerveDrive
-          .getOdometry()
-          .addVisionMeasurement(getRobotPose2d_Red(), getDetectionTimestamp(location));
-   
-
-   
+      // Assuming getAprilTags() returns a list of AprilTags detected
+      List<AprilTag> detectedTags = getAprilTags(location);
+  
+      if (detectedTags.size() > 1){
+        switch (allianceColor) {
+          case Blue:
+            m_swerveDrive
+            .getOdometry()
+            .addVisionMeasurement(getRobotPose2d_Blue(), getDetectionTimestamp(location));
+            break;
+          default:
+          case Red:
+            m_swerveDrive
+            .getOdometry()
+            .addVisionMeasurement(getRobotPose2d_Red(), getDetectionTimestamp(location));
+            break;
+        }
       }
     }
   }
-
 
 
   private void logData() {
