@@ -168,7 +168,8 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
                 m_stateHandler::isScoring));
-    xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
+                xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
+
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
@@ -358,7 +359,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "SubstationThree",
         new SubstationThree(
-            "SubstationTwoPickup",
+            "SubstationThree",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
