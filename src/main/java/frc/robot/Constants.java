@@ -131,7 +131,7 @@ public final class Constants {
       SCORE_MID_CUBE(Units.inchesToMeters(26.890057)),
       SCORE_HIGH_CONE(Units.inchesToMeters(44.816762)),
       SCORE_HIGH_CUBE(Units.inchesToMeters(45.087556)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(33.69)),
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(35.42176682)), //33.69
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
@@ -455,7 +455,7 @@ public final class Constants {
       SCORE_MID_CUBE(Units.degreesToRadians(163.425064)),
       SCORE_HIGH_CONE(Units.degreesToRadians(146.489296)),
       SCORE_HIGH_CUBE(Units.degreesToRadians(165.329990)),
-      INTAKING_EXTENDED_CONE(Units.degreesToRadians(140.5)),
+      INTAKING_EXTENDED_CONE(Units.degreesToRadians(145.5)),//140.5
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
