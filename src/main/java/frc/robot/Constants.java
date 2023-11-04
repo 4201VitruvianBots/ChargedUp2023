@@ -127,11 +127,11 @@ public final class Constants {
       SCORE_LOW_REVERSE(Units.inchesToMeters(0.0)),
       SCORE_LOW_CONE(Units.inchesToMeters(4.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.inchesToMeters(24.030800)),
-      SCORE_MID_CUBE(Units.inchesToMeters(26.890057)),
-      SCORE_HIGH_CONE(Units.inchesToMeters(44.816762)),
-      SCORE_HIGH_CUBE(Units.inchesToMeters(45.087556)),
-      INTAKING_EXTENDED_CONE(Units.inchesToMeters(34.79)), //33.69
+      SCORE_MID_CONE(Units.inchesToMeters(23.2)),//24.030800
+      SCORE_MID_CUBE(Units.inchesToMeters(23.03)),//26.890057
+      SCORE_HIGH_CONE(Units.inchesToMeters(42.56)),//44.816762
+      SCORE_HIGH_CUBE(Units.inchesToMeters(43.93)),//45.087556
+      INTAKING_EXTENDED_CONE(Units.inchesToMeters(39.8)), //34.79
       INTAKING_EXTENDED_CUBE(Units.inchesToMeters(38.5));
 
       private final double value;
@@ -364,7 +364,7 @@ public final class Constants {
     }
 
     public enum CAMERA_SERVER {
-      INTAKE("10.42.1.24"),
+      INTAKE("10.42.1.214"),
       BACK_LIMELIGHT("10.42.1.38"),
       LEFT_LOCALIZER("10.42.1.12"),
       RIGHT_LOCALIZER("10.42.1.13"),
@@ -446,16 +446,16 @@ public final class Constants {
     public enum SETPOINT {
       // Units are in Radians
       STOWED(Units.degreesToRadians(98.0)),
-      INTAKING_LOW_CUBE(Units.degreesToRadians(-13.5)),
-      INTAKING_LOW_CONE(Units.degreesToRadians(20.5)),
+      INTAKING_LOW_CUBE(Units.degreesToRadians(-15)),//-13.5
+      INTAKING_LOW_CONE(Units.degreesToRadians(15.05)), //20.5
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
-      SCORE_MID_CONE(Units.degreesToRadians(160.523643)),
-      SCORE_MID_CUBE(Units.degreesToRadians(163.425064)),
-      SCORE_HIGH_CONE(Units.degreesToRadians(146.489296)),
-      SCORE_HIGH_CUBE(Units.degreesToRadians(165.329990)),
-      INTAKING_EXTENDED_CONE(Units.degreesToRadians(141)),//140.5
+      SCORE_MID_CONE(Units.degreesToRadians(162.7)),//160.523643
+      SCORE_MID_CUBE(Units.degreesToRadians(161.83)),//163.425064
+      SCORE_HIGH_CONE(Units.degreesToRadians(157.9)),//146.489296
+      SCORE_HIGH_CUBE(Units.degreesToRadians(161.2)),//165.329990
+      INTAKING_EXTENDED_CONE(Units.degreesToRadians(158.1)),//141
       INTAKING_EXTENDED_CUBE(SCORE_HIGH_CUBE.get());
 
       private final double value;
