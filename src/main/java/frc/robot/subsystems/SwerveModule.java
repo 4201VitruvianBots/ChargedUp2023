@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.STATE_HANDLER;
 import frc.robot.Constants.SWERVE_DRIVE;
@@ -252,6 +253,8 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
     if (!m_limitCanUtil) {
       moduleEncoderHeadingPub.set(m_angleEncoder.getAbsolutePosition());
     }
+
+    SmartDashboard.putNumber(getModulePosition() + " turn angle error", m_lastAngle - getHeadingRotation2d().getDegrees());
   }
 
   public void updateLog() {

@@ -287,8 +287,8 @@ public final class Constants {
         new SwerveDriveKinematics(
             ModuleMap.orderedValues(kModuleTranslations, new Translation2d[0]));
 
-    public static double frontLeftCANCoderOffset = 125.068;
-    public static double frontRightCANCoderOffset = 171.475 ;
+    public static double frontLeftCANCoderOffset = 16.436;
+    public static double frontRightCANCoderOffset = 171.475;
     public static double backLeftCANCoderOffset = 190.635;
     public static double backRightCANCoderOffset = 31.904;
 
@@ -350,7 +350,7 @@ public final class Constants {
     public enum PIPELINE {
       DEFAULT(0),
       CUBE(1),
-      CONE(2);
+      CONE(2);  
 
       private final int pipeline;
 
@@ -447,7 +447,7 @@ public final class Constants {
       // Units are in Radians
       STOWED(Units.degreesToRadians(98.0)),
       INTAKING_LOW_CUBE(Units.degreesToRadians(-15)),//-13.5
-      INTAKING_LOW_CONE(Units.degreesToRadians(15.05)), //20.5
+      INTAKING_LOW_CONE(Units.degreesToRadians(15.05)), //20.5, works 15.5
       SCORE_LOW_REVERSE(Units.degreesToRadians(-14.0)),
       SCORE_LOW_CONE(Units.degreesToRadians(120.0)),
       SCORE_LOW_CUBE(SCORE_LOW_CONE.get()),
@@ -680,7 +680,7 @@ public final class Constants {
 
   private static void initBeta() {
     robotName = "Beta";
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 125.068; // 85.957;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 16.436; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 171.475 ; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 190.635; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 31.113;
@@ -689,7 +689,7 @@ public final class Constants {
   private static void initAlpha() {
     robotName = "Alpha";
 
-    SWERVE_DRIVE.frontLeftCANCoderOffset = 126.914; // 85.957;
+    SWERVE_DRIVE.frontLeftCANCoderOffset = 16.436; // 85.957;
     SWERVE_DRIVE.frontRightCANCoderOffset = 171.475 ; // 41.748;
     SWERVE_DRIVE.backLeftCANCoderOffset = 191.25; // 261.475;
     SWERVE_DRIVE.backRightCANCoderOffset = 34.7605;

@@ -116,8 +116,7 @@ public class SubstationThree extends SequentialCommandGroup {
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
                     new AutoSetIntakeSetpoint(
                         intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
-                        new AutoSetIntakeSetpoint(
-                            intake, INTAKE_STATE.NONE, vision, swerveDrive),
+        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }
