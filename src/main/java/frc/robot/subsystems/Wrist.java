@@ -361,6 +361,13 @@ public class Wrist extends SubsystemBase implements AutoCloseable {
     NetworkTable wristTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Wrist");
 
+    kCommandedAngleDegreesPub = new AdvantageDoublePublisher();
+    kDesiredAngleDegreesPub = new AdvantageDoublePublisher();
+    kCurrentAngleDegreesPub = new AdvantageDoublePublisher();
+    currentTrapezoidVelocity = new AdvantageDoublePublisher();
+    currentTrapezoidAcceleration = new AdvantageDoublePublisher();
+    currentCommandStatePub = new AdvantageStringPublisher();
+
     kCommandedAngleDegreesPub.publish(wristTab, "Commanded Angle Degrees");
     kDesiredAngleDegreesPub.publish(wristTab, "Desired Angle Degrees");
     kCurrentAngleDegreesPub.publish(wristTab, "Current Angle Degrees");

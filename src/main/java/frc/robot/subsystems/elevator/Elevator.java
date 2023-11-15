@@ -273,6 +273,17 @@ public class Elevator extends SubsystemBase implements AutoCloseable {
     NetworkTable elevatorNtTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Elevator");
 
+    kHeightPub = new AdvantageDoublePublisher();
+    kHeightInchesPub = new AdvantageDoublePublisher();
+    kDesiredHeightPub = new AdvantageDoublePublisher();
+    kEncoderCountsPub = new AdvantageDoublePublisher();
+    kPercentOutputPub = new AdvantageDoublePublisher();
+    kClosedLoopModePub = new AdvantageStringPublisher();
+    currentCommandStatePub = new AdvantageStringPublisher();
+    lowerLimitSwitchPub = new AdvantageBooleanPublisher();
+    kCurrentAccelPub = new AdvantageDoublePublisher();
+    kCurrentVelPub = new AdvantageDoublePublisher();
+
     kHeightPub.publish(elevatorNtTab, "Height Meters");
     // kHeightPub.publish(elevatorNtTab, "Height Meters");
     kHeightInchesPub.publish(elevatorNtTab, "Height Inches");

@@ -371,6 +371,13 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
 
     var swerveTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    pitchPub = new AdvantageDoublePublisher();
+    rollPub = new AdvantageDoublePublisher();
+    yawPub = new AdvantageDoublePublisher();
+    odometryXPub = new AdvantageDoublePublisher();
+    odometryYPub = new AdvantageDoublePublisher();
+    odometryYawPub = new AdvantageDoublePublisher();
+    
     pitchPub.publish(swerveTab, "Pitch");
     rollPub.publish(swerveTab, "Roll");
     yawPub.publish(swerveTab, "Yaw");

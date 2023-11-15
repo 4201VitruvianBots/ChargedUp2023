@@ -12,10 +12,7 @@ import edu.wpi.first.networktables.NetworkTable;
 public class AdvantageDoublePublisher {
     DoublePublisher m_publisher;
     String m_path;
-
-    public AdvantageDoublePublisher() {
-
-    }
+    
     public void publish(NetworkTable tab, String topicName) {
         m_publisher = tab.getDoubleTopic(topicName).publish();
         m_path = (tab.getPath() + "/" + topicName).replaceAll("\\s+","");

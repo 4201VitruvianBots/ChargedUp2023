@@ -234,6 +234,10 @@ public class SwerveModule extends SubsystemBase implements AutoCloseable {
   private void initSmartDashboard() {
     var moduleTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Swerve");
+    moduleEncoderHeadingPub = new AdvantageDoublePublisher();
+    moduleEncoderHealthPub = new AdvantageBooleanPublisher();
+    moduleMotorHeadingPub = new AdvantageDoublePublisher();
+    
     moduleEncoderHeadingPub.publish(moduleTab, "Module (" + m_moduleNumber + ") Encoder Heading");
     moduleTab
         .getDoubleTopic("Module (" + m_moduleNumber + ") Encoder Offset")

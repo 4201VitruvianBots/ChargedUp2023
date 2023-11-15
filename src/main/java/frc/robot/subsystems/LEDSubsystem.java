@@ -76,6 +76,8 @@ public class LEDSubsystem extends SubsystemBase implements AutoCloseable {
     m_candle.setStatusFramePeriod(CANdleStatusFrame.CANdleStatusFrame_Status_7_TopPixels, 255);
     var nt_instance =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
+    ledStatePub = new AdvantageStringPublisher();
+    
     ledStatePub.publish(nt_instance, "LED State");
 
     // Initialize visualization

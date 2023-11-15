@@ -511,7 +511,17 @@ public class StateHandler extends SubsystemBase implements AutoCloseable {
     } catch (Exception m_ignored) {
 
     }
-
+    m_isEnabledPub = new AdvantageBooleanPublisher();
+    m_currentStatePub = new AdvantageStringPublisher();
+    m_desiredStatePub = new AdvantageStringPublisher();
+    m_currentZonePub = new AdvantageStringPublisher();
+    m_elevatorHeightMetersPub = new AdvantageDoublePublisher();
+    m_elevatorLowerLimitPub = new AdvantageDoublePublisher();
+    m_elevatorUpperLimitPub = new AdvantageDoublePublisher();
+    m_wristAnglePub = new AdvantageDoublePublisher();
+    m_wristLowerLimitPub = new AdvantageDoublePublisher();
+    m_wristUpperLimitPub = new AdvantageDoublePublisher();
+    
     m_isEnabledPub.publish(stateHandlerTab, "isEnabled");
     m_currentStatePub.publish(stateHandlerTab, "currentState");
     m_desiredStatePub.publish(stateHandlerTab, "desiredState");

@@ -215,6 +215,7 @@ public class DistanceSensor implements AutoCloseable {
   private void initSmartDashboard() {
     var distanceSensorTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("DistanceSensor");
+
     rawStringPub.publish(distanceSensorTab, "Raw String Data");
     sensor1MMPub.publish(distanceSensorTab, "Sensor1MM");
     sensor2MMPub.publish(distanceSensorTab, "Sensor2MM");

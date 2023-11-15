@@ -55,6 +55,9 @@ public class Controls extends SubsystemBase implements AutoCloseable {
   private void initSmartDashboard() {
     var controlsTab =
         NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Controls");
+    allianceString = new AdvantageStringPublisher();
+    allianceBoolean = new AdvantageBooleanPublisher();
+    
     allianceString.publish(controlsTab, "alliance_string");
     allianceBoolean.publish(controlsTab, "Alliance");
     try {
