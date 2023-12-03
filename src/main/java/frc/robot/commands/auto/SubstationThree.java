@@ -73,10 +73,10 @@ public class SubstationThree extends SequentialCommandGroup {
 
         /** Runs Path with Intaking cube during */
         new ParallelDeadlineGroup(
-            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + 1),
+            new WaitCommand(m_trajectories.get(0).getTotalTimeSeconds() + .8),
             new DelayedInterruptingCommand(
                 swerveCommands.get(0),
-                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1.25),
+                new DriveForwardWithVisionInput(swerveDrive, vision, () -> 1.5),
                 1.25,
                 () -> vision.getValidTarget(CAMERA_SERVER.INTAKE)),
             new SequentialCommandGroup(
@@ -116,6 +116,7 @@ public class SubstationThree extends SequentialCommandGroup {
                     new AutoSetSetpoint(stateHandler, elevator, wrist, SETPOINT.INTAKING_LOW_CUBE),
                     new AutoSetIntakeSetpoint(
                         intake, INTAKE_STATE.INTAKING_CUBE, vision, swerveDrive)))),
+        new AutoSetIntakeSetpoint(intake, INTAKE_STATE.NONE, vision, swerveDrive),
         new SetSwerveNeutralMode(swerveDrive, NeutralMode.Brake)
             .andThen(() -> swerveDrive.drive(0, 0, 0, false, false)));
   }

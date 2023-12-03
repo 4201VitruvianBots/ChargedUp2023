@@ -379,6 +379,12 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putBoolean("Swerve Module Init Status", getModuleInitStatus());
     SmartDashboard.putNumber("Roll Offset", m_rollOffset);
 
+    // // Print module positional error
+    // for (SwerveModule module : ModuleMap.orderedValuesList(m_swerveModules)) {
+    //   SmartDashboard.putNumber(module.getModulePosition() + " positional error X", module.getModulePose().getX() - /* something here? */);
+    //   SmartDashboard.putNumber(module.getModulePosition() + " positional error Y", module.getModulePose().getY() /* something here? */);
+    // }
+    
     pitchPub.set(getPitchDegrees());
     rollPub.set(getRollDegrees() + getRollOffsetDegrees());
     yawPub.set(getHeadingDegrees());
@@ -388,6 +394,7 @@ public class SwerveDrive extends SubsystemBase implements AutoCloseable {
       odometryXPub.set(getOdometry().getEstimatedPosition().getX());
       odometryYPub.set(getOdometry().getEstimatedPosition().getY());
       odometryYawPub.set(getOdometry().getEstimatedPosition().getRotation().getDegrees());
+      
     }
   }
 

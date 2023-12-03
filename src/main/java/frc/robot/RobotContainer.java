@@ -34,6 +34,7 @@ import frc.robot.commands.auto.CenterOneBalanceCross;
 import frc.robot.commands.auto.DriveForward;
 import frc.robot.commands.auto.HighConeTimerTest;
 import frc.robot.commands.auto.HighCubeTimerTest;
+import frc.robot.commands.auto.LimeLightTest;
 import frc.robot.commands.auto.MidCubeTimerTest;
 import frc.robot.commands.auto.SubstationThree;
 import frc.robot.commands.auto.SubstationTwoBalance;
@@ -167,7 +168,8 @@ public class RobotContainer implements AutoCloseable {
                 new SetIntakeState(m_intake, INTAKE_STATE.INTAKING_CUBE),
                 new SetIntakeState(m_intake, INTAKE_STATE.SCORING_CONE),
                 m_stateHandler::isScoring));
-    xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
+                xboxController.leftTrigger().onFalse(new SetIntakeState(m_intake, INTAKE_STATE.NONE));
+
     xboxController
         .rightTrigger(0.1)
         .whileTrue(
@@ -357,7 +359,7 @@ public class RobotContainer implements AutoCloseable {
     m_autoChooser.addOption(
         "SubstationThree",
         new SubstationThree(
-            "SubstationTwoPickup",
+            "SubstationThree",
             m_swerveDrive,
             m_fieldSim,
             m_wrist,
@@ -474,17 +476,17 @@ public class RobotContainer implements AutoCloseable {
     //     new JustBalance(
     //         "JustBalance", m_swerveDrive, m_fieldSim, m_wrist, m_intake, m_elevator, m_vision));
 
-    // m_autoChooser.addOption(
-    //     "Limelight Test",
-    //     new LimeLightTest(
-    //         "DriveForward",
-    //         m_swerveDrive,
-    //         m_fieldSim,
-    //         m_wrist,
-    //         m_intake,
-    //         m_vision,
-    //         m_elevator,
-    //         m_stateHandler));
+    m_autoChooser.addOption(
+        "Limelight Test",
+        new LimeLightTest(
+            "DriveForward",
+            m_swerveDrive,
+            m_fieldSim,
+            m_wrist,
+            m_intake,
+            m_vision,
+            m_elevator,
+            m_stateHandler));
 
     // m_autoChooser.addOption("AutoBalance", new AutoBalance(m_swerveDrive));
 
