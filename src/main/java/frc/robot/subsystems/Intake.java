@@ -173,6 +173,14 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     SmartDashboard.putString("Intake State", getIntakeState().toString());
     SmartDashboard.putNumber("Intake Velocity", getIntakeVelocity());
     SmartDashboard.putNumber("Intake Percent Output", intakeMotor.getMotorOutputPercent());
+
+    SmartDashboard.putNumber("Intake Bus Voltage", intakeMotor.getBusVoltage());
+    SmartDashboard.putNumber("Intake Error Derivative", intakeMotor.getErrorDerivative());
+    SmartDashboard.putNumber("Intake Intergal Accumulator", intakeMotor.getIntegralAccumulator());
+    SmartDashboard.putNumber("Intake Motor Output Voltage", intakeMotor.getMotorOutputVoltage());
+    SmartDashboard.putNumber("Intake Sensor Velocity", intakeMotor.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("Intake Stator Current", intakeMotor.getStatorCurrent());
+    SmartDashboard.putNumber("Intake Supply Current", intakeMotor.getSupplyCurrent());
   }
 
   public void updateLog() {
