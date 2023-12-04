@@ -8,6 +8,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
+import frc.robot.Constants.LED.ANIMATION_TYPE;
+import frc.robot.Constants.LED;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -59,6 +61,9 @@ public class GetSubsystemStates extends CommandBase {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
       }
     } else {
+      if (m_intake.getSupplyCurrent() >= 3.5 && m_intake.getSupplyCurrent() <= 5) {
+        m_led.setPattern(null, 0, 0.5, ANIMATION_TYPE.Rainbow);
+      } else {
       switch (m_stateHandler.getDesiredState()) {
           // TODO: Add states for substation intaking
         case INTAKE_LOW_CONE:
@@ -106,6 +111,7 @@ public class GetSubsystemStates extends CommandBase {
           break;
       }
     }
+  }
   }
 
   // Called once the command ends or is interrupted.
