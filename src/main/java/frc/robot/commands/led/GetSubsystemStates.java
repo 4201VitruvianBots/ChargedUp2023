@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.Constants.LED.ANIMATION_TYPE;
 import frc.robot.Constants.LED;
+import frc.robot.Constants.LED.ANIMATION_TYPE;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -61,58 +61,58 @@ public class GetSubsystemStates extends CommandBase {
         m_led.expressState(SUPERSTRUCTURE_STATE.DISABLED);
       }
     } else {
-      if (m_intake.getSupplyCurrent() >= 3.5 && m_intake.getSupplyCurrent() <= 5) {
-        m_led.setPattern(null, 0, 0.5, ANIMATION_TYPE.Rainbow);
+      if (m_intake.getSupplyCurrent() >= 4 && m_intake.getSupplyCurrent() <= 5) {
+        m_led.setPattern(LED.pink, 0, 0.5, ANIMATION_TYPE.Rainbow);
       } else {
-      switch (m_stateHandler.getDesiredState()) {
-          // TODO: Add states for substation intaking
-        case INTAKE_LOW_CONE:
-          if (isIntakingCone) {
-            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
-          } else {
+        switch (m_stateHandler.getDesiredState()) {
+            // TODO: Add states for substation intaking
+          case INTAKE_LOW_CONE:
+            if (isIntakingCone) {
+              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+            } else {
+              m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
+            }
+            break;
+          case INTAKE_LOW_CUBE:
+            if (isIntakingCube) {
+              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+            } else {
+              m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
+            }
+            break;
+          case ALPHA_ZONE:
+          case SCORE_LOW_REVERSE:
+          case SCORE_LOW:
+            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
+            break;
+          case SCORE_LOW_CONE:
             m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
-          }
-          break;
-        case INTAKE_LOW_CUBE:
-          if (isIntakingCube) {
-            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
-          } else {
+            break;
+          case SCORE_LOW_CUBE:
             m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
-          }
-          break;
-        case ALPHA_ZONE:
-        case SCORE_LOW_REVERSE:
-        case SCORE_LOW:
-          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
-          break;
-        case SCORE_LOW_CONE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
-          break;
-        case SCORE_LOW_CUBE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
-          break;
-        case BETA_ZONE:
-        case SCORE_MID_CONE:
-        case SCORE_MID_CUBE:
-        case SCORE_MID:
-          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
-          break;
-        case GAMMA_ZONE:
-        case INTAKE_EXTENDED:
-          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_EXTENDED);
-          break;
-        case SCORE_HIGH:
-        case SCORE_HIGH_CONE:
-        case SCORE_HIGH_CUBE:
-          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
-          break;
-        default:
-          m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
-          break;
-      }
+            break;
+          case BETA_ZONE:
+          case SCORE_MID_CONE:
+          case SCORE_MID_CUBE:
+          case SCORE_MID:
+            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
+            break;
+          case GAMMA_ZONE:
+          case INTAKE_EXTENDED:
+            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_EXTENDED);
+            break;
+          case SCORE_HIGH:
+          case SCORE_HIGH_CONE:
+          case SCORE_HIGH_CUBE:
+            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
+            break;
+          default:
+            m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
+            break;
+        }
+      }}
     }
-  }
-  }
+  
 
   // Called once the command ends or is interrupted.
   @Override
@@ -129,3 +129,4 @@ public class GetSubsystemStates extends CommandBase {
     return true;
   }
 }
+

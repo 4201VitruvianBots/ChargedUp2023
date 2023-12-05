@@ -199,12 +199,15 @@ public class Intake extends SubsystemBase implements AutoCloseable {
     updateIntakeState();
     // TODO: If the cube or cone distance sensors see a game object, run the intake intakeMotor to
     // hold the game piece in.
-     if (getSupplyCurrent() >= 3.5 && getSupplyCurrent() <= 5) {
+    if (getSupplyCurrent() >= 4 && getSupplyCurrent() <= 5) {
       setIntakingState(INTAKE_STATE.HOLDING_CONE);
-      
-    } else if(m_state == INTAKE_STATE.SCORING_CONE || m_state == INTAKE_STATE.SCORING_CUBE || m_state == INTAKE_STATE.INTAKING_CUBE || m_state == INTAKE_STATE.INTAKING_CONE ) {
+
+    } else if (m_state == INTAKE_STATE.SCORING_CONE
+        || m_state == INTAKE_STATE.SCORING_CUBE
+        || m_state == INTAKE_STATE.INTAKING_CUBE
+        || m_state == INTAKE_STATE.INTAKING_CONE) {
       setIntakingState(m_state);
-     }
+    }
   }
 
   @Override
