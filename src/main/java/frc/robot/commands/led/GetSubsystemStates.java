@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.INTAKE.INTAKE_STATE;
-import frc.robot.Constants.LED;
 import frc.robot.Constants.LED.ANIMATION_TYPE;
+import frc.robot.Constants.LED;
 import frc.robot.Constants.STATE_HANDLER.SUPERSTRUCTURE_STATE;
 import frc.robot.subsystems.*;
 
@@ -27,8 +27,6 @@ public class GetSubsystemStates extends CommandBase {
   private final Intake m_intake;
   private final StateHandler m_stateHandler;
   private final Wrist m_wrist;
-  private boolean isIntakingCone;
-  private boolean isIntakingCube;
 
   /** Sets the LED based on the subsystems' statuses */
   public GetSubsystemStates(
@@ -48,8 +46,6 @@ public class GetSubsystemStates extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isIntakingCone = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
-    isIntakingCube = m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE;
     // the prioritized state to be expressed to the LEDs
     // set in order of priority to be expressed from the least priority to the
     // highest priority
@@ -62,57 +58,57 @@ public class GetSubsystemStates extends CommandBase {
       }
     } else {
       if (m_intake.getSupplyCurrent() >= 4 && m_intake.getSupplyCurrent() <= 5) {
-        m_led.setPattern(LED.pink, 0, 0.5, ANIMATION_TYPE.Rainbow);
-      } else {
-        switch (m_stateHandler.getDesiredState()) {
-            // TODO: Add states for substation intaking
-          case INTAKE_LOW_CONE:
-            if (isIntakingCone) {
-              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
-            } else {
-              m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
-            }
-            break;
-          case INTAKE_LOW_CUBE:
-            if (isIntakingCube) {
-              m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
-            } else {
-              m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
-            }
-            break;
-          case ALPHA_ZONE:
-          case SCORE_LOW_REVERSE:
-          case SCORE_LOW:
-            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
-            break;
-          case SCORE_LOW_CONE:
+        m_led.setPattern(LED.pink, 0, 0.5, ANIMATION_TYPE.Rainbow);} 
+        else {
+      switch (m_stateHandler.getDesiredState()) {
+          // TODO: Add states for substation intaking
+        case INTAKE_LOW_CONE:
+          if (m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CONE) {
+            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CONE);
+          } else {
             m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
-            break;
-          case SCORE_LOW_CUBE:
+          }
+          break;
+        case INTAKE_LOW_CUBE:
+          if (m_intake.getIntakeState() == INTAKE_STATE.INTAKING_CUBE) {
+            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_LOW_CUBE);
+          } else {
             m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
-            break;
-          case BETA_ZONE:
-          case SCORE_MID_CONE:
-          case SCORE_MID_CUBE:
-          case SCORE_MID:
-            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
-            break;
-          case GAMMA_ZONE:
-          case INTAKE_EXTENDED:
-            m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_EXTENDED);
-            break;
-          case SCORE_HIGH:
-          case SCORE_HIGH_CONE:
-          case SCORE_HIGH_CUBE:
-            m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
-            break;
-          default:
-            m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
-            break;
-        }
-      }}
+          }
+          break;
+        case ALPHA_ZONE:
+        case SCORE_LOW_REVERSE:
+        case SCORE_LOW:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW);
+          break;
+        case SCORE_LOW_CONE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CONE);
+          break;
+        case SCORE_LOW_CUBE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_LOW_CUBE);
+          break;
+        case BETA_ZONE:
+        case SCORE_MID_CONE:
+        case SCORE_MID_CUBE:
+        case SCORE_MID:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_MID);
+          break;
+        case GAMMA_ZONE:
+        case INTAKE_EXTENDED:
+          m_led.expressState(SUPERSTRUCTURE_STATE.INTAKE_EXTENDED);
+          break;
+        case SCORE_HIGH:
+        case SCORE_HIGH_CONE:
+        case SCORE_HIGH_CUBE:
+          m_led.expressState(SUPERSTRUCTURE_STATE.SCORE_HIGH);
+          break;
+        default:
+          m_led.expressState(SUPERSTRUCTURE_STATE.ENABLED);
+          break;
+      }
     }
-  
+  }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -129,4 +125,3 @@ public class GetSubsystemStates extends CommandBase {
     return true;
   }
 }
-

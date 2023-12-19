@@ -203,9 +203,7 @@ public class Intake extends SubsystemBase implements AutoCloseable {
       setIntakingState(INTAKE_STATE.HOLDING_CONE);
 
     } else if (m_state == INTAKE_STATE.SCORING_CONE
-        || m_state == INTAKE_STATE.SCORING_CUBE
-        || m_state == INTAKE_STATE.INTAKING_CUBE
-        || m_state == INTAKE_STATE.INTAKING_CONE) {
+        || m_state == INTAKE_STATE.INTAKING_CUBE) {
       setIntakingState(m_state);
     }
   }
